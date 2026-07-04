@@ -83,7 +83,7 @@ const stars = Array.from({ length: 34 }, () => {
 });
 ---
 
-<section class="portal" data-portal data-mark-src={mark}>
+<section class="portal" data-portal data-mark-src={mark} data-loop-src={`${base}/media/home/portal-loop.mp4`}>
   <div class="portal-stage">
     <!-- 1 · the living world (still + ambient overlays; scales as one group) -->
     <div class="portal-world" data-portal-world>
@@ -102,9 +102,27 @@ const stars = Array.from({ length: 34 }, () => {
         />
       </picture>
 
-      <!-- LP-1 living portrait: additive light over the still, keyed to p.
-           Pure enhancement — the still below is the no-JS / reduced-motion /
-           swappable-media base; overlays degrade to a calm static night. -->
+      <!-- LP-1 living portrait, primary: the looping living-painting render
+           (seamless tail→head crossfade of the brand sting scene, ~13s ≤1MB).
+           No src in markup — the engine mounts it at idle on wide viewports
+           only, so no-JS / reduced-motion / save-data / mobile never download
+           a byte. Its first frame IS the poster still below, so the fade-in
+           is pixel-continuous. -->
+      <video
+        class="portal-loop"
+        data-portal-loop
+        muted
+        loop
+        playsinline
+        preload="none"
+        width="1280"
+        height="720"
+        aria-hidden="true"></video>
+
+      <!-- LP-1 living portrait, fallback: additive light over the still,
+           keyed to p. Runs when the video can't (mobile, save-data, autoplay
+           blocked, file missing) — the still below stays the no-JS /
+           reduced-motion / swappable-media base either way. -->
       <div class="portal-life" data-portal-life aria-hidden="true">
         <div class="portal-aurora"></div>
         <div class="portal-stars">
@@ -159,6 +177,7 @@ const stars = Array.from({ length: 34 }, () => {
     const params = new URLSearchParams(location.search);
     const stage = root.querySelector<HTMLElement>(".portal-stage")!;
     const worldEl = root.querySelector<HTMLElement>("[data-portal-world]")!;
+    const loopEl = root.querySelector<HTMLVideoElement>("[data-portal-loop]")!;
     const lifeEl = root.querySelector<HTMLElement>("[data-portal-life]")!;
     const voidEl = root.querySelector<HTMLElement>("[data-portal-void]")!;
     const windowEl = root.querySelector<HTMLElement>("[data-portal-window]")!;
@@ -195,7 +214,12 @@ const stars = Array.from({ length: 34 }, () => {
     const seg = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
 
     const proxy = { p: 0 };
-    // Run the living-portrait loops only while the hero is essentially open
+    // Living-portrait ladder: video loop (primary) > still + CSS overlays
+    // (fallback) > still (base). videoLive flips once the loop is actually
+    // rendering frames; the overlays stand down then (the video already IS
+    // the living aurora — doubling them would over-glow).
+    let videoLive = false;
+    // Run the living-portrait layers only while the hero is essentially open
     // (p>0.8). Scrolling the hero away drives p<0.8 (the bookend below) almost
     // immediately, so this alone pauses them off-screen; backgrounded tabs are
     // throttled by the browser natively. (An IntersectionObserver gate was
@@ -203,7 +227,12 @@ const stars = Array.from({ length: 34 }, () => {
     // die while the hero is plainly in view.) Under reduced motion the engine
     // returns above, so this never arms.
     function syncAmbient() {
-      root.classList.toggle("portal-ambient", proxy.p > 0.8);
+      const open = proxy.p > 0.8;
+      root.classList.toggle("portal-ambient", open);
+      if (loopEl.src) {
+        if (open && loopEl.paused) loopEl.play().catch(() => {}); // autoplay may be blocked → overlays carry it
+        else if (!open && !loopEl.paused) loopEl.pause();
+      }
     }
     function render(p: number) {
       // solid mark holds, then dissolves (ghost re-forms on reverse)
@@ -221,12 +250,30 @@ const stars = Array.from({ length: 34 }, () => {
       // the world (still + living overlays) settles as it rises through
       worldEl.style.transform = `scale(${1.08 - 0.08 * p})`;
       // living portrait fades in only once the scene is essentially open, so
-      // the intro dissolve and the scroll-out bookend both stay clean
-      lifeEl.style.opacity = String(seg(p, 0.82, 1));
+      // the intro dissolve and the scroll-out bookend both stay clean; once
+      // the video loop is rendering, the CSS overlays stand down entirely
+      lifeEl.style.opacity = videoLive ? "0" : String(seg(p, 0.82, 1));
       syncAmbient();
       scrimEl.style.opacity = String(seg(p, 0.5, 1));
     }
     render(0);
+
+    // mount the living-painting loop at idle: wide viewports only (§9.7 —
+    // mobile keeps the weightless CSS overlays over the still; the 16:9 crop
+    // hides most of the aurora-S there anyway) and never under Save-Data.
+    // preload="none" + src-at-idle keeps the ~1MB clip off the LCP path.
+    const mountLoop = () => {
+      const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+      if (conn?.saveData || !window.matchMedia("(min-width: 768px)").matches) return;
+      loopEl.addEventListener("playing", () => {
+        if (videoLive) return;
+        videoLive = true;
+        root.classList.add("portal-video-live"); // CSS fades the loop in over the identical poster frame
+        render(proxy.p); // stands the CSS overlays down
+      });
+      loopEl.src = root.dataset.loopSrc!;
+      syncAmbient(); // starts playback if we're already open
+    };
 
     // intro: the sting's opening — hold on the mark, then dissolve through
     let introKilled = false;
@@ -279,10 +326,14 @@ const stars = Array.from({ length: 34 }, () => {
         /* bookend is enhancement; the intro already ran */
       }
     };
+    const mountEnhancements = () => {
+      void mountBookend();
+      mountLoop();
+    };
     if ("requestIdleCallback" in window) {
-      requestIdleCallback(() => void mountBookend(), { timeout: 2500 });
+      requestIdleCallback(mountEnhancements, { timeout: 2500 });
     } else {
-      setTimeout(() => void mountBookend(), 1200);
+      setTimeout(mountEnhancements, 1200);
     }
 
     // QA surface (harness tabs pause rAF; render(p) is deterministic)
@@ -296,6 +347,13 @@ const stars = Array.from({ length: 34 }, () => {
         proxy.p = v;
         render(v);
       },
+      video: () => ({
+        mounted: !!loopEl.src,
+        live: videoLive,
+        paused: loopEl.paused,
+        readyState: loopEl.readyState,
+      }),
+      forceLoop: () => mountLoop(), // QA: mount regardless of idle timing
     };
   }
 </script>

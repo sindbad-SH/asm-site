@@ -788,6 +788,22 @@
     height: 100%;
     object-fit: cover;
   }
+  /* LP-1 primary: the living-painting loop. Sits over the still; invisible
+     until the engine confirms real playback (.portal-video-live), then fades
+     in over its own identical first frame — a pixel-continuous handoff. */
+  .portal-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 700ms var(--ease-survey);
+    pointer-events: none;
+  }
+  .portal-video-live .portal-loop {
+    opacity: 1;
+  }
   /* LP-1 living portrait — additive light over the still. Default (endcard /
      no-JS / reduced motion) renders it statically with motion PAUSED; the
      engine drives .portal-life opacity and adds .portal-ambient to run the

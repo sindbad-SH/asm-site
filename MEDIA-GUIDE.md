@@ -84,6 +84,36 @@ files listed below.
   />
   ```
 
+### 1b. `/` home — the Portal Hero living painting (brand art; already filled)
+
+- **What's there now:** the hero's scene is a "living painting" — a seamless ~13s loop of
+  the brand sting's aurora-mountain world (`portal-loop.mp4`, ≤1.5MB) over a poster still.
+  The loop mounts at idle on wide viewports only; mobile / Save-Data / no-JS / reduced
+  motion get the still (with lightweight CSS aurora/star overlays as the mid-tier).
+- **To swap the scene:** replace ALL THREE files in `public/media/home/` — no code changes:
+  - `portal-loop.mp4` — muted seamless loop, 1280×720, ≤1.5MB (H.264, crf ~30 works for
+    dark scenes)
+  - `portal-scene.avif` + `portal-scene.webp` — **must be frame 0 of the loop** (the video
+    fades in over this exact frame; a mismatched poster = a visible jump). Extract it:
+    `ffmpeg -i portal-loop.mp4 -vf "select=eq(n\,0)" -frames:v 1 frame0.png`, then use the
+    poster recipe below.
+- **Making a near-loop seamless** (a generated clip that almost-but-not-quite loops):
+  crossfade the tail into the head. For a clip of length `T` seconds with a `D`-second blend
+  (D=2 is a good default for slow ambient motion):
+  ```
+  ffmpeg -i in.mp4 -filter_complex "[0:v]split[a][b];\
+  [a]trim=start=D,setpts=PTS-STARTPTS[main];\
+  [b]trim=duration=D,setpts=PTS-STARTPTS[head];\
+  [main][head]xfade=transition=fade:duration=D:offset=OFFSET[v]" \
+  -map "[v]" -an -c:v libx264 -crf 30 -preset slow -pix_fmt yuv420p \
+  -movflags +faststart out.mp4
+  ```
+  where `OFFSET = T - 2×D` (e.g. T=15.04, D=2 → offset=11.04). The output loops perfectly
+  because its last frame *is* its first frame. Verify: extract both endpoint frames and eyeball.
+- **HONESTY NOTE:** this scene is AI-generated **brand art** — the logo's world. It lives in
+  the hero as brand identity and must never appear in Work/Adventure gallery contexts where
+  it could read as shot footage.
+
 ### 2. `/adventure` — the gallery (the most important slot on the site)
 
 See **Worked Example 2** below — this is the photo-first priority's #1 target.
