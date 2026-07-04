@@ -1,9 +1,15 @@
 ---
 import Base from "../layouts/Base.astro";
+import { SITE, COPY } from "../consts";
 ---
 
-<Base title="Adventure Storytelling Media — The StorySmith">
+<Base title={`${SITE.name} — ${SITE.persona}`}>
   <main class="grid min-h-screen place-items-center p-8 text-center">
-    <p>Scaffold placeholder. Page content is a Phase 1+ task per BUILD-PLAN.md §1.</p>
+    <div>
+      <p class="text-2xl">{COPY.hero.headline}</p>
+      <p class="mt-4 opacity-70">
+        Greybox pending — page content is the Phase 1 assembly task per BUILD-PLAN.md §1.
+      </p>
+    </div>
   </main>
 </Base>

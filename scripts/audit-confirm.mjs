@@ -1,53 +1,44 @@
 #!/usr/bin/env node
 /**
- * Fails a production build if any `[confirm]` placeholder survives to the
- * built output. Per BUILD-PLAN.md §3.5: the `[confirm]` placeholder
- * discipline from consts.ts must never ship — every claim must be resolved
- * to a real, Ledger-checked value before launch.
+ * CLI wrapper: [confirm] placeholder sweep against built output.
+ * Per BUILD-PLAN.md §3.5 the gate is a PRODUCTION gate: staging/greybox may
+ * carry [confirm] values (they're the honest alternative to invented facts);
+ * a production build (DEPLOY_TARGET=production) fails while any survive.
+ * On non-production targets this reports them as warnings and exits 0.
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
+import { statSync } from "node:fs";
+import {
+  findConfirmPlaceholders,
+  isProductionTarget,
+  walkTextFiles,
+} from "./audit-lib.mjs";
 
 const DIST_DIR = "dist";
-const TEXT_EXTENSIONS = new Set([".html", ".htm", ".txt", ".xml", ".json", ".js", ".css"]);
-const CONFIRM_PATTERN = /\[confirm\]/i;
 
-function walk(dir, files = []) {
-  for (const entry of readdirSync(dir)) {
-    const fullPath = join(dir, entry);
-    const stats = statSync(fullPath);
-    if (stats.isDirectory()) {
-      walk(fullPath, files);
-    } else if (TEXT_EXTENSIONS.has(extname(entry))) {
-      files.push(fullPath);
-    }
-  }
-  return files;
+try {
+  if (!statSync(DIST_DIR).isDirectory()) throw new Error("not a directory");
+} catch {
+  console.error(`✖ audit-confirm: "${DIST_DIR}" not found — run "npm run build" first.`);
+  process.exit(1);
 }
 
-function main() {
-  let distStats;
-  try {
-    distStats = statSync(DIST_DIR);
-  } catch {
-    console.error(`✖ audit-confirm: "${DIST_DIR}" not found — run "npm run build" first.`);
+const hits = findConfirmPlaceholders(DIST_DIR);
+
+if (hits.length > 0) {
+  const strict = isProductionTarget();
+  const mark = strict ? "✖" : "⚠";
+  console[strict ? "error" : "warn"](
+    `${mark} audit-confirm: unresolved [confirm] placeholder(s) in:`,
+  );
+  for (const file of hits) console[strict ? "error" : "warn"](`  - ${file}`);
+  if (strict) {
+    console.error("\nProduction builds must not ship [confirm] placeholders.");
     process.exit(1);
   }
-  if (!distStats.isDirectory()) {
-    console.error(`✖ audit-confirm: "${DIST_DIR}" is not a directory.`);
-    process.exit(1);
-  }
-
-  const files = walk(DIST_DIR);
-  const hits = files.filter((file) => CONFIRM_PATTERN.test(readFileSync(file, "utf8")));
-
-  if (hits.length > 0) {
-    console.error(`✖ audit-confirm: unresolved [confirm] placeholder(s) in:\n`);
-    for (const file of hits) console.error(`  - ${file}`);
-    process.exit(1);
-  }
-
-  console.log(`✓ audit-confirm: no [confirm] placeholders found across ${files.length} file(s).`);
+  console.warn("\n(Allowed on staging; blocks DEPLOY_TARGET=production builds.)");
+  process.exit(0);
 }
 
-main();
+console.log(
+  `✓ audit-confirm: no [confirm] placeholders across ${walkTextFiles(DIST_DIR).length} file(s).`,
+);
