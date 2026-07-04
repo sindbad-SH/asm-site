@@ -733,6 +733,46 @@
     }
   }
 
+  /* ── §2e hover-distortion: CSS fallback + WebGL handover ──
+     The CSS transform hover is the DEFAULT for every visitor (scale +
+     brightness, mirroring the shader's own response). When the OGL engine
+     streams in it adds .distort-on to the grid (disabling the CSS transform —
+     the shader takes over) and .is-distorted to each tile (neutralizing the
+     media surface the plane replaces, lifting the label text above the
+     canvas at z-5). Scoped to [data-distort-grid] media only — never text,
+     never site-wide. */
+  [data-distort-grid] .map-inset {
+    overflow: clip;
+  }
+  [data-distort-grid] .map-inset > div,
+  [data-distort-grid] .map-inset img {
+    transition:
+      transform var(--dur-hover) var(--ease-swift),
+      filter var(--dur-hover) var(--ease-swift);
+  }
+  [data-distort-grid] .card:hover .map-inset > div,
+  [data-distort-grid] .card:hover .map-inset img {
+    transform: scale(1.03);
+    filter: brightness(1.06);
+  }
+  [data-distort-grid].distort-on .card:hover .map-inset > div,
+  [data-distort-grid].distort-on .card:hover .map-inset img {
+    transform: none;
+    filter: none;
+  }
+  .map-inset.is-distorted > div {
+    border-color: transparent;
+    background-image: none;
+    background-color: transparent;
+  }
+  .map-inset.is-distorted img {
+    visibility: hidden;
+  }
+  .map-inset.is-distorted .hud-label {
+    position: relative;
+    z-index: 6; /* above the shared distortion canvas (z-5) */
+  }
+
   /* ── Tableaux (§2b) ── */
   .tableau-pin {
     position: relative;
@@ -899,6 +939,13 @@ html.js .contour-draw.is-revealed path {
     animation: none;
   }
   [data-lane="forge"] .heat {
+    transition: none;
+  }
+  /* §2e: no hover scale under reduced motion (and the WebGL gate never opens) */
+  [data-distort-grid] .card:hover .map-inset > div,
+  [data-distort-grid] .card:hover .map-inset img {
+    transform: none;
+    filter: none;
     transition: none;
   }
 }

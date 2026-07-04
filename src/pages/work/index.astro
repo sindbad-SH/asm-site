@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
+import DistortionLayer from "../../components/DistortionLayer.astro";
 import { PAGES, WORK } from "../../consts";
 
 const p = PAGES.work;
@@ -15,7 +16,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   </section>
 
   <section class="p-8">
-    <div class="mx-auto grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="mx-auto grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2" data-distort-grid>
       {
         WORK.map((item) => (
           <Card
@@ -31,4 +32,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       }
     </div>
   </section>
+
+  <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
+  <DistortionLayer />
 </Base>

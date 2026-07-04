@@ -1,0 +1,66 @@
+---
+/**
+ * DistortionLayer (BUILD-PLAN.md §2e) — script-only gate for the 14islands
+ * hover-distortion engine. Include ONCE on any page whose grids are marked
+ * [data-distort-grid].
+ *
+ * The CSS hover fallback (scale 1.03 + brightness, global.css) is the
+ * DEFAULT for everyone. This script upgrades to WebGL only when ALL gates
+ * pass:
+ *   - motion allowed (prefers-reduced-motion: no-preference)
+ *   - fine pointer (hover is meaningless on touch; also §2e's
+ *     mobile-low-power exclusion)
+ *   - WebGL actually available (probe, not assumption)
+ *   - a grid has approached the viewport (IntersectionObserver, 50% margin —
+ *     the §4 lazy-load boundary); only then does the engine chunk download.
+ *
+ * Debug: ?fx=css forces the CSS fallback path; ?fx=force skips the
+ * IntersectionObserver wait and boots the engine immediately (QA in
+ * environments where IO delivery is throttled, e.g. hidden tabs).
+ */
+---
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const grids = [...document.querySelectorAll<HTMLElement>("[data-distort-grid]")];
+
+  const gatesPass =
+    grids.length > 0 &&
+    params.get("fx") !== "css" &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+    window.matchMedia("(pointer: fine)").matches;
+
+  if (gatesPass) {
+    let webgl = false;
+    try {
+      const probe = document.createElement("canvas");
+      webgl = !!(probe.getContext("webgl2") ?? probe.getContext("webgl"));
+    } catch {
+      webgl = false;
+    }
+
+    if (webgl) {
+      const boot = () =>
+        import("../lib/distort-engine")
+          .then((m) => m.initDistortion(grids))
+          .catch(() => {
+            /* engine failed to load — the CSS fallback simply remains */
+          });
+
+      if (params.get("fx") === "force") {
+        void boot();
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+              io.disconnect();
+              void boot();
+            }
+          },
+          { rootMargin: "50%" },
+        );
+        grids.forEach((g) => io.observe(g));
+      }
+    }
+  }
+</script>
