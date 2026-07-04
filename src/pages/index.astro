@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
-import GlobeHero from "../components/GlobeHero.astro";
+import Placeholder from "../components/Placeholder.astro";
 import Tableaux from "../components/Tableaux.astro";
 import TrailJourney from "../components/TrailJourney.astro";
 import { COPY, PAGES } from "../consts";
@@ -17,13 +17,24 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
        threads the three pillar sections. Desktop-only, degrades to static. -->
   <TrailJourney />
 
-  <!-- H1 — globe hero (§2a). Headline paints first (LCP); the globe streams
-       in behind it and the poster covers every fallback state. -->
+  <!--
+    H1 — PORTAL HERO — RESERVED STUB (BUILD-PLAN.md §9.2, dispatch Q2, Fable 5 · high).
+    The globe moved to /adventure (§9.3) — this slot is now the brand "portal" moment:
+    the logo mark as a window that dissolves into an aurora-lit mountain scene and back
+    (A→B→A), built from the horizontal sting reference in
+    `01 - Brand Assets/Logos/Logo videos/Main reference/Main reference horizontal/`.
+    Headline still paints first (LCP); the portal composite streams in behind it.
+    DO NOT build the visual effect here — that's Q2. This stub is copy + a labeled
+    placeholder so the page is navigable and the next task's spec is unambiguous.
+  -->
   <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
     <p class="hud-label">{COPY.hero.kicker}</p>
     <h1 class="text-3xl font-bold sm:text-5xl">{COPY.hero.headline}</h1>
     <p class="text-lg">{COPY.hero.subline}</p>
-    <GlobeHero />
+    <Placeholder
+      ratio="21/9"
+      label="PORTAL HERO — NEXT TASK (Q2, Fable 5 · high, §9.2) — logo-as-window A→B→A composite: mark holds on --hero-void → dissolves into the aurora-mountain scene (frame-grabbed from the horizontal sting, public/media/home/) → settles full-bleed → reverses on scroll-out as the handoff into the tableaux below. Reduced-motion/no-JS: static endcard (scene + solid mark)."
+    />
     <a href={`${base}/forge-the-saga`} class="btn">
       {COPY.paths[0].label}
     </a>
