@@ -38,6 +38,15 @@ export const SITE = {
     tiktok: "[confirm]",
     linkedin: "[confirm]",
   },
+  /**
+   * GoatCounter site code for privacy-respecting analytics (no cookies, no
+   * personal data — see /privacy). EMPTY = analytics fully disabled (nothing
+   * loads). Deliberately "" rather than "[confirm]": analytics is optional
+   * and must never block a production build. To enable: create a free
+   * account at goatcounter.com and put the site code here (the `xxx` in
+   * xxx.goatcounter.com), then update /privacy to match.
+   */
+  analytics: "",
 } as const;
 
 // ---------------------------------------------------------------------------

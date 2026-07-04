@@ -23,3 +23,5 @@ Thumbs.db
 
 # lighthouse
 .lighthouseci/
+.lighthouseci-site/
+.chrome-lhci/

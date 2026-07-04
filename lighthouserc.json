@@ -1,14 +1,14 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist",
+      "staticDistDir": "./.lighthouseci-site",
       "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--no-sandbox --headless=new",
         "throttlingMethod": "simulate",
         "throttling": {
-          "rttMs": 150,
-          "throughputKbps": 1638.4,
+          "rttMs": 70,
+          "throughputKbps": 10240,
           "cpuSlowdownMultiplier": 4
         }
       }

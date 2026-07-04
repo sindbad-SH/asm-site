@@ -1,0 +1,66 @@
+---
+/**
+ * /privacy — plain-language, first-person, and only claims what the site
+ * actually does (Phase 7, BUILD-PLAN.md §7). Linked from the footer, not the
+ * main nav (the 6-item cap holds). If analytics is ever enabled
+ * (SITE.analytics in consts.ts), the analytics section below must be updated
+ * in the same change — it currently states, truthfully, that none runs.
+ */
+import Base from "../layouts/Base.astro";
+import { SITE } from "../consts";
+---
+
+<Base
+  title="Privacy"
+  description="What this site does and doesn't collect. Short version: almost nothing."
+>
+  <section class="mx-auto max-w-2xl space-y-6 p-8">
+    <h1 class="text-3xl font-bold">Privacy</h1>
+    <p class="text-ink">
+      Short version: this site collects almost nothing, and I'd like to keep it that way.
+    </p>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Analytics & cookies</h2>
+      <p class="text-ink">
+        {
+          SITE.analytics
+            ? "This site uses GoatCounter for basic visit counts — it sets no cookies, collects no personal data, and keeps only aggregate numbers (which pages were visited, roughly when, from what country)."
+            : "This site currently runs no analytics and sets no cookies. If that ever changes, it will be a privacy-respecting counter (no cookies, no personal data, aggregate page counts only) — and this page will say so."
+        }
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Embedded video</h2>
+      <p class="text-ink">
+        Where the site embeds a video from YouTube, nothing is loaded from YouTube — and no
+        request of any kind is made to them — until you click play. Embeds then load through
+        YouTube's reduced-tracking domain (youtube-nocookie.com). YouTube's own privacy policy
+        applies from the moment you press play.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Contact</h2>
+      <p class="text-ink">
+        If you email me, I have your email — that's it, and I use it to reply. The contact form,
+        once live, sends your name, email, and message to a form-handling service solely so it
+        reaches my inbox; nothing else is done with it.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Hosting</h2>
+      <p class="text-ink">
+        This site is a static site served by GitHub Pages. Like any web host, GitHub may keep
+        standard server logs (IP addresses, requested pages) to operate the service — see
+        GitHub's privacy statement for how they handle those.
+      </p>
+    </div>
+
+    <p class="text-sm text-ink-muted">
+      Questions? <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+    </p>
+  </section>
+</Base>

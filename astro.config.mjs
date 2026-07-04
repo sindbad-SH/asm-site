@@ -17,6 +17,12 @@ export default defineConfig({
     : "https://sindbad-sh.github.io",
   base: isProduction ? "/" : "/asm-site",
   trailingSlash: "ignore",
+  build: {
+    // Inline all CSS into each page: removes the render-blocking stylesheet
+    // round-trip from the FCP critical path (§4). Total CSS is ~25KB gz —
+    // cheap per-page, and a 9-page static site loses little to re-caching.
+    inlineStylesheets: "always",
+  },
   integrations: [honestyAudit()],
   vite: {
     plugins: [tailwindcss()],

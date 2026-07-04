@@ -50,14 +50,37 @@
   --color-forge-heat: #ff7a2f; /* incandescent focal glow, Forge lane only */
   --color-forge-deep: #c43a1e; /* cooling ember, Forge lane only */
 
-  /* ── §3.2 type roles ── */
-  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
-  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  /* ── §3.2 type roles — each web font is backed by a metric-matched local
+        fallback face (defined below the @theme block) so the swap doesn't
+        shift layout (§4 "font-display: swap + fallback metrics"). ── */
+  --font-display: "Fraunces Variable", "Fraunces Fallback", ui-serif, Georgia, serif;
+  --font-sans: "DM Sans Variable", "DM Sans Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
 
   /* ── §3.3 motion grammar ── */
   --ease-survey: cubic-bezier(0.16, 1, 0.3, 1); /* geological settle (expo.out) */
   --ease-swift: cubic-bezier(0.215, 0.61, 0.355, 1); /* hover response (power2.out) */
+}
+
+/* Metric-matched local fallbacks (§4 "fallback metrics"): while the web fonts
+   load (font-display: swap), text renders in a local face size-adjusted to
+   occupy ≈ the same space, so the swap doesn't shift layout (CLS). Values are
+   tuned approximations for Georgia→Fraunces and Arial→DM Sans. */
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Georgia");
+  size-adjust: 105%;
+  ascent-override: 96%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "DM Sans Fallback";
+  src: local("Arial");
+  size-adjust: 100%;
+  ascent-override: 97%;
+  descent-override: 30%;
+  line-gap-override: 0%;
 }
 
 :root {

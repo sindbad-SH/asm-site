@@ -13,7 +13,7 @@
     "audit:exclusions": "node scripts/audit-exclusions.mjs",
     "audit:confirm": "node scripts/audit-confirm.mjs",
     "audit": "npm run audit:exclusions && npm run audit:confirm",
-    "lhci": "lhci autorun"
+    "lhci": "node scripts/lhci-prep.mjs && lhci autorun"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.2.8",

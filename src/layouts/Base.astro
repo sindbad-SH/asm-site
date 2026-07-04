@@ -3,6 +3,12 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import MobileMenu from "../components/MobileMenu.astro";
+import { SITE } from "../consts";
+// Hashed URLs for the two paint-critical font files (display + body), so we
+// can preload them — text is the LCP on most pages, and early font arrival
+// also shrinks the swap-shift window (§4 CLS).
+import frauncesWoff2 from "@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url";
+import dmSansWoff2 from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url";
 
 interface Props {
   title: string;
@@ -10,6 +16,20 @@ interface Props {
 }
 
 const { title, description = "Adventure Storytelling Media — Sindbad Horizon, The StorySmith." } = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// Absolute URLs for social scrapers (they don't resolve relative paths).
+// Astro.site is parameterized in astro.config.mjs (staging github.io vs the
+// apex domain at cutover), so these flip automatically with DEPLOY_TARGET.
+const abs = (path: string) => new URL(`${base}${path}`, Astro.site).href;
+// strip the base prefix (if present) then re-join — avoids the double-slash
+// a naive string replace produces on the root path
+const pagePath = Astro.url.pathname.startsWith(base)
+  ? Astro.url.pathname.slice(base.length) || "/"
+  : Astro.url.pathname;
+const canonical = new URL(`${base}${pagePath}`, Astro.site).href;
+// Staging (github.io) must never compete with the live domain in search.
+const isStaging = (Astro.site?.href ?? "").includes("github.io");
 ---
 
 <!doctype html>
@@ -17,12 +37,46 @@ const { title, description = "Adventure Storytelling Media — Sindbad Horizon, 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={frauncesWoff2} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={dmSansWoff2} crossorigin />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {isStaging && <meta name="robots" content="noindex" />}
+
+    <!-- Open Graph / Twitter (og.jpg = the brand endcard: mark over the sting scene) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs("/media/og.jpg")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={abs("/media/og.jpg")} />
+
     <script is:inline>
       document.documentElement.classList.replace("no-js", "js");
     </script>
+
+    <!-- Privacy-respecting analytics (GoatCounter: no cookies, no personal
+         data, aggregate counts only). DISABLED until SITE.analytics is set to
+         a real GoatCounter code — requires Sindbad to create the (free)
+         account; see /privacy. Nothing loads while it's empty. -->
+    {
+      SITE.analytics && (
+        <script
+          is:inline
+          data-goatcounter={`https://${SITE.analytics}.goatcounter.com/count`}
+          async
+          src="https://gc.zgo.at/count.js"
+        />
+      )
+    }
   </head>
   <body class="min-h-screen">
     <a href="#main" class="sr-only focus:not-sr-only">Skip to content</a>
