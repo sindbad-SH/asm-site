@@ -1,0 +1,121 @@
+---
+/**
+ * Three-pillar scroll tableaux (§2b) — the home page's narrative body, the
+ * KPR-style "chapters revealed as you scroll" model. Each chapter pins while
+ * its parallax layers drift (transform/opacity only — NO WebGL), the headline
+ * rises in masked lines, and a contour line draws between chapters.
+ *
+ * Fallbacks (§2b):
+ *   • reduced motion → engine no-ops; CSS renders static, everything visible.
+ *   • no-JS         → same static layout (html.js-gated hiding never applies).
+ *   • mobile        → no pin/parallax; masked reveals only (avoids mobile pin
+ *                     jank). Handled at runtime by width check.
+ *
+ * The engine is generic over [data-tableau]; a chapter is "full" or "stub"
+ * purely by whether it has a layer set below — so replication is data, not
+ * code.
+ */
+import TableauChapter, { type TableauLayer } from "./TableauChapter.astro";
+import ContourDivider from "./ContourDivider.astro";
+import { PAGES } from "../consts";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const chapters = PAGES.home.tableaux;
+
+// ── LAYER_SETS — art-direction layer descriptors, keyed by chapter terrain.
+// "The wild" is the FULLY BUILT EXEMPLAR (3 layers: background → midground →
+// foreground cut-out). "The market" and "The industry" are STUBS (null) and
+// render a clearly-marked replication stub. NEXT TASK (Sonnet): give each a
+// 3-layer set mirroring the wild set, with art direction for its lane —
+// e.g. the market = the ordered city street-grid, the industry = the
+// coastline / stage-lights sprawl (see brief §6 Option 3 layout logic).
+const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
+  "The wild": [
+    { depth: 0.15, label: "WILD · BACKGROUND — distant ridgeline & sky, full-bleed (§2b · ≤180KB AVIF)" },
+    { depth: 0.45, label: "WILD · MIDGROUND — mid ridge / valley haze (§2b)" },
+    { depth: 0.85, label: "WILD · FOREGROUND — near rock or figure, alpha cut-out (§2b)" },
+  ],
+  "The market": null, // STUB — replicate
+  "The industry": null, // STUB — replicate
+};
+---
+
+<section class="tableaux" data-tableaux aria-label="Three terrains, one craft">
+  {
+    chapters.map((chapter, i) => (
+      <Fragment>
+        {i > 0 && <ContourDivider class="mx-auto max-w-3xl px-8" />}
+        <TableauChapter
+          chapter={chapter}
+          index={i}
+          layers={LAYER_SETS[chapter.terrain] ?? undefined}
+          base={base}
+        />
+      </Fragment>
+    ))
+  }
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { splitLines } from "../lib/split-lines";
+  import { ensureSmoothScroll } from "../lib/smooth-scroll";
+
+  const section = document.querySelector<HTMLElement>("[data-tableaux]");
+  if (section) void initTableaux(section);
+
+  async function initTableaux(section: HTMLElement) {
+    // reduced motion → leave the static CSS layout untouched (§2b fallback)
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    const lenis = await ensureSmoothScroll();
+    if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
+
+    // measure line breaks only once fonts are settled
+    if (document.fonts?.ready) await document.fonts.ready;
+
+    const mobile = window.matchMedia("(max-width: 640px)").matches;
+
+    section.querySelectorAll<HTMLElement>("[data-tableau]").forEach((tableau) => {
+      const pin = tableau.querySelector<HTMLElement>(".tableau-pin");
+      const content = tableau.querySelector<HTMLElement>("[data-tableau-content]");
+      const headline = tableau.querySelector<HTMLElement>("[data-tableau-headline]");
+      if (!pin || !content) return;
+
+      if (headline) splitLines(headline);
+
+      // masked-line + content reveal, once, as the chapter enters
+      ScrollTrigger.create({
+        trigger: pin,
+        start: "top 78%",
+        once: true,
+        onEnter: () => content.classList.add("is-revealed"),
+      });
+
+      // mobile: reveals only, no pin/parallax (§2b) — avoids mobile pin jank
+      if (mobile) return;
+
+      const layers = pin.querySelectorAll<HTMLElement>("[data-depth]");
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: pin,
+          start: "top top",
+          end: "+=90%",
+          pin: true,
+          scrub: true,
+          anticipatePin: 1,
+        },
+      });
+      layers.forEach((layer, i) => {
+        const depth = parseFloat(layer.getAttribute("data-depth") || "0.5");
+        // near layers travel further than distant ones → parallax depth
+        tl.fromTo(layer, { yPercent: depth * 14 }, { yPercent: -depth * 14, ease: "none" }, 0);
+        if (i === 0) tl.fromTo(layer, { scale: 1.12 }, { scale: 1, ease: "none" }, 0);
+      });
+    });
+
+    ScrollTrigger.refresh();
+  }
+</script>

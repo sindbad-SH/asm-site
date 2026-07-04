@@ -1,10 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
-import Placeholder from "../components/Placeholder.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
 import GlobeHero from "../components/GlobeHero.astro";
+import Tableaux from "../components/Tableaux.astro";
 import { COPY, PAGES } from "../consts";
 
 const p = PAGES.home;
@@ -39,23 +39,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     </ul>
   </nav>
 
-  <!-- H3 — three-pillar scroll tableaux (Phase 2 engine, §2b; static here) -->
-  <section class="border-t border-current/20">
-    {
-      p.tableaux.map((chapter) => (
-        <article class="mx-auto max-w-3xl space-y-4 p-8">
-          <p class="text-sm uppercase tracking-widest opacity-70">{chapter.terrain}</p>
-          <h2 class="text-2xl font-bold">{chapter.headline}</h2>
-          <p>{chapter.body}</p>
-          <Placeholder ratio="16/9" label={`${chapter.terrain.toUpperCase()} TABLEAU — layered scroll imagery (Phase 2, §2b)`} />
-          <LegendMark proof={chapter.proof} />
-          <a href={`${base}${chapter.link.href}`} class="inline-block hover:underline">
-            {chapter.link.label} →
-          </a>
-        </article>
-      ))
-    }
-  </section>
+  <!-- H3 — three-pillar scroll tableaux engine (§2b) -->
+  <Tableaux />
 
   <!-- H4 — proof band -->
   <section class="mx-auto max-w-3xl space-y-6 border-t border-current/20 p-8">

@@ -1,0 +1,65 @@
+---
+/**
+ * One tableau chapter (§2b). Structure is uniform across all three chapters
+ * so the engine in Tableaux.astro drives them identically — the whole point
+ * of "engine + exemplar": replicating a chapter means supplying a `layers`
+ * set, nothing more.
+ *
+ *   layers present → full parallax chapter (the wild exemplar)
+ *   layers absent  → a clearly-marked REPLICATION STUB (copy still renders so
+ *                    the page stays coherent; only the parallax art is missing)
+ */
+import LegendMark from "./LegendMark.astro";
+import type { TableauChapter as TChapter } from "../consts";
+
+export interface TableauLayer {
+  depth: number; // 0 (far, slow) .. 1 (near, fast)
+  label: string; // annotated shot-list slot — what art belongs here
+}
+
+interface Props {
+  chapter: TChapter;
+  index: number;
+  layers?: readonly TableauLayer[];
+  base: string;
+}
+const { chapter, index, layers, base } = Astro.props;
+const isStub = !layers || layers.length === 0;
+const no = String(index + 1).padStart(2, "0");
+---
+
+<article class="tableau" data-tableau data-chapter={chapter.terrain}>
+  <div class="tableau-pin">
+    {
+      isStub ? (
+        <div class="tableau-layer" data-depth="0.5">
+          <div class="tableau-ph tableau-ph--stub">
+            <span class="hud-label normal-case">
+              REPLICATION STUB — “{chapter.terrain}”. Replicate the wild chapter: add a 3-layer set
+              for this chapter to LAYER_SETS in Tableaux.astro (background → midground → foreground
+              cut-out). The engine and copy already work; only the parallax art is missing.
+            </span>
+          </div>
+        </div>
+      ) : (
+        layers.map((layer, i) => (
+          <div class="tableau-layer" data-depth={layer.depth} data-layer={i}>
+            <div class="tableau-ph">
+              <span class="hud-label normal-case">{layer.label}</span>
+            </div>
+          </div>
+        ))
+      )
+    }
+
+    <div class="tableau-content" data-tableau-content>
+      <p class="hud-label">{no} · {chapter.terrain}</p>
+      <h2 class="tableau-headline" data-tableau-headline>{chapter.headline}</h2>
+      <div class="tableau-reveal">
+        <p class="mx-auto max-w-xl text-lg text-ink">{chapter.body}</p>
+        <LegendMark proof={chapter.proof} class="justify-center" />
+        <a href={`${base}${chapter.link.href}`} class="btn">{chapter.link.label}</a>
+      </div>
+    </div>
+  </div>
+</article>

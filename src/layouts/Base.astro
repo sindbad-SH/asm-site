@@ -58,5 +58,11 @@ const { title, description = "Adventure Storytelling Media — Sindbad Horizon, 
         setTimeout(revealAll, 4000); // watchdog — nothing stays hidden
       })();
     </script>
+    <script>
+      // Site-wide Lenis smooth scroll (v1 KEEP). Singleton; no-ops under
+      // reduced motion. Scroll-animation islands share this same instance.
+      import { ensureSmoothScroll } from "../lib/smooth-scroll";
+      void ensureSmoothScroll();
+    </script>
   </body>
 </html>
