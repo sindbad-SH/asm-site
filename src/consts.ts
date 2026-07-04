@@ -383,3 +383,383 @@ export const GLOBE = {
     },
   ] as readonly GlobePin[],
 } as const;
+
+// ---------------------------------------------------------------------------
+// TESTIMONIALS — quotes are [confirm] until Sindbad supplies the exact wording
+// AND written permission (BUILD-PLAN.md §5A S4/S5). NEVER invent a quote or an
+// attribution; the production gate blocks launch until these resolve.
+// ---------------------------------------------------------------------------
+
+export type Testimonial = {
+  id: string;
+  quote: string; // [confirm] — verbatim, permissioned only
+  attribution: string; // [confirm] — name + role, permissioned only
+  relationshipId: string; // ties to RELATIONSHIPS (tier symbol + Ledger phrasing)
+  /** Authored framing — descriptive only, never a status claim. */
+  context: string;
+};
+
+export const TESTIMONIALS: readonly Testimonial[] = [
+  {
+    id: "pitchboulder",
+    quote: "[confirm]",
+    attribution: "[confirm]",
+    relationshipId: "pitchboulder",
+    context: "The primary proof anchor.",
+  },
+  {
+    // A coverage endorsement from the car owner — NOT from Pebble Beach.
+    // The Ledger forbids attributing anything to the event itself.
+    id: "pebble-beach-owner",
+    quote: "[confirm]",
+    attribution: "[confirm]",
+    relationshipId: "pebble-beach",
+    context: "A coverage endorsement from the car owner.",
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// Lookup maps — for components that resolve a relationship/testimonial by id.
+// Components MUST render RELATIONSHIP_BY_ID[id].permittedPhrasing verbatim for
+// any status claim; page prose below never restates a status.
+// ---------------------------------------------------------------------------
+
+export const RELATIONSHIP_BY_ID: Record<string, Relationship> = Object.fromEntries(
+  RELATIONSHIPS.map((r) => [r.id, r]),
+);
+
+export const TESTIMONIAL_BY_ID: Record<string, Testimonial> = Object.fromEntries(
+  TESTIMONIALS.map((t) => [t.id, t]),
+);
+
+// ---------------------------------------------------------------------------
+// PAGES — all page copy, first-person solo voice (BUILD-PLAN.md §1; hero angles
+// research-brief.md §3). GOVERNANCE:
+//   • Prose fields (heading/body/etc.) are authored positioning — they must
+//     never assert a relationship's status.
+//   • Any relationship claim is a `ProofLine` {relationshipId}; the renderer
+//     prints RELATIONSHIP_BY_ID[id].permittedPhrasing verbatim + its legend
+//     symbol. This is the only channel through which a status may be stated.
+//   • `[confirm]` marks any fact not yet verified (blocks production builds).
+// ---------------------------------------------------------------------------
+
+export type Cta = { label: string; href: string };
+
+/** Renders as the relationship's verbatim permittedPhrasing + legend symbol. */
+export type ProofLine = {
+  relationshipId: string;
+  /** Optional authored lead-in — descriptive only, never a status claim. */
+  context?: string;
+};
+
+export type TableauChapter = {
+  terrain: string;
+  headline: string;
+  body: string;
+  proof: ProofLine;
+  link: Cta;
+};
+
+export const PAGES = {
+  // ---- HOME (§1.1). Hero + paths live in COPY; sections below follow. ------
+  home: {
+    meta: {
+      title: `${SITE.name} — ${SITE.persona}`,
+      description:
+        "Sindbad Horizon, the StorySmith — one craft, told across the wild, the market, and the industry. Narrative strategy for founders under Forge the Saga.",
+    },
+    // H3 — three-pillar scroll tableaux, equal grammatical weight.
+    tableaux: [
+      {
+        terrain: "The wild",
+        headline: "The story is usually where it's hardest to reach.",
+        body: "I cover expeditions and wild places most cameras never get to — on foot, in the air, in conditions that don't wait for a second take.",
+        proof: { relationshipId: "amazing-aerial" },
+        link: { label: "See the adventure work", href: "/adventure" },
+      },
+      {
+        terrain: "The market",
+        headline: COPY.anchors.belief, // "Your product works. Your story isn't landing."
+        body: "Under Forge the Saga, I turn a founder's real advantage into a narrative the market actually feels — and I pressure-test it before you spend to find out.",
+        proof: { relationshipId: "pitchboulder" },
+        link: { label: "Forge your saga", href: "/forge-the-saga" },
+      },
+      {
+        terrain: "The industry",
+        headline: "I keep a pulse on the rooms your story has to survive.",
+        body: "I stay close to how the industry moves — the board work, the coverage, the festivals and markets — and I'm honest about exactly how close each relationship is.",
+        proof: { relationshipId: "meme" },
+        link: { label: "The network", href: "/entertainment" },
+      },
+    ] as readonly TableauChapter[],
+    // H4 — proof band. Replaces the v1 flat marquee with honest tiering.
+    proof: {
+      heading: "The honest version of the network.",
+      intro:
+        "Every relationship here is marked at exactly what it is — official, delivered, informal, or simply a room I was in. No logo wall, no borrowed credit.",
+      anchor: { relationshipId: "pitchboulder" } as ProofLine,
+      testimonialId: "pitchboulder",
+      // Order = descending honesty weight; each renders with its legend symbol.
+      tiered: [
+        "meme",
+        "amazing-aerial",
+        "pitchboulder",
+        "workshop-coverage",
+        "pebble-beach",
+        "seriesfest",
+        "afm",
+      ] as readonly string[],
+    },
+    // H5 — Forge the Saga teaser. Stage names come from SAGA_STAGES.
+    forgeTeaser: {
+      heading: "Forge the Saga",
+      body: "A five-stage method that takes a founder's story from raw market intelligence to a tested, ready-to-run narrative.",
+      anchor: COPY.anchors.testing, // "find out what works before you spend real money..."
+      cta: PRIMARY_CTA,
+    },
+    // H6 — About teaser.
+    aboutTeaser: {
+      body: "One craft — storytelling — told across the wild, the market, and the industry.",
+      anchor: COPY.anchors.homeBase, // "Boulder is home base. The world is the territory."
+      link: { label: "How it all fits", href: "/about" },
+    },
+    // H7 — contact CTA band.
+    contactBand: {
+      headline: COPY.anchors.noPressure, // "No pitch, no pressure."
+      body: "Tell me what you're building. If I can help you make it land, I'll tell you how. If I can't, I'll tell you that too.",
+      cta: { label: "Book a call", href: "/contact" },
+    },
+  },
+
+  // ---- FORGE THE SAGA (§1.2) — primary lane, belief-first. ------------------
+  forge: {
+    meta: {
+      title: "Forge the Saga — narrative strategy for founders",
+      description:
+        "A five-stage method for founders: from raw market research to a tested Core Narrative Blueprint. Your product works — let's make the story land.",
+    },
+    // F1 — belief hero.
+    hero: {
+      headline: COPY.anchors.belief,
+      subline:
+        "Forge the Saga is my five-stage method for founders — from raw market research to a tested Core Narrative Blueprint your team can actually run.",
+      cta: { label: "Book a call", href: "/contact" },
+    },
+    // F2 — who it's for.
+    whoFor: {
+      heading: "Who it's for",
+      body: "Founders at the edge of a launch, a raise, or a real ad spend — when the story finally has to carry weight, and guessing gets expensive.",
+      items: [
+        "You're about to launch, and the messaging still isn't sharp.",
+        "You're raising, and the pitch has to land in a single meeting.",
+        "You're about to spend on ads, and you want to know the story works first.",
+      ] as readonly string[],
+    },
+    // F3 — the five stages. Presentation maps SAGA_STAGES directly.
+    stages: {
+      heading: "The five stages",
+      body: "One ordered arc, cold research to tested narrative. Stage 02 delivers the Core Narrative Blueprint — the spine everything else is built on.",
+      anchor: COPY.anchors.beliefIsntData, // used at the Story Testing stage
+    },
+    // F4 — pretest. LAUNCHES AS VARIANT B (OD-2): no standalone section; the
+    // pretest idea already lives honestly inside SAGA_STAGES[3] ("curated human
+    // panels, AI audience simulations, or both"). The Variant-A copy is kept
+    // here on the shelf, NOT rendered, so it lifts back in without rework if
+    // the service proves out. It contains zero mention of any platform.
+    pretestShelved: {
+      rendered: false,
+      heading: "Before your story meets investors, it meets the panel.",
+      body: "Echo Panel is an AI investor-pitch pretest tool I built — your pitch gets stress-tested before it costs you a real meeting.",
+    },
+    // F5 — proof.
+    proof: {
+      heading: "Proof",
+      anchor: { relationshipId: "pitchboulder" } as ProofLine,
+      testimonialId: "pitchboulder",
+      // Delivered-work cards — services actually delivered for real people,
+      // each labeled at exact status (WORK[].engagement, [confirm] until set).
+      deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
+      note: "No second consulting testimonial at launch. Everything shown is work I actually delivered, labeled paid or unpaid as it truly was.",
+    },
+    // F6 — pricing (OD-4: exact "from $X"). Per-stage prices from SAGA_STAGES.
+    pricing: {
+      heading: "Pricing",
+      body: "Engagements start at $2,500 for a single stage. Most run between $2,500 and $12,500, depending on how far you take the arc.",
+      note: "Every price is a starting point — the shape of the work sets the rest.",
+    },
+    // F7 — CTA.
+    cta: {
+      headline: COPY.anchors.noPressure,
+      body: "Tell me where the story isn't landing. If Forge the Saga is a fit, we'll map it. If it isn't, I'll say so.",
+      cta: { label: "Book a call", href: "/contact" },
+    },
+  },
+
+  // ---- ADVENTURE (§1.3) — credibility lane, the wild. ----------------------
+  adventure: {
+    meta: {
+      title: "Adventure — the wild",
+      description:
+        "Expedition and adventure coverage, photo and film, from the places hardest to reach.",
+    },
+    hero: {
+      headline: "The wild doesn't do second takes.",
+      subline:
+        "Expedition and adventure coverage — photo and film — from the places that are hardest to reach.",
+    },
+    territory: {
+      heading: "The territory",
+      // Honest current footprint: Italy & Switzerland only. "So far" signals
+      // growth without claiming more.
+      body: "So far the work has taken me deepest through the Alps — Italy and Switzerland — shooting on the ground and from the air.",
+    },
+    // A3 — Licensed vs Personal nesting (Mark Clennon model).
+    licensed: {
+      heading: "Licensed",
+      body: "The aerial footage that's available to license lives off-site — follow it out to where it's licensed.",
+      proof: { relationshipId: "amazing-aerial" } as ProofLine,
+    },
+    personal: {
+      heading: "Personal & editorial",
+      body: "The self-driven expedition work — the frames I chase for their own sake.",
+    },
+    gallery: {
+      heading: "The field",
+      note: "Real stills replace these slots as footage arrives (BUILD-PLAN.md §5A S2).",
+    },
+    // A5 — soft handoff toward consulting.
+    handoff: {
+      body: PILLARS.find((p) => p.id === "adventure")!.handoff,
+      cta: PRIMARY_CTA,
+    },
+  },
+
+  // ---- ENTERTAINMENT (§1.4) — credibility lane, the industry. --------------
+  entertainment: {
+    meta: {
+      title: "Entertainment — the industry",
+      description:
+        "A pulse on the industry — board work, real coverage, and the festivals and markets I attend, each stated at exactly what it is.",
+    },
+    // E1 — restrained hero; no "at the table where the industry decides" claim.
+    hero: {
+      headline: "I keep a pulse on the industry.",
+      subline:
+        "Board work, real coverage, and the festivals and markets I attend — here's exactly what each one is.",
+    },
+    // E2 — MEME (the most formal role).
+    meme: {
+      heading: "MEME",
+      proof: { relationshipId: "meme" } as ProofLine,
+      body: "The role I hold most formally in this world.",
+    },
+    // E3 — PitchBoulder feature (primary proof anchor).
+    pitchboulder: {
+      heading: "PitchBoulder",
+      proof: { relationshipId: "pitchboulder" } as ProofLine,
+      testimonialId: "pitchboulder",
+      link: { label: "See the work", href: "/work/pitchboulder" },
+    },
+    // E4 — the rooms; each honest about itself. Testimonial #2 sits here.
+    rooms: {
+      heading: "The rooms",
+      intro: "The rest is honest about itself.",
+      items: [
+        {
+          proof: { relationshipId: "pebble-beach" } as ProofLine,
+          testimonialId: "pebble-beach-owner",
+        },
+        { proof: { relationshipId: "seriesfest" } as ProofLine },
+        { proof: { relationshipId: "afm" } as ProofLine },
+        { proof: { relationshipId: "workshop-coverage" } as ProofLine },
+      ],
+    },
+    // E5 — soft handoff.
+    handoff: {
+      body: PILLARS.find((p) => p.id === "entertainment")!.handoff,
+      cta: PRIMARY_CTA,
+    },
+  },
+
+  // ---- WORK (§1.5) — cross-lane proof index + case-study template. ---------
+  work: {
+    meta: {
+      title: "Work",
+      description:
+        "Everything I've actually done — each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+    },
+    intro: {
+      heading: "The field",
+      body: "Everything I've actually done, each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+    },
+    // Case-study copy (Immersive-Garden walkthrough). PitchBoulder ships first
+    // and sets the template. Facts I can't verify are [confirm] (asset S3);
+    // outcome carries NO invented metric.
+    caseStudies: {
+      pitchboulder: {
+        meta: {
+          title: "PitchBoulder — coverage, recaps & a commercial",
+          description:
+            "How I run PitchBoulder's event coverage and recaps, and produced their commercial.",
+        },
+        hook: "The work I do for PitchBoulder, start to finish.",
+        context: {
+          heading: "Who they are",
+          body: "[confirm]",
+        },
+        ask: {
+          heading: "The ask",
+          body: "[confirm]",
+        },
+        work: {
+          heading: "The work",
+          proof: { relationshipId: "pitchboulder" } as ProofLine,
+          body: "Event coverage and recaps on an ongoing basis, plus a commercial produced end to end.",
+        },
+        outcome: {
+          heading: "The outcome",
+          body: "[confirm]", // plain honest statement or one real metric — never invented
+        },
+        testimonialId: "pitchboulder",
+        cta: { label: "Forge your saga", href: "/forge-the-saga" },
+      },
+    },
+  },
+
+  // ---- ABOUT (§1.6) — single-arc StorySmith narrative, first person. -------
+  about: {
+    meta: {
+      title: "About — Sindbad Horizon, the StorySmith",
+      description:
+        "One craft — storytelling — told across the wild, the market, and the industry. Boulder is home base; the world is the territory.",
+    },
+    // Verifiable facts only (research-brief §1). Everything else is thesis.
+    bio: {
+      name: SITE.person,
+      persona: SITE.persona,
+      location: SITE.location,
+    },
+    narrative: [
+      "I'm Sindbad Horizon. People call me the StorySmith. I find the truest version of a story and forge it into something people feel.",
+      "I've learned to do that in three kinds of terrain. In the wild, the story is a place most cameras never reach. In the market, it's a founder's real advantage, buried under the wrong words. In the industry, it's a set of relationships — and the honesty to name each one for what it is.",
+      "They look like three different jobs. They're one craft. The same instinct that reads the line of a ridge reads the line of an argument.",
+      COPY.anchors.homeBase, // "Boulder is home base. The world is the territory."
+    ] as readonly string[],
+    // The legend device turned into a trust statement (§1.6 close).
+    legendLine:
+      "And because trust is the whole point, I mark every relationship on this site at exactly what it is — official, delivered, informal, or simply a room I was in.",
+  },
+
+  // ---- CONTACT (§1.7) — conversion. ----------------------------------------
+  contact: {
+    meta: {
+      title: "Contact",
+      description:
+        "Tell me what you're building. No pitch, no pressure — if Forge the Saga is a fit, we'll talk.",
+    },
+    headline: COPY.anchors.noPressure,
+    body: "Tell me what you're building. If Forge the Saga is a fit, we'll talk. If it isn't, I'll point you somewhere better.",
+    email: SITE.email,
+    // Form endpoint, book-a-call, and socials resolve from SITE ([confirm]).
+  },
+} as const;
