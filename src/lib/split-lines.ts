@@ -44,7 +44,7 @@ export function splitLines(el: HTMLElement): void {
     const mask = document.createElement("span");
     mask.className = "line-mask";
     const inner = document.createElement("span");
-    inner.style.setProperty("--reveal-delay", `${idx * 90}ms`);
+    inner.style.setProperty("--reveal-delay", `${idx * 115}ms`); // LP-3: line-rise stagger up (was 90ms)
     inner.textContent = line.join(" ");
     mask.append(inner);
     el.append(mask);

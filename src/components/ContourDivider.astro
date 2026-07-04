@@ -13,26 +13,26 @@ const { class: klass = "" } = Astro.props;
 ---
 
 <div class={`contour-draw ${klass}`} data-reveal aria-hidden="true">
-  <svg viewBox="0 0 1200 48" fill="none" preserveAspectRatio="none" class="h-8 w-full opacity-60">
+  <svg viewBox="0 0 1200 48" fill="none" preserveAspectRatio="none" class="h-8 w-full opacity-75">
     <path
       pathLength="1"
       d="M0 38 C 140 30, 240 44, 380 34 S 640 14, 800 26 S 1080 40, 1200 30"
       stroke="var(--color-accent-deep)"
-      stroke-width="1"
+      stroke-width="1.25"
     ></path>
     <path
       pathLength="1"
       d="M0 24 C 160 18, 300 30, 460 22 S 720 6, 900 16 S 1120 26, 1200 18"
       stroke="color-mix(in srgb, var(--color-peak) 30%, transparent)"
-      stroke-width="1"
-      style="--reveal-delay: 150ms"
+      stroke-width="1.25"
+      style="--reveal-delay: 200ms"
     ></path>
     <path
       pathLength="1"
       d="M0 10 C 180 6, 340 16, 520 10 S 780 2, 960 8 S 1140 14, 1200 8"
       stroke="color-mix(in srgb, var(--color-peak) 16%, transparent)"
-      stroke-width="1"
-      style="--reveal-delay: 300ms"
+      stroke-width="1.25"
+      style="--reveal-delay: 400ms"
     ></path>
   </svg>
 </div>

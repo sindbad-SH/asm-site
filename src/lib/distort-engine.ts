@@ -43,18 +43,18 @@ varying vec2 vUv;
 void main() {
   vec2 uv = vUv;
 
-  // scroll-velocity wave — the whole surface breathes with the scroll (subtle)
-  uv.x += sin(uv.y * 5.0 + uTime * 0.8) * uVel * 0.03;
-  uv.y += sin(uv.x * 3.0) * uVel * 0.012;
+  // scroll-velocity wave — the whole surface breathes with the scroll (LP-3: up a notch)
+  uv.x += sin(uv.y * 5.0 + uTime * 0.8) * uVel * 0.037;
+  uv.y += sin(uv.x * 3.0) * uVel * 0.015;
 
-  // hover ripple — rings emanate from the pointer, eased by uStrength
+  // hover ripple — rings emanate from the pointer, eased by uStrength (LP-3: stronger)
   float d = distance(uv, uHover);
   float fall = smoothstep(0.6, 0.0, d);
-  float ripple = sin(d * 26.0 - uTime * 3.4) * 0.012;
-  uv += normalize(uv - uHover + 1e-4) * ripple * fall * uStrength * 2.0;
+  float ripple = sin(d * 26.0 - uTime * 3.4) * 0.015;
+  uv += normalize(uv - uHover + 1e-4) * ripple * fall * uStrength * 2.35;
 
   vec3 color = texture2D(tMap, uv).rgb;
-  color *= 1.0 + 0.07 * uStrength * fall; // brightness lift mirrors the CSS fallback
+  color *= 1.0 + 0.09 * uStrength * fall; // brightness lift (LP-3: was 0.07)
   gl_FragColor = vec4(color, 1.0);
 }
 `;
