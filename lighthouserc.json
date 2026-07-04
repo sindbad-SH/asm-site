@@ -2,6 +2,17 @@
   "ci": {
     "collect": {
       "staticDistDir": "./.lighthouseci-site",
+      "url": [
+        "/asm-site/",
+        "/asm-site/about/",
+        "/asm-site/adventure/",
+        "/asm-site/contact/",
+        "/asm-site/entertainment/",
+        "/asm-site/forge-the-saga/",
+        "/asm-site/privacy/",
+        "/asm-site/work/",
+        "/asm-site/work/pitchboulder/"
+      ],
       "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--no-sandbox --headless=new",

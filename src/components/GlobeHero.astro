@@ -21,7 +21,19 @@
  * (cobe → globe.gl) touches only this island.
  *
  * Debug: ?globe=static forces the poster path; ?globe=debug shows hotspot
- * rings for projection-alignment checks against cobe's own marker dots.
+ * rings for projection-alignment checks against cobe's own marker dots;
+ * ?globe=force skips the software-renderer check (below) and boots cobe
+ * regardless — for testing the interactive globe in a software-GL environment.
+ *
+ * Fallback layers, in order: no-JS → poster (server-rendered, always correct).
+ * html.js + reduced-motion / ?globe=static → poster (script bails early).
+ * html.js + no WebGL at all → poster (createGlobe throws, caught below).
+ * html.js + WebGL is CPU-rasterized (SwiftShader/llvmpipe — some sandboxed/
+ * virtualized/CI environments) → poster: cobe's continuous per-frame render
+ * is cheap on real GPU acceleration but can be an order of magnitude slower
+ * with every fragment shaded on the CPU, exactly the "weak device" class the
+ * §4 CPU budget protects against — so this is treated the same as no WebGL,
+ * not a new special case.
  */
 import { GLOBE } from "../consts";
 import { projectPin, facingPhi } from "../lib/globe-math";
@@ -145,6 +157,32 @@ const LATS = [-45, -15, 15, 45];
   };
 
   const root = document.querySelector<HTMLElement>("[data-globe]");
+
+  // Detect a SOFTWARE (CPU-rasterized) WebGL renderer — e.g. SwiftShader/
+  // llvmpipe, seen on some sandboxed/virtualized environments and CI runners
+  // with no GPU. cobe's continuous per-frame render is cheap on real hardware
+  // acceleration (the globe measured perf 100 / TTI ~1s on real hardware in
+  // dev) but can be an order of magnitude slower when every fragment is
+  // shaded on the CPU — exactly the class of "weak device" the §4 4x-CPU
+  // budget exists to protect. Rather than add a special case, this extends
+  // the EXISTING no-WebGL fallback (poster + static story list, §2a) to also
+  // cover "WebGL exists but is emulated in software" — a probe canvas (never
+  // attached to the DOM) is used so checking this never touches the real
+  // canvas cobe will render into.
+  function hasSoftwareRenderer(): boolean {
+    try {
+      const probe = document.createElement("canvas");
+      const gl = (probe.getContext("webgl") ||
+        probe.getContext("experimental-webgl")) as WebGLRenderingContext | null;
+      if (!gl) return false; // no context at all — createGlobe's own try/catch handles that
+      const info = gl.getExtension("WEBGL_debug_renderer_info");
+      const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      return /swiftshader|llvmpipe|software|basic render/i.test(renderer);
+    } catch {
+      return false; // can't tell — assume hardware, keep the interactive globe
+    }
+  }
 
   const boot = () => {
     if (!root) return;
@@ -275,6 +313,11 @@ const LATS = [-45, -15, 15, 45];
         }
       }
     };
+
+    // Software-rendered WebGL → the poster + static story list is the correct
+    // experience (same fallback as "no WebGL"), not a degraded interactive
+    // globe fighting a CPU rasterizer every frame.
+    if (params.get("globe") !== "force" && hasSoftwareRenderer()) return;
 
     // ── cobe v2: it renders synchronously inside update(); we own the loop.
     //    Options take LOGICAL pixels — cobe multiplies by devicePixelRatio. ──
