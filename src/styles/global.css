@@ -733,6 +733,66 @@
     }
   }
 
+  /* ── Scroll-scrubbed frame sequence (§2c / §4) ──
+     Poster-first: the poster (or annotated placeholder) shows until frame 0
+     decodes, then the canvas fades in and the poster fades out. Reduced
+     motion / no-JS / no frames → the poster stays (static), which is the
+     accessible baseline. */
+  .scrub {
+    position: relative;
+  }
+  .scrub__sticky {
+    position: relative;
+    height: 82svh;
+    overflow: clip;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+  [data-scrub-poster],
+  .scrub__canvas,
+  .scrub__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  [data-scrub-poster] {
+    z-index: 0;
+    transition: opacity 400ms var(--ease-survey);
+  }
+  [data-scrub-poster].is-hidden {
+    opacity: 0;
+  }
+  .scrub__ph {
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    text-align: center;
+    background: var(--color-elevated);
+  }
+  .scrub__canvas {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 400ms var(--ease-survey);
+  }
+  .scrub__canvas.is-ready {
+    opacity: 1;
+  }
+  .scrub__video {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 700ms var(--ease-survey);
+  }
+  .scrub__video.is-playing {
+    opacity: 1;
+  }
+  .scrub__content {
+    position: relative;
+    z-index: 2;
+  }
+
   /* ── §2e hover-distortion: CSS fallback + WebGL handover ──
      The CSS transform hover is the DEFAULT for every visitor (scale +
      brightness, mirroring the shader's own response). When the OGL engine

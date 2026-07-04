@@ -1,0 +1,187 @@
+---
+/**
+ * ScrubSequence (BUILD-PLAN.md §2c / §4) — a reusable scroll-scrubbed
+ * frame-sequence "moment" (the Apple product-page technique). Drop one into a
+ * page for a BTS/commercial beat; the case-study walkthrough is its first
+ * consumer.
+ *
+ * Poster-first: the poster (or, until real assets land, the annotated
+ * placeholder) is the LCP and shows immediately. The engine — canvas +
+ * off-thread decode + ScrollTrigger scrub — is a lazy chunk that loads only
+ * when the scene approaches AND motion is allowed.
+ *
+ * Fallbacks:
+ *   - no-JS / reduced motion → static poster (accessible baseline). NOTE: §4
+ *     names a "<video> ambient loop" for reduced motion, but a looping video
+ *     is itself motion — so reduced motion here gets the STATIC poster only.
+ *     The optional videoFallback loops only when there is NO frame sequence
+ *     (an ambient alternative) or if the engine fails to load, and never under
+ *     reduced motion. Deliberate, accessibility-respecting deviation.
+ *   - no frames yet → the placeholder IS the poster, naming the exact asset +
+ *     budget (S/G3). Supply `framesBase`+`count` (+`poster`) later; no markup
+ *     change.
+ *
+ * Budget (§4): count is clamped to 96 at build (warns); the engine enforces
+ * ≤2.5MB/sequence and ≤2 sequences/page at runtime.
+ *
+ * Usage:
+ *   <ScrubSequence count={72} framesBase="/seq/pitchboulder/f-" frameExt="webp"
+ *     poster="/seq/pitchboulder/poster.webp"
+ *     placeholderLabel="BTS scrub — …" />
+ */
+export interface VideoSource {
+  src: string;
+  type: string;
+}
+
+interface Props {
+  count?: number;
+  framesBase?: string; // e.g. "/seq/name/f-" → f-001.webp …
+  frameExt?: string;
+  framePad?: number;
+  frames?: readonly string[]; // OR pass explicit URLs (skips framesBase build)
+  poster?: string;
+  videoFallback?: readonly VideoSource[];
+  placeholderLabel: string;
+  scrollVh?: number;
+  class?: string;
+}
+
+const MAX_FRAMES = 96;
+
+const {
+  count = 0,
+  framesBase,
+  frameExt = "webp",
+  framePad = 3,
+  frames: framesProp,
+  poster,
+  videoFallback = [],
+  placeholderLabel,
+  scrollVh = 160,
+  class: klass = "",
+} = Astro.props;
+
+let frames: string[] =
+  framesProp?.slice() ??
+  (framesBase
+    ? Array.from(
+        { length: count },
+        (_, i) => `${framesBase}${String(i + 1).padStart(framePad, "0")}.${frameExt}`,
+      )
+    : []);
+
+if (frames.length > MAX_FRAMES) {
+  console.warn(
+    `[scrub] ${frames.length} frames exceeds the ${MAX_FRAMES}-frame budget — clamped (${placeholderLabel}).`,
+  );
+  frames = frames.slice(0, MAX_FRAMES);
+}
+
+const hasFrames = frames.length > 0;
+const hasVideo = videoFallback.length > 0;
+---
+
+<div class={`scrub ${klass}`} data-scrub data-scroll-vh={scrollVh}>
+  <div class="scrub__sticky" data-scrub-sticky>
+    {
+      poster ? (
+        <img
+          class="scrub__poster"
+          src={poster}
+          alt=""
+          fetchpriority="high"
+          decoding="async"
+          data-scrub-poster
+        />
+      ) : (
+        <div class="scrub__ph topo-lines" aria-hidden="true" data-scrub-poster>
+          <span class="hud-label max-w-prose normal-case">{placeholderLabel}</span>
+        </div>
+      )
+    }
+
+    {hasFrames && <canvas class="scrub__canvas" aria-hidden="true" data-scrub-canvas />}
+
+    {
+      hasVideo && (
+        <video
+          class="scrub__video"
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={poster}
+          aria-hidden="true"
+          data-scrub-video
+        >
+          {videoFallback.map((s) => (
+            <source data-src={s.src} type={s.type} />
+          ))}
+        </video>
+      )
+    }
+
+    <div class="scrub__content"><slot /></div>
+  </div>
+
+  {hasFrames && <script type="application/json" data-scrub-frames is:inline set:html={JSON.stringify(frames)} />}
+</div>
+
+<script>
+  // Gate + fallback. GSAP + the engine load ONLY on the scrub path — the
+  // static/fallback paths stay light. Handles every [data-scrub] on the page
+  // (Astro dedupes this hoisted script; querySelectorAll covers all instances).
+  const params = new URLSearchParams(location.search);
+
+  document.querySelectorAll<HTMLElement>("[data-scrub]").forEach((root) => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const framesEl = root.querySelector("[data-scrub-frames]");
+    const frames: string[] = framesEl ? JSON.parse(framesEl.textContent || "[]") : [];
+    const video = root.querySelector<HTMLVideoElement>("[data-scrub-video]");
+
+    // reduced motion → static poster only (never autoplay a looping video)
+    if (reduce) return;
+
+    // no frame sequence → the video loop is the ambient alternative, if any
+    if (frames.length === 0) {
+      if (video) startLoop(video);
+      return;
+    }
+
+    const boot = () =>
+      import("../lib/scrub-engine")
+        .then((m) => m.initScrub(root, { frames, scrollVh: Number(root.dataset.scrollVh) || 160 }))
+        .catch(() => {
+          if (video) startLoop(video); // engine failed → ambient video (non-reduce)
+        });
+
+    if (params.get("scrub") === "force") {
+      void boot(); // QA: skip the IO wait (hidden tabs starve IO delivery)
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          void boot();
+        }
+      },
+      { rootMargin: "60%" }, // §4 lazy boundary
+    );
+    io.observe(root);
+  });
+
+  function startLoop(video: HTMLVideoElement) {
+    video.querySelectorAll<HTMLSourceElement>("source[data-src]").forEach((s) => {
+      s.src = s.dataset.src ?? "";
+    });
+    if (!video.querySelector("source[src]")) return; // no real source → poster stays
+    video.muted = true;
+    video.preload = "auto";
+    video.load();
+    video.addEventListener("playing", () => video.classList.add("is-playing"), { once: true });
+    void video.play().catch(() => {});
+  }
+</script>
