@@ -463,6 +463,22 @@ export type TableauChapter = {
   link: Cta;
 };
 
+/** A case-study walkthrough (§2c) — consumed by CaseStudy.astro. Chapters are
+ *  fixed (context / ask / work / outcome / words); `body: "[confirm]"` marks
+ *  an honest-outcome slot still awaiting Sindbad's real content (never
+ *  invented). */
+export type CaseStudySection = { heading: string; body: string; proof?: ProofLine };
+export type CaseStudyData = {
+  meta: { title: string; description: string };
+  hook: string;
+  context: CaseStudySection;
+  ask: CaseStudySection;
+  work: CaseStudySection & { proof: ProofLine };
+  outcome: CaseStudySection;
+  testimonialId: string;
+  cta: Cta;
+};
+
 export const PAGES = {
   // ---- HOME (§1.1). Hero + paths live in COPY; sections below follow. ------
   home: {

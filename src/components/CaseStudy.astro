@@ -1,0 +1,181 @@
+---
+/**
+ * CaseStudy — the Immersive-Garden walkthrough template (BUILD-PLAN.md §2c).
+ * The quality bar for every future case: full-bleed hook → sticky survey
+ * chapter rail → reasoning-first chapters (the strategy behind each piece,
+ * Noguier model) → honest outcome (never an invented metric) → testimonial →
+ * a single CTA. Data-driven from CaseStudyData, so a future case is data + a
+ * three-line page.
+ *
+ * Reads as a plain no-JS document first: semantic <article>, chapters in
+ * order, rail is jump-links, media degrades to posters. The rail scroll-spy,
+ * hook video, BTS scrub, and reveals are all progressive enhancement.
+ */
+import type { CaseStudyData } from "../consts";
+import HeroVideo from "./HeroVideo.astro";
+import LegendMark from "./LegendMark.astro";
+import Testimonial from "./Testimonial.astro";
+import ScrubSequence from "./ScrubSequence.astro";
+import YouTubeEmbed from "./YouTubeEmbed.astro";
+import Placeholder from "./Placeholder.astro";
+
+interface Props {
+  study: CaseStudyData;
+  base: string;
+  /** Real video id for the commercial once supplied (S3); [confirm] until then. */
+  commercialVideoId?: string;
+}
+const { study, base, commercialVideoId } = Astro.props;
+
+const rail = [
+  { id: "context", label: "Context" },
+  { id: "ask", label: "The Ask" },
+  { id: "work", label: "The Work" },
+  { id: "outcome", label: "Outcome" },
+  { id: "words", label: "Words" },
+] as const;
+
+// An honest-outcome slot still awaiting Sindbad's real content renders as a
+// visible pending marker, never as fabricated copy. Keeps the literal
+// "[confirm]" in the output so the audit gate still catches it.
+const isPending = (body: string) => body.trim() === "[confirm]";
+---
+
+<article class="case">
+  <!-- Hook — full-bleed (§2c). The case's h1 lives here. -->
+  <HeroVideo
+    placeholderLabel="HOOK MEDIA (§2c) — PitchBoulder commercial still or a short ambient loop (S3). Poster ships first."
+  >
+    <h1 class="text-4xl font-bold sm:text-6xl">{study.hook}</h1>
+  </HeroVideo>
+
+  <!-- Sticky survey chapter rail (desktop; jump-links without JS) -->
+  <nav class="case-rail" aria-label="Chapters">
+    <ol>
+      {
+        rail.map((item, i) => (
+          <li>
+            <a href={`#${item.id}`} data-rail-link={item.id}>
+              <span class="tick" aria-hidden="true" />
+              <span class="no">{String(i + 1).padStart(2, "0")}</span>
+              <span class="label">{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <!-- 01 · Context -->
+  <section id="context" class="case-chapter" data-chapter>
+    <div class="case-chapter__inner space-y-4">
+      <p class="hud-label">01 · Context</p>
+      <h2 class="text-2xl font-bold" data-reveal>{study.context.heading}</h2>
+      {
+        isPending(study.context.body) ? (
+          <p class="case-pending">[confirm] — who PitchBoulder is, in Sindbad's words (S3)</p>
+        ) : (
+          <p class="text-lg text-ink" data-reveal>{study.context.body}</p>
+        )
+      }
+      <Placeholder ratio="16/9" class="mt-4" label="CONTEXT STILL — a PitchBoulder event frame (S3)" />
+    </div>
+  </section>
+
+  <!-- 02 · The Ask -->
+  <section id="ask" class="case-chapter" data-chapter>
+    <div class="case-chapter__inner space-y-4">
+      <p class="hud-label">02 · The Ask</p>
+      <h2 class="text-2xl font-bold" data-reveal>{study.ask.heading}</h2>
+      {
+        isPending(study.ask.body) ? (
+          <p class="case-pending">[confirm] — what they needed, in Sindbad's words (S3)</p>
+        ) : (
+          <p class="text-lg text-ink" data-reveal>{study.ask.body}</p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- 03 · The Work — the rich chapter: BTS scrub + commercial + proof -->
+  <section id="work" class="case-chapter" data-chapter>
+    <div class="case-chapter__inner space-y-6">
+      <p class="hud-label">03 · The Work</p>
+      <h2 class="text-2xl font-bold" data-reveal>{study.work.heading}</h2>
+      <p class="text-lg text-ink" data-reveal>{study.work.body}</p>
+      <LegendMark proof={study.work.proof} />
+    </div>
+
+    <!-- BTS scroll-scrub moment (§2c). No frames yet → poster (S/G3). -->
+    <ScrubSequence
+      count={0}
+      placeholderLabel="BTS SCRUB (§2c/§4) — behind-the-scenes of the commercial as a scroll-scrubbed sequence. WebP · ≤96 frames · ≤2.5MB. Supply framesBase+count to activate."
+    />
+
+    <div class="case-chapter__inner space-y-3">
+      <p class="hud-label">The commercial</p>
+      <YouTubeEmbed
+        videoId={commercialVideoId}
+        title="PitchBoulder commercial"
+        placeholderLabel="COMMERCIAL — YouTube embed, click-to-load facade (S3). Supply the video id; full video is never self-hosted (§4)."
+      />
+    </div>
+  </section>
+
+  <!-- 04 · Outcome — honest, never an invented metric -->
+  <section id="outcome" class="case-chapter" data-chapter>
+    <div class="case-chapter__inner space-y-4">
+      <p class="hud-label">04 · Outcome</p>
+      <h2 class="text-2xl font-bold" data-reveal>{study.outcome.heading}</h2>
+      {
+        isPending(study.outcome.body) ? (
+          <p class="case-pending">
+            [confirm] — a plain honest statement or one real metric, never invented (S3)
+          </p>
+        ) : (
+          <p class="text-lg text-ink" data-reveal>{study.outcome.body}</p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- 05 · Words — the testimonial -->
+  <section id="words" class="case-chapter" data-chapter>
+    <div class="case-chapter__inner">
+      <p class="hud-label mb-4">05 · Words</p>
+      <Testimonial testimonialId={study.testimonialId} class="panel p-6" />
+    </div>
+  </section>
+
+  <!-- Single CTA -->
+  <section class="case-chapter">
+    <div class="case-chapter__inner space-y-4 text-center">
+      <a href={`${base}${study.cta.href}`} class="btn">{study.cta.label}</a>
+    </div>
+  </section>
+</article>
+
+<script>
+  // Rail scroll-spy — light the chapter crossing the viewport's middle band.
+  // Pure enhancement: without JS the rail links still jump to each chapter.
+  const links = new Map<string, HTMLElement>();
+  document.querySelectorAll<HTMLElement>("[data-rail-link]").forEach((a) => {
+    const id = a.dataset.railLink;
+    if (id) links.set(id, a);
+  });
+  const chapters = document.querySelectorAll<HTMLElement>("[data-chapter]");
+  if (links.size && chapters.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            links.forEach((a) => a.classList.remove("is-active"));
+            links.get(e.target.id)?.classList.add("is-active");
+          }
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+    );
+    chapters.forEach((s) => io.observe(s));
+  }
+</script>

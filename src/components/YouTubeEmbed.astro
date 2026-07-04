@@ -1,0 +1,62 @@
+---
+/**
+ * YouTube click-to-load facade (§4: "click-to-load facade — no iframe until
+ * interaction"). Zero contact with YouTube until the visitor clicks: no
+ * iframe, no thumbnail fetch (we show a self-hosted poster / placeholder, not
+ * i.ytimg.com), and the embed uses youtube-nocookie.com. Full videos are
+ * NEVER self-hosted (§4) — this is the only way a reel/commercial appears.
+ *
+ * Until the real video id lands (S3, currently [confirm]) the facade is an
+ * inert annotated placeholder — no play control, nothing to click.
+ */
+interface Props {
+  videoId?: string;
+  title: string;
+  placeholderLabel: string;
+  poster?: string;
+  class?: string;
+}
+const { videoId, title, placeholderLabel, poster, class: klass = "" } = Astro.props;
+const ready = !!videoId && videoId !== "[confirm]";
+---
+
+{
+  ready ? (
+    <div class={`yt map-inset ${klass}`} data-yt-id={videoId} data-yt-title={title}>
+      <button type="button" class="yt__btn" aria-label={`Play video: ${title}`}>
+        {poster ? (
+          <img src={poster} alt="" class="absolute inset-0 h-full w-full object-cover" decoding="async" />
+        ) : (
+          <span class="topo-lines absolute inset-0" aria-hidden="true" />
+        )}
+        <span class="yt__icon" aria-hidden="true">▶</span>
+      </button>
+    </div>
+  ) : (
+    <div class={`map-inset ${klass}`}>
+      <div class="topo-lines grid aspect-video place-items-center border border-dashed border-current/25 p-4">
+        <span class="hud-label max-w-prose normal-case text-center">{placeholderLabel}</span>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  // Click-to-load: swap the facade for a nocookie iframe on click. Only wired
+  // when a real video id is present (facade markup exists).
+  document.querySelectorAll<HTMLElement>("[data-yt-id]").forEach((el) => {
+    const btn = el.querySelector("button");
+    btn?.addEventListener("click", () => {
+      const id = el.dataset.ytId;
+      if (!id) return;
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      iframe.title = el.dataset.ytTitle ?? "Video";
+      iframe.className = "yt__iframe";
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      iframe.allowFullscreen = true;
+      iframe.loading = "lazy";
+      el.replaceChildren(iframe);
+    });
+  });
+</script>
