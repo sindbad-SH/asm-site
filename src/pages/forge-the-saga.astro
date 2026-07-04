@@ -1,102 +1,279 @@
 ---
+/**
+ * Forge the Saga — the primary lane (BUILD-PLAN.md §1.2). The whole page runs
+ * the Forge & Anneal dialect via data-lane="forge" (the sanctioned synthesis:
+ * Forge treatment scoped to the Consulting lane inside the Contour Survey
+ * shell — orange never escapes this scope, §6).
+ *
+ * F3 is the horizontal temper-line stepper (§3.3): a gradient temper line
+ * (orange → aqua = the thermal progression of forging) with 5 stage nodes.
+ * Interactive tablist when enhanced; the stacked panels are the accessible
+ * tabular fallback (no-JS / narrow / reduced-motion-safe).
+ */
 import Base from "../layouts/Base.astro";
 import Testimonial from "../components/Testimonial.astro";
+import Card from "../components/Card.astro";
 import { PAGES, SAGA_STAGES, WORK } from "../consts";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const deliveredWork = WORK.filter((item) => p.proof.deliveredWorkSlugs.includes(item.slug));
+const n = SAGA_STAGES.length;
+
+// Each node's temperature tint: stage 01 sits at the hot (orange) working end,
+// stage 05 at the set (aqua) end — the forging progression made literal.
+const nodeColor = (i: number) =>
+  `color-mix(in srgb, var(--color-forge-heat) ${Math.round((1 - i / (n - 1)) * 100)}%, var(--color-accent))`;
+
+// Split a "from $X …" price so the numeric part can count up (real data, §OD-4).
+function parsePrice(price: string) {
+  const m = price.match(/\$([\d,]+)/);
+  if (!m) return { pre: price, num: "", val: 0, suf: "" };
+  const idx = price.indexOf(m[0]);
+  return {
+    pre: price.slice(0, idx + 1), // through the "$"
+    num: m[1],
+    val: Number(m[1].replace(/,/g, "")),
+    suf: price.slice(idx + m[0].length),
+  };
+}
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- F1 — belief hero -->
-  <section class="mx-auto max-w-3xl space-y-4 p-8 text-center">
-    <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
-    <p class="text-lg">{p.hero.subline}</p>
-    <a href={`${base}${p.hero.cta.href}`} class="inline-block rounded border border-current px-4 py-2">
-      {p.hero.cta.label}
-    </a>
-  </section>
+  <div data-lane="forge">
+    <!-- F1 — belief hero -->
+    <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
+      <h1 class="text-4xl font-bold sm:text-6xl">{p.hero.headline}</h1>
+      <p class="mx-auto max-w-xl text-lg text-ink">{p.hero.subline}</p>
+      <a href={`${base}${p.hero.cta.href}`} class="btn">{p.hero.cta.label}</a>
+    </section>
 
-  <!-- F2 — who it's for -->
-  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8">
-    <h2 class="text-2xl font-bold">{p.whoFor.heading}</h2>
-    <p>{p.whoFor.body}</p>
-    <ul class="list-inside list-disc space-y-1">
-      {p.whoFor.items.map((item) => <li>{item}</li>)}
-    </ul>
-  </section>
+    <!-- F2 — who it's for -->
+    <section class="mx-auto max-w-3xl space-y-5 border-t border-hairline p-8">
+      <h2 class="text-2xl font-bold">{p.whoFor.heading}</h2>
+      <p class="text-ink">{p.whoFor.body}</p>
+      <ul class="grid gap-3 sm:grid-cols-3">
+        {
+          p.whoFor.items.map((item) => (
+            <li class="panel p-4 text-sm text-ink">{item}</li>
+          ))
+        }
+      </ul>
+    </section>
 
-  <!-- F3 — the five stages (temper-line walkthrough is a Phase 2/3 build, §2/§3.3;
-       tabular fallback shown here as the accessible baseline) -->
-  <section class="mx-auto max-w-3xl space-y-6 border-t border-current/20 p-8">
-    <h2 class="text-2xl font-bold">{p.stages.heading}</h2>
-    <p>{p.stages.body}</p>
-    <ol class="space-y-6">
-      {
-        SAGA_STAGES.map((stage) => (
-          <li class="space-y-1 border-l-2 border-current/30 pl-4">
-            <p class="text-sm uppercase tracking-widest opacity-70">
-              {stage.no} · {stage.sub}
-            </p>
-            <h3 class="text-xl font-bold">{stage.name}</h3>
-            <p>{stage.process}</p>
-            <p class="text-sm opacity-80">
-              Deliverable: {stage.deliverable} · {stage.price}
-            </p>
-            <p class="text-sm italic opacity-70">Best for: {stage.bestFor}</p>
-          </li>
-        ))
-      }
-    </ol>
-  </section>
+    <!-- F3 — the five stages: horizontal temper-line stepper -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
+      <h2 class="text-2xl font-bold">{p.stages.heading}</h2>
+      <p class="text-ink">{p.stages.body}</p>
+      <p class="hud-label text-accent-deep">{p.stages.anchor}</p>
 
-  <!--
-    F4 — pretest section. LAUNCHES AS VARIANT B (OD-2): Echo Panel is off the
-    site. Nothing renders here by design — the pretest idea already lives
-    honestly in Stage 04 above ("curated human panels, AI audience
-    simulations, or both"). Variant A copy sits unrendered in
-    PAGES.forge.pretestShelved and lifts back in without rework if the
-    service proves out.
-  -->
+      <div class="temper mt-4" data-temper>
+        <!-- track: hidden until JS + wide viewport enable the stepper -->
+        <div class="temper-track" data-temper-track hidden>
+          {
+            SAGA_STAGES.map((stage, i) => (
+              <button type="button" class="temper-node" data-tab={i} style={`--node-color:${nodeColor(i)}`}>
+                <span class="no">{stage.no}</span>
+                <span class="dot" aria-hidden="true" />
+                <span class="node-name">{stage.name}</span>
+              </button>
+            ))
+          }
+          <div class="temper-line" aria-hidden="true"></div>
+        </div>
 
-  <!-- F5 — proof -->
-  <section class="mx-auto max-w-3xl space-y-6 border-t border-current/20 p-8">
-    <h2 class="text-2xl font-bold">{p.proof.heading}</h2>
-    <Testimonial testimonialId={p.proof.testimonialId} />
-    <ul class="space-y-4">
-      {
-        deliveredWork.map((item) => (
-          <li class="space-y-2">
-            <p class="font-bold">
-              For {item.forOrg} · {item.what}
-            </p>
-            <p class="text-sm opacity-70">{item.engagement}</p>
-            {item.href && (
-              <a href={`${base}${item.href}`} class="link">
-                See the work <span class="arrow" aria-hidden="true">→</span>
-              </a>
-            )}
-          </li>
-        ))
-      }
-    </ul>
-    <p class="text-sm opacity-70">{p.proof.note}</p>
-  </section>
+        <!-- panels: all visible = the accessible tabular fallback -->
+        <div class="temper-panels">
+          {
+            SAGA_STAGES.map((stage, i) => {
+              const price = parsePrice(stage.price);
+              return (
+                <div
+                  class="temper-panel"
+                  data-panel={i}
+                  id={`forge-stage-${stage.no}`}
+                  style={`--node-color:${nodeColor(i)}`}
+                >
+                  <p class="hud-label">
+                    <span class="marker" aria-hidden="true">◆</span> {stage.no} · {stage.sub}
+                  </p>
+                  <h3 class="heat is-cold mt-1 text-2xl font-bold">{stage.name}</h3>
+                  <p class="mt-2 text-ink">{stage.process}</p>
+                  <dl class="temper-detail">
+                    <div>
+                      <dt>Deliverable</dt>
+                      <dd>{stage.deliverable}</dd>
+                    </div>
+                    <div>
+                      <dt>Investment</dt>
+                      <dd class="temper-price">
+                        {price.pre}
+                        <span data-price data-value={price.val}>{price.num}</span>
+                        {price.suf}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Best for</dt>
+                      <dd>{stage.bestFor}</dd>
+                    </div>
+                  </dl>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
 
-  <!-- F6 — pricing (OD-4: exact "from $X" — see the per-stage prices above) -->
-  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8">
-    <h2 class="text-2xl font-bold">{p.pricing.heading}</h2>
-    <p>{p.pricing.body}</p>
-    <p class="text-sm opacity-70">{p.pricing.note}</p>
-  </section>
+    <!--
+      F4 — pretest section. RESERVED SLOT, launches as VARIANT B (OD-2): Echo
+      Panel is off the site. Nothing renders here by design — the pretest idea
+      already lives honestly in Stage 04 above ("curated human panels, AI
+      audience simulations, or both"). Variant A copy sits unrendered in
+      PAGES.forge.pretestShelved; to lift it back in, render a <section> here
+      from that data. Do not remove this anchor — it keeps F5 numbering + the
+      page's honest structure intact.
+    -->
 
-  <!-- F7 — CTA -->
-  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8 text-center">
-    <h2 class="text-2xl font-bold">{p.cta.headline}</h2>
-    <p>{p.cta.body}</p>
-    <a href={`${base}${p.cta.cta.href}`} class="inline-block rounded border border-current px-4 py-2">
-      {p.cta.cta.label}
-    </a>
-  </section>
+    <!-- F5 — proof: PitchBoulder case + delivered-work cards (honest labels) -->
+    <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-8">
+      <h2 class="text-2xl font-bold">{p.proof.heading}</h2>
+      <Testimonial testimonialId={p.proof.testimonialId} class="panel p-5" />
+      <div class="grid gap-5 sm:grid-cols-2">
+        {
+          deliveredWork.map((item) => (
+            <Card
+              href={item.href ? `${base}${item.href}` : undefined}
+              eyebrow={item.engagement}
+              title={`For ${item.forOrg} · ${item.what}`}
+              proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
+              ctaLabel={item.href ? "See the work" : undefined}
+            />
+          ))
+        }
+      </div>
+      <p class="text-sm text-ink-muted">{p.proof.note}</p>
+    </section>
+
+    <!-- F6 — pricing (OD-4: exact "from $X"; per-stage figures live in F3) -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
+      <h2 class="text-2xl font-bold">{p.pricing.heading}</h2>
+      <p class="text-lg text-ink">{p.pricing.body}</p>
+      <p class="text-sm text-ink-muted">{p.pricing.note}</p>
+    </section>
+
+    <!-- F7 — CTA -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+      <h2 class="text-2xl font-bold">{p.cta.headline}</h2>
+      <p class="mx-auto max-w-xl text-ink">{p.cta.body}</p>
+      <a href={`${base}${p.cta.cta.href}`} class="btn">{p.cta.cta.label}</a>
+    </section>
+  </div>
 </Base>
+
+<script>
+  // F3 temper-line stepper controller. Progressive enhancement: the stacked
+  // panels are the accessible fallback; this upgrades them to a WAI-ARIA
+  // tablist on wide viewports only. Reduced motion → no count-up; hidden tab →
+  // price resting value stays correct (rAF may not fire).
+  const root = document.querySelector<HTMLElement>("[data-temper]");
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const track = root.querySelector<HTMLElement>("[data-temper-track]");
+    const nodes = [...root.querySelectorAll<HTMLElement>("[data-tab]")];
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-panel]")];
+    if (!track || nodes.length === 0 || nodes.length !== panels.length) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wide = window.matchMedia("(min-width: 768px)");
+    const fmt = (v: number) => v.toLocaleString("en-US");
+    const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
+
+    // ARIA wiring (only meaningful once interactive)
+    track.setAttribute("role", "tablist");
+    track.setAttribute("aria-label", "Forge the Saga stages");
+    nodes.forEach((node, i) => {
+      const panel = panels[i]!;
+      node.setAttribute("role", "tab");
+      node.setAttribute("aria-controls", panel.id);
+      panel.setAttribute("role", "tabpanel");
+      panel.setAttribute("aria-labelledby", (node.id ||= `temper-tab-${i}`));
+      panel.setAttribute("tabindex", "0");
+    });
+
+    let selected = 0;
+
+    function countUp(panel: HTMLElement) {
+      const el = panel.querySelector<HTMLElement>("[data-price]");
+      if (!el) return;
+      const target = Number(el.getAttribute("data-value")) || 0;
+      el.textContent = fmt(target); // correct resting value, always
+      if (reduce || document.visibilityState !== "visible" || !target) return;
+      const dur = 480;
+      let start = -1;
+      const step = (t: number) => {
+        if (start < 0) start = t;
+        const k = Math.min(1, (t - start) / dur);
+        el.textContent = fmt(Math.round(target * (0.12 + 0.88 * easeOut(k))));
+        if (k < 1) requestAnimationFrame(step);
+        else el.textContent = fmt(target);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function select(i: number, focusNode = false) {
+      selected = i;
+      nodes.forEach((node, j) => {
+        const on = j === i;
+        node.setAttribute("aria-selected", String(on));
+        node.tabIndex = on ? 0 : -1;
+        if (on && focusNode) node.focus();
+      });
+      panels.forEach((panel, j) => {
+        panel.hidden = j !== i;
+        const name = panel.querySelector(".heat");
+        name?.classList.remove("is-cold", "is-hot", "is-set");
+        // hot at the working (early) end, set (aqua) at the finished end
+        name?.classList.add(j !== i ? "is-cold" : i < 3 ? "is-hot" : "is-set");
+        if (j === i) countUp(panel);
+      });
+    }
+
+    track.addEventListener("keydown", (e) => {
+      let next = -1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (selected + 1) % nodes.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (selected - 1 + nodes.length) % nodes.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = nodes.length - 1;
+      if (next >= 0) {
+        e.preventDefault();
+        select(next, true);
+      }
+    });
+    nodes.forEach((node, i) => node.addEventListener("click", () => select(i)));
+
+    function enable() {
+      root.setAttribute("data-interactive", "true");
+      track!.hidden = false;
+      select(selected);
+    }
+    function disable() {
+      root.removeAttribute("data-interactive");
+      track!.hidden = true;
+      // fallback: every panel visible, no heat state, resting prices
+      panels.forEach((panel) => {
+        panel.hidden = false;
+        const name = panel.querySelector(".heat");
+        name?.classList.remove("is-hot", "is-set");
+        name?.classList.add("is-cold");
+        const el = panel.querySelector<HTMLElement>("[data-price]");
+        if (el) el.textContent = fmt(Number(el.getAttribute("data-value")) || 0);
+      });
+    }
+    const sync = () => (wide.matches ? enable() : disable());
+    wide.addEventListener("change", sync);
+    window.addEventListener("resize", sync); // belt-and-suspenders (MQL change alone can miss)
+    sync();
+  }
+</script>

@@ -482,6 +482,137 @@
     text-shadow: none;
   }
 
+  /* ── F3 temper-line stepper (§3.3) ──
+     Interactive tablist on wide + JS; the stacked panels ARE the accessible
+     tabular fallback (no-JS / narrow / JS-disabled). The track (nodes) is
+     `hidden` until JS enables it, so a no-JS visitor sees no dead controls —
+     just the full, readable list of every stage. */
+  [data-lane="forge"] .temper-track {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.25rem 0 1.5rem;
+  }
+  [data-lane="forge"] .temper-track .temper-line {
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    top: 1.6rem; /* through the dot centres */
+    z-index: 0;
+  }
+  [data-lane="forge"] .temper-node {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    background: transparent;
+    font-family: var(--font-mono);
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+  [data-lane="forge"] .temper-node .no {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  [data-lane="forge"] .temper-node .dot {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--node-color);
+    background: var(--color-base);
+    transition:
+      transform var(--dur-hover) var(--ease-swift),
+      box-shadow var(--dur-hover) var(--ease-swift),
+      background var(--dur-hover) var(--ease-swift);
+  }
+  [data-lane="forge"] .temper-node .node-name {
+    max-width: 9ch;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.25;
+    text-align: center;
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  [data-lane="forge"] .temper-node[aria-selected="true"] .dot {
+    background: var(--node-color);
+    transform: scale(1.35);
+    box-shadow: 0 0 16px -1px var(--node-color);
+  }
+  [data-lane="forge"] .temper-node[aria-selected="true"] .no,
+  [data-lane="forge"] .temper-node[aria-selected="true"] .node-name,
+  [data-lane="forge"] .temper-node:hover .no,
+  [data-lane="forge"] .temper-node:hover .node-name {
+    color: var(--color-peak);
+  }
+  [data-lane="forge"] .temper-node:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* panels — stacked (fallback) by default; single visible panel when
+     interactive (JS toggles the [hidden] attribute per panel) */
+  [data-lane="forge"] .temper-panel {
+    position: relative;
+    isolation: isolate;
+    padding: 1.25rem 0;
+  }
+  [data-lane="forge"] .temper:not([data-interactive="true"]) .temper-panel + .temper-panel {
+    border-top: 1px solid var(--color-hairline);
+  }
+  [data-lane="forge"] .temper-panel .marker {
+    color: var(--node-color);
+  }
+  /* focal heat-bloom behind the active panel (screen blend; forge-scoped so
+     orange never escapes this lane, per §6) */
+  [data-lane="forge"] .temper[data-interactive="true"] .temper-panel:not([hidden])::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -12% -6% auto -6%;
+    height: 72%;
+    background: radial-gradient(
+      55% 100% at 20% 8%,
+      color-mix(in srgb, var(--node-color) 16%, transparent),
+      transparent 72%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  [data-lane="forge"] .temper-detail {
+    display: grid;
+    gap: 0.75rem 2rem;
+    margin-top: 1rem;
+  }
+  @media (min-width: 640px) {
+    [data-lane="forge"] .temper-detail {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  [data-lane="forge"] .temper-detail dt {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted);
+  }
+  [data-lane="forge"] .temper-detail dd {
+    margin-top: 0.2rem;
+    color: var(--color-ink);
+  }
+  [data-lane="forge"] .temper-price {
+    font-family: var(--font-mono);
+    color: var(--color-peak);
+  }
+
   /* ── Adventure dialect (scoped) — flight-line + violet-slate depth ── */
   [data-lane="adventure"] .flight-line {
     height: 1px;
