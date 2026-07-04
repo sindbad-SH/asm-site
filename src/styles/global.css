@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/*
+ * Placeholder token stub — scaffolding only.
+ * The real Contour Survey design system (palette, type, motion grammar) is a
+ * Phase 2 task per BUILD-PLAN.md §3. Do not treat these as final values.
+ */
+@theme {
+  --color-base: #141922;
+  --color-ink: #e8e8e8;
+}
+
+html,
+body {
+  background-color: var(--color-base);
+  color: var(--color-ink);
+}
