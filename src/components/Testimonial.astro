@@ -10,9 +10,12 @@ import LegendMark from "./LegendMark.astro";
 
 interface Props {
   testimonialId: string;
+  /** Set false when the caller already renders a LegendMark for this same
+      relationship nearby — avoids printing the proof line twice. */
+  showProof?: boolean;
   class?: string;
 }
-const { testimonialId, class: klass = "" } = Astro.props;
+const { testimonialId, showProof = true, class: klass = "" } = Astro.props;
 const testimonial = TESTIMONIAL_BY_ID[testimonialId];
 
 if (!testimonial) {
@@ -23,5 +26,7 @@ if (!testimonial) {
 <figure class={`space-y-2 ${klass}`}>
   <blockquote class="italic">&ldquo;{testimonial.quote}&rdquo;</blockquote>
   <figcaption class="text-sm opacity-80">— {testimonial.attribution}</figcaption>
-  <LegendMark proof={{ relationshipId: testimonial.relationshipId, context: testimonial.context }} />
+  {showProof && (
+    <LegendMark proof={{ relationshipId: testimonial.relationshipId, context: testimonial.context }} />
+  )}
 </figure>

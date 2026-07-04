@@ -316,13 +316,17 @@ export const WORK: readonly WorkItem[] = [
     relationshipId: "pebble-beach",
   },
   {
+    // No relationshipId: this is personal/editorial work, not a licensed
+    // Amazing Aerial credit — attaching that relationship here would overstate
+    // it (the Ledger's "amazing-aerial" phrasing is specifically a LICENSING
+    // claim, not a blanket credit on all adventure footage). The Adventure
+    // page's Licensed section carries that proof line on its own.
     slug: "alps-expedition",
     title: "[confirm] — Italian Alps expedition selects",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
     what: "expedition photo & film, Italy",
     engagement: "personal / editorial",
-    relationshipId: "amazing-aerial",
   },
   {
     slug: "swiss-expedition",
@@ -331,7 +335,6 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "expedition photo & film, Switzerland",
     engagement: "personal / editorial",
-    relationshipId: "amazing-aerial",
   },
 ] as const;
 
@@ -656,7 +659,13 @@ export const PAGES = {
     // E3 — PitchBoulder feature (primary proof anchor).
     pitchboulder: {
       heading: "PitchBoulder",
-      proof: { relationshipId: "pitchboulder" } as ProofLine,
+      // context matches TESTIMONIALS["pitchboulder"].context — carried here
+      // since Testimonial's own proof line is suppressed (showProof={false})
+      // to avoid a back-to-back duplicate; see entertainment.astro E3.
+      proof: {
+        relationshipId: "pitchboulder",
+        context: "The primary proof anchor.",
+      } as ProofLine,
       testimonialId: "pitchboulder",
       link: { label: "See the work", href: "/work/pitchboulder" },
     },
@@ -666,7 +675,14 @@ export const PAGES = {
       intro: "The rest is honest about itself.",
       items: [
         {
-          proof: { relationshipId: "pebble-beach" } as ProofLine,
+          // context carries the same framing as TESTIMONIALS["pebble-beach-owner"]
+          // — the single LegendMark on this room states it once (Testimonial's
+          // own proof line is suppressed via showProof={false} to avoid a
+          // back-to-back duplicate; see entertainment.astro E4).
+          proof: {
+            relationshipId: "pebble-beach",
+            context: "A coverage endorsement from the car owner.",
+          } as ProofLine,
           testimonialId: "pebble-beach-owner",
         },
         { proof: { relationshipId: "seriesfest" } as ProofLine },
