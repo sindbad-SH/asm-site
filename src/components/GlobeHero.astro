@@ -341,9 +341,10 @@ const LATS = [-45, -15, 15, 45];
       running = false;
       cancelAnimationFrame(rafId);
     };
-    new IntersectionObserver(([entry]) => (entry?.isIntersecting ? start() : stop()), {
+    const io = new IntersectionObserver(([entry]) => (entry?.isIntersecting ? start() : stop()), {
       rootMargin: "80px",
-    }).observe(stage);
+    });
+    io.observe(stage);
     start();
 
     // ── drag with inertia (pointer events cover mouse + touch) ──
@@ -374,9 +375,10 @@ const LATS = [-45, -15, 15, 45];
     stage.style.touchAction = "pan-y"; // vertical page scroll stays native
 
     // ── resize (logical size; cobe re-applies dpr) ──
-    new ResizeObserver(() => {
+    const ro = new ResizeObserver(() => {
       size = stage.clientWidth;
-    }).observe(stage);
+    });
+    ro.observe(stage);
 
     // ── Layer 3: GSAP scroll handoff (Lando-style), streamed in at idle ──
     const mountHandoff = async () => {
@@ -415,6 +417,11 @@ const LATS = [-45, -15, 15, 45];
     window.addEventListener(
       "pagehide",
       () => {
+        // disconnect the observers BEFORE destroy — otherwise a bfcache restore
+        // can re-fire the IntersectionObserver, call start() → frame(), and hit
+        // globe.update() on a destroyed instance.
+        io.disconnect();
+        ro.disconnect();
         stop();
         globe.destroy();
       },

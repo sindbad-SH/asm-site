@@ -65,11 +65,14 @@ export async function initScrub(root: HTMLElement, opts: ScrubOptions): Promise<
     return null;
   };
 
-  const draw = (i: number) => {
+  // `force` re-draws the current index even when it hasn't changed — used to
+  // swap a blurry nearest-neighbour for the exact frame once it finishes
+  // decoding (the scrub path passes force=false to skip redundant redraws).
+  const draw = (i: number, force = false) => {
     const idx = Math.max(0, Math.min(frameUrls.length - 1, i));
     const bmp = nearest(idx);
     if (!bmp) return;
-    if (idx === currentIndex && posterHidden) return;
+    if (idx === currentIndex && posterHidden && !force) return;
     currentIndex = idx;
     if (canvas.width !== bmp.width || canvas.height !== bmp.height) {
       canvas.width = bmp.width; // intrinsic size from the real frame
@@ -87,7 +90,11 @@ export async function initScrub(root: HTMLElement, opts: ScrubOptions): Promise<
         if (!res.ok) continue;
         const blob = await res.blob();
         bytes += blob.size;
-        if (bytes > MAX_BYTES && decodedCount > 0) {
+        // Always admit frame 0 (a permanent poster is worse than one heavy
+        // frame); enforce the byte cap on every frame after it. i>0 is the
+        // explicit form — the old decodedCount>0 also let frame 1 bypass if
+        // frame 0's fetch had failed.
+        if (bytes > MAX_BYTES && i > 0) {
           console.warn(
             `[scrub] ${(bytes / 1e6).toFixed(1)}MB exceeds ${(MAX_BYTES / 1e6).toFixed(1)}MB budget — stopped at frame ${i} (§4).`,
           );
@@ -95,7 +102,7 @@ export async function initScrub(root: HTMLElement, opts: ScrubOptions): Promise<
         }
         bitmaps[i] = await createImageBitmap(blob); // decode off the main thread
         decodedCount++;
-        if (posterHidden) draw(currentIndex); // refine the shown frame as neighbours arrive
+        if (posterHidden) draw(currentIndex, true); // refine the shown frame as its exact bitmap arrives
         else if (i === 0) draw(0); // poster-first handover the moment frame 0 lands
       } catch {
         /* skip a bad frame; nearest() bridges the gap */

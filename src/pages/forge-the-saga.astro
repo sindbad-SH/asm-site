@@ -190,18 +190,6 @@ function parsePrice(price: string) {
     const fmt = (v: number) => v.toLocaleString("en-US");
     const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
 
-    // ARIA wiring (only meaningful once interactive)
-    track.setAttribute("role", "tablist");
-    track.setAttribute("aria-label", "Forge the Saga stages");
-    nodes.forEach((node, i) => {
-      const panel = panels[i]!;
-      node.setAttribute("role", "tab");
-      node.setAttribute("aria-controls", panel.id);
-      panel.setAttribute("role", "tabpanel");
-      panel.setAttribute("aria-labelledby", (node.id ||= `temper-tab-${i}`));
-      panel.setAttribute("tabindex", "0");
-    });
-
     let selected = 0;
 
     function countUp(panel: HTMLElement) {
@@ -256,13 +244,38 @@ function parsePrice(price: string) {
     function enable() {
       root.setAttribute("data-interactive", "true");
       track!.hidden = false;
+      // ARIA tablist wiring — only meaningful (and only present) while
+      // interactive, so disable() can strip it cleanly on resize back to narrow.
+      track!.setAttribute("role", "tablist");
+      track!.setAttribute("aria-label", "Forge the Saga stages");
+      nodes.forEach((node, i) => {
+        const panel = panels[i]!;
+        node.setAttribute("role", "tab");
+        node.setAttribute("aria-controls", panel.id);
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute("aria-labelledby", (node.id ||= `temper-tab-${i}`));
+        panel.setAttribute("tabindex", "0");
+      });
       select(selected);
     }
     function disable() {
       root.removeAttribute("data-interactive");
       track!.hidden = true;
-      // fallback: every panel visible, no heat state, resting prices
+      // strip the tablist semantics — otherwise screen readers see tabs and
+      // tabpanels layered over the now-static, all-visible stacked panels.
+      track!.removeAttribute("role");
+      track!.removeAttribute("aria-label");
+      nodes.forEach((node) => {
+        node.removeAttribute("role");
+        node.removeAttribute("aria-controls");
+        node.removeAttribute("aria-selected");
+        node.removeAttribute("tabindex");
+      });
+      // fallback: every panel visible, no tab semantics, no heat state, resting prices
       panels.forEach((panel) => {
+        panel.removeAttribute("role");
+        panel.removeAttribute("aria-labelledby");
+        panel.removeAttribute("tabindex");
         panel.hidden = false;
         const name = panel.querySelector(".heat");
         name?.classList.remove("is-hot", "is-set");

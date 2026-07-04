@@ -129,11 +129,13 @@ export function initDistortion(grids: HTMLElement[]): void {
 
   let W = 0;
   let H = 0;
+  let rectsDirty = true; // re-measure tile rects on the next frame
   const resize = () => {
     W = window.innerWidth;
     H = window.innerHeight;
     renderer.setSize(W, H);
     camera.orthographic({ left: -W / 2, right: W / 2, top: H / 2, bottom: -H / 2, near: 0.1, far: 100 });
+    rectsDirty = true;
   };
   resize();
   window.addEventListener("resize", resize);
@@ -147,6 +149,7 @@ export function initDistortion(grids: HTMLElement[]): void {
       texture = new Texture(gl, { generateMipmaps: false });
       const assign = () => {
         texture.image = img;
+        rectsDirty = true; // a late-loading image can change the tile's box
       };
       img.complete && img.naturalWidth > 0 ? assign() : img.addEventListener("load", assign, { once: true });
     } else {
@@ -183,14 +186,29 @@ export function initDistortion(grids: HTMLElement[]): void {
   let lastY = window.scrollY;
   let vel = 0;
 
+  // Tile DOM rects only move on scroll, resize, or a layout shift — measuring
+  // every tile every frame forces a reflow per tile and scales with the gallery
+  // (the media guide points toward 20–40 photos). Cache them and re-measure only
+  // when one of those fires; a rare non-scroll shift self-heals on the next
+  // scroll/frame, and the effect is ambient (text is lifted above via CSS).
+  const rects: DOMRect[] = [];
+  const measure = () => {
+    for (let k = 0; k < tiles.length; k++) rects[k] = tiles[k]!.media.getBoundingClientRect();
+    rectsDirty = false;
+  };
+
   const step = (now: number) => {
     const t = now * 0.001;
-    const dy = window.scrollY - lastY;
-    lastY = window.scrollY;
+    const y = window.scrollY;
+    const dy = y - lastY;
+    lastY = y;
     vel += (Math.max(-1, Math.min(1, dy * 0.05)) - vel) * 0.12;
 
-    for (const tile of tiles) {
-      const r = tile.media.getBoundingClientRect();
+    if (rectsDirty || dy !== 0) measure();
+
+    for (let k = 0; k < tiles.length; k++) {
+      const tile = tiles[k]!;
+      const r = rects[k]!;
       const off = r.bottom < -40 || r.top > H + 40 || r.width === 0;
       tile.mesh.visible = !off;
       if (off) continue;
@@ -213,6 +231,7 @@ export function initDistortion(grids: HTMLElement[]): void {
   const start = () => {
     if (!running) {
       running = true;
+      rectsDirty = true; // layout may have shifted while the grid was off-screen
       rafId = requestAnimationFrame(loop);
     }
   };

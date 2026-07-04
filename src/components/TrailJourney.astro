@@ -202,6 +202,15 @@ const NODE_LABELS = Object.fromEntries(PILLARS.map((p) => [p.id, p.name.toUpperC
       }
     }
 
+    let running = false;
+    // (re)start the motion loop only when there's something to animate
+    function kick() {
+      if (!reduce && !running) {
+        running = true;
+        raf = requestAnimationFrame(loop);
+      }
+    }
+
     function onScroll() {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       target = max > 0 ? clamp(window.scrollY / max, 0, 1) : 0;
@@ -210,10 +219,14 @@ const NODE_LABELS = Object.fromEntries(PILLARS.map((p) => [p.id, p.name.toUpperC
         prog = target;
         updateNodesReached();
         draw();
+      } else {
+        kick(); // wake the loop to ease toward the new target
       }
     }
 
     function loop() {
+      const settling = Math.abs(target - prog) < 0.0005;
+      if (settling) prog = target;
       prog += (target - prog) * 0.09;
       updateNodesReached();
       for (let i = pings.length - 1; i >= 0; i--) {
@@ -221,6 +234,12 @@ const NODE_LABELS = Object.fromEntries(PILLARS.map((p) => [p.id, p.name.toUpperC
         if (pings[i]!.t >= 1) pings.splice(i, 1);
       }
       draw();
+      // idle once the marker has caught up and no pings remain — the full-canvas
+      // redraw (with per-node shadowBlur) is too costly to run at rest.
+      if (settling && pings.length === 0) {
+        running = false;
+        return;
+      }
       raf = requestAnimationFrame(loop);
     }
 
@@ -234,7 +253,7 @@ const NODE_LABELS = Object.fromEntries(PILLARS.map((p) => [p.id, p.name.toUpperC
     setTimeout(() => { computeNodes(); onScroll(); draw(); }, 800);
 
     // motion loop only when animating; reduced motion redraws on scroll/resize
-    if (!reduce) raf = requestAnimationFrame(loop);
+    kick();
 
     window.addEventListener("pagehide", () => cancelAnimationFrame(raf), { once: true });
   }

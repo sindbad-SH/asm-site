@@ -28,6 +28,16 @@ export const FORBIDDEN_TERMS = [
 
 export const CONFIRM_PATTERN = /\[confirm\]/i;
 
+// Match each forbidden term on word boundaries, case-insensitively. Bare
+// substring matching (the previous approach) could false-fail a build on a
+// minified vendor bundle that merely *contains* "largo" etc. inside a longer
+// identifier or hash — a misleading Ledger error on code we didn't author.
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const TERM_PATTERNS = FORBIDDEN_TERMS.map((term) => ({
+  term,
+  re: new RegExp(`\\b${escapeRegex(term)}\\b`, "i"),
+}));
+
 export function walkTextFiles(dir, files = []) {
   for (const entry of readdirSync(dir)) {
     const fullPath = join(dir, entry);
@@ -45,9 +55,9 @@ export function walkTextFiles(dir, files = []) {
 export function findExclusionViolations(distDir) {
   const violations = [];
   for (const file of walkTextFiles(distDir)) {
-    const content = readFileSync(file, "utf8").toLowerCase();
-    for (const term of FORBIDDEN_TERMS) {
-      if (content.includes(term)) violations.push({ file, term });
+    const content = readFileSync(file, "utf8");
+    for (const { term, re } of TERM_PATTERNS) {
+      if (re.test(content)) violations.push({ file, term });
     }
   }
   return violations;

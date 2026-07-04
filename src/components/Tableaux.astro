@@ -131,5 +131,25 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
     });
 
     ScrollTrigger.refresh();
+    section.dataset.ready = "true"; // watchdog milestone (see inline fallback below)
   }
+</script>
+
+<script is:inline>
+  // Fallback watchdog (mirrors the reveal-engine + Portal Hero pattern in
+  // Base.astro): the tableaux headlines/body/CTA are hidden under html.js and
+  // only un-hidden by the module engine above. If that engine never reaches its
+  // ready milestone within 4s — its chunk 404s, a mid-init throw, or
+  // document.fonts.ready hangs — force the §2b static fallback so the home
+  // page's narrative body can never stay invisible. No-op once the engine boots
+  // (and redundant-but-harmless under reduced motion, which CSS already shows).
+  (() => {
+    const section = document.querySelector("[data-tableaux]");
+    if (!section) return;
+    setTimeout(() => {
+      if (section.dataset.ready === "true") return;
+      section.querySelectorAll(".tableau-headline").forEach((el) => el.classList.add("is-split"));
+      section.querySelectorAll(".tableau-content").forEach((el) => el.classList.add("is-revealed"));
+    }, 4000);
+  })();
 </script>
