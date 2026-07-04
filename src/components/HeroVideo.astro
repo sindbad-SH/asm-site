@@ -1,0 +1,114 @@
+---
+/**
+ * HeroVideo — fullscreen ambient-video hero (BUILD-PLAN.md §1.3 A1 / §2c).
+ * Reusable for the Adventure hero and case-study hooks. Overlay content
+ * (headline etc.) goes in the default slot.
+ *
+ * Poster-first (the perf contract, §4): the poster is the LCP and paints
+ * immediately; the <video> carries preload="none" and NO autoplay attribute,
+ * so it never downloads or plays without JS. The script promotes the sources,
+ * loads, and plays (muted/looped) only when motion is allowed and the
+ * connection isn't metered — then fades the video over the poster.
+ *
+ * Fallbacks:
+ *  - no-JS        → poster only (video inert; nothing downloads).
+ *  - reduced motion → poster only (CSS display:none on the video + JS skips).
+ *  - save-data / 2g → poster only (JS checks navigator.connection).
+ *  - no real media yet → the annotated placeholder IS the poster, naming the
+ *    exact assets needed (S1 reel + S2 poster still). Pass `poster` +
+ *    `sources` later and it plays with zero markup changes.
+ */
+export interface VideoSource {
+  src: string;
+  type: string; // e.g. "video/webm", "video/mp4"
+}
+
+interface Props {
+  poster?: string; // poster image URL; falls back to the annotated placeholder
+  sources?: readonly VideoSource[]; // empty until the real reel exists (S1)
+  placeholderLabel: string; // production shot-list note for the interim state
+  class?: string;
+}
+
+const { poster, sources = [], placeholderLabel, class: klass = "" } = Astro.props;
+const hasVideo = sources.length > 0;
+---
+
+<section class={`hero-video ${klass}`} data-hero-video>
+  <div class="hero-video__bg">
+    {
+      poster ? (
+        <img class="hero-video__poster" src={poster} alt="" fetchpriority="high" decoding="async" />
+      ) : (
+        <div class="hero-video__ph topo-lines" aria-hidden="true">
+          <span class="hud-label max-w-prose normal-case">{placeholderLabel}</span>
+        </div>
+      )
+    }
+    {
+      hasVideo && (
+        <video
+          class="hero-video__vid"
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={poster}
+          aria-hidden="true"
+          data-hero-vid
+        >
+          {sources.map((s) => (
+            <source data-src={s.src} type={s.type} />
+          ))}
+        </video>
+      )
+    }
+  </div>
+
+  <div class="hero-video__scrim" aria-hidden="true"></div>
+
+  <div class="hero-video__content">
+    <slot />
+  </div>
+
+  <span class="hero-video__cue hud-label" aria-hidden="true">
+    <span>Scroll</span>
+    <span class="chev">↓</span>
+  </span>
+</section>
+
+<script>
+  const hero = document.querySelector<HTMLElement>("[data-hero-video]");
+  const vid = hero?.querySelector<HTMLVideoElement>("[data-hero-vid]");
+  if (hero && vid) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // @ts-ignore — connection is not in all lib.dom versions
+    const conn = navigator.connection as { saveData?: boolean; effectiveType?: string } | undefined;
+    const metered = !!conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? "");
+
+    if (!reduce && !metered) {
+      // promote data-src → src only now (keeps the poster the LCP)
+      vid.querySelectorAll<HTMLSourceElement>("source[data-src]").forEach((s) => {
+        s.src = s.dataset.src ?? "";
+      });
+      vid.muted = true; // required for unattended playback (iOS/Safari)
+      vid.preload = "auto";
+      vid.load();
+
+      const markPlaying = () => vid.classList.add("is-playing");
+      vid.addEventListener("playing", markPlaying, { once: true });
+
+      // play while the hero is on-screen; pause when scrolled away
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry) return;
+          if (entry.isIntersecting) void vid.play().then(markPlaying).catch(() => {});
+          else vid.pause();
+        },
+        { threshold: 0.15 },
+      );
+      io.observe(hero);
+      window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+    }
+  }
+</script>

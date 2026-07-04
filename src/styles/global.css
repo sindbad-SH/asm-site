@@ -629,6 +629,110 @@
     border-color: color-mix(in srgb, var(--color-adventure-warm) 28%, transparent);
   }
 
+  /* ── Fullscreen ambient-video hero (§1.3 A1 / §2c) ──
+     Poster-first: the poster is the LCP and always shows; the muted/looped
+     video fades over it once JS starts playback. Reduced motion / no-JS /
+     save-data → poster only (video is display:none under reduced motion and
+     never plays without JS). */
+  .hero-video {
+    position: relative;
+    min-height: 90svh;
+    display: grid;
+    place-items: center;
+    overflow: clip;
+    isolation: isolate;
+  }
+  .hero-video__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-video__poster,
+  .hero-video__vid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-video__vid {
+    opacity: 0;
+    transition: opacity 900ms var(--ease-survey);
+  }
+  .hero-video__vid.is-playing {
+    opacity: 1;
+  }
+  /* interim poster: full-bleed annotated placeholder until the real reel/still
+     lands (S1/S2). Uses the adventure-slate ground when in that lane. */
+  .hero-video__ph {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    text-align: center;
+    background: var(--color-elevated);
+  }
+  [data-lane="adventure"] .hero-video__ph {
+    background: var(--color-adventure-slate);
+  }
+  /* legibility scrim — darkens edges + top/bottom, keeps the centred text
+     readable over any imagery (Maragos: let the footage be the design) */
+  .hero-video__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        120% 78% at 50% 50%,
+        transparent 32%,
+        color-mix(in srgb, var(--color-base) 50%, transparent) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-base) 45%, transparent),
+        transparent 24%,
+        transparent 68%,
+        color-mix(in srgb, var(--color-base) 72%, transparent)
+      );
+  }
+  .hero-video__content {
+    position: relative;
+    z-index: 2;
+    max-width: 48rem;
+    padding: 2rem;
+    text-align: center;
+  }
+  .hero-video__cue {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-ink-muted);
+  }
+  .hero-video__cue .chev {
+    animation: hero-bob 2.4s var(--ease-in-out, ease-in-out) infinite;
+  }
+  @keyframes hero-bob {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(4px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* guarantee poster-only regardless of JS, and stop the cue bob */
+    .hero-video__vid {
+      display: none;
+    }
+    .hero-video__cue .chev {
+      animation: none;
+    }
+  }
+
   /* ── Tableaux (§2b) ── */
   .tableau-pin {
     position: relative;

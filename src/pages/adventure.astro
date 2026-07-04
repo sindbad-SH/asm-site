@@ -12,8 +12,8 @@
  * consistent surface to enhance across both pages.
  */
 import Base from "../layouts/Base.astro";
-import Placeholder from "../components/Placeholder.astro";
 import Card from "../components/Card.astro";
+import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import { PAGES, WORK } from "../consts";
 
@@ -24,16 +24,15 @@ const adventureWork = WORK.filter((item) => item.pillar === "adventure");
 
 <Base title={p.meta.title} description={p.meta.description}>
   <div data-lane="adventure">
-    <!-- A1 — fullscreen hero: RESERVED STUB for the next dispatch task
-         (Opus 4.8 · high, §2c/§1.3). Do not build the real reel here. -->
-    <section class="space-y-4 p-8 text-center">
-      <Placeholder
-        ratio="21/9"
-        label="FULLSCREEN VIDEO HERO — NEXT TASK (Opus 4.8 · high, §2c/§1.3): the single strongest reel, ambient loop, poster-first, reduced-motion fallback"
-      />
-      <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
-      <p class="mx-auto max-w-2xl text-lg text-ink">{p.hero.subline}</p>
-    </section>
+    <!-- A1 — fullscreen ambient-video hero (§1.3 A1). Poster-first; the
+         interim placeholder IS the poster until the real reel/still lands
+         (S1/S2) — add `poster` + `sources` to make it play, no markup change. -->
+    <HeroVideo
+      placeholderLabel="FULLSCREEN VIDEO HERO (§1.3 A1) — the single strongest reel as a muted ambient loop (S1), with a poster still (S2). ≤8s · 720p · ≤1.5MB AV1/H.264, poster ships first (§4)."
+    >
+      <h1 class="text-4xl font-bold sm:text-6xl">{p.hero.headline}</h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-ink">{p.hero.subline}</p>
+    </HeroVideo>
 
     <!-- A2 — the territory -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
