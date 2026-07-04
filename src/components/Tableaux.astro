@@ -17,10 +17,14 @@
  */
 import TableauChapter, { type TableauLayer } from "./TableauChapter.astro";
 import ContourDivider from "./ContourDivider.astro";
-import { PAGES } from "../consts";
+import { PAGES, PILLARS } from "../consts";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
+
+// Map each chapter's terrain to its pillar slug so the survey trail (§3.3)
+// can anchor a portal node to the real pillar section.
+const pillarByTerrain = Object.fromEntries(PILLARS.map((p) => [p.terrain.toLowerCase(), p.id]));
 
 // ── LAYER_SETS — art-direction layer descriptors, keyed by chapter terrain.
 // All three chapters are now fully built, mirroring "the wild" exemplar's
@@ -59,6 +63,7 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
           index={i}
           layers={LAYER_SETS[chapter.terrain] ?? undefined}
           base={base}
+          nodeId={pillarByTerrain[chapter.terrain.toLowerCase()]}
         />
       </Fragment>
     ))

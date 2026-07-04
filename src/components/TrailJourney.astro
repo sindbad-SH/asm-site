@@ -1,0 +1,241 @@
+---
+/**
+ * The "you-are-here" survey trail (BUILD-PLAN.md §3.3) — the v1 TrailJourney
+ * KEEP, re-skinned to the Contour Survey. A cyan marker (the logo mark)
+ * travels a contour path down the right gutter as you scroll; the traveled
+ * path draws behind it; three portal nodes are tied to the real pillar
+ * sections (Adventure / Consulting / Entertainment) via [data-trail-node],
+ * and reaching one fires a one-shot "survey ping" (§3.3).
+ *
+ * This is an AMBIENT INSTRUMENT, not a spectacle (brief §0.1 / §7 effect
+ * curation). Re-skin from v1: the additive comet-particle spray is REMOVED
+ * (that was the effect-overload look the brief cut); colors read from the
+ * design tokens so the accent stays scarce; the resting path is a dim
+ * contour. Fixed behind content (z-index:-1) so it never covers text;
+ * desktop-only (hidden < lg, where the gutter is too tight for it).
+ *
+ * Fallbacks:
+ *   • no-JS         → the canvas stays empty (purely decorative).
+ *   • reduced motion → no rAF loop, no eased marker, no pings, no glow
+ *                      breathing; the trail is drawn statically on scroll,
+ *                      marker snapped to the exact scroll position.
+ *
+ * Portal fractions are recomputed whenever the document height changes, so
+ * they stay correct even as the tableaux pins expand the page.
+ */
+import { PILLARS } from "../consts";
+
+// id → short label, for the proximity-faded node labels
+const NODE_LABELS = Object.fromEntries(PILLARS.map((p) => [p.id, p.name.toUpperCase()]));
+---
+
+<canvas
+  id="trail-canvas"
+  class="pointer-events-none fixed inset-0 hidden lg:block"
+  style="z-index:-1"
+  aria-hidden="true"
+  data-node-labels={JSON.stringify(NODE_LABELS)}></canvas>
+
+<script>
+  const cvs = document.getElementById("trail-canvas") as HTMLCanvasElement | null;
+  if (cvs) {
+    const ctx = cvs.getContext("2d")!;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const labels: Record<string, string> = JSON.parse(cvs.dataset.nodeLabels ?? "{}");
+
+    // colors from the design tokens (accent stays token-driven + scarce)
+    const css = getComputedStyle(document.documentElement);
+    const parse = (v: string) => {
+      const h = v.trim().replace("#", "");
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+    };
+    const ACCENT = parse(css.getPropertyValue("--color-accent") || "#38f8ec");
+    const DEEP = parse(css.getPropertyValue("--color-accent-deep") || "#1e8f8a");
+    const rgba = (c: { r: number; g: number; b: number }, a: number) => `rgba(${c.r},${c.g},${c.b},${a})`;
+
+    let W = 0, H = 0, DPR = 1, prog = 0, target = 0, raf = 0;
+    let lastScrollH = -1;
+    const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
+
+    type Node = { id: string; label: string; frac: number; reached: boolean };
+    let nodes: Node[] = [];
+    type Ping = { frac: number; t: number };
+    const pings: Ping[] = [];
+
+    const img = new Image();
+    let imgReady = false;
+    img.onload = () => { imgReady = true; };
+    img.src = `${base}/logo-mark.png`;
+
+    // the contour path, in fixed viewport space; prog 0..1 = scroll progress
+    function pt(p: number) {
+      const baseX = 0.9 * W;
+      const sway = Math.sin(p * Math.PI * 2.2 - 0.3) * 0.022 * W; // gentle, geological
+      return { x: baseX + sway, y: -0.04 * H + p * 1.08 * H };
+    }
+
+    function resize() {
+      DPR = Math.min(2, window.devicePixelRatio || 1);
+      W = window.innerWidth;
+      H = window.innerHeight;
+      cvs!.width = Math.floor(W * DPR);
+      cvs!.height = Math.floor(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+
+    function computeNodes() {
+      const els = [...document.querySelectorAll<HTMLElement>("[data-trail-node]")];
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      lastScrollH = document.documentElement.scrollHeight;
+      nodes = els.map((el) => {
+        const id = el.getAttribute("data-trail-node") || "";
+        const r = el.getBoundingClientRect();
+        const docCenter = r.top + window.scrollY + r.height / 2;
+        const frac = max > 0 ? clamp((docCenter - window.innerHeight / 2) / max, 0, 1) : 0;
+        return { id, label: labels[id] ?? "", frac, reached: prog >= frac - 0.004 };
+      });
+    }
+
+    function contourStroke(from: number, to: number, color: string, w: number, blur = 0) {
+      ctx.beginPath();
+      const steps = 60;
+      for (let i = 0; i <= steps; i++) {
+        const o = pt(from + (to - from) * (i / steps));
+        i === 0 ? ctx.moveTo(o.x, o.y) : ctx.lineTo(o.x, o.y);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = w;
+      ctx.lineCap = "round";
+      ctx.shadowColor = color;
+      ctx.shadowBlur = blur;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // resting contour (untraveled) + faint survey ticks
+      contourStroke(0, 1, rgba(DEEP, 0.28), 1.25);
+      ctx.strokeStyle = rgba(DEEP, 0.14);
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 14; i++) {
+        const o = pt(i / 14);
+        ctx.beginPath();
+        ctx.moveTo(o.x - 5, o.y);
+        ctx.lineTo(o.x + 5, o.y);
+        ctx.stroke();
+      }
+
+      // traveled contour (the drawn path behind the marker)
+      contourStroke(0, Math.max(0.001, prog), rgba(ACCENT, 0.5), 2, 6);
+
+      // portal nodes — plotted survey points, one per real pillar
+      for (const n of nodes) {
+        const o = pt(n.frac);
+        const near = 1 - clamp(Math.abs(prog - n.frac) * 6, 0, 1);
+        // ring
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 8 + near * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = n.reached ? rgba(ACCENT, 0.45 + near * 0.4) : rgba(DEEP, 0.4);
+        ctx.lineWidth = 1.25;
+        ctx.shadowColor = rgba(ACCENT, 0.6);
+        ctx.shadowBlur = near * 9;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        // filled centre once reached
+        if (n.reached) {
+          ctx.beginPath();
+          ctx.arc(o.x, o.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = rgba(ACCENT, 0.85);
+          ctx.fill();
+        }
+        // proximity-faded mono label (wayfinding: which pillar this is)
+        if (near > 0.02 && n.label) {
+          ctx.font = '10px "Space Mono", ui-monospace, monospace';
+          ctx.textAlign = "right";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = rgba(n.reached ? ACCENT : DEEP, 0.25 + near * 0.55);
+          ctx.fillText(n.label, o.x - 16, o.y);
+          ctx.textAlign = "left";
+        }
+      }
+
+      // survey pings — one-shot expanding rings on node crossing
+      for (let i = pings.length - 1; i >= 0; i--) {
+        const p = pings[i]!;
+        const o = pt(p.frac);
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 8 + p.t * 22, 0, Math.PI * 2);
+        ctx.strokeStyle = rgba(ACCENT, (1 - p.t) * 0.5);
+        ctx.lineWidth = 1.25;
+        ctx.stroke();
+      }
+
+      // the traveller — logo mark at the you-are-here point
+      const g = pt(prog);
+      if (imgReady) {
+        const s = 40;
+        ctx.save();
+        ctx.shadowColor = rgba(ACCENT, 0.4);
+        ctx.shadowBlur = 10;
+        ctx.drawImage(img, g.x - s / 2, g.y - s / 2, s, s);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(ACCENT, 1);
+        ctx.shadowColor = rgba(ACCENT, 1);
+        ctx.shadowBlur = 16;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function updateNodesReached() {
+      for (const n of nodes) {
+        const wasReached = n.reached;
+        n.reached = prog >= n.frac - 0.004;
+        // fire a ping the first time the marker crosses into a node (motion only)
+        if (!reduce && n.reached && !wasReached) pings.push({ frac: n.frac, t: 0 });
+      }
+    }
+
+    function onScroll() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      target = max > 0 ? clamp(window.scrollY / max, 0, 1) : 0;
+      if (document.documentElement.scrollHeight !== lastScrollH) computeNodes();
+      if (reduce) {
+        prog = target;
+        updateNodesReached();
+        draw();
+      }
+    }
+
+    function loop() {
+      prog += (target - prog) * 0.09;
+      updateNodesReached();
+      for (let i = pings.length - 1; i >= 0; i--) {
+        pings[i]!.t += 0.02;
+        if (pings[i]!.t >= 1) pings.splice(i, 1);
+      }
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+
+    resize();
+    computeNodes();
+    onScroll();
+    draw(); // synchronous first paint — never wait on the rAF loop (or a hidden tab)
+    window.addEventListener("resize", () => { resize(); computeNodes(); onScroll(); draw(); });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // recompute once more after layout settles (fonts + tableaux pins expand the page)
+    setTimeout(() => { computeNodes(); onScroll(); draw(); }, 800);
+
+    // motion loop only when animating; reduced motion redraws on scroll/resize
+    if (!reduce) raf = requestAnimationFrame(loop);
+
+    window.addEventListener("pagehide", () => cancelAnimationFrame(raf), { once: true });
+  }
+</script>

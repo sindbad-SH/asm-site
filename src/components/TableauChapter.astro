@@ -22,13 +22,15 @@ interface Props {
   index: number;
   layers?: readonly TableauLayer[];
   base: string;
+  /** Pillar slug — the survey-trail anchor for this chapter's portal node. */
+  nodeId?: string;
 }
-const { chapter, index, layers, base } = Astro.props;
+const { chapter, index, layers, base, nodeId } = Astro.props;
 const isStub = !layers || layers.length === 0;
 const no = String(index + 1).padStart(2, "0");
 ---
 
-<article class="tableau" data-tableau data-chapter={chapter.terrain}>
+<article class="tableau" data-tableau data-chapter={chapter.terrain} data-trail-node={nodeId}>
   <div class="tableau-pin">
     {
       isStub ? (
