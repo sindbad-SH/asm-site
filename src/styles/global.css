@@ -774,14 +774,158 @@
     isolation: isolate;
     background: var(--hero-void);
   }
-  .portal-scene {
+  .portal-world {
     position: absolute;
     inset: 0;
     z-index: 0;
+    will-change: transform;
+    transform-origin: center;
+  }
+  .portal-scene {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    will-change: transform;
+  }
+  /* LP-1 living portrait — additive light over the still. Default (endcard /
+     no-JS / reduced motion) renders it statically with motion PAUSED; the
+     engine drives .portal-life opacity and adds .portal-ambient to run the
+     loops only while the hero is open (p>0.8) and on-screen. */
+  .portal-life {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 1;
+  }
+  .portal-aurora {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: screen;
+    filter: blur(40px);
+    opacity: 0.72;
+  }
+  .portal-aurora::before,
+  .portal-aurora::after {
+    content: "";
+    position: absolute;
+    animation-play-state: paused;
+  }
+  /* primary teal ribbon — echoes the sting's aurora falling toward the peak */
+  .portal-aurora::before {
+    left: 33%;
+    top: -8%;
+    width: 40%;
+    height: 80%;
+    background: radial-gradient(
+      48% 40% at 50% 50%,
+      rgba(86, 240, 212, 0.5),
+      rgba(70, 205, 185, 0.2) 46%,
+      transparent 72%
+    );
+    transform: rotate(17deg);
+    animation: portal-aurora-a 19s ease-in-out infinite alternate;
+  }
+  /* secondary violet-teal sweep, right of centre, slower + out of phase */
+  .portal-aurora::after {
+    left: 52%;
+    top: 2%;
+    width: 40%;
+    height: 66%;
+    background: radial-gradient(
+      46% 42% at 50% 50%,
+      rgba(126, 156, 255, 0.36),
+      rgba(96, 220, 205, 0.16) 50%,
+      transparent 74%
+    );
+    transform: rotate(-13deg);
+    animation: portal-aurora-b 25s ease-in-out infinite alternate;
+  }
+  .portal-stars {
+    position: absolute;
+    inset: 0;
+  }
+  .portal-star {
+    position: absolute;
+    border-radius: 50%;
+    background: #e6efff;
+    opacity: var(--o0);
+    box-shadow: 0 0 6px 1px rgba(180, 214, 255, 0.5);
+    animation: portal-twinkle var(--tw) ease-in-out var(--twd) infinite alternate;
+    animation-play-state: paused;
+  }
+  .portal-haze {
+    position: absolute;
+    left: -12%;
+    right: -12%;
+    top: 56%;
+    height: 28%;
+    mix-blend-mode: screen;
+    filter: blur(28px);
+    opacity: 0.5;
+    background: linear-gradient(
+      to top,
+      rgba(60, 92, 120, 0) 0%,
+      rgba(150, 138, 120, 0.14) 34%,
+      rgba(120, 150, 180, 0.18) 60%,
+      transparent 100%
+    );
+    animation: portal-haze-drift 36s ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+  /* run the ambient loops only when the engine confirms open + on-screen */
+  .portal-ambient .portal-aurora::before,
+  .portal-ambient .portal-aurora::after,
+  .portal-ambient .portal-star,
+  .portal-ambient .portal-haze {
+    animation-play-state: running;
+  }
+  @keyframes portal-aurora-a {
+    0% {
+      transform: rotate(17deg) translate(-1%, 0) scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: rotate(14deg) translate(3%, 2%) scale(1.06);
+      opacity: 0.95;
+    }
+  }
+  @keyframes portal-aurora-b {
+    0% {
+      transform: rotate(-13deg) translate(1%, 0) scale(1.02);
+      opacity: 0.42;
+    }
+    100% {
+      transform: rotate(-16deg) translate(-2%, 3%) scale(1.08);
+      opacity: 0.8;
+    }
+  }
+  @keyframes portal-twinkle {
+    from {
+      opacity: var(--o0);
+    }
+    to {
+      opacity: var(--o1);
+    }
+  }
+  @keyframes portal-haze-drift {
+    0% {
+      transform: translateX(-3%);
+    }
+    100% {
+      transform: translateX(3%);
+    }
+  }
+  /* reduced motion: the living portrait holds perfectly still (belt-and-braces
+     with the JS gate, which also never arms .portal-ambient under reduce) */
+  @media (prefers-reduced-motion: reduce) {
+    .portal-star,
+    .portal-aurora::before,
+    .portal-aurora::after,
+    .portal-haze {
+      animation: none;
+    }
   }
   .portal-void {
     position: absolute;
@@ -858,18 +1002,11 @@
   html.js .portal-scrim {
     opacity: 0;
   }
-  /* watchdog: engine never started → soft-force the endcard */
-  html.js .portal-forced .portal-void {
-    opacity: 0;
-    transition: opacity 600ms var(--ease-survey);
-  }
-  html.js .portal-forced .portal-mark {
-    opacity: 0.92;
-  }
-  html.js .portal-forced .portal-scrim {
-    opacity: 1;
-    transition: opacity 600ms var(--ease-survey);
-  }
+  /* NOTE: the .portal-forced endcard overrides live UNLAYERED below (next to
+     the reduced-motion portal block). Authored inside @layer components they
+     lost to the layered `html.js .portal-void` state-A rule — Tailwind v4's
+     bundler flattening means specificity didn't save them; only an unlayered
+     rule reliably wins (same reason the reduced-motion fix is unlayered). */
 
   /* ── Case-study walkthrough (§2c) — Immersive-Garden model ── */
   /* Sticky survey rail: chapters as contour elevation ticks, active one lit.
@@ -1332,4 +1469,22 @@ html.js .contour-draw.is-revealed path {
   html.js .portal-scene {
     transform: none;
   }
+}
+
+/* §9.2 Portal Hero — the .portal-forced endcard overrides, UNLAYERED so they
+   beat the layered `html.js .portal-void` state-A rule (see the note where the
+   state-A rules are authored). Covers the watchdog (chunk never started) and
+   the ?portal=static QA path; reduced motion is handled in the block above.
+   Result in all three: void dissolves away → the (living) scene, solid mark
+   ghost, scrim on. */
+html.js .portal-forced .portal-void {
+  opacity: 0;
+  transition: opacity 600ms var(--ease-survey);
+}
+html.js .portal-forced .portal-mark {
+  opacity: 0.92;
+}
+html.js .portal-forced .portal-scrim {
+  opacity: 1;
+  transition: opacity 600ms var(--ease-survey);
 }
