@@ -23,20 +23,29 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
 
 // ── LAYER_SETS — art-direction layer descriptors, keyed by chapter terrain.
-// "The wild" is the FULLY BUILT EXEMPLAR (3 layers: background → midground →
-// foreground cut-out). "The market" and "The industry" are STUBS (null) and
-// render a clearly-marked replication stub. NEXT TASK (Sonnet): give each a
-// 3-layer set mirroring the wild set, with art direction for its lane —
-// e.g. the market = the ordered city street-grid, the industry = the
-// coastline / stage-lights sprawl (see brief §6 Option 3 layout logic).
+// All three chapters are now fully built, mirroring "the wild" exemplar's
+// structure exactly (3 layers: background 0.15 → midground 0.45 →
+// foreground 0.85 alpha cut-out). Lane art direction per brief §6 Option 3
+// layout logic: the market = the ordered, built environment (city
+// street-grid); the industry = the coastline / stage-lights sprawl at
+// night. Interim assets are AI-generated per BUILD-PLAN.md §5B (G1) until
+// real footage/stills replace them slot-for-slot in Phase 6.
 const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
   "The wild": [
     { depth: 0.15, label: "WILD · BACKGROUND — distant ridgeline & sky, full-bleed (§2b · ≤180KB AVIF)" },
     { depth: 0.45, label: "WILD · MIDGROUND — mid ridge / valley haze (§2b)" },
     { depth: 0.85, label: "WILD · FOREGROUND — near rock or figure, alpha cut-out (§2b)" },
   ],
-  "The market": null, // STUB — replicate
-  "The industry": null, // STUB — replicate
+  "The market": [
+    { depth: 0.15, label: "MARKET · BACKGROUND — city skyline at dusk, full-bleed (§2b · ≤180KB AVIF)" },
+    { depth: 0.45, label: "MARKET · MIDGROUND — ordered street-grid / built environment, haze (§2b)" },
+    { depth: 0.85, label: "MARKET · FOREGROUND — a desk, a deck, a founder at work, alpha cut-out (§2b)" },
+  ],
+  "The industry": [
+    { depth: 0.15, label: "INDUSTRY · BACKGROUND — coastline or skyline at night, full-bleed (§2b · ≤180KB AVIF)" },
+    { depth: 0.45, label: "INDUSTRY · MIDGROUND — stage-lights sprawl / venue glow, haze (§2b)" },
+    { depth: 0.85, label: "INDUSTRY · FOREGROUND — a camera, a badge, a set in motion, alpha cut-out (§2b)" },
+  ],
 };
 ---
 
