@@ -1,0 +1,43 @@
+---
+/**
+ * Top nav — the capped 6-item nav from consts.ts (BUILD-PLAN.md §1.0). No
+ * design system yet: this is functional structure only, unstyled beyond
+ * layout. Forge the Saga is styled no differently here (Phase 2 gives it the
+ * primary-CTA treatment) but it does own the single dominant CTA button.
+ */
+import { NAV, SITE, PRIMARY_CTA } from "../consts";
+
+const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_URL, "/");
+---
+
+<header class="flex flex-wrap items-center justify-between gap-4 border-b border-current/20 p-4">
+  <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/`} class="font-bold">
+    {SITE.name}
+  </a>
+  <nav aria-label="Primary">
+    <ul class="flex flex-wrap gap-4 text-sm">
+      {
+        NAV.map((item) => {
+          const isCurrent = path === item.href || path.startsWith(`${item.href}/`);
+          return (
+            <li>
+              <a
+                href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}${item.href}`}
+                aria-current={isCurrent ? "page" : undefined}
+                class={isCurrent ? "underline" : "hover:underline"}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+  <a
+    href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}${PRIMARY_CTA.href}`}
+    class="rounded border border-current px-3 py-1.5 text-sm"
+  >
+    {PRIMARY_CTA.label}
+  </a>
+</header>

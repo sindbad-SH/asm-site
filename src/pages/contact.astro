@@ -1,0 +1,56 @@
+---
+/**
+ * Form structure only. The live endpoint (SITE.formEndpoint) is [confirm] —
+ * wiring it to a real service is a separate Phase 3 task (BUILD-PLAN.md §6.3
+ * "Contact page + live form wiring"). Until then the form has no `action`,
+ * so it can't silently POST to a placeholder URL.
+ */
+import Base from "../layouts/Base.astro";
+import { PAGES, SITE } from "../consts";
+
+const p = PAGES.contact;
+const formReady = SITE.formEndpoint !== "[confirm]";
+---
+
+<Base title={p.meta.title} description={p.meta.description}>
+  <section class="mx-auto max-w-xl space-y-6 p-8">
+    <h1 class="text-3xl font-bold">{p.headline}</h1>
+    <p>{p.body}</p>
+
+    {
+      !formReady && (
+        <p class="border border-dashed border-current/30 bg-current/5 p-3 text-sm opacity-70">
+          Form endpoint [confirm] — not wired yet (BUILD-PLAN.md §5A S9). Use email below in the
+          meantime.
+        </p>
+      )
+    }
+
+    <form method="post" action={formReady ? SITE.formEndpoint : undefined} class="space-y-4">
+      <div class="space-y-1">
+        <label for="name" class="block text-sm">Name</label>
+        <input id="name" name="name" type="text" required class="w-full border border-current/30 bg-transparent p-2" />
+      </div>
+      <div class="space-y-1">
+        <label for="email" class="block text-sm">Email</label>
+        <input id="email" name="email" type="email" required class="w-full border border-current/30 bg-transparent p-2" />
+      </div>
+      <div class="space-y-1">
+        <label for="message" class="block text-sm">What are you building?</label>
+        <textarea id="message" name="message" required rows="5" class="w-full border border-current/30 bg-transparent p-2" />
+      </div>
+      <button type="submit" disabled={!formReady} class="rounded border border-current px-4 py-2 disabled:opacity-40">
+        Send
+      </button>
+    </form>
+
+    <div class="border-t border-current/20 pt-6 text-sm">
+      <p>
+        Prefer email? <a href={`mailto:${p.email}`} class="hover:underline">{p.email}</a>
+      </p>
+      <p class="mt-1">
+        Book a call: {SITE.bookACall === "[confirm]" ? <span class="opacity-50">[confirm] — S10</span> : <a href={SITE.bookACall} class="hover:underline">{SITE.bookACall}</a>}
+      </p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,62 @@
+---
+import Base from "../layouts/Base.astro";
+import LegendMark from "../components/LegendMark.astro";
+import LegendKey from "../components/LegendKey.astro";
+import Testimonial from "../components/Testimonial.astro";
+import { PAGES } from "../consts";
+
+const p = PAGES.entertainment;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<Base title={p.meta.title} description={p.meta.description}>
+  <!-- E1 — restrained hero -->
+  <section class="mx-auto max-w-3xl space-y-4 p-8 text-center">
+    <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
+    <p class="text-lg">{p.hero.subline}</p>
+  </section>
+
+  <!-- E2 — MEME -->
+  <section class="mx-auto max-w-3xl space-y-2 border-t border-current/20 p-8">
+    <h2 class="text-2xl font-bold">{p.meme.heading}</h2>
+    <LegendMark proof={p.meme.proof} />
+    <p>{p.meme.body}</p>
+  </section>
+
+  <!-- E3 — PitchBoulder feature (primary proof anchor) -->
+  <section class="mx-auto max-w-3xl space-y-2 border-t border-current/20 p-8">
+    <h2 class="text-2xl font-bold">{p.pitchboulder.heading}</h2>
+    <LegendMark proof={p.pitchboulder.proof} />
+    <Testimonial testimonialId={p.pitchboulder.testimonialId} />
+    <a href={`${base}${p.pitchboulder.link.href}`} class="hover:underline">
+      {p.pitchboulder.link.label} →
+    </a>
+  </section>
+
+  <!-- E4 — the rooms; testimonial #2 lives here (OD-5) -->
+  <section class="mx-auto max-w-3xl space-y-6 border-t border-current/20 p-8">
+    <h2 class="text-2xl font-bold">{p.rooms.heading}</h2>
+    <p>{p.rooms.intro}</p>
+    <ul class="space-y-6">
+      {
+        p.rooms.items.map((room) => (
+          <li class="space-y-2">
+            <LegendMark proof={room.proof} />
+            {"testimonialId" in room && room.testimonialId && (
+              <Testimonial testimonialId={room.testimonialId} />
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    <LegendKey />
+  </section>
+
+  <!-- E5 — soft handoff -->
+  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8 text-center">
+    <p class="text-lg italic">{p.handoff.body}</p>
+    <a href={`${base}${p.handoff.cta.href}`} class="inline-block rounded border border-current px-4 py-2">
+      {p.handoff.cta.label}
+    </a>
+  </section>
+</Base>

@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+import Placeholder from "../components/Placeholder.astro";
+import { PAGES } from "../consts";
+
+const p = PAGES.about;
+---
+
+<Base title={p.meta.title} description={p.meta.description}>
+  <section class="mx-auto max-w-3xl space-y-6 p-8">
+    <Placeholder ratio="4/5" class="mx-auto max-w-sm" label="ABOUT PORTRAIT — environmental portrait, ≥1600px (S12)" />
+    <h1 class="text-3xl font-bold">
+      {p.bio.name} — {p.bio.persona}
+    </h1>
+    <p class="opacity-70">{p.bio.location}</p>
+    <div class="space-y-4 text-lg">
+      {p.narrative.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+    <p class="border-t border-current/20 pt-6 italic opacity-80">{p.legendLine}</p>
+  </section>
+</Base>

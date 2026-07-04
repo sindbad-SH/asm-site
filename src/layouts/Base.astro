@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
 
 interface Props {
   title: string;
@@ -21,7 +23,12 @@ const { title, description = "Adventure Storytelling Media — Sindbad Horizon, 
       document.documentElement.classList.replace("no-js", "js");
     </script>
   </head>
-  <body>
-    <slot />
+  <body class="min-h-screen">
+    <a href="#main" class="sr-only focus:not-sr-only">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>

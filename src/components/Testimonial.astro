@@ -1,0 +1,27 @@
+---
+/**
+ * Renders a testimonial quote + attribution. Both fields are `[confirm]`
+ * until Sindbad supplies the exact wording AND written permission
+ * (BUILD-PLAN.md §5A S4/S5) — never invent a quote or a name. The
+ * relationship's status still only comes from <LegendMark>, never from here.
+ */
+import { TESTIMONIAL_BY_ID } from "../consts";
+import LegendMark from "./LegendMark.astro";
+
+interface Props {
+  testimonialId: string;
+  class?: string;
+}
+const { testimonialId, class: klass = "" } = Astro.props;
+const testimonial = TESTIMONIAL_BY_ID[testimonialId];
+
+if (!testimonial) {
+  throw new Error(`Testimonial: unknown testimonialId "${testimonialId}"`);
+}
+---
+
+<figure class={`space-y-2 ${klass}`}>
+  <blockquote class="italic">&ldquo;{testimonial.quote}&rdquo;</blockquote>
+  <figcaption class="text-sm opacity-80">— {testimonial.attribution}</figcaption>
+  <LegendMark proof={{ relationshipId: testimonial.relationshipId, context: testimonial.context }} />
+</figure>

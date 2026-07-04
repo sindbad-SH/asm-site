@@ -1,0 +1,56 @@
+---
+/**
+ * Footer — email + socials from SITE (both [confirm] until Sindbad supplies
+ * real values, BUILD-PLAN.md §5A S8/S9). A [confirm] href here is inert (#)
+ * rather than a broken/guessed link, and the visible label still reads
+ * "[confirm]" so it's obviously not ready to ship — the audit gate catches it.
+ */
+import { SITE, NAV } from "../consts";
+
+const socialEntries = Object.entries(SITE.socials);
+---
+
+<footer class="border-t border-current/20 p-4 text-sm">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p>{SITE.person} — {SITE.persona}</p>
+      <p>{SITE.location}</p>
+      <p>
+        <a href={`mailto:${SITE.email}`} class="hover:underline">{SITE.email}</a>
+      </p>
+    </div>
+    <nav aria-label="Footer">
+      <ul class="flex flex-wrap gap-4">
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}${item.href}`}
+                class="hover:underline"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ul class="flex flex-wrap gap-4">
+      {
+        socialEntries.map(([platform, url]) => (
+          <li>
+            {url === "[confirm]" ? (
+              <span aria-disabled="true" class="opacity-50">
+                {platform} [confirm]
+              </span>
+            ) : (
+              <a href={url} class="hover:underline" rel="me noopener">
+                {platform}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</footer>

@@ -1,0 +1,31 @@
+---
+/**
+ * The ONLY channel through which a relationship's status may be stated
+ * (BUILD-PLAN.md §3.4). Resolves a ProofLine to its relationship and prints
+ * `permittedPhrasing` verbatim, prefixed by its legend tier symbol. Never
+ * paraphrase this output — if a page needs different framing, change the
+ * `context` lead-in in consts.ts, not this component.
+ */
+import { LEGEND, RELATIONSHIP_BY_ID, type ProofLine } from "../consts";
+
+interface Props {
+  proof: ProofLine;
+  class?: string;
+}
+const { proof, class: klass = "" } = Astro.props;
+const relationship = RELATIONSHIP_BY_ID[proof.relationshipId];
+
+if (!relationship) {
+  throw new Error(`LegendMark: unknown relationshipId "${proof.relationshipId}"`);
+}
+
+const tier = LEGEND[relationship.tier];
+---
+
+<p class={`flex items-start gap-2 ${klass}`}>
+  <span aria-hidden="true" title={tier.label} class="mt-0.5 shrink-0">{tier.symbol}</span>
+  <span>
+    {proof.context && <span class="opacity-70">{proof.context} </span>}
+    {relationship.permittedPhrasing}
+  </span>
+</p>

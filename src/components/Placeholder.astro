@@ -1,0 +1,25 @@
+---
+/**
+ * Dimensioned, intent-annotated media slot — ported from the v1 Placeholder
+ * pattern (research-brief.md §7 KEEP). Doubles as Sindbad's shot list: every
+ * slot states its aspect ratio and exactly what belongs there, so greybox
+ * pages are real navigable structure, not blank space. Replaced slot-for-slot
+ * by real media in Phase 6 (BUILD-PLAN.md §7.1).
+ */
+interface Props {
+  ratio?: string;
+  label: string;
+  class?: string;
+}
+const { ratio = "16/10", label, class: klass = "" } = Astro.props;
+---
+
+<figure
+  class={`grid place-items-center border border-dashed border-current/30 bg-current/5 p-4 ${klass}`}
+  style={`aspect-ratio:${ratio}`}
+>
+  <span class="max-w-prose px-4 text-center text-[0.7rem] uppercase tracking-[0.2em] opacity-70">
+    {label}
+  </span>
+  <figcaption class="sr-only">{label}</figcaption>
+</figure>

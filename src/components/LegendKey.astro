@@ -1,0 +1,21 @@
+---
+/**
+ * The visible legend key (BUILD-PLAN.md §3.4) — appears on Home H4,
+ * /entertainment, and /work so the tier symbols in <LegendMark> are always
+ * decodable, never a private notation.
+ */
+import { LEGEND } from "../consts";
+
+const tiers = Object.values(LEGEND);
+---
+
+<ul class="flex flex-wrap gap-x-6 gap-y-1 text-sm opacity-80">
+  {
+    tiers.map((tier) => (
+      <li class="flex items-center gap-2">
+        <span aria-hidden="true">{tier.symbol}</span>
+        <span>{tier.label}</span>
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,62 @@
+---
+/**
+ * The Immersive-Garden walkthrough template (BUILD-PLAN.md §2c), instantiated
+ * for its first and template-setting case. Sticky-rail chapters are a Phase 5
+ * motion build; this greybox is the plain-article fallback structure itself
+ * (reasoning-first chapters, honest outcome, testimonial, single CTA).
+ */
+import Base from "../../layouts/Base.astro";
+import Placeholder from "../../components/Placeholder.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import Testimonial from "../../components/Testimonial.astro";
+import { PAGES } from "../../consts";
+
+const c = PAGES.work.caseStudies.pitchboulder;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<Base title={c.meta.title} description={c.meta.description}>
+  <!-- Hook -->
+  <section class="space-y-4 p-8 text-center">
+    <Placeholder ratio="21/9" label="HOOK MEDIA — PitchBoulder commercial still/loop (Phase 5, §2c)" />
+    <h1 class="text-3xl font-bold sm:text-4xl">{c.hook}</h1>
+  </section>
+
+  <!-- Context -->
+  <section class="mx-auto max-w-3xl space-y-2 border-t border-current/20 p-8">
+    <h2 class="text-xl font-bold">{c.context.heading}</h2>
+    <p>{c.context.body}</p>
+  </section>
+
+  <!-- Ask -->
+  <section class="mx-auto max-w-3xl space-y-2 border-t border-current/20 p-8">
+    <h2 class="text-xl font-bold">{c.ask.heading}</h2>
+    <p>{c.ask.body}</p>
+  </section>
+
+  <!-- The work -->
+  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8">
+    <h2 class="text-xl font-bold">{c.work.heading}</h2>
+    <p>{c.work.body}</p>
+    <LegendMark proof={c.work.proof} />
+    <Placeholder ratio="16/9" label="RECAP CUT / COMMERCIAL — YouTube embed, click-to-load facade (S3)" />
+  </section>
+
+  <!-- Outcome -->
+  <section class="mx-auto max-w-3xl space-y-2 border-t border-current/20 p-8">
+    <h2 class="text-xl font-bold">{c.outcome.heading}</h2>
+    <p>{c.outcome.body}</p>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="mx-auto max-w-3xl border-t border-current/20 p-8">
+    <Testimonial testimonialId={c.testimonialId} />
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-3xl space-y-4 border-t border-current/20 p-8 text-center">
+    <a href={`${base}${c.cta.href}`} class="inline-block rounded border border-current px-4 py-2">
+      {c.cta.label}
+    </a>
+  </section>
+</Base>
