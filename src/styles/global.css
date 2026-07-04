@@ -1048,6 +1048,34 @@
 
 /* ─────────────────── reveal engine + contour motion (§3.3) ────────────── */
 
+/* Active filter state (/work lane filters, §2d). Uses !important
+   deliberately: Tailwind v4's bundler orders @layer utilities AFTER
+   @layer components (so a plain utility like `border-hairline` on the same
+   button beats any override authored inside @layer components regardless of
+   specificity), AND its Vite plugin was observed folding "unlayered" rules
+   placed after the Tailwind import into the utilities layer anyway — so
+   neither plain specificity nor unlayered placement reliably wins here.
+   !important is the one mechanism guaranteed to beat both layers by spec.
+
+   [data-filter] is ALWAYS transition:none (both pressed and unpressed),
+   not just conditionally on the pressed override — verified that making the
+   transition conditional (present only when unpressed) was itself flaky:
+   when multiple filter buttons change aria-pressed in the same click (one
+   loses the match, one gains it), Chrome's transition engine intermittently
+   miscomputed the interpolation for whichever button was reverting, leaving
+   its color "stuck" at the prior value even after the transition duration
+   elapsed (border-color, which never had a competing transition, always
+   updated correctly — the tell that this was a transition-engine issue, not
+   a selector/cascade issue). Making it unconditionally instant removes the
+   race entirely; a discrete filter toggle doesn't need an animated color. */
+[data-filter] {
+  transition: none !important;
+}
+.btn-quiet[aria-pressed="true"] {
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+}
+
 /* Hidden ONLY under html.js — no-JS users always see everything (KEEP port). */
 html.js [data-reveal] {
   opacity: 0;

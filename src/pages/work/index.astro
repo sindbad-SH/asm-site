@@ -1,22 +1,65 @@
 ---
+/**
+ * /work — Resn-style grid (§2d, OD-3), attribution-first uniform Cards (Clay
+ * Boan rigidity), lane filters (Matchstic tag-filter model), and the §2e
+ * hover-distortion texture (wired via DistortionLayer, built in the prior
+ * Phase-4 task).
+ *
+ * Filters are pure enhancement: EVERY card is visible by default (the no-JS
+ * baseline), and the filter bar is real <button>s that do nothing without
+ * JS — inert, never broken, since "show everything" is already correct.
+ */
 import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
 import DistortionLayer from "../../components/DistortionLayer.astro";
-import { PAGES, WORK } from "../../consts";
+import { PAGES, WORK, PILLARS } from "../../consts";
 
 const p = PAGES.work;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Filter options in the canonical PILLARS order, limited to pillars that
+// actually have WORK items (no empty filter for a lane with nothing to show).
+const presentPillars = new Set(WORK.map((item) => item.pillar));
+const filters = [
+  { id: "all", label: "All" },
+  ...PILLARS.filter((pillar) => presentPillars.has(pillar.id)).map((pillar) => ({
+    id: pillar.id,
+    label: pillar.name,
+  })),
+] as const;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- Resn-style grid (Phase 5 build, §2d; uniform Card containers here, OD-3) -->
   <section class="mx-auto max-w-3xl space-y-4 p-8">
     <h1 class="text-3xl font-bold">{p.intro.heading}</h1>
-    <p>{p.intro.body}</p>
+    <p class="text-ink">{p.intro.body}</p>
   </section>
 
+  <!-- Lane filters (Matchstic model) — inert without JS; every card already
+       shows, so there's nothing to restore on a no-JS visit. -->
+  <div class="mx-auto max-w-3xl px-8">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by lane" data-work-filters>
+      {
+        filters.map((f) => (
+          <button
+            type="button"
+            class="btn-quiet border border-hairline px-3 py-1.5"
+            data-filter={f.id}
+            aria-pressed={f.id === "all" ? "true" : "false"}
+          >
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
   <section class="p-8">
-    <div class="mx-auto grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2" data-distort-grid>
+    <div
+      class="mx-auto grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2"
+      data-distort-grid
+      data-work-grid
+    >
       {
         WORK.map((item) => (
           <Card
@@ -27,12 +70,43 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
             meta={item.engagement}
             proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
             ctaLabel={item.href ? "See the work" : undefined}
+            pillar={item.pillar}
           />
         ))
       }
     </div>
+    <p class="mx-auto mt-4 max-w-3xl text-sm text-ink-muted" data-work-empty hidden>
+      Nothing in this lane yet.
+    </p>
   </section>
 
   <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
   <DistortionLayer />
 </Base>
+
+<script>
+  // Filter enhancement only — every card starts visible (see file header).
+  const grid = document.querySelector<HTMLElement>("[data-work-grid]");
+  const bar = document.querySelector<HTMLElement>("[data-work-filters]");
+  const empty = document.querySelector<HTMLElement>("[data-work-empty]");
+  if (grid && bar) {
+    const cards = [...grid.querySelectorAll<HTMLElement>("[data-pillar]")];
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+
+    bar.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
+      if (!btn) return;
+      const filter = btn.dataset.filter!;
+
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const show = filter === "all" || card.dataset.pillar === filter;
+        card.classList.toggle("hidden", !show);
+        if (show) visibleCount++;
+      });
+      if (empty) empty.hidden = visibleCount > 0;
+    });
+  }
+</script>

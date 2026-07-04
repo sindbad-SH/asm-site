@@ -19,6 +19,8 @@ interface Props {
   proof?: ProofLine;
   ctaLabel?: string;
   class?: string;
+  /** Rendered as data-pillar — a hook for JS filtering (e.g. /work's lane filters). */
+  pillar?: string;
 }
 const {
   href,
@@ -30,12 +32,13 @@ const {
   proof,
   ctaLabel,
   class: klass = "",
+  pillar,
 } = Astro.props;
 
 const Tag = href ? "a" : "div";
 ---
 
-<Tag href={href} class={`card ${klass}`}>
+<Tag href={href} class={`card ${klass}`} data-pillar={pillar}>
   {mediaLabel && <Placeholder ratio={mediaRatio} label={mediaLabel} />}
   {eyebrow && <p class="card-eyebrow">{eyebrow}</p>}
   <h3 class="card-title">{title}</h3>
