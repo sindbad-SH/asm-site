@@ -1,0 +1,426 @@
+---
+/**
+ * The interactive globe hero (BUILD-PLAN.md §2a) — "where the stories are
+ * told", never a client map. cobe dotted sphere, drag-to-spin with inertia,
+ * GSAP scroll handoff (lazy-loaded), screen-projected hover story-cards on
+ * fine pointers, tap-cycle story slot on coarse pointers. No arcs.
+ *
+ * Progressive layers (perf budget §4 — the page never waits on the globe):
+ *   1. Server-rendered SVG survey-wireframe poster + static story list.
+ *      This IS the no-JS state, and the reduced-motion / no-WebGL state.
+ *      (Spec said "static PNG"; an inline SVG in the contour voice is ~2KB,
+ *      crisp at any DPR, and needs no asset pipeline — documented deviation.)
+ *   2. Deferred module boots cobe v2 (~8KB gz total) and drives its own rAF
+ *      loop (cobe v2 renders synchronously inside update()). The loop pauses
+ *      whenever the hero is off-screen.
+ *   3. GSAP + ScrollTrigger stream in at idle for the scroll handoff.
+ *
+ * Data contract: pins come from GLOBE in consts.ts (single source of truth),
+ * handed to the client via an embedded JSON script — the "globe-pins.json"
+ * contract without a second file to drift. Swapping the renderer
+ * (cobe → globe.gl) touches only this island.
+ *
+ * Debug: ?globe=static forces the poster path; ?globe=debug shows hotspot
+ * rings for projection-alignment checks against cobe's own marker dots.
+ */
+import { GLOBE } from "../consts";
+import { projectPin, facingPhi } from "../lib/globe-math";
+
+// Initial view: mid-Atlantic (lng -40°), so Boulder and the Alps are both on-globe.
+const PHI0 = facingPhi(-40);
+const THETA = 0.28;
+
+const posterPins = GLOBE.pins.map((pin) => ({
+  ...pin,
+  p: projectPin(pin.lat, pin.lng, PHI0, THETA),
+}));
+
+// poster wireframe: latitude circles as orthographic ellipses
+const LATS = [-45, -15, 15, 45];
+---
+
+<section
+  class="globe-hero relative mx-auto w-full max-w-[520px]"
+  data-globe
+  data-phi0={PHI0}
+  data-theta={THETA}
+>
+  <div class="relative aspect-square" data-globe-stage>
+    <!-- Layer 1: the poster (no-JS / reduced-motion / pre-boot state) -->
+    <svg
+      class="absolute inset-0 h-full w-full"
+      viewBox="-1.12 -1.12 2.24 2.24"
+      aria-hidden="true"
+      data-globe-poster
+    >
+      <circle
+        r="1"
+        fill="color-mix(in srgb, var(--color-elevated) 60%, transparent)"
+        stroke="color-mix(in srgb, var(--color-peak) 30%, transparent)"
+        stroke-width="0.008"></circle>
+      {LATS.map((lat) => {
+        const ry = Math.cos((lat * Math.PI) / 180);
+        return (
+          <ellipse
+            cx="0"
+            cy={-Math.sin((lat * Math.PI) / 180) * Math.cos(THETA)}
+            rx={ry}
+            ry={Math.max(ry * Math.sin(THETA), 0.02)}
+            fill="none"
+            stroke="color-mix(in srgb, var(--color-peak) 14%, transparent)"
+            stroke-width="0.006"
+          />
+        );
+      })}
+      <ellipse cx="0" cy="0" rx="0.72" ry="1" fill="none" stroke="color-mix(in srgb, var(--color-peak) 12%, transparent)" stroke-width="0.006" transform="rotate(9)"></ellipse>
+      <ellipse cx="0" cy="0" rx="0.4" ry="1" fill="none" stroke="color-mix(in srgb, var(--color-peak) 10%, transparent)" stroke-width="0.006" transform="rotate(-16)"></ellipse>
+      {posterPins
+        .filter((pin) => pin.p.front)
+        .map((pin) => (
+          <circle
+            cx={pin.p.x}
+            cy={-pin.p.y}
+            r={pin.kind === "home" ? 0.022 : 0.03}
+            fill="var(--color-accent)"
+            opacity="0.9"
+          />
+        ))}
+    </svg>
+
+    <!-- Layer 2: cobe canvas, faded in once the module boots -->
+    <canvas
+      class="absolute inset-0 h-full w-full opacity-0 transition-opacity duration-700"
+      data-globe-canvas
+      aria-hidden="true"></canvas>
+
+    <!-- hover hotspots are injected here (pointer users) -->
+    <div class="absolute inset-0" data-globe-hotspots></div>
+
+    <!-- shared story card, positioned near the active pin -->
+    <div class="globe-card absolute z-10" data-globe-card hidden>
+      <p class="hud-label" data-globe-card-label></p>
+      <p class="mt-1 text-sm text-ink" data-globe-card-story></p>
+    </div>
+  </div>
+
+  <!-- LOCKED caption (§2a honesty guardrail) — sourced from GLOBE.caption -->
+  <p class="hud-label mt-5 text-center">{GLOBE.caption}</p>
+
+  <!-- Static story list: the no-JS / reduced-motion content. When the live
+       globe boots it becomes sr-only (screen readers keep the full list);
+       on coarse pointers the tap-cycle slot replaces it visually. -->
+  <div class="mt-3" data-globe-static>
+    <ul class="mx-auto max-w-sm space-y-1.5 text-left text-sm text-ink-muted">
+      {GLOBE.pins.map((pin) => (
+        <li>
+          <span class="text-peak">{pin.label}</span> — {pin.story}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <!-- Tap-cycle slot (coarse pointers), enabled by the module -->
+  <div
+    class="mx-auto mt-3 hidden max-w-sm items-start justify-between gap-3 text-left"
+    data-globe-cycle
+  >
+    <p class="min-h-[3.5rem] text-sm text-ink-muted" data-globe-cycle-story aria-live="polite"></p>
+    <button type="button" class="btn shrink-0 px-3 py-1.5" data-globe-cycle-next aria-label="Next story">→</button>
+  </div>
+
+  <script type="application/json" data-globe-pins is:inline set:html={JSON.stringify(GLOBE.pins)} />
+</section>
+
+<script>
+  import createGlobe from "cobe";
+  import { projectPin, facingPhi, angleDelta } from "../lib/globe-math";
+
+  type Pin = {
+    id: string;
+    label: string;
+    lat: number;
+    lng: number;
+    kind: "home" | "story";
+    story: string;
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-globe]");
+
+  const boot = () => {
+    if (!root) return;
+
+    const params = new URLSearchParams(location.search);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canvas = root.querySelector<HTMLCanvasElement>("[data-globe-canvas]");
+    const stage = root.querySelector<HTMLElement>("[data-globe-stage]");
+    if (!canvas || !stage) return;
+    // Reduced motion / debug flag → the poster IS the hero (§2a fallback).
+    if (reduceMotion || params.get("globe") === "static") return;
+
+    const pins: Pin[] = JSON.parse(
+      root.querySelector("[data-globe-pins]")!.textContent ?? "[]",
+    );
+    const poster = root.querySelector<SVGElement>("[data-globe-poster]");
+    const hotspotLayer = root.querySelector<HTMLElement>("[data-globe-hotspots]")!;
+    const card = root.querySelector<HTMLElement>("[data-globe-card]")!;
+    const cardLabel = card.querySelector<HTMLElement>("[data-globe-card-label]")!;
+    const cardStory = card.querySelector<HTMLElement>("[data-globe-card-story]")!;
+    const staticList = root.querySelector<HTMLElement>("[data-globe-static]")!;
+    const cycle = root.querySelector<HTMLElement>("[data-globe-cycle]")!;
+    const cycleStory = root.querySelector<HTMLElement>("[data-globe-cycle-story]")!;
+    const cycleNext = root.querySelector<HTMLButtonElement>("[data-globe-cycle-next]")!;
+
+    const coarse =
+      window.matchMedia("(pointer: coarse)").matches || params.get("globe") === "coarse";
+    const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2); // §2a mobile budget
+    const THETA = Number(root.dataset.theta);
+    let phi = Number(root.dataset.phi0);
+
+    // ── rotation state: auto-rotate + drag inertia + rotate-to-pin + scroll ──
+    const debugRings = params.get("globe") === "debug";
+    const AUTO_SPEED = debugRings ? 0 : 0.0022; // frozen in debug for calibration
+    // cobe's sphere radius as a fraction of the canvas half-size (it leaves a
+    // glow margin) — calibrated visually against cobe's own marker dots.
+    const RADIUS_K = 0.86;
+    let velocity = 0;
+    let dragging = false;
+    let paused = false; // story-card open
+    let targetPhi: number | null = null;
+    let scrollPhi = 0;
+    let size = stage.clientWidth;
+    let lastSize = size;
+
+    // ── hotspots + story card ──
+    type Spot = { pin: Pin; el: HTMLButtonElement };
+    const spots: Spot[] = [];
+    let activeSpot: Spot | null = null;
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const showCard = (spot: Spot) => {
+      clearTimeout(hideTimer);
+      activeSpot = spot;
+      paused = true;
+      cardLabel.textContent = spot.pin.label;
+      cardStory.textContent = spot.pin.story;
+      card.hidden = false;
+    };
+    const hideCard = () => {
+      hideTimer = setTimeout(() => {
+        card.hidden = true;
+        activeSpot = null;
+        paused = false;
+      }, 160);
+    };
+
+    if (coarse) {
+      // §2a tap-cycle fallback: fixed slot + next button; the globe eases
+      // around to face the active pin. Hotspots stay for direct taps.
+      staticList.classList.add("hidden");
+      cycle.classList.remove("hidden");
+      cycle.classList.add("flex");
+      let idx = -1;
+      const showPin = (i: number) => {
+        idx = i % pins.length;
+        const pin = pins[idx]!;
+        cycleStory.innerHTML = "";
+        const strong = document.createElement("span");
+        strong.className = "text-peak";
+        strong.textContent = pin.label;
+        cycleStory.append(strong, ` — ${pin.story}`);
+        targetPhi = facingPhi(pin.lng);
+      };
+      cycleNext.addEventListener("click", () => showPin(idx + 1));
+      showPin(0);
+    } else {
+      // screen readers keep the full story list
+      staticList.classList.add("sr-only");
+    }
+
+    for (const pin of pins) {
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "globe-hotspot";
+      el.setAttribute("aria-label", `${pin.label}: ${pin.story}`);
+      if (debugRings) el.style.setProperty("outline", "1px solid red");
+      const spot: Spot = { pin, el }; // ONE identity — positionOverlays matches by ===
+      el.addEventListener("mouseenter", () => showCard(spot));
+      el.addEventListener("focus", () => showCard(spot));
+      el.addEventListener("mouseleave", hideCard);
+      el.addEventListener("blur", hideCard);
+      el.addEventListener("click", () => showCard(spot));
+      hotspotLayer.appendChild(el);
+      spots.push(spot);
+    }
+
+    const positionOverlays = () => {
+      const r = size / 2;
+      const k = r * RADIUS_K;
+      for (const spot of spots) {
+        const p = projectPin(spot.pin.lat, spot.pin.lng, phi + scrollPhi, THETA);
+        const visible = p.front;
+        spot.el.style.visibility = visible ? "visible" : "hidden";
+        spot.el.disabled = !visible;
+        if (visible) {
+          spot.el.style.transform = `translate(${r + p.x * k}px, ${r - p.y * k}px) translate(-50%, -50%) scale(${0.7 + p.depth * 0.45})`;
+        }
+        if (spot === activeSpot) {
+          if (!visible) hideCard();
+          else {
+            const cx = r + p.x * k;
+            const cy = r - p.y * k;
+            card.style.left = `${Math.min(Math.max(cx, 70), size - 70)}px`;
+            card.style.top = `${cy}px`;
+            card.style.transform = `translate(-50%, ${cy > size * 0.55 ? "calc(-100% - 18px)" : "18px"})`;
+          }
+        }
+      }
+    };
+
+    // ── cobe v2: it renders synchronously inside update(); we own the loop.
+    //    Options take LOGICAL pixels — cobe multiplies by devicePixelRatio. ──
+    let globe: { update: (s: Record<string, unknown>) => void; destroy: () => void };
+    try {
+      globe = createGlobe(canvas, {
+        devicePixelRatio: dpr,
+        width: size,
+        height: size,
+        phi,
+        theta: THETA,
+        dark: 1,
+        diffuse: 1.15,
+        mapSamples: 16000,
+        mapBrightness: 5.2,
+        baseColor: [0.32, 0.4, 0.43], // steel/peak family — chrome stays neutral
+        markerColor: [0.22, 0.97, 0.93], // sanctioned scarce accent: the pins
+        glowColor: [0.08, 0.1, 0.13], // base-ground halo, no bloom
+        markers: pins.map((pin) => ({
+          location: [pin.lat, pin.lng] as [number, number],
+          size: pin.kind === "home" ? 0.055 : 0.085,
+        })),
+      });
+    } catch {
+      return; // no WebGL → poster stays (§2a fallback)
+    }
+
+    // first frame is already drawn by createGlobe — swap poster for canvas
+    canvas.style.opacity = "1";
+    poster?.style.setProperty("transition", "opacity 700ms var(--ease-survey)");
+    poster?.style.setProperty("opacity", "0");
+
+    // ── the loop (paused off-screen; rAF also pauses in background tabs) ──
+    let rafId = 0;
+    let running = false;
+    const frame = () => {
+      if (dragging) {
+        // phi is driven directly by the pointer
+      } else if (targetPhi !== null) {
+        const d = angleDelta(phi, targetPhi);
+        if (Math.abs(d) < 0.005) targetPhi = null;
+        else phi += d * 0.08;
+      } else {
+        velocity *= 0.94; // inertia decay
+        phi += velocity + (paused ? 0 : AUTO_SPEED);
+      }
+      const payload: Record<string, unknown> = { phi: phi + scrollPhi };
+      if (size !== lastSize) {
+        lastSize = size;
+        payload.width = size;
+        payload.height = size;
+      }
+      globe.update(payload);
+      positionOverlays();
+      rafId = requestAnimationFrame(frame);
+    };
+    const start = () => {
+      if (!running) {
+        running = true;
+        rafId = requestAnimationFrame(frame);
+      }
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+    };
+    new IntersectionObserver(([entry]) => (entry?.isIntersecting ? start() : stop()), {
+      rootMargin: "80px",
+    }).observe(stage);
+    start();
+
+    // ── drag with inertia (pointer events cover mouse + touch) ──
+    let lastX = 0;
+    stage.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      velocity = 0;
+      targetPhi = null;
+      lastX = e.clientX;
+      stage.setPointerCapture(e.pointerId);
+      stage.style.cursor = "grabbing";
+    });
+    stage.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX;
+      lastX = e.clientX;
+      const delta = dx * 0.005;
+      phi += delta;
+      velocity = delta;
+    });
+    const endDrag = () => {
+      dragging = false;
+      stage.style.cursor = "grab";
+    };
+    stage.addEventListener("pointerup", endDrag);
+    stage.addEventListener("pointercancel", endDrag);
+    stage.style.cursor = "grab";
+    stage.style.touchAction = "pan-y"; // vertical page scroll stays native
+
+    // ── resize (logical size; cobe re-applies dpr) ──
+    new ResizeObserver(() => {
+      size = stage.clientWidth;
+    }).observe(stage);
+
+    // ── Layer 3: GSAP scroll handoff (Lando-style), streamed in at idle ──
+    const mountHandoff = async () => {
+      try {
+        const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+          import("gsap"),
+          import("gsap/ScrollTrigger"),
+        ]);
+        gsap.registerPlugin(ScrollTrigger);
+        const hero = root.closest("section") ?? root;
+        gsap.to(root, {
+          scale: 0.86,
+          yPercent: 8,
+          autoAlpha: 0.3,
+          ease: "none",
+          scrollTrigger: {
+            trigger: hero,
+            start: "bottom 92%",
+            end: "bottom 30%",
+            scrub: true,
+            onUpdate: (self) => {
+              scrollPhi = self.progress * 0.55; // keeps turning through the handoff
+            },
+          },
+        });
+      } catch {
+        /* handoff is enhancement only — the globe works without it */
+      }
+    };
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => mountHandoff(), { timeout: 2500 });
+    } else {
+      setTimeout(mountHandoff, 1200);
+    }
+
+    window.addEventListener(
+      "pagehide",
+      () => {
+        stop();
+        globe.destroy();
+      },
+      { once: true },
+    );
+  };
+
+  boot();
+</script>

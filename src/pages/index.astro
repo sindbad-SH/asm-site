@@ -4,25 +4,22 @@ import Placeholder from "../components/Placeholder.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { COPY, PAGES, GLOBE } from "../consts";
+import GlobeHero from "../components/GlobeHero.astro";
+import { COPY, PAGES } from "../consts";
 
 const p = PAGES.home;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- H1 — globe hero. Globe engine is a Phase 2 build (BUILD-PLAN.md §2a);
-       this greybox slot names exactly what replaces it. -->
-  <section class="mx-auto max-w-3xl space-y-4 p-8 text-center">
-    <p class="text-sm uppercase tracking-widest opacity-70">{COPY.hero.kicker}</p>
+  <!-- H1 — globe hero (§2a). Headline paints first (LCP); the globe streams
+       in behind it and the poster covers every fallback state. -->
+  <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
+    <p class="hud-label">{COPY.hero.kicker}</p>
     <h1 class="text-3xl font-bold sm:text-5xl">{COPY.hero.headline}</h1>
     <p class="text-lg">{COPY.hero.subline}</p>
-    <Placeholder
-      ratio="1/1"
-      class="mx-auto max-w-md"
-      label={`INTERACTIVE GLOBE HERO (Phase 2, §2a) — cobe dotted sphere. Pins: ${GLOBE.pins.map((pin) => pin.label).join(", ")}. Caption (locked): "${GLOBE.caption}"`}
-    />
-    <a href={`${base}/forge-the-saga`} class="inline-block rounded border border-current px-4 py-2">
+    <GlobeHero />
+    <a href={`${base}/forge-the-saga`} class="btn">
       {COPY.paths[0].label}
     </a>
   </section>

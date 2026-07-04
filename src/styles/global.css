@@ -245,6 +245,40 @@
     color: var(--color-ink-muted);
   }
 
+  /* ── Globe hero (§2a) ── */
+  .globe-hotspot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    /* invisible target over cobe's own marker dot; ring appears on hover */
+    background: transparent;
+    will-change: transform;
+  }
+  .globe-hotspot::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    opacity: 0;
+    transition: opacity var(--dur-hover) var(--ease-swift);
+  }
+  .globe-hotspot:hover::after,
+  .globe-hotspot:focus-visible::after {
+    opacity: 0.9;
+  }
+  .globe-card {
+    max-width: 15rem;
+    background: color-mix(in srgb, var(--color-elevated) 92%, transparent);
+    border: 1px solid var(--color-hairline);
+    padding: 0.7rem 0.85rem;
+    pointer-events: none;
+    backdrop-filter: blur(2px);
+  }
+
   /* ── Forge dialect (scoped) — heat is the only warm light (§3.3/§6) ── */
   [data-lane="forge"] .temper-line {
     height: 1px;
