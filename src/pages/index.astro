@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
-import Placeholder from "../components/Placeholder.astro";
+import PortalHero from "../components/PortalHero.astro";
 import Tableaux from "../components/Tableaux.astro";
 import TrailJourney from "../components/TrailJourney.astro";
 import { COPY, PAGES } from "../consts";
@@ -17,28 +17,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
        threads the three pillar sections. Desktop-only, degrades to static. -->
   <TrailJourney />
 
-  <!--
-    H1 — PORTAL HERO — RESERVED STUB (BUILD-PLAN.md §9.2, dispatch Q2, Fable 5 · high).
-    The globe moved to /adventure (§9.3) — this slot is now the brand "portal" moment:
-    the logo mark as a window that dissolves into an aurora-lit mountain scene and back
-    (A→B→A), built from the horizontal sting reference in
-    `01 - Brand Assets/Logos/Logo videos/Main reference/Main reference horizontal/`.
-    Headline still paints first (LCP); the portal composite streams in behind it.
-    DO NOT build the visual effect here — that's Q2. This stub is copy + a labeled
-    placeholder so the page is navigable and the next task's spec is unambiguous.
-  -->
-  <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
+  <!-- H1 — the Portal Hero (§9.2): the mark as a window, A→B→A. Content
+       paints first (LCP) over the void; the dissolve-through plays behind it
+       and reverses on scroll-out as the handoff into the tableaux. -->
+  <PortalHero>
     <p class="hud-label">{COPY.hero.kicker}</p>
-    <h1 class="text-3xl font-bold sm:text-5xl">{COPY.hero.headline}</h1>
-    <p class="text-lg">{COPY.hero.subline}</p>
-    <Placeholder
-      ratio="21/9"
-      label="PORTAL HERO — NEXT TASK (Q2, Fable 5 · high, §9.2) — logo-as-window A→B→A composite: mark holds on --hero-void → dissolves into the aurora-mountain scene (frame-grabbed from the horizontal sting, public/media/home/) → settles full-bleed → reverses on scroll-out as the handoff into the tableaux below. Reduced-motion/no-JS: static endcard (scene + solid mark)."
-    />
+    <h1 class="text-4xl font-bold sm:text-6xl">{COPY.hero.headline}</h1>
+    <p class="mx-auto max-w-2xl text-lg text-ink">{COPY.hero.subline}</p>
     <a href={`${base}/forge-the-saga`} class="btn">
       {COPY.paths[0].label}
     </a>
-  </section>
+  </PortalHero>
 
   <!-- H2 — paths band -->
   <nav aria-label="Explore by intent" class="border-t border-current/20 p-8">

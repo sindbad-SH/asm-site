@@ -1,0 +1,224 @@
+---
+/**
+ * The Portal Hero (BUILD-PLAN.md §9.2) — the home page's signature, built
+ * from the brand logo-sting reference: the mark alone on a void → the mark
+ * becomes a WINDOW as an aurora-lit mountain night rises through it → full
+ * scene → (on scroll-out) the mark re-forms. A→B→A, bookended, exactly the
+ * sting's structure. Content (kicker/h1/subline/CTA) goes in the slot and
+ * holds still throughout ("one thing moves at a time" — the sting brief).
+ *
+ * Layer stack (bottom→top):
+ *   1. .portal-scene   — the beauty-shot still (frame-grabbed from the
+ *                        horizontal sting → AVIF 26KB + WebP fallback)
+ *   2. .portal-void    — the --hero-void curtain; its DISSOLVE does the true
+ *                        full reveal (the mark's interior is partially
+ *                        transparent, so a pure mask-zoom could never fully
+ *                        clear the viewport — same reason the sting itself is
+ *                        dissolve-driven, "no hard cuts")
+ *   3. .portal-window  — the scene again, masked by the logo alpha; its
+ *                        mask-size GROWS during the open (the portal accent)
+ *                        and it fades out at the end, handing to layer 1
+ *   4. .portal-mark    — the solid mark (state A / ghost re-form)
+ *   5. scrim + content
+ *
+ * One proxy p (0 = closed/state A, 1 = open/endcard) drives render(p):
+ * intro tween runs 0→1 on load (0.8s hold + dissolve-through); a scrubbed
+ * ScrollTrigger runs 1→0 as the hero exits — the bookend handoff into the
+ * tableaux (replacing the globe's old handoff).
+ *
+ * States & fallbacks:
+ *   - no-JS default        → ENDCARD (scene + solid mark ghost + headline)
+ *   - html.js              → state A (void + solid mark); intro plays when
+ *                            the chunk lands
+ *   - reduced motion       → CSS forces the endcard back; script bails
+ *   - chunk-load failure   → 4s inline watchdog forces .portal-forced endcard
+ *   - ?portal=static       → endcard, no animation (QA)
+ * Debug: window.__PORTAL { p(), set(p) } — set() drives render directly
+ * (harness tabs pause rAF; render is deterministic).
+ *
+ * HONESTY NOTE (§9.2): the scene is BRAND ART — the logo's world, from the
+ * AI-generated sting. It lives here as brand identity and must never appear
+ * in Work/Adventure gallery contexts where it could read as shot footage.
+ *
+ * The 9:16 sting mp4 (1.26MB) remains available as a mobile poster-first
+ * alternative (§9.2 "decide at build by feel") — not used at launch: the
+ * live composite is one code path and works at every aspect.
+ */
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const scene = {
+  avif: `${base}/media/home/portal-scene.avif`,
+  webp: `${base}/media/home/portal-scene.webp`,
+};
+const mark = `${base}/logo-mark.png`;
+---
+
+<section class="portal" data-portal data-mark-src={mark}>
+  <div class="portal-stage">
+    <!-- 1 · the world -->
+    <picture>
+      <source srcset={scene.avif} type="image/avif" />
+      <img
+        class="portal-scene"
+        src={scene.webp}
+        alt=""
+        width="1280"
+        height="720"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        data-portal-scene
+      />
+    </picture>
+
+    <!-- 2 · the void curtain -->
+    <div class="portal-void" data-portal-void aria-hidden="true"></div>
+
+    <!-- 3 · the scene through the mark (the window) -->
+    <div class="portal-window" data-portal-window aria-hidden="true" style={`background-image: image-set(url(${scene.avif}) type("image/avif"), url(${scene.webp}) type("image/webp"))`}></div>
+
+    <!-- 4 · the solid mark -->
+    <img class="portal-mark" src={mark} alt="" width="512" height="512" loading="eager" decoding="async" data-portal-mark />
+
+    <!-- 5 · legibility scrim + content -->
+    <div class="portal-scrim" data-portal-scrim aria-hidden="true"></div>
+    <div class="portal-content">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<!-- Watchdog OUTSIDE the engine chunk (mirrors the site's 4s reveal watchdog):
+     if html.js put us in state A but the engine chunk never starts (network /
+     script failure), force the endcard so the scene can never stay hidden. -->
+<script is:inline>
+  setTimeout(() => {
+    const el = document.querySelector("[data-portal]");
+    if (el && !el.hasAttribute("data-portal-live")) el.classList.add("portal-forced");
+  }, 4000);
+</script>
+
+<script>
+  import { gsap } from "gsap";
+
+  const root = document.querySelector<HTMLElement>("[data-portal]");
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const params = new URLSearchParams(location.search);
+    const stage = root.querySelector<HTMLElement>(".portal-stage")!;
+    const sceneEl = root.querySelector<HTMLElement>("[data-portal-scene]")!;
+    const voidEl = root.querySelector<HTMLElement>("[data-portal-void]")!;
+    const windowEl = root.querySelector<HTMLElement>("[data-portal-window]")!;
+    const markEl = root.querySelector<HTMLElement>("[data-portal-mark]")!;
+    const scrimEl = root.querySelector<HTMLElement>("[data-portal-scrim]")!;
+
+    // reduced motion / QA flag → the endcard, nothing animates. (Reduced
+    // motion is also CSS-forced; the class covers the ?portal=static QA path,
+    // where the media query doesn't apply.)
+    if (reduce || params.get("portal") === "static") {
+      root.setAttribute("data-portal-live", "static"); // disarm the watchdog
+      root.classList.add("portal-forced");
+      return;
+    }
+    root.setAttribute("data-portal-live", "true");
+
+    // mask geometry — the window opens from mark-size to past the viewport
+    windowEl.style.setProperty("-webkit-mask-image", `url(${root.dataset.markSrc})`);
+    windowEl.style.setProperty("mask-image", `url(${root.dataset.markSrc})`);
+    let S0 = 0;
+    let SF = 0;
+    const measure = () => {
+      const r = stage.getBoundingClientRect();
+      S0 = Math.min(r.width, r.height) * 0.38; // the sting's mark ≈ 38% of frame
+      SF = Math.hypot(r.width, r.height) * 2.2;
+    };
+    measure();
+    window.addEventListener("resize", () => {
+      measure();
+      render(proxy.p);
+    });
+
+    // sub-range helper: 0→1 across [a,b] of p
+    const seg = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
+
+    const proxy = { p: 0 };
+    function render(p: number) {
+      // solid mark holds, then dissolves (ghost re-forms on reverse)
+      markEl.style.opacity = String(1 - seg(p, 0.2, 0.5));
+      markEl.style.transform = `translate(-50%, -50%) scale(${1 + p * 0.05})`;
+      // the window: in as the mark fades, out as the void finishes (hand-off)
+      const wIn = seg(p, 0.15, 0.35);
+      const wOut = 1 - seg(p, 0.85, 1);
+      windowEl.style.opacity = String(Math.min(wIn, wOut));
+      const size = S0 + (SF - S0) * seg(p, 0.2, 1);
+      windowEl.style.setProperty("-webkit-mask-size", `${size}px`);
+      windowEl.style.setProperty("mask-size", `${size}px`);
+      // the void dissolve = the true reveal
+      voidEl.style.opacity = String(1 - seg(p, 0.45, 0.95));
+      // the world settles as it rises through
+      sceneEl.style.transform = `scale(${1.08 - 0.08 * p})`;
+      scrimEl.style.opacity = String(seg(p, 0.5, 1));
+    }
+    render(0);
+
+    // intro: the sting's opening — hold on the mark, then dissolve through
+    let introKilled = false;
+    const intro = gsap.to(proxy, {
+      p: 1,
+      duration: 2.0,
+      delay: 0.8,
+      ease: "power2.inOut",
+      onUpdate: () => render(proxy.p),
+    });
+
+    // bookend: scrolling the hero away runs the portal in REVERSE (1→0),
+    // handing off into the tableaux. Streams in at idle like the old globe
+    // handoff; scroll before then simply leaves the endcard (safe).
+    const mountBookend = async () => {
+      try {
+        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: root,
+          start: "top top",
+          end: "bottom 30%",
+          scrub: true,
+          onUpdate: (self) => {
+            if (self.progress > 0.001) {
+              if (!introKilled) {
+                intro.kill();
+                introKilled = true;
+              }
+              proxy.p = 1 - self.progress;
+              render(proxy.p);
+            } else if (introKilled) {
+              proxy.p = 1; // back at the top after scrolling: stay open
+              render(1);
+            }
+          },
+        });
+      } catch {
+        /* bookend is enhancement; the intro already ran */
+      }
+    };
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => void mountBookend(), { timeout: 2500 });
+    } else {
+      setTimeout(() => void mountBookend(), 1200);
+    }
+
+    // QA surface (harness tabs pause rAF; render(p) is deterministic)
+    (window as unknown as Record<string, unknown>).__PORTAL = {
+      p: () => proxy.p,
+      set: (v: number) => {
+        if (!introKilled) {
+          intro.kill();
+          introKilled = true;
+        }
+        proxy.p = v;
+        render(v);
+      },
+    };
+  }
+</script>
