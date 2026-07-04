@@ -1,0 +1,51 @@
+---
+/**
+ * Card — the uniform container (§3 component library; Clay Boan "rigid
+ * container" model, research-brief §7 KEEP): one shape holds every arena's
+ * work so wildly different content reads as one system. Every slot below is
+ * optional — the container never changes shape, only what fills it.
+ */
+import Placeholder from "./Placeholder.astro";
+import LegendMark from "./LegendMark.astro";
+import type { ProofLine } from "../consts";
+
+interface Props {
+  href?: string;
+  mediaRatio?: string;
+  mediaLabel?: string;
+  eyebrow?: string;
+  title: string;
+  meta?: string;
+  proof?: ProofLine;
+  ctaLabel?: string;
+  class?: string;
+}
+const {
+  href,
+  mediaRatio = "4/5",
+  mediaLabel,
+  eyebrow,
+  title,
+  meta,
+  proof,
+  ctaLabel,
+  class: klass = "",
+} = Astro.props;
+
+const Tag = href ? "a" : "div";
+---
+
+<Tag href={href} class={`card ${klass}`}>
+  {mediaLabel && <Placeholder ratio={mediaRatio} label={mediaLabel} />}
+  {eyebrow && <p class="card-eyebrow">{eyebrow}</p>}
+  <h3 class="card-title">{title}</h3>
+  {meta && <p class="card-meta">{meta}</p>}
+  {/* showName=false: the card's own title already names the org — the
+      proof line here only needs to state the status. */}
+  {proof && <LegendMark proof={proof} showName={false} class="text-sm" />}
+  {ctaLabel && (
+    <span class="link mt-1">
+      {ctaLabel} <span class="arrow" aria-hidden="true">→</span>
+    </span>
+  )}
+</Tag>

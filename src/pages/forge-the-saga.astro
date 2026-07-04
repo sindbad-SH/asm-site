@@ -73,8 +73,8 @@ const deliveredWork = WORK.filter((item) => p.proof.deliveredWorkSlugs.includes(
             </p>
             <p class="text-sm opacity-70">{item.engagement}</p>
             {item.href && (
-              <a href={`${base}${item.href}`} class="hover:underline">
-                See the work →
+              <a href={`${base}${item.href}`} class="link">
+                See the work <span class="arrow" aria-hidden="true">→</span>
               </a>
             )}
           </li>

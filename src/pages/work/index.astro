@@ -1,7 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import Placeholder from "../../components/Placeholder.astro";
-import LegendMark from "../../components/LegendMark.astro";
+import Card from "../../components/Card.astro";
 import { PAGES, WORK } from "../../consts";
 
 const p = PAGES.work;
@@ -9,30 +8,25 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- Resn-style grid (Phase 5 build, §2d; static uniform cards here, OD-3) -->
+  <!-- Resn-style grid (Phase 5 build, §2d; uniform Card containers here, OD-3) -->
   <section class="mx-auto max-w-3xl space-y-4 p-8">
     <h1 class="text-3xl font-bold">{p.intro.heading}</h1>
     <p>{p.intro.body}</p>
   </section>
 
   <section class="p-8">
-    <div class="mx-auto grid max-w-3xl grid-cols-1 gap-8 sm:grid-cols-2">
+    <div class="mx-auto grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
       {
         WORK.map((item) => (
-          <article class="space-y-2">
-            <Placeholder ratio="4/5" label={`${item.title} — grid thumbnail (Phase 5, §2d)`} />
-            <p class="text-sm uppercase tracking-widest opacity-70">{item.pillar}</p>
-            <h2 class="font-bold">
-              For {item.forOrg} · {item.what}
-            </h2>
-            <p class="text-sm opacity-70">{item.engagement}</p>
-            {item.relationshipId && <LegendMark proof={{ relationshipId: item.relationshipId }} class="text-sm" />}
-            {item.href && (
-              <a href={`${base}${item.href}`} class="inline-block hover:underline">
-                See the work →
-              </a>
-            )}
-          </article>
+          <Card
+            href={item.href ? `${base}${item.href}` : undefined}
+            mediaLabel={`${item.title} — grid thumbnail (Phase 5, §2d)`}
+            eyebrow={item.pillar}
+            title={`For ${item.forOrg} · ${item.what}`}
+            meta={item.engagement}
+            proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
+            ctaLabel={item.href ? "See the work" : undefined}
+          />
         ))
       }
     </div>

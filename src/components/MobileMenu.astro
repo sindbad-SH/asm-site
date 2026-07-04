@@ -1,0 +1,84 @@
+---
+/**
+ * Fullscreen mobile menu (§3 component library) — v1 KEEP concept (staggered
+ * link reveals, Escape to close), re-skinned to tokens only: elevated-ground
+ * blur sheet, mono hud voice, geological reveal easing.
+ *
+ * No-JS safety: the inline header nav list (Nav.astro) is ALWAYS visible by
+ * default — never hidden by a plain CSS media query. This overlay and its
+ * burger toggle are inert without JS, and Nav.astro's script only collapses
+ * the inline list into this menu once JS confirms it's running (mirrors the
+ * site's [data-reveal] "hide only under html.js" discipline). So a no-JS
+ * visitor always has a working nav, just not the fullscreen presentation.
+ */
+import { NAV, PRIMARY_CTA, SITE } from "../consts";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<div id="fs-menu" class="fs-menu" role="dialog" aria-modal="true" aria-label="Menu">
+  <nav class="flex h-full flex-col justify-center gap-2 px-8" aria-label="Primary (mobile)">
+    {
+      NAV.map((item, i) => (
+        <a
+          href={`${base}${item.href}`}
+          class="fs-menu-item font-display text-4xl text-peak transition-colors hover:text-accent"
+          style={`--stagger-delay: ${i * 55}ms`}
+        >
+          <span class="hud-label mr-3 text-accent-deep">{String(i + 1).padStart(2, "0")}</span>
+          {item.label}
+        </a>
+      ))
+    }
+    <a
+      href={`${base}${PRIMARY_CTA.href}`}
+      class="fs-menu-item btn mt-6 w-fit"
+      style={`--stagger-delay: ${NAV.length * 55}ms`}
+    >
+      {PRIMARY_CTA.label}
+    </a>
+    <p class="fs-menu-item hud-label mt-8" style={`--stagger-delay: ${(NAV.length + 1) * 55}ms`}>
+      <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+    </p>
+  </nav>
+</div>
+
+<script>
+  const menu = document.getElementById("fs-menu");
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const navLinks = document.querySelector<HTMLElement>("[data-nav-links]");
+  if (!menu || !toggle) throw new Error("MobileMenu: expected #fs-menu and [data-menu-toggle]");
+
+  let open = false;
+  function setOpen(next: boolean) {
+    open = next;
+    toggle!.setAttribute("aria-expanded", String(next));
+    menu!.classList.toggle("is-open", next);
+    document.body.style.overflow = next ? "hidden" : "";
+    if (next) menu!.querySelector("a")?.focus();
+    else toggle!.focus();
+  }
+
+  toggle.addEventListener("click", () => setOpen(!open));
+  menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && open) setOpen(false);
+  });
+
+  // Collapse the inline nav list into this menu ONLY once JS confirms it's
+  // running (never via a plain CSS media query — see file header). A resize
+  // just toggles which chrome is authoritative; no-JS or JS-disabled visitors
+  // never reach this code, so their inline list stays visible unconditionally.
+  const collapse = window.matchMedia("(max-width: 1023px)");
+  function syncCollapse() {
+    navLinks?.classList.toggle("hidden", collapse.matches);
+    toggle!.classList.toggle("hidden", !collapse.matches);
+    if (!collapse.matches && open) setOpen(false);
+  }
+  // Belt-and-suspenders: MediaQueryList's own "change" event should fire on
+  // viewport resize, but don't rely on that alone — window "resize" always
+  // fires on a real resize, so re-check the query there too.
+  collapse.addEventListener("change", syncCollapse);
+  window.addEventListener("resize", syncCollapse);
+  syncCollapse();
+</script>

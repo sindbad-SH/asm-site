@@ -16,7 +16,12 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
     <img src={`${base}/logo-mark.png`} alt="" class="h-8 w-auto" />
     <span class="font-display text-lg text-peak">{SITE.name}</span>
   </a>
-  <nav aria-label="Primary">
+  <!--
+    Always visible by default — this is the no-JS nav. MobileMenu.astro's
+    script hides it (adding .hidden) ONLY once JS confirms a narrow viewport;
+    without JS it stays visible and wraps, imperfect but fully functional.
+  -->
+  <nav aria-label="Primary" data-nav-links>
     <ul class="flex flex-wrap gap-5">
       {
         NAV.map((item) => {
@@ -36,5 +41,17 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
       }
     </ul>
   </nav>
-  <a href={`${base}${PRIMARY_CTA.href}`} class="btn">{PRIMARY_CTA.label}</a>
+  <a href={`${base}${PRIMARY_CTA.href}`} class="btn hidden lg:inline-block">{PRIMARY_CTA.label}</a>
+
+  <!-- Hidden until MobileMenu's script confirms JS + narrow viewport. -->
+  <button
+    type="button"
+    class="menu-toggle hidden"
+    data-menu-toggle
+    aria-controls="fs-menu"
+    aria-expanded="false"
+    aria-label="Open menu"
+  >
+    <span class="bar" aria-hidden="true"></span>
+  </button>
 </header>

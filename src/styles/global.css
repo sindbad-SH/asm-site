@@ -151,6 +151,47 @@
     color: var(--color-accent);
     box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-accent) 55%, transparent);
   }
+  .btn:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  /* Low-emphasis button — no border, for a secondary action beside a .btn. */
+  .btn-quiet {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .btn-quiet:hover,
+  .btn-quiet:focus-visible {
+    color: var(--color-accent);
+  }
+
+  /* Inline wayfinding link (system voice) — replaces bare hover:underline.
+     Mono, muted resting state, accent on hover; a trailing "→" (if present
+     in the link text) drifts right on hover as the one motion cue. */
+  .link {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-muted);
+    text-underline-offset: 3px;
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .link:hover,
+  .link:focus-visible {
+    color: var(--color-accent);
+  }
+  .link .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover) var(--ease-swift);
+  }
+  .link:hover .arrow {
+    transform: translateX(3px);
+  }
 
   /* Photography/media in "map-inset" frames (§3.1): peak hairline border +
      mono coordinate caption. Depth is contour density — no drop shadows. */
@@ -187,6 +228,66 @@
   .panel {
     background: var(--color-elevated);
     border: 1px solid var(--color-hairline);
+  }
+
+  /* ── Card — the uniform container (Clay Boan "rigid container" model,
+        research-brief §7 KEEP): one shape holds every arena's work, so wildly
+        different content reads as one system. Media/eyebrow/title/meta/proof
+        slots are all optional — the shape never changes, only what fills it. ── */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-hairline);
+    padding: 0.75rem;
+    transition:
+      border-color var(--dur-hover) var(--ease-swift),
+      transform var(--dur-hover) var(--ease-swift);
+  }
+  a.card:hover,
+  a.card:focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-hairline));
+  }
+  .card-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--color-peak);
+  }
+  .card-meta {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── Form shell (§3 tokens; used by /contact) ── */
+  .field {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+    margin-bottom: 0.4rem;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-hairline);
+    color: var(--color-ink);
+    padding: 0.65rem 0.75rem;
+    font-family: var(--font-sans);
+    transition: border-color var(--dur-hover) var(--ease-swift);
+  }
+  .field-input:focus-visible {
+    border-color: var(--color-accent);
+    outline: none;
   }
 
   /* ── Legend / honesty device (§3.4) ── */
@@ -243,6 +344,79 @@
     text-transform: uppercase;
     letter-spacing: 0.22em;
     color: var(--color-ink-muted);
+  }
+
+  /* ── Fullscreen menu (mobile nav) — v1 KEEP concept, tokens only ── */
+  .menu-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--color-ink);
+  }
+  .menu-toggle .bar,
+  .menu-toggle .bar::before,
+  .menu-toggle .bar::after {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: currentColor;
+    transition:
+      transform var(--dur-hover) var(--ease-swift),
+      opacity var(--dur-hover) var(--ease-swift);
+  }
+  .menu-toggle .bar::before {
+    transform: translateY(-6px);
+  }
+  .menu-toggle .bar::after {
+    transform: translateY(4.5px);
+  }
+  .menu-toggle[aria-expanded="true"] .bar {
+    background: transparent;
+  }
+  .menu-toggle[aria-expanded="true"] .bar::before {
+    transform: translateY(0) rotate(45deg);
+  }
+  .menu-toggle[aria-expanded="true"] .bar::after {
+    transform: translateY(0) rotate(-45deg);
+  }
+
+  .fs-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: color-mix(in srgb, var(--color-base) 97%, transparent);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--dur-reveal) var(--ease-survey),
+      visibility var(--dur-reveal) var(--ease-survey);
+  }
+  .fs-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .fs-menu-item {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity var(--dur-reveal) var(--ease-survey) var(--stagger-delay, 0ms),
+      transform var(--dur-reveal) var(--ease-survey) var(--stagger-delay, 0ms);
+  }
+  .fs-menu.is-open .fs-menu-item {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fs-menu,
+    .fs-menu-item,
+    .menu-toggle .bar,
+    .menu-toggle .bar::before,
+    .menu-toggle .bar::after {
+      transition: none;
+    }
   }
 
   /* ── Globe hero (§2a) ── */
