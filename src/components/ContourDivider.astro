@@ -1,0 +1,38 @@
+---
+/**
+ * Contour-line section divider — the §3.3 motion grammar made concrete:
+ * "contour lines ARE the motion." Three topographic strokes draw themselves
+ * in on approach (stroke-dashoffset via the [data-reveal] engine); resting
+ * color is accent-deep so the bright accent stays scarce. Static under
+ * reduced motion / no-JS (fully drawn). Purely decorative.
+ */
+interface Props {
+  class?: string;
+}
+const { class: klass = "" } = Astro.props;
+---
+
+<div class={`contour-draw ${klass}`} data-reveal aria-hidden="true">
+  <svg viewBox="0 0 1200 48" fill="none" preserveAspectRatio="none" class="h-8 w-full opacity-60">
+    <path
+      pathLength="1"
+      d="M0 38 C 140 30, 240 44, 380 34 S 640 14, 800 26 S 1080 40, 1200 30"
+      stroke="var(--color-accent-deep)"
+      stroke-width="1"
+    ></path>
+    <path
+      pathLength="1"
+      d="M0 24 C 160 18, 300 30, 460 22 S 720 6, 900 16 S 1120 26, 1200 18"
+      stroke="color-mix(in srgb, var(--color-peak) 30%, transparent)"
+      stroke-width="1"
+      style="--reveal-delay: 150ms"
+    ></path>
+    <path
+      pathLength="1"
+      d="M0 10 C 180 6, 340 16, 520 10 S 780 2, 960 8 S 1140 14, 1200 8"
+      stroke="color-mix(in srgb, var(--color-peak) 16%, transparent)"
+      stroke-width="1"
+      style="--reveal-delay: 300ms"
+    ></path>
+  </svg>
+</div>

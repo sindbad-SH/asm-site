@@ -1,17 +1,361 @@
+/**
+ * ASM design system — "The Contour Survey" (BUILD-PLAN.md §3).
+ * The whole site is a topographic survey of one person's territory.
+ *
+ * ─── ACCENT DISCIPLINE (binding, §0.1 / §3.1) ────────────────────────────────
+ * Chrome is neutral/dark; imagery carries the color. `--color-accent` (the
+ * logo cyan) is a SCARCE signature: live links, the active contour, the
+ * you-are-here marker, CTAs, globe pins. It is never a fill, never a heading
+ * color, never a background. Resting linework uses `--color-accent-deep` so
+ * the bright cyan only fires on focus/hover/active.
+ *
+ * ─── LANE DIALECTS (§3.3) ────────────────────────────────────────────────────
+ * Scoped by ancestor attribute, never global:
+ *   [data-lane="forge"]      — heat-in states, temper line (orange → quench).
+ *                              Orange NEVER escapes this scope (§6: "Do not
+ *                              let orange become a site-wide accent").
+ *   [data-lane="adventure"]  — flight-line, violet-slate depth, warm amber
+ *                              tint on imagery only.
+ *
+ * ─── MOTION GRAMMAR (§3.3) ───────────────────────────────────────────────────
+ * Geological tempo: reveals 600–1200ms on --ease-survey; hover < 200ms on
+ * --ease-swift. Contour lines ARE the motion (stroke-dashoffset draw).
+ * Reveal engine: elements with [data-reveal] are hidden ONLY when html.js is
+ * present, revealed by IntersectionObserver (Base.astro), force-revealed by a
+ * 4s watchdog, and always visible under no-JS / reduced motion — the v1 KEEP
+ * architecture, ported.
+ */
+
 @import "tailwindcss";
 
-/*
- * Placeholder token stub — scaffolding only.
- * The real Contour Survey design system (palette, type, motion grammar) is a
- * Phase 2 task per BUILD-PLAN.md §3. Do not treat these as final values.
- */
+/* Type (§3.2) — self-hosted variable fonts, latin, font-display: swap. */
+@import "@fontsource-variable/fraunces/opsz.css"; /* display — engraved map-title voice */
+@import "@fontsource-variable/dm-sans"; /* body/UI — KEEP from v1 */
+@import "@fontsource/space-mono/latin-400.css"; /* labels — surveyor's instrument voice */
+@import "@fontsource/space-mono/latin-700.css";
+
 @theme {
-  --color-base: #141922;
+  /* ── §3.1 Contour Survey palette ── */
+  --color-base: #141922; /* page ground — the survey field */
+  --color-elevated: #1c2530; /* cards, panels */
+  --color-hairline: rgba(255, 255, 255, 0.06); /* panel hairlines */
+  --color-accent: #38f8ec; /* SCARCE — see discipline above */
+  --color-accent-deep: #1e8f8a; /* resting contours & linework */
+  --color-peak: #c9d6da; /* headings, summit contours (logo peaks) */
   --color-ink: #e8e8e8;
+  --color-ink-muted: #8a9a96;
+  /* lane-scoped only — never used outside their [data-lane] scope */
+  --color-adventure-warm: #e4a257; /* sun-on-rock amber, Adventure imagery only */
+  --color-adventure-slate: #2a2e44; /* violet-slate valley shadow (from Overhead) */
+  --color-forge-heat: #ff7a2f; /* incandescent focal glow, Forge lane only */
+  --color-forge-deep: #c43a1e; /* cooling ember, Forge lane only */
+
+  /* ── §3.2 type roles ── */
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
+
+  /* ── §3.3 motion grammar ── */
+  --ease-survey: cubic-bezier(0.16, 1, 0.3, 1); /* geological settle (expo.out) */
+  --ease-swift: cubic-bezier(0.215, 0.61, 0.355, 1); /* hover response (power2.out) */
 }
 
-html,
-body {
-  background-color: var(--color-base);
-  color: var(--color-ink);
+:root {
+  --dur-hover: 180ms; /* hover must answer < 200ms */
+  --dur-reveal: 800ms; /* standard reveal */
+  --dur-geological: 1200ms; /* contour draws, heat ramps */
+  --reveal-delay: 0ms; /* per-element stagger hook */
+  color-scheme: dark;
+}
+
+/* ───────────────────────────── base layer ─────────────────────────────── */
+
+@layer base {
+  html {
+    background-color: var(--color-base);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 560;
+    letter-spacing: -0.015em;
+    color: var(--color-peak);
+    text-wrap: balance;
+  }
+
+  a {
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  a:hover {
+    color: var(--color-accent); /* sanctioned accent use: live links */
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-accent) 25%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Printed-survey-sheet grain (§3.1 texture) — fixed, non-interactive. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* ─────────────────────────── system components ────────────────────────── */
+
+@layer components {
+  /* Surveyor's-instrument voice: eyebrows, kickers, coordinates, indices. */
+  .hud-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-muted);
+  }
+
+  /* Buttons — accent is the border/voice, never a fill. */
+  .btn {
+    display: inline-block;
+    border: 1px solid var(--color-accent-deep);
+    border-radius: 2px;
+    padding: 0.6rem 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    transition:
+      border-color var(--dur-hover) var(--ease-swift),
+      color var(--dur-hover) var(--ease-swift),
+      box-shadow var(--dur-hover) var(--ease-swift);
+  }
+  .btn:hover,
+  .btn:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  /* Photography/media in "map-inset" frames (§3.1): peak hairline border +
+     mono coordinate caption. Depth is contour density — no drop shadows. */
+  .map-inset {
+    border: 1px solid color-mix(in srgb, var(--color-peak) 22%, transparent);
+    padding: 0.375rem;
+    background: var(--color-elevated);
+  }
+  .map-inset figcaption,
+  .map-inset .coord {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  /* Low-opacity contour linework texture for section grounds. */
+  .topo-lines {
+    background-image:
+      repeating-radial-gradient(
+        circle at 28% 18%,
+        transparent 0 52px,
+        color-mix(in srgb, var(--color-peak) 5%, transparent) 52px 53px
+      ),
+      repeating-radial-gradient(
+        circle at 82% 88%,
+        transparent 0 68px,
+        color-mix(in srgb, var(--color-peak) 4%, transparent) 68px 69px
+      );
+  }
+
+  /* Panel on elevated ground with hairline. */
+  .panel {
+    background: var(--color-elevated);
+    border: 1px solid var(--color-hairline);
+  }
+
+  /* ── Legend / honesty device (§3.4) ── */
+  .legend-mark {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .legend-mark .symbol {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-top: 0.05rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-accent-deep); /* resting contour; pings accent on hover */
+  }
+  /* the one-shot "survey ping" — a contour ring pulses once on hover (§3.3) */
+  .legend-mark .symbol::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    opacity: 0;
+  }
+  .legend-mark:hover .symbol {
+    color: var(--color-accent);
+  }
+  .legend-mark:hover .symbol::after {
+    animation: survey-ping 900ms var(--ease-survey) 1;
+  }
+  .legend-mark .name {
+    color: var(--color-peak);
+    font-weight: 600;
+  }
+  .legend-mark .phrasing {
+    color: var(--color-ink-muted);
+  }
+
+  /* the visible legend key, styled as an actual map legend */
+  .legend-key {
+    display: inline-block;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-hairline);
+    padding: 0.9rem 1.1rem;
+  }
+  .legend-key .legend-title {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── Forge dialect (scoped) — heat is the only warm light (§3.3/§6) ── */
+  [data-lane="forge"] .temper-line {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      to right,
+      var(--color-forge-deep),
+      var(--color-forge-heat) 35%,
+      var(--color-accent-deep) 75%,
+      var(--color-accent)
+    );
+  }
+  [data-lane="forge"] .heat {
+    transition:
+      color var(--dur-geological) var(--ease-survey),
+      text-shadow var(--dur-geological) var(--ease-survey);
+  }
+  [data-lane="forge"] .heat.is-cold {
+    color: var(--color-ink-muted);
+  }
+  [data-lane="forge"] .heat.is-hot {
+    color: var(--color-forge-heat);
+    text-shadow: 0 0 24px color-mix(in srgb, var(--color-forge-heat) 45%, transparent);
+  }
+  [data-lane="forge"] .heat.is-set {
+    color: var(--color-accent);
+    text-shadow: none;
+  }
+
+  /* ── Adventure dialect (scoped) — flight-line + violet-slate depth ── */
+  [data-lane="adventure"] .flight-line {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-accent-deep) 30%,
+      var(--color-accent)
+    );
+  }
+  [data-lane="adventure"] .map-inset {
+    background: var(--color-adventure-slate);
+    border-color: color-mix(in srgb, var(--color-adventure-warm) 28%, transparent);
+  }
+}
+
+/* ─────────────────── reveal engine + contour motion (§3.3) ────────────── */
+
+/* Hidden ONLY under html.js — no-JS users always see everything (KEEP port). */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity var(--dur-reveal) var(--ease-survey) var(--reveal-delay),
+    transform var(--dur-reveal) var(--ease-survey) var(--reveal-delay);
+}
+html.js [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Masked-line headline reveal: wrap each line, child rises out of the mask. */
+html.js .line-mask {
+  overflow: hidden;
+}
+html.js .line-mask > * {
+  display: block;
+  transform: translateY(110%);
+  transition: transform var(--dur-reveal) var(--ease-survey) var(--reveal-delay);
+}
+html.js .line-mask.is-revealed > *,
+html.js .is-revealed .line-mask > * {
+  transform: none;
+}
+
+/* Contour draw for SVG paths (set pathLength="1" on the path). */
+html.js .contour-draw path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--dur-geological) var(--ease-survey) var(--reveal-delay);
+}
+html.js .contour-draw.is-revealed path {
+  stroke-dashoffset: 0;
+}
+
+@keyframes survey-ping {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.55);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* ── Reduced motion: contours static, marker a fixed dot, all content shown
+      (binding fallback, §3.3). ── */
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal],
+  html.js .line-mask > *,
+  html.js .contour-draw path {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    stroke-dashoffset: 0;
+  }
+  .legend-mark:hover .symbol::after {
+    animation: none;
+  }
+  [data-lane="forge"] .heat {
+    transition: none;
+  }
 }

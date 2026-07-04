@@ -1,33 +1,30 @@
 ---
 /**
- * Footer — email + socials from SITE (both [confirm] until Sindbad supplies
- * real values, BUILD-PLAN.md §5A S8/S9). A [confirm] href here is inert (#)
- * rather than a broken/guessed link, and the visible label still reads
- * "[confirm]" so it's obviously not ready to ship — the audit gate catches it.
+ * Footer in the system voice — hairline top rule, mono hud labels, muted ink.
+ * Email + socials from SITE ([confirm] values render visibly inert, never
+ * guessed links — the audit gate catches them before production).
  */
 import { SITE, NAV } from "../consts";
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const socialEntries = Object.entries(SITE.socials);
 ---
 
-<footer class="border-t border-current/20 p-4 text-sm">
-  <div class="flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <p>{SITE.person} — {SITE.persona}</p>
-      <p>{SITE.location}</p>
+<footer class="border-t border-hairline px-5 py-8 text-sm">
+  <div class="mx-auto flex max-w-5xl flex-wrap items-start justify-between gap-8">
+    <div class="space-y-1">
+      <p class="text-peak">{SITE.person} — {SITE.persona}</p>
+      <p class="hud-label">{SITE.location}</p>
       <p>
-        <a href={`mailto:${SITE.email}`} class="hover:underline">{SITE.email}</a>
+        <a href={`mailto:${SITE.email}`} class="text-ink-muted hover:text-accent">{SITE.email}</a>
       </p>
     </div>
     <nav aria-label="Footer">
-      <ul class="flex flex-wrap gap-4">
+      <ul class="space-y-1.5">
         {
           NAV.map((item) => (
             <li>
-              <a
-                href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}${item.href}`}
-                class="hover:underline"
-              >
+              <a href={`${base}${item.href}`} class="text-ink-muted hover:text-accent">
                 {item.label}
               </a>
             </li>
@@ -35,16 +32,16 @@ const socialEntries = Object.entries(SITE.socials);
         }
       </ul>
     </nav>
-    <ul class="flex flex-wrap gap-4">
+    <ul class="space-y-1.5">
       {
         socialEntries.map(([platform, url]) => (
           <li>
             {url === "[confirm]" ? (
-              <span aria-disabled="true" class="opacity-50">
+              <span aria-disabled="true" class="hud-label opacity-60">
                 {platform} [confirm]
               </span>
             ) : (
-              <a href={url} class="hover:underline" rel="me noopener">
+              <a href={url} class="text-ink-muted capitalize hover:text-accent" rel="me noopener">
                 {platform}
               </a>
             )}

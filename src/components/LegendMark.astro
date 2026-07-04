@@ -1,18 +1,21 @@
 ---
 /**
- * The ONLY channel through which a relationship's status may be stated
- * (BUILD-PLAN.md §3.4). Resolves a ProofLine to its relationship and prints
- * `permittedPhrasing` verbatim, prefixed by its legend tier symbol. Never
- * paraphrase this output — if a page needs different framing, change the
- * `context` lead-in in consts.ts, not this component.
+ * The map-legend honesty device (BUILD-PLAN.md §3.4) — the ONLY channel
+ * through which a relationship's status may be stated. Resolves a ProofLine
+ * and prints `permittedPhrasing` VERBATIM after the relationship's name,
+ * plotted-point style: tier symbol in resting accent-deep, one-shot "survey
+ * ping" contour ring on hover (accent — a sanctioned scarce use). Never
+ * paraphrase this output; change `context` in consts.ts if framing must vary.
  */
 import { LEGEND, RELATIONSHIP_BY_ID, type ProofLine } from "../consts";
 
 interface Props {
   proof: ProofLine;
+  /** Hide the org name when surrounding copy already names it (e.g. a heading). */
+  showName?: boolean;
   class?: string;
 }
-const { proof, class: klass = "" } = Astro.props;
+const { proof, showName = true, class: klass = "" } = Astro.props;
 const relationship = RELATIONSHIP_BY_ID[proof.relationshipId];
 
 if (!relationship) {
@@ -20,12 +23,17 @@ if (!relationship) {
 }
 
 const tier = LEGEND[relationship.tier];
+// Avoid "MEME — Board Chair, MEME (…)" duplication when phrasing starts with the name.
+const nameShown = showName && !relationship.permittedPhrasing.startsWith(relationship.name);
 ---
 
-<p class={`flex items-start gap-2 ${klass}`}>
-  <span aria-hidden="true" title={tier.label} class="mt-0.5 shrink-0">{tier.symbol}</span>
+<p class={`legend-mark ${klass}`}>
+  <span class="symbol" aria-hidden="true">{tier.symbol}</span>
   <span>
-    {proof.context && <span class="opacity-70">{proof.context} </span>}
-    {relationship.permittedPhrasing}
+    <span class="sr-only">{tier.label}: </span>
+    {proof.context && <span class="phrasing">{proof.context} </span>}
+    {nameShown && <span class="name">{relationship.name}</span>}
+    {nameShown && <span class="phrasing"> · </span>}
+    <span class="phrasing">{relationship.permittedPhrasing}</span>
   </span>
 </p>
