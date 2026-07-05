@@ -20,12 +20,14 @@ ambient-reel slot, explicitly marked optional). Concretely:
 
 1. **Adventure gallery stills** (S2) — the single highest-impact thing you can add. See
    Worked Example 2.
-2. **Real copy** for the `[confirm]` case-study text (who PitchBoulder is, the ask, the
+2. **The home tableaux** (§1c below) — the scroll body every visitor hits right after the
+   hero; even just the wild chapter's background layer is a big visible upgrade.
+3. **Real copy** for the `[confirm]` case-study text (who PitchBoulder is, the ask, the
    outcome) — these are text edits in `src/consts.ts`, not media, but they unblock the case
    study page more than any image will.
-3. **PitchBoulder package stills + testimonial** (S3/S4).
-4. **About portrait** (S12) — one photo, quick win.
-5. **Video, last** — the Cobra/Pebble Beach derivations (Worked Example 1), the Adventure
+4. **PitchBoulder package stills + testimonial** (S3/S4).
+5. **About portrait** (S12) — one photo, quick win.
+6. **Video, last** — the Cobra/Pebble Beach derivations (Worked Example 1), the Adventure
    ambient reel (optional), the PitchBoulder hook/BTS/commercial.
 
 ## How to verify anything you change
@@ -113,6 +115,67 @@ files listed below.
 - **HONESTY NOTE:** this scene is AI-generated **brand art** — the logo's world. It lives in
   the hero as brand identity and must never appear in Work/Adventure gallery contexts where
   it could read as shot footage.
+
+### 1c. `/` home — the three tableaux ("the wild" / "the market" / "the industry")
+
+This is the scroll body right below the Portal Hero — three full-screen chapters, each with
+3 parallax layers (background → midground → foreground) behind the headline/copy/CTA. Right
+now all three chapters show their placeholder boxes for all 3 layers; **this is the highest-
+impact slot after the Adventure gallery**, since it's the first thing every visitor scrolls
+into on the home page.
+
+- **What belongs in each layer** (quoted from the current placeholders):
+  - **"the wild"** — *"WILD · BACKGROUND — distant ridgeline & sky, full-bleed"* /
+    *"WILD · MIDGROUND — mid ridge / valley haze"* / *"WILD · FOREGROUND — near rock or
+    figure, alpha cut-out"*
+  - **"the market"** — city skyline at dusk / street-grid haze / a desk-deck-founder cut-out
+  - **"the industry"** — coastline or skyline at night / stage-lights sprawl / a camera-badge-
+    set cut-out
+- **Layer criteria (all three chapters, same shape):**
+  - **Background** — a wide establishing shot, full-bleed, ≤180KB AVIF. This is what fills
+    the whole screen behind everything.
+  - **Midground** — adds depth/haze between background and foreground; also full-bleed,
+    similar weight budget.
+  - **Foreground** — **must be a real alpha cut-out** (a subject on a transparent
+    background), NOT a rectangular photo. It renders bottom-anchored and "contained" (not
+    stretched to fill), so the transparent margin lets the background/midground show through
+    — that's what sells the parallax depth. To make one: pull a subject out of a photo with
+    any background-removal tool (Photoshop's Remove Background, remove.bg, Preview's
+    instant alpha, etc.) and export a PNG with real transparency before converting.
+- **File to change:** none. Just drop the files in — see below.
+- **Folder + exact filenames** (drop these in for whichever chapter you have art for):
+  ```
+  public/media/home/wild/background.avif      public/media/home/wild/background.webp
+  public/media/home/wild/midground.avif       public/media/home/wild/midground.webp
+  public/media/home/wild/foreground.avif      public/media/home/wild/foreground.webp
+
+  public/media/home/market/background.avif    public/media/home/market/background.webp
+  public/media/home/market/midground.avif     public/media/home/market/midground.webp
+  public/media/home/market/foreground.avif    public/media/home/market/foreground.webp
+
+  public/media/home/industry/background.avif  public/media/home/industry/background.webp
+  public/media/home/industry/midground.avif   public/media/home/industry/midground.webp
+  public/media/home/industry/foreground.avif  public/media/home/industry/foreground.webp
+  ```
+  Each layer needs BOTH its `.avif` and `.webp` to appear — if either is missing, that one
+  layer keeps its placeholder (the other two layers can go live independently; you don't
+  have to finish all three at once).
+- **Recipe:**
+  ```bash
+  # background / midground — opaque, full-bleed
+  ffmpeg -y -i source.jpg -vf "scale=1600:-1" -c:v libaom-av1 -crf 30 -b:v 0 background.avif
+  ffmpeg -y -i source.jpg -vf "scale=1600:-1" -c:v libwebp -quality 78 background.webp
+
+  # foreground — MUST preserve alpha. Start from a transparent PNG cut-out:
+  ffmpeg -y -i cutout.png -vf "scale=1200:-1" -c:v libaom-av1 -crf 28 -b:v 0 foreground.avif
+  ffmpeg -y -i cutout.png -vf "scale=1200:-1" -c:v libwebp -lossless 1 foreground.webp
+  ```
+- **Verify:** `npm run build`, then look at the chapter in preview — a filled layer shows the
+  real photo in place of its dashed box; an unfilled layer is unchanged. No layout shift
+  either way (CLS stays 0 — the layers are always full-bleed/absolute regardless of content).
+- **HONESTY NOTE:** until real photos replace them, the placeholder boxes ARE the honest
+  state — no fabricated imagery ever renders. Real photos of Sindbad's actual expeditions/
+  work belong here; do not substitute stock or AI-generated shots once real material exists.
 
 ### 2. `/adventure` — the gallery (the most important slot on the site)
 

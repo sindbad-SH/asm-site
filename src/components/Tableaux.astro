@@ -15,12 +15,39 @@
  * purely by whether it has a layer set below — so replication is data, not
  * code.
  */
-import TableauChapter, { type TableauLayer } from "./TableauChapter.astro";
+import TableauChapter, { type TableauLayer, type TableauImage } from "./TableauChapter.astro";
 import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
+
+// Media self-service (MEDIA-GUIDE.md "Home tableaux"): each layer's real art
+// lives at public/media/home/<slug>/<layer>.{avif,webp}. Checked at BUILD
+// TIME (this component runs server-side) — if both files for a layer exist,
+// that layer renders the real image; if not, its annotated placeholder shows.
+// No code change is ever needed to "wire in" a photo — dropping the files in
+// is the whole action, exactly like every other slot in MEDIA-GUIDE.md.
+// Anchored to process.cwd() (the project root `astro build`/`astro dev` are
+// always invoked from), NOT import.meta.url — the production build bundles
+// this frontmatter into dist/.prerender/chunks/, so an import.meta.url-
+// relative path resolves against the wrong (bundled) location once built.
+const LAYER_NAMES = ["background", "midground", "foreground"] as const;
+function findLayerImages(terrain: string): (TableauImage | null)[] {
+  const slug = terrain.toLowerCase().replace(/^the\s+/, "");
+  const dir = join(process.cwd(), "public", "media", "home", slug);
+  return LAYER_NAMES.map((name) => {
+    const hasAvif = existsSync(join(dir, `${name}.avif`));
+    const hasWebp = existsSync(join(dir, `${name}.webp`));
+    if (!hasAvif || !hasWebp) return null; // partial fill-in keeps that layer's placeholder
+    return {
+      avif: `${base}/media/home/${slug}/${name}.avif`,
+      webp: `${base}/media/home/${slug}/${name}.webp`,
+    };
+  });
+}
 
 // Map each chapter's terrain to its pillar slug so the survey trail (§3.3)
 // can anchor a portal node to the real pillar section.
@@ -62,6 +89,7 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
           chapter={chapter}
           index={i}
           layers={LAYER_SETS[chapter.terrain] ?? undefined}
+          images={LAYER_SETS[chapter.terrain] ? findLayerImages(chapter.terrain) : undefined}
           base={base}
           nodeId={pillarByTerrain[chapter.terrain.toLowerCase()]}
         />

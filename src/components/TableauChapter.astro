@@ -17,15 +17,24 @@ export interface TableauLayer {
   label: string; // annotated shot-list slot — what art belongs here
 }
 
+/** A layer's real art, once dropped in — see MEDIA-GUIDE.md "Home tableaux". */
+export interface TableauImage {
+  avif: string;
+  webp: string;
+}
+
 interface Props {
   chapter: TChapter;
   index: number;
   layers?: readonly TableauLayer[];
+  /** Parallel to `layers` by index; `null`/missing entries keep that layer's
+   * placeholder — MEDIA-GUIDE self-service: drop the files in, no code edit. */
+  images?: readonly (TableauImage | null)[];
   base: string;
   /** Pillar slug — the survey-trail anchor for this chapter's portal node. */
   nodeId?: string;
 }
-const { chapter, index, layers, base, nodeId } = Astro.props;
+const { chapter, index, layers, images, base, nodeId } = Astro.props;
 const isStub = !layers || layers.length === 0;
 const no = String(index + 1).padStart(2, "0");
 ---
@@ -46,9 +55,22 @@ const no = String(index + 1).padStart(2, "0");
       ) : (
         layers.map((layer, i) => (
           <div class="tableau-layer" data-depth={layer.depth} data-layer={i}>
-            <div class="tableau-ph">
-              <span class="hud-label normal-case">{layer.label}</span>
-            </div>
+            {images?.[i] ? (
+              <picture>
+                <source srcset={images[i]!.avif} type="image/avif" />
+                <img
+                  class="tableau-img"
+                  src={images[i]!.webp}
+                  alt=""
+                  loading={i === 0 && index === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              </picture>
+            ) : (
+              <div class="tableau-ph">
+                <span class="hud-label normal-case">{layer.label}</span>
+              </div>
+            )}
           </div>
         ))
       )
