@@ -107,7 +107,19 @@ function galleryMedia(slug: string) {
           ))
         }
       </div>
-      <p class="mx-auto mt-4 max-w-5xl text-sm text-ink-muted">{p.gallery.note}</p>
+      <!-- AA funnel outro (operator exclusivity handling): the gallery is a
+           teaser referral to the agency that licenses the full collection. -->
+      <div class="mx-auto mt-8 max-w-5xl">
+        <div class="panel flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div class="space-y-1">
+            <h3 class="text-lg font-bold">{p.aaFunnel.heading}</h3>
+            <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
+          </div>
+          <a href={p.aaFunnel.cta.href} class="btn shrink-0" rel="noopener">
+            {p.aaFunnel.cta.label}
+          </a>
+        </div>
+      </div>
     </section>
 
     <!-- Ambient reel — OPTIONAL / selective (§9.5 / DIRECTION §2.3). SKIPPED by

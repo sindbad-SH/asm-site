@@ -1,0 +1,21 @@
+<!--
+  Amazing Aerial watermark mark — a clean RECREATION (approved re-draw) of the
+  agency's logo for use as a baked-in preview watermark on AA-bound stills.
+  NOT the operator's original file — eyeball against the real mark before any
+  production use. Geometry mirrors the extracted logo:
+    · left: a solid right-triangle wedge (right angle top-right; flat top edge,
+      vertical right edge, hypotenuse top-left -> bottom-right point).
+    · right: "AMAZING" over "AERIAL", stacked, all-caps, bold geometric sans,
+      generous tracking, tight leading, left-aligned.
+  Single colour (currentColor -> white when overlaid). viewBox matches the
+  source logo's 421x139 aspect.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 421 139" fill="currentColor" role="img" aria-label="Amazing Aerial">
+  <!-- right-triangle wedge: top-left (8,14) -> top-right (128,14) -> bottom-right point (128,125) -->
+  <path d="M8 14 H128 V125 Z" />
+  <!-- wordmark: two stacked bold geometric-sans lines, generous tracking -->
+  <text x="165" y="58" font-family="'Montserrat','Futura','Arial Black',sans-serif"
+        font-size="52" font-weight="800" letter-spacing="6" text-anchor="start">AMAZING</text>
+  <text x="165" y="120" font-family="'Montserrat','Futura','Arial Black',sans-serif"
+        font-size="52" font-weight="800" letter-spacing="14" text-anchor="start">AERIAL</text>
+</svg>

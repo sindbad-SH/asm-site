@@ -305,6 +305,10 @@ export type WorkItem = {
   engagement: "paid engagement" | "unpaid coverage" | "personal / editorial" | "[confirm]";
   relationshipId?: string;
   href?: string;
+  /** AA-bound teaser still: its exported media carries a baked-in dual-brand
+   *  (Amazing Aerial + ASM) watermark (exclusivity handling — see the gallery
+   *  comment). Purely descriptive; the gallery uses it for an optional caption. */
+  watermarked?: boolean;
 };
 
 export const WORK: readonly WorkItem[] = [
@@ -336,29 +340,29 @@ export const WORK: readonly WorkItem[] = [
   },
   // ---------------------------------------------------------------------------
   // Adventure gallery — the two [confirm]-titled placeholders (alps-expedition,
-  // swiss-expedition) are REPLACED by the ten real selects below (COPY.md §5.2;
+  // swiss-expedition) are REPLACED by the real selects below (COPY.md §5.2;
   // MEDIA-GUIDE Worked Example 2 sanctions replacement). All pillar "adventure",
   // forOrg "Personal / Editorial", engagement "personal / editorial", NO
   // relationshipId (personal/editorial work is not a licensed Amazing Aerial
   // credit — attaching that relationship here would overstate the licensing
   // claim; the Adventure page's Licensed section carries that proof on its own).
   // Titles are place-names only — no time-of-day or story claims.
+  //
+  // EXCLUSIVITY (operator decision): the Colorado 7-3-2026 batch is AA-bound
+  // (premium-exclusive). Per the operator, only the 4 BEST Colorado picks ship,
+  // WATERMARKED (dual-brand AA+ASM baked into the exports), as an Amazing Aerial
+  // teaser/funnel; the clean Valais set fills the rest unwatermarked. The two
+  // weaker Colorado picks (chautauqua-01, ncar-mesa-01) are DROPPED (AA curation
+  // standard: best-of-series only). `watermarked: true` flags the teaser cards.
   // ---------------------------------------------------------------------------
   {
-    slug: "flatirons-chautauqua-01",
+    slug: "flatirons-chautauqua-03",
     title: "The Flatirons over Chautauqua",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
     what: "aerial photo, Boulder, Colorado",
     engagement: "personal / editorial",
-  },
-  {
-    slug: "flatirons-chautauqua-03",
-    title: "Chautauqua meadows from the air",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "aerial photo, Boulder, Colorado",
-    engagement: "personal / editorial",
+    watermarked: true,
   },
   {
     slug: "eldorado-springs-01",
@@ -367,14 +371,7 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "aerial photo, Colorado",
     engagement: "personal / editorial",
-  },
-  {
-    slug: "ncar-mesa-01",
-    title: "The NCAR mesa",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "aerial photo, Boulder, Colorado",
-    engagement: "personal / editorial",
+    watermarked: true,
   },
   {
     slug: "walker-ranch-01",
@@ -383,6 +380,7 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "aerial photo, Boulder County, Colorado",
     engagement: "personal / editorial",
+    watermarked: true,
   },
   {
     slug: "crescent-meadows-01",
@@ -391,6 +389,7 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "aerial photo, Front Range, Colorado",
     engagement: "personal / editorial",
+    watermarked: true,
   },
   {
     slug: "matterhorn-zermatt-01",
@@ -750,6 +749,19 @@ export const PAGES = {
     gallery: {
       heading: "The field",
       note: "Real stills replace these slots as footage arrives (BUILD-PLAN.md §5A S2).",
+    },
+    // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
+    // are watermarked previews; the gallery is a referral to the agency that
+    // licenses the full collection. Link verified: the /shorizon short form
+    // redirects to the AA homepage, so this points at the resolvable contributor
+    // URL. Copy invites licensing THROUGH Amazing Aerial.
+    aaFunnel: {
+      heading: "License the full collection",
+      body: "The aerial work is represented by Amazing Aerial Agency. The watermarked frames here are previews — see the full, licensable collection on my Amazing Aerial portfolio.",
+      cta: {
+        label: "See the full collection at Amazing Aerial",
+        href: "https://www.amazingaerial.com/controller/portfolio/shorizon",
+      },
     },
     // A5 — soft handoff toward consulting.
     handoff: {
