@@ -59,7 +59,7 @@ export const SITE = {
 export const NAV = [
   { label: "Forge the Saga", href: "/forge-the-saga" },
   { label: "Adventure", href: "/adventure" },
-  { label: "Entertainment", href: "/entertainment" },
+  { label: "Film & TV", href: "/entertainment" },
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -103,7 +103,7 @@ export const PILLARS: readonly Pillar[] = [
   },
   {
     id: "entertainment",
-    name: "Entertainment",
+    name: "Film & TV",
     terrain: "the industry",
     role: "credibility",
     href: "/entertainment",
@@ -784,12 +784,14 @@ export const PAGES = {
   // ---- ENTERTAINMENT (§1.4) — credibility lane, the industry. --------------
   entertainment: {
     meta: {
-      title: "Entertainment — the industry",
+      title: "Film & TV — the industry",
       description:
-        "A pulse on the industry — board work, real coverage, and the festivals and markets I attend, each stated at exactly what it is.",
+        "Film & TV: a pulse on the industry — board work, real coverage, and the festivals and markets I attend, each stated at exactly what it is.",
     },
     // E1 — restrained hero; no "at the table where the industry decides" claim.
+    // Eyebrow names the lane (Film & TV) per R8; headline stays honest.
     hero: {
+      eyebrow: "Film & TV",
       headline: "I keep a pulse on the industry.",
       subline:
         "Board work, real coverage, and the festivals and markets I attend — here's exactly what each one is.",

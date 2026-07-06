@@ -12,16 +12,45 @@ import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
 import { PAGES } from "../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const p = PAGES.entertainment;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// R8 visual lift — reuse the real industry-room photos (published event
+// frames: SeriesFest red carpet + American Film Market panel) already exported
+// for the home tableau. Hero band uses the SeriesFest frame; the "rooms"
+// section break uses the AFM frame. Build-time existence check (cwd-anchored);
+// each band renders only when its image is present. No invented claims — these
+// are honest "attended" event photos matching the page's relationship tiers.
+const indDir = join(process.cwd(), "public", "media", "home", "industry");
+const heroBand = existsSync(join(indDir, "background.avif"))
+  ? { avif: `${base}/media/home/industry/background.avif`, webp: `${base}/media/home/industry/background.webp` }
+  : undefined;
+const roomsBand = existsSync(join(indDir, "midground.avif"))
+  ? { avif: `${base}/media/home/industry/midground.avif`, webp: `${base}/media/home/industry/midground.webp` }
+  : undefined;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- E1 — restrained hero -->
-  <section class="mx-auto max-w-3xl space-y-4 p-8 text-center">
-    <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
-    <p class="text-lg text-ink">{p.hero.subline}</p>
+  <!-- E1 — hero image band (R8). The SeriesFest frame sits behind the headline
+       under a legibility scrim; when the image is absent the hero degrades to
+       the plain centered treatment. -->
+  <section class={`filmtv-hero ${heroBand ? "filmtv-hero--banded" : ""}`}>
+    {
+      heroBand && (
+        <picture class="filmtv-hero__bg" aria-hidden="true">
+          <source srcset={heroBand.avif} type="image/avif" />
+          <img src={heroBand.webp} alt="" loading="eager" decoding="async" />
+        </picture>
+      )
+    }
+    <div class="filmtv-hero__inner mx-auto max-w-3xl space-y-4 p-8 text-center">
+      <p class="hud-label">{p.hero.eyebrow}</p>
+      <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
+      <p class="text-lg text-ink">{p.hero.subline}</p>
+    </div>
   </section>
 
   <!-- E2 — MEME (the most formal role) -->
@@ -44,6 +73,20 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       </a>
     </div>
   </section>
+
+  <!-- Visual break (R8) — the American Film Market panel frame as a full-width
+       band between the PitchBoulder feature and the rooms. One visual break per
+       scroll depth; honest published event photo (an attended room). -->
+  {
+    roomsBand && (
+      <div class="filmtv-band" aria-hidden="true">
+        <picture>
+          <source srcset={roomsBand.avif} type="image/avif" />
+          <img src={roomsBand.webp} alt="" loading="lazy" decoding="async" />
+        </picture>
+      </div>
+    )
+  }
 
   <!-- E4 — the rooms; testimonial #2 lives here (OD-5), framed as the car
        owner's endorsement, never attributed to Pebble Beach itself -->

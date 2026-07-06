@@ -1473,6 +1473,61 @@
     }
   }
 
+  /* ── Film & TV page visual lift (R8) ── */
+  .filmtv-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+  .filmtv-hero--banded {
+    display: grid;
+    place-items: center;
+    min-height: 56vh;
+  }
+  .filmtv-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .filmtv-hero__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* legibility scrim over the hero image — enough for the copy, still lets the
+     room read through (not a full blackout). */
+  .filmtv-hero--banded::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-base) 62%, transparent),
+      color-mix(in srgb, var(--color-base) 78%, transparent)
+    );
+  }
+  .filmtv-hero__inner {
+    position: relative;
+    z-index: 2;
+  }
+  /* Full-width visual break band between chapters. */
+  .filmtv-band {
+    position: relative;
+    max-height: 42vh;
+    overflow: clip;
+    border-block: 1px solid var(--color-hairline, color-mix(in srgb, var(--color-peak) 12%, transparent));
+  }
+  .filmtv-band img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: 42vh;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+
   /* ── Mixed-aspect gallery wall (R3) ── */
   /* CSS multi-column masonry: every card keeps its NATIVE aspect (landscape 3:2,
      vertical 4:5) and flows into balanced columns — portrait stills stand tall
