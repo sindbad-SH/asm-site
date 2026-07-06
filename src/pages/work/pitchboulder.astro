@@ -7,9 +7,19 @@
 import Base from "../../layouts/Base.astro";
 import CaseStudy from "../../components/CaseStudy.astro";
 import { PAGES } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const study = PAGES.work.caseStudies.pitchboulder;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// R3.2c — PitchBoulder reserved logo slot. Per the PARTNER-LOGO RULE (consts.ts),
+// PitchBoulder's logo may render (client relationship + public testimonial) IF a
+// real asset is supplied. None exists on disk as of 2026-07-06 → this build-time
+// check renders nothing today; dropping pb-logo.png in is the only future action.
+const pbLogo = existsSync(join(process.cwd(), "public", "media", "work", "pitchboulder", "pb-logo.png"))
+  ? `${base}/media/work/pitchboulder/pb-logo.png`
+  : undefined;
 // The embed his live site already uses (COPY.md §3 / DIRECTION §2.5).
 const commercialVideoId = "n7k-Bwu3KIU";
 // Hook poster = a representative frame from the commercial (builder-pick, t=28:
@@ -26,6 +36,8 @@ const contextImage = `${base}/media/work/pitchboulder/context.avif`;
     base={base}
     commercialVideoId={commercialVideoId}
     hookPoster={hookPoster}
+    hookLogo={pbLogo}
+    hookLogoAlt="PitchBoulder"
     contextImage={contextImage}
   />
 </Base>

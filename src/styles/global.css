@@ -638,6 +638,67 @@
     color: var(--color-peak);
   }
 
+  /* ── AA funnel card logo + Ledger phrasing (R3.2b) ── */
+  .aa-funnel-logo {
+    height: 44px;
+    width: auto;
+    opacity: 0.92;
+  }
+  @media (max-width: 640px) {
+    .aa-funnel-logo {
+      height: 36px;
+    }
+  }
+  /* R3.6b/R3.10 §3.6 — a single accent hairline draws across the funnel card's
+     top on reveal (scaleX 0→1, 600ms). Gated like every reveal (html.js only,
+     shown under no-JS / reduced motion). */
+  .aa-funnel {
+    position: relative;
+  }
+  .aa-funnel::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--color-accent-deep), var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  html.js .aa-funnel[data-reveal].is-revealed::before {
+    transform: scaleX(1);
+    transition: transform 600ms var(--ease-survey);
+  }
+  html.no-js .aa-funnel::before {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aa-funnel::before {
+      transform: scaleX(1);
+      transition: none;
+    }
+  }
+
+  /* ── /work AA-attribution band (R3.2b) — one slim always-visible band under
+        the /work grid, real AA mark + the Ledger phrasing, honest framing. ── */
+  .aa-work-band {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .aa-work-band img {
+    height: 34px;
+    width: auto;
+    opacity: 0.9;
+    flex-shrink: 0;
+  }
+  @media (max-width: 640px) {
+    .aa-work-band img {
+      height: 28px;
+    }
+  }
+
   /* ── Adventure dialect (scoped) — flight-line + violet-slate depth ── */
   [data-lane="adventure"] .flight-line {
     height: 1px;
@@ -1113,6 +1174,16 @@
   }
   .case-rail a.is-active .no {
     color: var(--color-accent);
+  }
+
+  /* Client logo beside the case hook (R3.2c) — ~120px, renders only when a real
+     asset is supplied per the PARTNER-LOGO RULE. */
+  .case-hook-logo {
+    display: block;
+    width: 120px;
+    height: auto;
+    margin: 0 auto 1rem;
+    opacity: 0.95;
   }
 
   .case-chapter {

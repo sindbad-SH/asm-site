@@ -31,6 +31,11 @@ interface Props {
    *  loop sources; absent → the annotated placeholder poster is kept. */
   hookPoster?: string;
   hookSources?: readonly VideoSource[];
+  /** Optional client logo rendered beside the case hook (R3.2c). Only supplied
+   *  when a real logo asset exists on disk (PARTNER-LOGO RULE, consts.ts). */
+  hookLogo?: string;
+  /** Alt text for hookLogo (the client name). */
+  hookLogoAlt?: string;
   /** Context still (MEDIA-GUIDE §5) — swaps the CONTEXT STILL placeholder for a
    *  real <img> when supplied; absent → placeholder kept. */
   contextImage?: string;
@@ -48,6 +53,8 @@ const {
   fullFilmVideoId,
   hookPoster,
   hookSources = [],
+  hookLogo,
+  hookLogoAlt = "",
   contextImage,
   btsFramesBase,
   btsCount = 0,
@@ -79,6 +86,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     sources={hookSources}
     placeholderLabel="HOOK MEDIA (§2c) — PitchBoulder commercial still or a short ambient loop (S3). Poster ships first."
   >
+    {hookLogo && <img src={hookLogo} alt={hookLogoAlt} class="case-hook-logo" loading="eager" decoding="async" />}
     <h1 class="text-4xl font-bold sm:text-6xl">{study.hook}</h1>
   </HeroVideo>
 

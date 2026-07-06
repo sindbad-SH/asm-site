@@ -125,10 +125,22 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
       <!-- AA funnel outro (operator exclusivity handling): the gallery is a
            teaser referral to the agency that licenses the full collection. -->
       <div class="mx-auto mt-8 max-w-5xl">
-        <div class="panel flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div class="space-y-1">
-            <h3 class="text-lg font-bold">{p.aaFunnel.heading}</h3>
-            <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
+        <div class="panel aa-funnel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+          <div class="flex items-center gap-4">
+            <img
+              src={`${base}/media/adventure/aa-logo.png`}
+              alt="Amazing Aerial Agency"
+              class="aa-funnel-logo shrink-0"
+              width="480"
+              height="158"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="space-y-1">
+              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
+              <h3 class="text-lg font-bold">{p.aaFunnel.heading}</h3>
+              <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
+            </div>
           </div>
           <a href={p.aaFunnel.cta.href} class="btn shrink-0" rel="noopener">
             {p.aaFunnel.cta.label}

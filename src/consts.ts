@@ -231,6 +231,18 @@ export type Relationship = {
   permittedPhrasing: string;
 };
 
+// PARTNER-LOGO RULE (R3.2, operator-directed):
+//  • Amazing Aerial — REAL logo allowed on: gallery watermarks, the AA funnel card/button,
+//    the gallery outro. Always adjacent to the Ledger phrasing "Aerial work licensed through
+//    Amazing Aerial Agency" (nominative use of a real contributor relationship — accurate
+//    framing only, never implying ASM ownership of or exclusivity with the agency).
+//  • PitchBoulder — logo allowed on its case study IF a real logo asset is supplied
+//    (client relationship + public testimonial). NONE exists on disk as of 2026-07-06 →
+//    text-only until the operator obtains one from Peter. (Reserved slot, see R3.2c.)
+//  • SeriesFest / AFM / Pebble Beach — TEXT ONLY, always. Attendance ≠ affiliation; a logo
+//    reads as endorsement. This is a legal posture, not a style choice.
+//  • MEME — text-only at launch (Board Chair is already the strongest phrasing; revisit only
+//    if the operator explicitly asks).
 export const RELATIONSHIPS: readonly Relationship[] = [
   /** Never: a paid staff role (unless confirmed). */
   {

@@ -102,6 +102,22 @@ const filters = [
     <p class="mx-auto mt-4 max-w-3xl text-sm text-ink-muted" data-work-empty hidden>
       Nothing in this lane yet.
     </p>
+    <!-- AA-attribution band (R3.2b) — real Amazing Aerial mark + the Ledger
+         phrasing, honest framing of the licensed adventure work. Always shown
+         (simpler and honest — the phrasing is accurate regardless of filter). -->
+    <div class="mx-auto mt-8 max-w-3xl">
+      <div class="panel aa-work-band p-4">
+        <img
+          src={`${base}/media/adventure/aa-logo.png`}
+          alt="Amazing Aerial Agency"
+          width="480"
+          height="158"
+          loading="lazy"
+          decoding="async"
+        />
+        <p class="hud-label">Aerial work licensed through Amazing Aerial Agency</p>
+      </div>
+    </div>
   </section>
 
   <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
