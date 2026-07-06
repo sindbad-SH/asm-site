@@ -13,9 +13,26 @@ import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
 import DistortionLayer from "../../components/DistortionLayer.astro";
 import { PAGES, WORK, PILLARS } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const p = PAGES.work;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Slug → grid-thumbnail media (Task 5). The exported sets live in the shared
+// gallery folder (the 10 adventure selects + the Shelby thumb). A card renders
+// a responsive <picture> only when its 800w export exists; otherwise it keeps
+// its placeholder (e.g. PitchBoulder, which has no grid-thumb export). Checked
+// at build time (frontmatter runs server-side); anchored to process.cwd().
+function gridMedia(slug: string) {
+  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  return {
+    avif: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
+  };
+}
 
 // Filter options in the canonical PILLARS order, limited to pillars that
 // actually have WORK items (no empty filter for a lane with nothing to show).
@@ -64,6 +81,8 @@ const filters = [
         WORK.map((item) => (
           <Card
             href={item.href ? `${base}${item.href}` : undefined}
+            mediaSrc={gridMedia(item.slug)}
+            mediaAlt={item.title}
             mediaLabel={`${item.title} — grid thumbnail (Phase 5, §2d)`}
             eyebrow={item.pillar}
             title={`For ${item.forOrg} · ${item.what}`}

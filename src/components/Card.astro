@@ -9,10 +9,24 @@ import Placeholder from "./Placeholder.astro";
 import LegendMark from "./LegendMark.astro";
 import type { ProofLine } from "../consts";
 
+/** Responsive media set for a card — MEDIA-GUIDE Worked Example 2 Step 3.
+ *  `avif`/`webp` are full srcset strings (800/1400/2200w); `src` is the default
+ *  (800w webp) fallback. When supplied, a real <picture> replaces the
+ *  placeholder; absent → the placeholder path is unchanged. */
+export interface CardMedia {
+  avif: string;
+  webp: string;
+  src: string;
+}
+
 interface Props {
   href?: string;
   mediaRatio?: string;
   mediaLabel?: string;
+  /** Real responsive media — renders instead of the placeholder when present. */
+  mediaSrc?: CardMedia;
+  /** Alt text for real media (decorative fallback if omitted). */
+  mediaAlt?: string;
   eyebrow?: string;
   title: string;
   meta?: string;
@@ -26,6 +40,8 @@ const {
   href,
   mediaRatio = "4/5",
   mediaLabel,
+  mediaSrc,
+  mediaAlt = "",
   eyebrow,
   title,
   meta,
@@ -36,10 +52,32 @@ const {
 } = Astro.props;
 
 const Tag = href ? "a" : "div";
+// Responsive sizes: 2-col on phones, 3-col on the adventure grid, ≤2-col on the
+// work grid — the 800w select is the render target in every case (§4 budget).
+const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 50vw";
 ---
 
 <Tag href={href} class={`card ${klass}`} data-pillar={pillar}>
-  {mediaLabel && <Placeholder ratio={mediaRatio} label={mediaLabel} />}
+  {
+    mediaSrc ? (
+      <figure class="map-inset" style={`overflow:clip`}>
+        <picture>
+          <source type="image/avif" srcset={mediaSrc.avif} sizes={sizes} />
+          <source type="image/webp" srcset={mediaSrc.webp} sizes={sizes} />
+          <img
+            src={mediaSrc.src}
+            alt={mediaAlt}
+            class="block w-full"
+            style={`aspect-ratio:${mediaRatio};object-fit:cover`}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      </figure>
+    ) : (
+      mediaLabel && <Placeholder ratio={mediaRatio} label={mediaLabel} />
+    )
+  }
   {eyebrow && <p class="card-eyebrow">{eyebrow}</p>}
   <h3 class="card-title">{title}</h3>
   {meta && <p class="card-meta">{meta}</p>}

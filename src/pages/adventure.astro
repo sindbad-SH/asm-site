@@ -97,6 +97,8 @@ function galleryMedia(slug: string) {
           adventureWork.map((item) => (
             <Card
               mediaRatio="4/5"
+              mediaSrc={galleryMedia(item.slug)}
+              mediaAlt={item.title}
               mediaLabel={`${item.title} — grid thumbnail (§2b/§2e)`}
               eyebrow={item.engagement}
               title={item.title}
