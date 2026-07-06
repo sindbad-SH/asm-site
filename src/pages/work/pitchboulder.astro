@@ -10,9 +10,22 @@ import { PAGES } from "../../consts";
 
 const study = PAGES.work.caseStudies.pitchboulder;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-// commercialVideoId stays undefined until Sindbad supplies the YouTube id (S3).
+// The embed his live site already uses (COPY.md §3 / DIRECTION §2.5).
+const commercialVideoId = "n7k-Bwu3KIU";
+// Hook poster = a representative frame from the commercial (builder-pick, t=28:
+// the PitchBoulder brand lockup over the room). Context still = the published
+// event frame. Both are his own published assets.
+const hookPoster = `${base}/media/work/pitchboulder/hook-poster.avif`;
+const contextImage = `${base}/media/work/pitchboulder/context.avif`;
+// BTS: no PitchBoulder BTS footage exists → section hidden (DIRECTION §2.5/§2.7).
 ---
 
 <Base title={study.meta.title} description={study.meta.description}>
-  <CaseStudy study={study} base={base} />
+  <CaseStudy
+    study={study}
+    base={base}
+    commercialVideoId={commercialVideoId}
+    hookPoster={hookPoster}
+    contextImage={contextImage}
+  />
 </Base>

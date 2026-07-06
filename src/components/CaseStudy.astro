@@ -12,7 +12,7 @@
  * hook video, BTS scrub, and reveals are all progressive enhancement.
  */
 import type { CaseStudyData } from "../consts";
-import HeroVideo from "./HeroVideo.astro";
+import HeroVideo, { type VideoSource } from "./HeroVideo.astro";
 import LegendMark from "./LegendMark.astro";
 import Testimonial from "./Testimonial.astro";
 import ScrubSequence from "./ScrubSequence.astro";
@@ -24,8 +24,35 @@ interface Props {
   base: string;
   /** Real video id for the commercial once supplied (S3); [confirm] until then. */
   commercialVideoId?: string;
+  /** Full-film YouTube embed id (Shelby case §2.6). Optional — rendered as a
+   *  second embed under the commercial slot when supplied. */
+  fullFilmVideoId?: string;
+  /** Hook media (MEDIA-GUIDE §4). A poster still alone, or a poster + ambient
+   *  loop sources; absent → the annotated placeholder poster is kept. */
+  hookPoster?: string;
+  hookSources?: readonly VideoSource[];
+  /** Context still (MEDIA-GUIDE §5) — swaps the CONTEXT STILL placeholder for a
+   *  real <img> when supplied; absent → placeholder kept. */
+  contextImage?: string;
+  /** BTS scrub sequence (§2.7 / DIRECTION §2c). Rendered ONLY when count > 0 —
+   *  an optional-media section that renders nothing (not a placeholder box)
+   *  when absent. */
+  btsFramesBase?: string;
+  btsCount?: number;
+  btsPoster?: string;
 }
-const { study, base, commercialVideoId } = Astro.props;
+const {
+  study,
+  base,
+  commercialVideoId,
+  fullFilmVideoId,
+  hookPoster,
+  hookSources = [],
+  contextImage,
+  btsFramesBase,
+  btsCount = 0,
+  btsPoster,
+} = Astro.props;
 
 // The "Words" chapter only exists when the case supplies a testimonialId — a
 // RESERVED testimonial (Shelby / Jack Bell, COPY.md §2.2) omits it, so the rail
@@ -45,8 +72,11 @@ const isPending = (body: string) => body.trim() === "[confirm]";
 ---
 
 <article class="case">
-  <!-- Hook — full-bleed (§2c). The case's h1 lives here. -->
+  <!-- Hook — full-bleed (§2c). The case's h1 lives here. Real poster/loop when
+       supplied; absent → the annotated placeholder poster (unchanged). -->
   <HeroVideo
+    poster={hookPoster}
+    sources={hookSources}
     placeholderLabel="HOOK MEDIA (§2c) — PitchBoulder commercial still or a short ambient loop (S3). Poster ships first."
   >
     <h1 class="text-4xl font-bold sm:text-6xl">{study.hook}</h1>
@@ -81,7 +111,24 @@ const isPending = (body: string) => body.trim() === "[confirm]";
           <p class="text-lg text-ink" data-reveal>{study.context.body}</p>
         )
       }
-      <Placeholder ratio="16/9" class="mt-4" label="CONTEXT STILL — a PitchBoulder event frame (S3)" />
+      {
+        contextImage ? (
+          <figure class="map-inset mt-4">
+            <img
+              src={contextImage}
+              alt=""
+              class="block w-full"
+              style="aspect-ratio:16/9;object-fit:cover"
+              width="1600"
+              height="900"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        ) : (
+          <Placeholder ratio="16/9" class="mt-4" label="CONTEXT STILL — a PitchBoulder event frame (S3)" />
+        )
+      }
     </div>
   </section>
 
@@ -109,20 +156,47 @@ const isPending = (body: string) => body.trim() === "[confirm]";
       <LegendMark proof={study.work.proof} />
     </div>
 
-    <!-- BTS scroll-scrub moment (§2c). No frames yet → poster (S/G3). -->
-    <ScrubSequence
-      count={0}
-      placeholderLabel="BTS SCRUB (§2c/§4) — behind-the-scenes of the commercial as a scroll-scrubbed sequence. WebP · ≤96 frames · ≤2.5MB. Supply framesBase+count to activate."
-    />
+    <!-- BTS scroll-scrub moment (§2c). OPTIONAL-media (DIRECTION §2.7): rendered
+         ONLY when a real count > 0 is supplied — otherwise nothing renders (no
+         dashed placeholder box on this money surface). Hard cap: one scrub per
+         page (§1.1 P4). -->
+    {
+      btsCount > 0 && btsFramesBase && (
+        <ScrubSequence
+          framesBase={btsFramesBase}
+          frameExt="webp"
+          count={btsCount}
+          poster={btsPoster}
+          placeholderLabel="BTS SCRUB (§2c/§4) — behind-the-scenes of the commercial as a scroll-scrubbed sequence."
+        />
+      )
+    }
 
-    <div class="case-chapter__inner space-y-3">
-      <p class="hud-label">The commercial</p>
-      <YouTubeEmbed
-        videoId={commercialVideoId}
-        title="PitchBoulder commercial"
-        placeholderLabel="COMMERCIAL — YouTube embed, click-to-load facade (S3). Supply the video id; full video is never self-hosted (§4)."
-      />
-    </div>
+    {
+      (commercialVideoId || !fullFilmVideoId) && (
+        <div class="case-chapter__inner space-y-3">
+          <p class="hud-label">The commercial</p>
+          <YouTubeEmbed
+            videoId={commercialVideoId}
+            title="The commercial"
+            placeholderLabel="COMMERCIAL — YouTube embed, click-to-load facade (S3). Supply the video id; full video is never self-hosted (§4)."
+          />
+        </div>
+      )
+    }
+
+    {
+      fullFilmVideoId && (
+        <div class="case-chapter__inner space-y-3">
+          <p class="hud-label">The film</p>
+          <YouTubeEmbed
+            videoId={fullFilmVideoId}
+            title="The film"
+            placeholderLabel="FILM — YouTube embed, click-to-load facade (§4)."
+          />
+        </div>
+      )
+    }
   </section>
 
   <!-- 04 · Outcome — honest, never an invented metric -->
