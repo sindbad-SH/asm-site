@@ -325,6 +325,14 @@ export type WorkItem = {
    *  export widths 800/1400/2200; "vertical" = 4:5 widths 800/1120/1600. The
    *  gallery honors this so images are never squished into a fixed card shape. */
   orientation?: "landscape" | "vertical";
+  /** Field note (R3.4) — a first-person location story, 40–90 words, VERBATIM
+   *  from FIELD-NOTES-COPY.md. Rendered as a collapsible block on the gallery
+   *  card (outside .map-inset so the hover warp is untouched). STAGING-ONLY
+   *  review gate: every note awaits operator read-approval before production. */
+  fieldNote?: string;
+  /** When true, the field note ships expanded (Matterhorn — the sample a
+   *  visitor sees without interacting). All others collapsed by default. */
+  fieldNoteOpen?: boolean;
 };
 
 export const WORK: readonly WorkItem[] = [
@@ -379,6 +387,16 @@ export const WORK: readonly WorkItem[] = [
   // landscapes so the grid reads as a mixed-aspect wall, not a uniform strip.
   // Watermarks are now OBVIOUS (R4): AA mark large + centered, ASM corner clear.
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // ROUND 3 (R3.3): Walker Ranch + Crescent Meadows CUT (weak slots). Replaced
+  // by two Italy picks (Castel Toblino, Varenna/Lake Como — the first Italian
+  // frames on the site). EVERY gallery still is now watermarked (dual-brand
+  // AA+ASM, baked from the REAL AA logo) — the gallery is dual-brand advertising
+  // for AA + ASM, not a portfolio of clean files (operator framing). Field notes
+  // (R3.4) are VERBATIM from FIELD-NOTES-COPY.md; STAGING-ONLY until operator
+  // read-approval. Order interleaves verticals/landscapes for the mixed-aspect
+  // wall (no two verticals adjacent in DOM/source order).
+  // ---------------------------------------------------------------------------
   {
     slug: "matterhorn-zermatt-01",
     title: "The Matterhorn, from Zermatt",
@@ -386,7 +404,11 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "expedition photo, Switzerland",
     engagement: "personal / editorial",
+    watermarked: true,
     orientation: "vertical",
+    fieldNoteOpen: true,
+    fieldNote:
+      "Zermatt doesn't let cars in, so the town is quiet enough to hear the river. The Matterhorn doesn't care either way. In 1865, Edward Whymper's party reached the summit first — and four men died on the rope coming down. The mountain has been charging that kind of respect ever since. I stood below it with a camera and did the only sensible thing: waited for the light and got out of its way.",
   },
   {
     slug: "flatirons-chautauqua-03",
@@ -397,6 +419,8 @@ export const WORK: readonly WorkItem[] = [
     engagement: "personal / editorial",
     watermarked: true,
     orientation: "landscape",
+    fieldNote:
+      "The story goes that pioneer women named the Flatirons for the irons they pressed laundry with. From the air you see what they meant — great slabs leaned against the mountain like tools set down mid-job. Chautauqua's meadow below has been Boulder's front porch since 1898. I've walked under these rocks more times than I can count; flying over them was the first time they looked brand new.",
   },
   {
     slug: "gornergrat-glacier-01",
@@ -405,7 +429,10 @@ export const WORK: readonly WorkItem[] = [
     forOrg: "Personal / Editorial",
     what: "expedition photo, Switzerland",
     engagement: "personal / editorial",
+    watermarked: true,
     orientation: "vertical",
+    fieldNote:
+      "From the Gornergrat ridge you look across at Monte Rosa and down onto the Gorner Glacier — one of the largest ice streams left in the Alps. “Left” is the operative word. Photographs from a century ago show ice where there is now bare rock. I shot this panorama knowing the frame is a record as much as a picture: this exact view is leaving, one summer at a time.",
   },
   {
     slug: "eldorado-springs-01",
@@ -416,35 +443,40 @@ export const WORK: readonly WorkItem[] = [
     engagement: "personal / editorial",
     watermarked: true,
     orientation: "landscape",
+    fieldNote:
+      "A century ago this canyon was a resort they called the Coney Island of the West, and a man named Ivy Baldwin walked a wire strung across it — hundreds of feet up, no net. He made his last crossing at 82. The resort faded; the nerve stayed. Most mornings the sandstone is dotted with climbers picking their way up. I flew the drone through the quiet above them and tried to earn the view Baldwin got for free.",
   },
   {
-    slug: "lac-de-tseuzier-01",
-    title: "Lac de Tseuzier, Valais",
+    slug: "castel-toblino-01",
+    title: "Castel Toblino, Trentino",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
+    what: "expedition photo, Italy",
     engagement: "personal / editorial",
-    orientation: "landscape",
+    watermarked: true,
+    orientation: "vertical",
+    // DRAFT (R3.4) — awaiting operator read-approval. Legend beats web-verified:
+    // 12th-c. castle on a near-island in Lago di Toblino; long tied to the
+    // prince-bishops of Trento; the folk-legend of Claudia Particella (the
+    // bishop's love) is widely documented local lore (hedged as legend).
+    fieldNote:
+      "They say a prince-bishop of Trento kept his forbidden love, Claudia Particella, out here where the lake could hide her — the kind of story a castle on its own little island seems built to attract. Toblino has stood on this water since medieval times, half fortress, half fairy tale. I came for the reflection and got the whole legend thrown in. Some places you photograph; this one photographs back.",
   },
   {
-    slug: "walker-ranch-01",
-    title: "Walker Ranch",
+    slug: "varenna-lake-como-01",
+    title: "Lake Como, from Varenna",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
-    what: "aerial photo, Boulder County, Colorado",
+    what: "expedition photo, Italy",
     engagement: "personal / editorial",
     watermarked: true,
     orientation: "landscape",
-  },
-  {
-    slug: "crescent-meadows-01",
-    title: "Crescent Meadows",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "aerial photo, Front Range, Colorado",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "landscape",
+    // DRAFT (R3.4) — awaiting operator read-approval. Legend beats web-verified:
+    // Castello di Vezio above Varenna is traditionally linked to the Lombard
+    // queen Theodelinda (c. 600 AD) in local history (hedged as tradition); Lake
+    // Como's glacial depth (~400m, one of Europe's deepest lakes) is documented.
+    fieldNote:
+      "Local tradition puts the tower above Varenna at the order of Theodelinda, a Lombard queen from around the year 600 — a watchpost over a lake that drops more than a thousand feet straight down, one of the deepest in Europe. From up here Como looks calm enough to walk on. It isn't. I held the frame wide and let the water do the talking; on Como the water usually wins.",
   },
 ] as const;
 
