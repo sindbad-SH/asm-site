@@ -1,0 +1,56 @@
+---
+/**
+ * Shelby / Pebble Beach — the second case study (DIRECTION §2.6, COPY.md §4).
+ * Proof that the CaseStudy.astro template scales: same component, no new
+ * layout — this page is data + prop wiring, exactly like pitchboulder.astro.
+ *
+ * Honesty rails: relationship tier = `attended`; the proof line (rendered by
+ * CaseStudy via study.work.proof) carries the only status claim; prose never
+ * implies an official Pebble Beach engagement. Testimonial (Jack Bell) is
+ * RESERVED per operator (COPY.md §2.2) — the case data omits testimonialId, so
+ * the Words chapter + rail link do not render.
+ */
+import Base from "../../layouts/Base.astro";
+import CaseStudy from "../../components/CaseStudy.astro";
+import { PAGES } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const study = PAGES.work.caseStudies.shelbyPebbleBeach;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Hook = ambient loop cut from the 4K master (MEDIA-GUIDE Worked Example 1 Step
+// 3, crf 40 → 1.20MB) over a poster that IS the loop's frame 0. Context still =
+// a builder-picked lawn frame (t=66, the blue Cobra with the coastline behind).
+const mediaDir = join(process.cwd(), "public", "media", "work", "shelby-pebble-beach");
+const hookPoster = `${base}/media/work/shelby-pebble-beach/poster.avif`;
+const hookSources = existsSync(join(mediaDir, "loop.mp4"))
+  ? [{ src: `${base}/media/work/shelby-pebble-beach/loop.mp4`, type: "video/mp4" }]
+  : [];
+const contextImage = `${base}/media/work/shelby-pebble-beach/context.avif`;
+
+// BTS scrub — the site's single scrub moment (§1.1 P4), genuine BTS of this
+// shoot (16:9 center-crop of the vertical source; see HANDOFF.md). Rendered
+// only when the frame sequence exists on disk.
+const btsDir = join(mediaDir, "bts");
+const btsCount = existsSync(join(btsDir, "f-096.webp")) ? 96 : 0;
+const btsFramesBase = btsCount > 0 ? `${base}/media/work/shelby-pebble-beach/bts/f-` : undefined;
+const btsPoster = btsCount > 0 ? `${base}/media/work/shelby-pebble-beach/bts/poster.webp` : undefined;
+
+// Full film — already public-embedded on the live site (DIRECTION §2.6).
+const fullFilmVideoId = "SvIIXnM2R70";
+---
+
+<Base title={study.meta.title} description={study.meta.description}>
+  <CaseStudy
+    study={study}
+    base={base}
+    hookPoster={hookPoster}
+    hookSources={hookSources}
+    contextImage={contextImage}
+    btsFramesBase={btsFramesBase}
+    btsCount={btsCount}
+    btsPoster={btsPoster}
+    fullFilmVideoId={fullFilmVideoId}
+  />
+</Base>
