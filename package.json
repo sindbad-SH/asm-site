@@ -16,6 +16,7 @@
     "lhci": "node scripts/lhci-prep.mjs && lhci autorun"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource/space-mono": "^5.2.9",

@@ -1,0 +1,37 @@
+---
+/**
+ * 404 — off the map (COPY.md §8 / BUILD-ORDERS Task 9). Base layout, sibling-
+ * page structure. Links derive from import.meta.env.BASE_URL exactly like every
+ * other page, so they resolve on the staging base-prefix (/asm-site) and on the
+ * production root alike (the war-game Move 2.2 base-prefix trap).
+ */
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Forge the Saga", href: "/forge-the-saga" },
+  { label: "Adventure", href: "/adventure" },
+  { label: "Work", href: "/work" },
+] as const;
+---
+
+<Base title="404 — off the map">
+  <section class="mx-auto max-w-2xl space-y-6 p-8 text-center">
+    <h1 class="text-3xl font-bold sm:text-5xl">This trail doesn't exist.</h1>
+    <p class="text-lg text-ink">
+      The page you're after isn't on the map. Here's where the real ones are.
+    </p>
+    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-2">
+      {
+        links.map((l) => (
+          <li>
+            <a href={`${base}${l.href}`} class="link">
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>

@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
+import sitemap from "@astrojs/sitemap";
 import honestyAudit from "./integrations/honesty-audit.mjs";
 
 // Deploy target is parameterized so the eventual live-site cutover (BUILD-PLAN.md §8)
@@ -23,7 +24,10 @@ export default defineConfig({
     // cheap per-page, and a 9-page static site loses little to re-caching.
     inlineStylesheets: "always",
   },
-  integrations: [honestyAudit()],
+  // Sitemap inherits `site` + `base` above, so staging builds emit staging
+  // URLs and the cutover build emits production URLs — the correct behavior,
+  // not hacked (BUILD-ORDERS Task 9).
+  integrations: [sitemap(), honestyAudit()],
   vite: {
     plugins: [tailwindcss()],
   },

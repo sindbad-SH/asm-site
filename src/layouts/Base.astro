@@ -30,6 +30,36 @@ const pagePath = Astro.url.pathname.startsWith(base)
 const canonical = new URL(`${base}${pagePath}`, Astro.site).href;
 // Staging (github.io) must never compete with the live domain in search.
 const isStaging = (Astro.site?.href ?? "").includes("github.io");
+
+// JSON-LD (BUILD-ORDERS Task 9) — a solo StorySmith. Values come ONLY from the
+// SITE consts (no composed facts). Person + ProfessionalService (provider is the
+// Person — a solo practice, NOT an Organization-with-employees). Socials wire in
+// as `sameAs` only for the entries that actually exist on SITE.socials.
+const siteBase = new URL(base || "/", Astro.site).href.replace(/\/$/, "");
+const sameAs = Object.values(SITE.socials);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": `${siteBase}/#person`,
+      name: SITE.person,
+      alternateName: SITE.persona,
+      email: `mailto:${SITE.email}`,
+      url: `${siteBase}/`,
+      ...(sameAs.length ? { sameAs } : {}),
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": `${siteBase}/#service`,
+      name: SITE.name,
+      provider: { "@id": `${siteBase}/#person` },
+      areaServed: SITE.location,
+      email: `mailto:${SITE.email}`,
+      url: `${siteBase}/`,
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -58,6 +88,10 @@ const isStaging = (Astro.site?.href ?? "").includes("github.io");
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={abs("/media/og.jpg")} />
+
+    <!-- JSON-LD: solo StorySmith (Person + ProfessionalService). Values only
+         from SITE consts — no composed facts (BUILD-ORDERS Task 9). -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
     <script is:inline>
       document.documentElement.classList.replace("no-js", "js");
