@@ -1599,6 +1599,75 @@
     object-position: center 40%;
   }
 
+  /* ── Field note (R3.4) — a first-person location story on the gallery card,
+        the one place BODY text may borrow Fraunces (marks it as story, not UI).
+        Collapsible grid-rows technique; no-JS open; reduced motion instant. ── */
+  .field-note {
+    border-top: 1px solid var(--color-hairline);
+    padding-top: 0.55rem;
+    margin-top: 0.15rem;
+  }
+  .field-note-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+    color: var(--color-ink-muted);
+  }
+  .field-note-toggle:hover .hud-label {
+    color: var(--color-accent);
+  }
+  .fn-glyph {
+    font-family: var(--font-mono);
+    transition: transform 320ms var(--ease-survey);
+  }
+  .field-note.is-open .fn-glyph {
+    transform: rotate(45deg);
+  } /* + becomes × */
+  .field-note-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms var(--ease-survey);
+  }
+  .field-note.is-open .field-note-body {
+    grid-template-rows: 1fr;
+  }
+  .field-note-body > div {
+    overflow: hidden;
+  }
+  .field-note-body p {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 420;
+    line-height: 1.6;
+    color: var(--color-ink);
+    padding: 0.6rem 0 0.25rem 0.75rem;
+    border-left: 2px solid var(--color-accent-deep);
+    opacity: 0;
+    transition: opacity 260ms var(--ease-arrival) 120ms;
+  }
+  .field-note.is-open .field-note-body p {
+    opacity: 1;
+  }
+  /* no-JS: everything open, toggle hidden */
+  html.no-js .field-note-body {
+    grid-template-rows: 1fr;
+  }
+  html.no-js .field-note-body p {
+    opacity: 1;
+  }
+  html.no-js .field-note-toggle {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .field-note-body,
+    .fn-glyph,
+    .field-note-body p {
+      transition: none;
+    }
+  }
+
   /* ── Mixed-aspect gallery wall (R3) ── */
   /* CSS multi-column masonry: every card keeps its NATIVE aspect (landscape 3:2,
      vertical 4:5) and flows into balanced columns — portrait stills stand tall

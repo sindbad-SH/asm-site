@@ -35,6 +35,15 @@ interface Props {
   class?: string;
   /** Rendered as data-pillar — a hook for JS filtering (e.g. /work's lane filters). */
   pillar?: string;
+  /** Field note (R3.4) — a first-person location story rendered as a collapsible
+   *  block after card-meta, OUTSIDE .map-inset (hover warp untouched). */
+  fieldNote?: string;
+  /** Ships the field note expanded (Matterhorn). Others collapsed. */
+  fieldNoteOpen?: boolean;
+  /** Opt the card into the reveal engine (R3.9/R3.10 cascades) — sets
+   *  [data-reveal] + optional per-element stagger on the card root. */
+  reveal?: boolean;
+  revealStagger?: number;
 }
 const {
   href,
@@ -49,6 +58,10 @@ const {
   ctaLabel,
   class: klass = "",
   pillar,
+  fieldNote,
+  fieldNoteOpen = false,
+  reveal = false,
+  revealStagger,
 } = Astro.props;
 
 const Tag = href ? "a" : "div";
@@ -57,7 +70,13 @@ const Tag = href ? "a" : "div";
 const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 50vw";
 ---
 
-<Tag href={href} class={`card ${klass}`} data-pillar={pillar}>
+<Tag
+  href={href}
+  class={`card ${klass}`}
+  data-pillar={pillar}
+  data-reveal={reveal ? "" : undefined}
+  data-reveal-stagger={reveal && revealStagger ? String(revealStagger) : undefined}
+>
   {
     mediaSrc ? (
       <figure class="map-inset" style={`overflow:clip`}>
@@ -81,6 +100,19 @@ const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 50vw";
   {eyebrow && <p class="card-eyebrow">{eyebrow}</p>}
   <h3 class="card-title">{title}</h3>
   {meta && <p class="card-meta">{meta}</p>}
+  {/* Field note (R3.4) — collapsible; Matterhorn ships open. Sits OUTSIDE
+      .map-inset so the gallery hover warp is unaffected. No-JS: open. */}
+  {fieldNote && (
+    <div class={`field-note ${fieldNoteOpen ? "is-open" : ""}`} data-field-note>
+      <button type="button" class="field-note-toggle" aria-expanded={fieldNoteOpen ? "true" : "false"}>
+        <span class="hud-label">Field note</span>
+        <span class="fn-glyph" aria-hidden="true">+</span>
+      </button>
+      <div class="field-note-body">
+        <div><p>{fieldNote}</p></div>
+      </div>
+    </div>
+  )}
   {/* showName=false: the card's own title already names the org — the
       proof line here only needs to state the status. */}
   {proof && <LegendMark proof={proof} showName={false} class="text-sm" />}
