@@ -60,6 +60,7 @@
   /* ── §3.3 motion grammar ── */
   --ease-survey: cubic-bezier(0.16, 1, 0.3, 1); /* geological settle (expo.out) */
   --ease-swift: cubic-bezier(0.215, 0.61, 0.355, 1); /* hover response (power2.out) */
+  --ease-arrival: cubic-bezier(0.22, 1, 0.36, 1); /* DIRECTION §1.1 P3 arrival (power2.out) */
 }
 
 /* Metric-matched local fallbacks (§4 "fallback metrics"): while the web fonts
@@ -85,7 +86,8 @@
 
 :root {
   --dur-hover: 180ms; /* hover must answer < 200ms */
-  --dur-reveal: 800ms; /* standard reveal */
+  --dur-reveal: 800ms; /* standard reveal (geological transitions) */
+  --dur-arrival: 700ms; /* DIRECTION §1.1 P3 arrival reveal — 0.7s */
   --dur-geological: 1200ms; /* contour draws, heat ramps */
   --reveal-delay: 0ms; /* per-element stagger hook */
   color-scheme: dark;
@@ -739,8 +741,13 @@
     gap: 0.35rem;
     color: var(--color-ink-muted);
   }
+  /* DIRECTION §1.2 restraint: "no idle bobbing... once it settles, it stays
+     still." The scroll cue hints a few times on load, then rests — a finite
+     entrance affordance, not perpetual motion (only ambient loops (P5) run
+     perpetually on this site). */
   .hero-video__cue .chev {
-    animation: hero-bob 2.4s var(--ease-in-out, ease-in-out) infinite;
+    animation: hero-bob 2.4s var(--ease-in-out, ease-in-out) 3;
+    animation-fill-mode: forwards;
   }
   @keyframes hero-bob {
     0%, 100% { transform: translateY(0); opacity: 0.6; }
@@ -1385,10 +1392,10 @@
 /* Hidden ONLY under html.js — no-JS users always see everything (KEEP port). */
 html.js [data-reveal] {
   opacity: 0;
-  transform: translateY(1.4rem); /* LP-3: reveal travel up a notch (was 1rem) */
+  transform: translateY(28px); /* DIRECTION §1.1 P3 — y 28px → 0 */
   transition:
-    opacity var(--dur-reveal) var(--ease-survey) var(--reveal-delay),
-    transform var(--dur-reveal) var(--ease-survey) var(--reveal-delay);
+    opacity var(--dur-arrival) var(--ease-arrival) var(--reveal-delay),
+    transform var(--dur-arrival) var(--ease-arrival) var(--reveal-delay);
 }
 html.js [data-reveal].is-revealed {
   opacity: 1;

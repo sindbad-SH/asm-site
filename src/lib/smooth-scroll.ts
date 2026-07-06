@@ -19,8 +19,10 @@ export async function ensureSmoothScroll(): Promise<Lenis | null> {
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return null;
 
+  // lerp 0.10 = top of the DIRECTION §1.1 P1 momentum band (0.08–0.10); wheel
+  // multiplier 1.0. Momentum scroll that glides, never snaps.
   const { default: LenisCtor } = await import("lenis");
-  instance = new LenisCtor({ lerp: 0.11, wheelMultiplier: 1 });
+  instance = new LenisCtor({ lerp: 0.1, wheelMultiplier: 1 });
 
   const raf = (time: number) => {
     instance!.raf(time);

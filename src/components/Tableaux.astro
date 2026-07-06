@@ -150,11 +150,17 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
           anticipatePin: 1,
         },
       });
+      // DIRECTION §1.1 P2 amplitudes (total travel over one viewport of scroll):
+      // background 8% (6–10% band), midground 14% (12–16%), foreground 21%
+      // (18–24%). Keyed to layer index (bg→mid→fg), not the raw depth value, so
+      // the caps are exact. Split symmetrically (+half → −half). Scale
+      // 1.04 → 1.0 on the BACKGROUND ONLY. Text layers are excluded (they live
+      // in [data-tableau-content], not [data-depth]).
+      const TRAVEL = [8, 14, 21]; // % of viewport, per layer index
       layers.forEach((layer, i) => {
-        const depth = parseFloat(layer.getAttribute("data-depth") || "0.5");
-        // near layers travel further than distant ones → parallax depth
-        tl.fromTo(layer, { yPercent: depth * 14 }, { yPercent: -depth * 14, ease: "none" }, 0);
-        if (i === 0) tl.fromTo(layer, { scale: 1.12 }, { scale: 1, ease: "none" }, 0);
+        const amp = (TRAVEL[i] ?? TRAVEL[TRAVEL.length - 1]!) / 2;
+        tl.fromTo(layer, { yPercent: amp }, { yPercent: -amp, ease: "none" }, 0);
+        if (i === 0) tl.fromTo(layer, { scale: 1.04 }, { scale: 1, ease: "none" }, 0);
       });
     });
 
