@@ -90,6 +90,10 @@
   --dur-arrival: 700ms; /* DIRECTION §1.1 P3 arrival reveal — 0.7s */
   --dur-geological: 1200ms; /* contour draws, heat ramps */
   --reveal-delay: 0ms; /* per-element stagger hook */
+  /* ── R3 motion tokens (MOTION-SPEC §1) ── */
+  --dur-drift-min: 6s; /* documentation anchor — engine values live in JS */
+  --dur-marquee: 1ms; /* scrubbed; token exists only for the reduced-motion kill */
+  --ping-idle: 6s; /* H7 CTA pulse cycle */
   color-scheme: dark;
 }
 
