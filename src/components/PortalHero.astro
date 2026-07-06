@@ -233,9 +233,12 @@ const stars = Array.from({ length: 34 }, () => {
       }
     }
     function render(p: number) {
-      // solid mark holds, then dissolves (ghost re-forms on reverse)
+      // solid mark holds, then dissolves (ghost re-forms on reverse). R6 — the
+      // mark grows a touch more as it dissolves (scale 1 → ~1.16 across the fade
+      // window) so the scroll-scrubbed exit reads as a cinematic bloom into the
+      // scene, not an instant pop-out.
       markEl.style.opacity = String(1 - seg(p, 0.2, 0.5));
-      markEl.style.transform = `translate(-50%, -50%) scale(${1 + p * 0.05})`;
+      markEl.style.transform = `translate(-50%, -50%) scale(${1 + seg(p, 0.2, 0.5) * 0.16 + p * 0.03})`;
       // the window: in as the mark fades, out as the void finishes (hand-off)
       const wIn = seg(p, 0.15, 0.35);
       const wOut = 1 - seg(p, 0.85, 1);
@@ -283,16 +286,20 @@ const stars = Array.from({ length: 34 }, () => {
       onUpdate: () => render(proxy.p),
     });
 
-    // scroll-out (LP-2): the living scene simply RECEDES with the section — it
-    // stays whole (p=1) and scrolls away like any hero, while the content fades
-    // for a clean handoff into the tableaux and the loop pauses once the hero
-    // is mostly gone. The mark deliberately does NOT re-form over the scene on
-    // scroll: with the living video as the star, a logo blooming back over it
-    // (behind the still-present headline) read as wrong. Streams in at idle;
-    // scroll before then simply leaves the open scene (safe).
+    // scroll-out (LP-2 + R6): the living scene RECEDES with the section while
+    // the content fades for a clean handoff into the tableaux. R6 — the load-in
+    // MARK no longer evaporates instantly on first scroll: instead of snapping
+    // the intro to fully-open, we HAND its remaining progress to the scroll and
+    // scrub the mark's exit (scale up + fade) over the first ~50vh, so the logo
+    // dissolves cinematically with scroll distance rather than popping out of
+    // existence. If the intro already finished (mark long gone) this is a no-op.
     const smooth = (x: number) => x * x * (3 - 2 * x); // smoothstep — eases the content fade
     const FADE_FROM = 0.12; // let the hero scroll a touch before the content dims
     const FADE_TO = 0.72; // content fully handed off by ~70% of the exit
+    // R6 mark-exit window: 0 → 1 over the first ~55% of the hero's scroll-out
+    // (~55vh given a 100vh hero), the graceful scroll-scrubbed logo dissolve.
+    const MARK_EXIT_TO = 0.55;
+    let introScrubbed = false;
     const mountBookend = async () => {
       try {
         const { ScrollTrigger } = await import("gsap/ScrollTrigger");
@@ -303,12 +310,23 @@ const stars = Array.from({ length: 34 }, () => {
           end: "bottom top",
           scrub: true,
           onUpdate: (self) => {
-            // first scroll: settle the intro to fully-open and leave it there
-            if (self.progress > 0.001 && !introKilled) {
+            // First scroll: stop the timed intro but DON'T snap the mark away.
+            // Capture where the intro had reached (pAtScroll) and scrub the rest
+            // of the mark's dissolve across the scroll distance below.
+            if (self.progress > 0.0005 && !introKilled) {
               intro.kill();
               introKilled = true;
-              proxy.p = 1;
-              render(1);
+              introScrubbed = proxy.p < 0.999; // was the mark still (partly) present?
+              (proxy as { pStart?: number }).pStart = proxy.p;
+            }
+            if (introScrubbed) {
+              // scrub p from where the intro left off → 1 across the exit window,
+              // so the mark scales up + dissolves smoothly with scroll (R6).
+              const pStart = (proxy as { pStart?: number }).pStart ?? proxy.p;
+              const k = smooth(Math.min(1, self.progress / MARK_EXIT_TO));
+              proxy.p = pStart + (1 - pStart) * k;
+              render(proxy.p);
+              if (proxy.p > 0.999) introScrubbed = false; // done — leave it open
             }
             const exit = smooth(Math.min(1, Math.max(0, (self.progress - FADE_FROM) / (FADE_TO - FADE_FROM))));
             contentEl.style.opacity = String(1 - exit);
