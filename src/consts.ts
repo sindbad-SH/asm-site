@@ -309,6 +309,10 @@ export type WorkItem = {
    *  (Amazing Aerial + ASM) watermark (exclusivity handling — see the gallery
    *  comment). Purely descriptive; the gallery uses it for an optional caption. */
   watermarked?: boolean;
+  /** Native orientation of the exported gallery still (R3). "landscape" = 3:2
+   *  export widths 800/1400/2200; "vertical" = 4:5 widths 800/1120/1600. The
+   *  gallery honors this so images are never squished into a fixed card shape. */
+  orientation?: "landscape" | "vertical";
 };
 
 export const WORK: readonly WorkItem[] = [
@@ -349,12 +353,29 @@ export const WORK: readonly WorkItem[] = [
   // Titles are place-names only — no time-of-day or story claims.
   //
   // EXCLUSIVITY (operator decision): the Colorado 7-3-2026 batch is AA-bound
-  // (premium-exclusive). Per the operator, only the 4 BEST Colorado picks ship,
+  // (premium-exclusive). Per the operator, only the BEST Colorado picks ship,
   // WATERMARKED (dual-brand AA+ASM baked into the exports), as an Amazing Aerial
-  // teaser/funnel; the clean Valais set fills the rest unwatermarked. The two
-  // weaker Colorado picks (chautauqua-01, ncar-mesa-01) are DROPPED (AA curation
-  // standard: best-of-series only). `watermarked: true` flags the teaser cards.
+  // teaser/funnel; the clean Valais set fills the rest unwatermarked.
+  //
+  // ROUND 2 (REVISION-ORDERS R3/R4): re-selected for "awesome, hire me" impact
+  // — 7 knockout cards, mixed aspect (never letterbox-squished). The two Valais
+  // verticals (Matterhorn 5, Gornergrat 6 — genuinely portrait 3060x5440 stills)
+  // get vertical cards; the rest are 3:2 landscape. Dropped the mid-tier
+  // `zermatt-panorama-01` (a trail-bench frame). `lac-de-tseuzier-01` re-sourced
+  // to the actual turquoise lake (Tseuzier 10) — the prior export was a rapids
+  // frame that didn't match its title. Order interleaves verticals with
+  // landscapes so the grid reads as a mixed-aspect wall, not a uniform strip.
+  // Watermarks are now OBVIOUS (R4): AA mark large + centered, ASM corner clear.
   // ---------------------------------------------------------------------------
+  {
+    slug: "matterhorn-zermatt-01",
+    title: "The Matterhorn, from Zermatt",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+    orientation: "vertical",
+  },
   {
     slug: "flatirons-chautauqua-03",
     title: "The Flatirons over Chautauqua",
@@ -363,6 +384,16 @@ export const WORK: readonly WorkItem[] = [
     what: "aerial photo, Boulder, Colorado",
     engagement: "personal / editorial",
     watermarked: true,
+    orientation: "landscape",
+  },
+  {
+    slug: "gornergrat-glacier-01",
+    title: "Gornergrat glacier panorama",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+    orientation: "vertical",
   },
   {
     slug: "eldorado-springs-01",
@@ -372,6 +403,16 @@ export const WORK: readonly WorkItem[] = [
     what: "aerial photo, Colorado",
     engagement: "personal / editorial",
     watermarked: true,
+    orientation: "landscape",
+  },
+  {
+    slug: "lac-de-tseuzier-01",
+    title: "Lac de Tseuzier, Valais",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+    orientation: "landscape",
   },
   {
     slug: "walker-ranch-01",
@@ -381,6 +422,7 @@ export const WORK: readonly WorkItem[] = [
     what: "aerial photo, Boulder County, Colorado",
     engagement: "personal / editorial",
     watermarked: true,
+    orientation: "landscape",
   },
   {
     slug: "crescent-meadows-01",
@@ -390,38 +432,7 @@ export const WORK: readonly WorkItem[] = [
     what: "aerial photo, Front Range, Colorado",
     engagement: "personal / editorial",
     watermarked: true,
-  },
-  {
-    slug: "matterhorn-zermatt-01",
-    title: "The Matterhorn, from Zermatt",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
-  },
-  {
-    slug: "gornergrat-glacier-01",
-    title: "Gornergrat glacier panorama",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
-  },
-  {
-    slug: "lac-de-tseuzier-01",
-    title: "Lac de Tseuzier, Valais",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
-  },
-  {
-    slug: "zermatt-panorama-01",
-    title: "Mountain panorama above Zermatt",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
+    orientation: "landscape",
   },
 ] as const;
 

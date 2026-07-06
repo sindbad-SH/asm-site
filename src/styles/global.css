@@ -1357,6 +1357,28 @@
     gap: 1rem;
     justify-items: center;
   }
+
+  /* ── Mixed-aspect gallery wall (R3) ── */
+  /* CSS multi-column masonry: every card keeps its NATIVE aspect (landscape 3:2,
+     vertical 4:5) and flows into balanced columns — portrait stills stand tall
+     beside landscape ones, nothing is squished into a uniform shape. Columns
+     are bulletproof across browsers (no grid row-span math, no JS). */
+  .gallery-wall {
+    column-count: 2;
+    column-gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .gallery-wall {
+      column-count: 3;
+    }
+  }
+  .gallery-wall > .gallery-card {
+    display: block;
+    width: 100%;
+    margin: 0 0 1rem;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
 }
 
 /* ─────────────────── reveal engine + contour motion (§3.3) ────────────── */

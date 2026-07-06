@@ -41,14 +41,20 @@ const reelSources = reelHasLoop
   : [];
 const reelPoster = reelHasPoster ? `${base}/media/adventure/reel-poster.avif` : undefined;
 
-// Slug → gallery media map (Task 5). A responsive <picture> renders on a Card
-// only when its exported set exists; otherwise the card keeps its placeholder.
-function galleryMedia(slug: string) {
+// Slug → gallery media map. Round 2 (R3): widths are orientation-aware —
+// landscape cards export 800/1400/2200 (3:2), vertical cards 800/1120/1600
+// (4:5). A responsive <picture> renders only when the exported set exists.
+const GALLERY_WIDTHS = {
+  landscape: [800, 1400, 2200],
+  vertical: [800, 1120, 1600],
+} as const;
+function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
   const g = join(process.cwd(), "public", "media", "adventure", "gallery");
   if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  const widths = GALLERY_WIDTHS[orientation];
   return {
-    avif: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
-    webp: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
     src: `${base}/media/adventure/gallery/${slug}-800.webp`,
   };
 }
@@ -92,19 +98,28 @@ function galleryMedia(slug: string) {
     <section class="border-t border-hairline p-8">
       <hr class="flight-line mb-6" aria-hidden="true" />
       <h2 class="mx-auto mb-4 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
-      <div class="mx-auto grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3" data-distort-grid>
+      <!-- Mixed-aspect gallery wall (R3): native orientation honored, never
+           letterbox-squished. Vertical cards (Matterhorn, Gornergrat glacier)
+           span two grid rows and render 4/5; landscape cards render 3/2 and
+           span one row. object-fit:cover inside each card, no stretch. -->
+      <div class="gallery-wall mx-auto max-w-5xl" data-distort-grid>
         {
-          adventureWork.map((item) => (
-            <Card
-              mediaRatio="4/5"
-              mediaSrc={galleryMedia(item.slug)}
-              mediaAlt={item.title}
-              mediaLabel={`${item.title} — grid thumbnail (§2b/§2e)`}
-              eyebrow={item.engagement}
-              title={item.title}
-              meta={item.what}
-            />
-          ))
+          adventureWork.map((item) => {
+            const orientation = item.orientation ?? "landscape";
+            const isVertical = orientation === "vertical";
+            return (
+              <Card
+                class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}
+                mediaRatio={isVertical ? "4/5" : "3/2"}
+                mediaSrc={galleryMedia(item.slug, orientation)}
+                mediaAlt={item.title}
+                mediaLabel={`${item.title} — gallery still (§2b/§2e)`}
+                eyebrow={item.engagement}
+                title={item.title}
+                meta={item.what}
+              />
+            );
+          })
         }
       </div>
       <!-- AA funnel outro (operator exclusivity handling): the gallery is a
