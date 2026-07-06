@@ -16,6 +16,7 @@
  * code.
  */
 import TableauChapter, { type TableauLayer, type TableauImage } from "./TableauChapter.astro";
+import TableauCluster from "./TableauCluster.astro";
 import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
 import { existsSync } from "node:fs";
@@ -23,6 +24,36 @@ import { join } from "node:path";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
+
+// R5 — the "wild" chapter renders as a FLOATING SHOT CLUSTER (TableauCluster)
+// when its cluster assets exist on disk, replacing the old full-bleed layered
+// scene. Build-time check (frontmatter runs server-side), anchored to cwd.
+const clusterDir = join(process.cwd(), "public", "media", "home", "wild", "cluster");
+const wildDir = join(process.cwd(), "public", "media", "home", "wild");
+function clusterShot(id: string) {
+  const has = existsSync(join(clusterDir, `${id}.avif`)) && existsSync(join(clusterDir, `${id}.webp`));
+  return has
+    ? { avif: `${base}/media/home/wild/cluster/${id}.avif`, webp: `${base}/media/home/wild/cluster/${id}.webp` }
+    : undefined;
+}
+const hasLoop =
+  existsSync(join(wildDir, "matterhorn-loop.mp4")) &&
+  existsSync(join(wildDir, "matterhorn-loop-poster.avif"));
+const clusterShots = {
+  peak: clusterShot("peak"),
+  valley: clusterShot("valley"),
+  lake: clusterShot("lake"),
+  ridge: clusterShot("ridge"),
+  loop: hasLoop
+    ? {
+        mp4: `${base}/media/home/wild/matterhorn-loop.mp4`,
+        poster: `${base}/media/home/wild/matterhorn-loop-poster.avif`,
+      }
+    : undefined,
+};
+// The cluster is "live" only if at least the peak + one more shot exist; else
+// the wild chapter falls back to the classic layered TableauChapter.
+const clusterLive = !!(clusterShots.peak && (clusterShots.valley || clusterShots.ridge));
 
 // Media self-service (MEDIA-GUIDE.md "Home tableaux"): each layer's real art
 // lives at public/media/home/<slug>/<layer>.{avif,webp}. Checked at BUILD
@@ -82,19 +113,27 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
 
 <section class="tableaux" data-tableaux aria-label="Three terrains, one craft">
   {
-    chapters.map((chapter, i) => (
-      <Fragment>
-        {i > 0 && <ContourDivider class="mx-auto max-w-3xl px-8" />}
-        <TableauChapter
-          chapter={chapter}
-          index={i}
-          layers={LAYER_SETS[chapter.terrain] ?? undefined}
-          images={LAYER_SETS[chapter.terrain] ? findLayerImages(chapter.terrain) : undefined}
-          base={base}
-          nodeId={pillarByTerrain[chapter.terrain.toLowerCase()]}
-        />
-      </Fragment>
-    ))
+    chapters.map((chapter, i) => {
+      const isWild = chapter.terrain.toLowerCase() === "the wild";
+      const nodeId = pillarByTerrain[chapter.terrain.toLowerCase()];
+      return (
+        <Fragment>
+          {i > 0 && <ContourDivider class="mx-auto max-w-3xl px-8" />}
+          {isWild && clusterLive ? (
+            <TableauCluster chapter={chapter} index={i} base={base} nodeId={nodeId} shots={clusterShots} />
+          ) : (
+            <TableauChapter
+              chapter={chapter}
+              index={i}
+              layers={LAYER_SETS[chapter.terrain] ?? undefined}
+              images={LAYER_SETS[chapter.terrain] ? findLayerImages(chapter.terrain) : undefined}
+              base={base}
+              nodeId={nodeId}
+            />
+          )}
+        </Fragment>
+      );
+    })
   }
 </section>
 
@@ -120,7 +159,58 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
 
     const mobile = window.matchMedia("(max-width: 640px)").matches;
 
-    section.querySelectorAll<HTMLElement>("[data-tableau]").forEach((tableau) => {
+    // R5 — floating shot clusters (the "wild" chapter). Not pinned: the shots
+    // drift at their own rates as the section scrolls past, bright and visible.
+    section.querySelectorAll<HTMLElement>("[data-cluster]").forEach((cluster) => {
+      const content = cluster.querySelector<HTMLElement>("[data-tableau-content]");
+      const headline = cluster.querySelector<HTMLElement>("[data-tableau-headline]");
+      if (content && headline) splitLines(headline);
+
+      // content reveal, once
+      if (content) {
+        ScrollTrigger.create({
+          trigger: cluster,
+          start: "top 72%",
+          once: true,
+          onEnter: () => content.classList.add("is-revealed"),
+        });
+      }
+
+      // lazy-mount the live loop on wide viewports only (P5), poster-first
+      const loopVideo = cluster.querySelector<HTMLVideoElement>("[data-cluster-loop-video]");
+      if (loopVideo && !mobile) {
+        const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+        const mount = () => {
+          if (conn?.saveData) return;
+          const src = loopVideo.dataset.src;
+          if (src && !loopVideo.src) {
+            loopVideo.src = src;
+            loopVideo.play().catch(() => {});
+          }
+        };
+        const io = new IntersectionObserver(
+          (entries) => entries.forEach((e) => (e.isIntersecting ? mount() : loopVideo.pause())),
+          { rootMargin: "0px" },
+        );
+        io.observe(cluster);
+      }
+
+      // float parallax — each shot drifts at its data-rate (% of viewport),
+      // split symmetrically (+half → −half) over the section's scroll. Text
+      // (data-tableau-content) is excluded — it never parallaxes.
+      if (mobile) return;
+      const floats = cluster.querySelectorAll<HTMLElement>("[data-float]");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: cluster, start: "top bottom", end: "bottom top", scrub: true },
+      });
+      floats.forEach((f) => {
+        const rate = Number(f.dataset.rate) || 8;
+        const amp = Math.min(rate, 24) / 2; // cap at 24% (DIRECTION §1.2)
+        tl.fromTo(f, { yPercent: amp }, { yPercent: -amp, ease: "none" }, 0);
+      });
+    });
+
+    section.querySelectorAll<HTMLElement>("[data-tableau]:not([data-cluster])").forEach((tableau) => {
       const pin = tableau.querySelector<HTMLElement>(".tableau-pin");
       const content = tableau.querySelector<HTMLElement>("[data-tableau-content]");
       const headline = tableau.querySelector<HTMLElement>("[data-tableau-headline]");
