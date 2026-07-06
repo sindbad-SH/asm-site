@@ -21,9 +21,37 @@ import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import { PAGES, WORK } from "../consts";
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const adventureWork = WORK.filter((item) => item.pillar === "adventure");
+
+// Ambient reel: SKIPPED by default (DIRECTION §2.3) — the on-disk loop
+// candidates were unverified content. The section renders only if a real reel
+// is dropped at public/media/adventure/reel-loop.mp4 (+ poster). No sources =
+// no section (not a placeholder box). Checked at build time (frontmatter runs
+// server-side); anchored to process.cwd() like Tableaux.astro.
+const reelDir = join(process.cwd(), "public", "media", "adventure");
+const reelHasLoop = existsSync(join(reelDir, "reel-loop.mp4"));
+const reelHasPoster = existsSync(join(reelDir, "reel-poster.avif"));
+const reelSources = reelHasLoop
+  ? [{ src: `${base}/media/adventure/reel-loop.mp4`, type: "video/mp4" }]
+  : [];
+const reelPoster = reelHasPoster ? `${base}/media/adventure/reel-poster.avif` : undefined;
+
+// Slug → gallery media map (Task 5). A responsive <picture> renders on a Card
+// only when its exported set exists; otherwise the card keeps its placeholder.
+function galleryMedia(slug: string) {
+  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  return {
+    avif: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: [800, 1400, 2200].map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
+  };
+}
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -80,16 +108,23 @@ const adventureWork = WORK.filter((item) => item.pillar === "adventure");
       <p class="mx-auto mt-4 max-w-5xl text-sm text-ink-muted">{p.gallery.note}</p>
     </section>
 
-    <!-- Ambient reel — OPTIONAL / selective (§9.5: video is selective, not
-         the default). Sits below the gallery now, not as the page opener.
-         Poster-first; the interim placeholder IS the poster until a reel is
-         chosen — add `poster` + `sources` to make it play, no markup change. -->
-    <section class="border-t border-hairline p-8">
-      <HeroVideo
-        placeholderLabel="AMBIENT REEL — OPTIONAL / SELECTIVE (§9.5) — only if a specific piece of footage earns the spot; the gallery above is the primary surface. If used: muted ambient loop, ≤8s · 720p · ≤1.5MB AV1/H.264, poster ships first (§4)."
-        class="mx-auto max-w-5xl"
-      />
-    </section>
+    <!-- Ambient reel — OPTIONAL / selective (§9.5 / DIRECTION §2.3). SKIPPED by
+         default: the only loop candidates on disk are unverified content, so
+         per DIRECTION the reel renders NOTHING (not a placeholder box) unless
+         real sources are supplied. To activate: set `reelSources` (+ poster)
+         below — the section returns with zero other markup change. -->
+    {
+      reelSources.length > 0 && (
+        <section class="border-t border-hairline p-8">
+          <HeroVideo
+            poster={reelPoster}
+            sources={reelSources}
+            placeholderLabel="AMBIENT REEL — muted ambient loop, ≤8s · 720p · ≤1.5MB AV1/H.264, poster ships first (§4)."
+            class="mx-auto max-w-5xl"
+          />
+        </section>
+      )
+    }
 
     <!-- A5 — soft handoff -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
