@@ -12,6 +12,7 @@
 import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
 import DistortionLayer from "../../components/DistortionLayer.astro";
+import YouTubeEmbed from "../../components/YouTubeEmbed.astro";
 import { PAGES, WORK, PILLARS } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -50,6 +51,18 @@ const filters = [
   <section class="mx-auto max-w-3xl space-y-4 p-8">
     <h1 class="text-3xl font-bold">{p.intro.heading}</h1>
     <p class="text-ink">{p.intro.body}</p>
+
+    <!-- Featured reel (COPY.md §10 / DIRECTION §2.4) — the page's single video
+         moment, click-to-load facade, directly under the intro. Operator
+         default: reel featured (flagged for staging review). -->
+    <div class="space-y-2 pt-2">
+      <YouTubeEmbed
+        videoId="QTsUfIQwk94"
+        title="Cinematic Portfolio Reel"
+        placeholderLabel="FEATURED REEL — YouTube embed, click-to-load facade (§4)."
+      />
+      <p class="hud-label normal-case text-ink-muted">The reel — the work in motion.</p>
+    </div>
   </section>
 
   <!-- Lane filters (Matchstic model) — inert without JS; every card already

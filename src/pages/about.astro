@@ -7,20 +7,40 @@
  * just asserted.
  */
 import Base from "../layouts/Base.astro";
-import Placeholder from "../components/Placeholder.astro";
 import LegendKey from "../components/LegendKey.astro";
 import { PAGES } from "../consts";
 
 const p = PAGES.about;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Personal socials (COPY.md §6) — Sindbad's own channels (personal socials
+// belong on About per operator directive). Text links, Space Mono label style,
+// no brand-colored icons. Order is operator-provided (2026-07-04).
+const personalSocials = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/sindbad-horizon-b19b4a264" },
+  { label: "YouTube", href: "https://www.youtube.com/@SindbadSightsAndStories" },
+  { label: "Instagram", href: "https://www.instagram.com/sindbad_sights_and_stories/" },
+  { label: "TikTok", href: "https://www.tiktok.com/@sindbadsightsandstories" },
+] as const;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-3xl space-y-6 p-8">
-    <Placeholder
-      ratio="4/5"
-      class="mx-auto max-w-sm"
-      label="ABOUT PORTRAIT — environmental portrait, ≥1600px (S12)"
-    />
+    <figure class="map-inset mx-auto max-w-sm" style="overflow:clip">
+      <picture>
+        <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
+        <img
+          src={`${base}/media/about/portrait.webp`}
+          alt="Sindbad Horizon, The StorySmith"
+          class="block w-full"
+          style="aspect-ratio:4/5;object-fit:cover"
+          width="1600"
+          height="2000"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
+    </figure>
     <div class="text-center">
       <h1 class="text-3xl font-bold">
         {p.bio.name} — {p.bio.persona}
@@ -30,6 +50,25 @@ const p = PAGES.about;
 
     <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink" data-reveal>
       {p.narrative.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+
+    <!-- Personal socials row (COPY.md §6 / DIRECTION §2.8) — "Find me in the
+         field": Sindbad's personal channels. Text links, Space Mono label,
+         styled like the existing label rows (no new component archetype). -->
+    <div class="mx-auto max-w-2xl space-y-2 border-t border-hairline pt-6">
+      <p class="hud-label">FIND ME IN THE FIELD</p>
+      <p class="text-ink">The business lives here. I live on these:</p>
+      <ul class="flex flex-wrap gap-x-5 gap-y-1.5 pt-1">
+        {
+          personalSocials.map((s) => (
+            <li>
+              <a href={s.href} class="link" rel="me noopener">
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 

@@ -19,14 +19,28 @@ const formReady = SITE.formEndpoint !== "[confirm]";
     <h1 class="text-3xl font-bold">{p.headline}</h1>
     <p>{p.body}</p>
 
-    {
-      !formReady && (
-        <p class="hud-label border border-dashed border-current/30 bg-current/5 p-3 normal-case">
-          Form endpoint [confirm] — not wired yet (BUILD-PLAN.md §5A S9). Use email below in the
-          meantime.
-        </p>
-      )
-    }
+    <!-- Primary action (DIRECTION §2.9 / COPY.md §9): booking = the primary CTA;
+         the brand contract's only sanctioned CTA label. Opens Calendly. -->
+    <div class="pt-1">
+      <a href={SITE.bookACall} class="btn" rel="noopener">Book a Strategy Call</a>
+    </div>
+
+    <!-- The form remains present but visually secondary; it stays inert until
+         SITE.formEndpoint resolves (operator task — the form's existing
+         designed behavior). While inert, an honest pending marker names the
+         reserved endpoint (this is the "formEndpoint-driven form state" the
+         production gate is expected to catch — BUILD-ORDERS Task 10/11). -->
+    <div class="space-y-4 border-t border-hairline pt-6">
+      <p class="hud-label normal-case text-ink-muted">Or send a note</p>
+
+      {
+        !formReady && (
+          <p class="hud-label border border-dashed border-current/30 bg-current/5 p-3 normal-case text-ink-muted">
+            The form is inert until its endpoint is wired ({SITE.formEndpoint}). Use the booking
+            button or email below in the meantime.
+          </p>
+        )
+      }
 
     <form method="post" action={formReady ? SITE.formEndpoint : undefined} class="space-y-4">
       <div>
@@ -41,16 +55,20 @@ const formReady = SITE.formEndpoint !== "[confirm]";
         <label for="message" class="field">What are you building?</label>
         <textarea id="message" name="message" required rows="5" class="field-input" />
       </div>
-      <button type="submit" disabled={!formReady} class="btn">Send</button>
+      <button type="submit" disabled={!formReady} class="btn-quiet border border-hairline px-4 py-2">Send</button>
     </form>
 
-    <div class="border-t border-hairline pt-6 text-sm">
-      <p>
-        Prefer email? <a href={`mailto:${p.email}`} class="link">{p.email}</a>
-      </p>
-      <p class="mt-1">
-        Book a call: {SITE.bookACall === "[confirm]" ? <span class="hud-label normal-case opacity-60">[confirm] — S10</span> : <a href={SITE.bookACall} class="link">{SITE.bookACall}</a>}
-      </p>
+      {
+        /* Inert-form email line (COPY.md §9) — shown ONLY while the form is
+           inert (formReady === false). Remove-once-live is automatic: the line
+           disappears the moment SITE.formEndpoint resolves. */
+        !formReady && (
+          <p class="text-sm text-ink-muted">
+            Prefer email? <a href={`mailto:${p.email}`} class="link">{p.email}</a> — or book a call
+            above.
+          </p>
+        )
+      }
     </div>
   </section>
 </Base>
