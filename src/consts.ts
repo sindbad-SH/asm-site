@@ -30,13 +30,16 @@ export const SITE = {
   location: "Boulder, Colorado",
   // Matches the address on file; per BUILD-PLAN §5A S9 confirm once with Sindbad.
   email: "sindbad@adventurestorytellingmedia.com",
-  formEndpoint: "[confirm]", // live form endpoint — replaces the v1 stub (S9)
-  bookACall: "[confirm]", // Calendly/Cal.com URL, or drop the pattern (S10)
+  formEndpoint: "[confirm]", // RESERVED — awaiting operator fact (AS-2). Free-tier form
+                             // endpoint; account creation needs his email verification (a
+                             // ~2-minute operator task). Form stays inert by design until then.
+  bookACall: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting", // his binding pricing sheet + live site source
   socials: {
-    instagram: "[confirm]",
-    youtube: "[confirm]",
-    tiktok: "[confirm]",
-    linkedin: "[confirm]",
+    youtube: "https://www.youtube.com/@AdventureStorytellingMedia", // verified channel
+    instagram: "https://www.instagram.com/adventurestorytellingmedia/", // operator roster 2026-07-04 — flag at staging review (account is young)
+    // tiktok: REMOVED — operator's own roster: "name may change"; re-add when he confirms the handle
+    // linkedin: REMOVED — no ASM company page could be verified (roster URL was truncated);
+    //           Sindbad's personal LinkedIn lives on /about instead, per his directive
   },
   /**
    * GoatCounter site code for privacy-respecting analytics (no cookies, no
@@ -311,7 +314,10 @@ export const WORK: readonly WorkItem[] = [
     pillar: "entertainment",
     forOrg: "PitchBoulder",
     what: "event coverage & recaps, and produced their commercial",
-    engagement: "[confirm]",
+    // Sourced (COPY.md §3), not guessed: Rothschild's published quote says
+    // "I hired Sindbad Horizon"; the published case copy says "directly
+    // commissioned by founder Peter Rothschild."
+    engagement: "paid engagement",
     relationshipId: "pitchboulder",
     href: "/work/pitchboulder",
   },
@@ -319,30 +325,103 @@ export const WORK: readonly WorkItem[] = [
     slug: "shelby-pebble-beach",
     title: "A restored Shelby at Pebble Beach",
     pillar: "entertainment",
-    forOrg: "[confirm]", // the car owner's name, with permission
+    forOrg: "Jack Bell", // published with attribution on his live site — flag at staging review (COPY.md §4)
     what: "attended with a car owner to cover a restored Shelby",
+    // RESERVED — awaiting operator fact (COPY.md §4). Paid vs unpaid is not
+    // stated anywhere in his published copy; one word from him at staging review
+    // resolves it. This stays "[confirm]" — one of the two production blockers.
     engagement: "[confirm]",
     relationshipId: "pebble-beach",
+    href: "/work/shelby-pebble-beach",
   },
+  // ---------------------------------------------------------------------------
+  // Adventure gallery — the two [confirm]-titled placeholders (alps-expedition,
+  // swiss-expedition) are REPLACED by the ten real selects below (COPY.md §5.2;
+  // MEDIA-GUIDE Worked Example 2 sanctions replacement). All pillar "adventure",
+  // forOrg "Personal / Editorial", engagement "personal / editorial", NO
+  // relationshipId (personal/editorial work is not a licensed Amazing Aerial
+  // credit — attaching that relationship here would overstate the licensing
+  // claim; the Adventure page's Licensed section carries that proof on its own).
+  // Titles are place-names only — no time-of-day or story claims.
+  // ---------------------------------------------------------------------------
   {
-    // No relationshipId: this is personal/editorial work, not a licensed
-    // Amazing Aerial credit — attaching that relationship here would overstate
-    // it (the Ledger's "amazing-aerial" phrasing is specifically a LICENSING
-    // claim, not a blanket credit on all adventure footage). The Adventure
-    // page's Licensed section carries that proof line on its own.
-    slug: "alps-expedition",
-    title: "[confirm] — Italian Alps expedition selects",
+    slug: "flatirons-chautauqua-01",
+    title: "The Flatirons over Chautauqua",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
-    what: "expedition photo & film, Italy",
+    what: "aerial photo, Boulder, Colorado",
     engagement: "personal / editorial",
   },
   {
-    slug: "swiss-expedition",
-    title: "[confirm] — Switzerland expedition selects",
+    slug: "flatirons-chautauqua-03",
+    title: "Chautauqua meadows from the air",
     pillar: "adventure",
     forOrg: "Personal / Editorial",
-    what: "expedition photo & film, Switzerland",
+    what: "aerial photo, Boulder, Colorado",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "eldorado-springs-01",
+    title: "Eldorado Springs canyon",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "aerial photo, Colorado",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "ncar-mesa-01",
+    title: "The NCAR mesa",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "aerial photo, Boulder, Colorado",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "walker-ranch-01",
+    title: "Walker Ranch",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "aerial photo, Boulder County, Colorado",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "crescent-meadows-01",
+    title: "Crescent Meadows",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "aerial photo, Front Range, Colorado",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "matterhorn-zermatt-01",
+    title: "The Matterhorn, from Zermatt",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "gornergrat-glacier-01",
+    title: "Gornergrat glacier panorama",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "lac-de-tseuzier-01",
+    title: "Lac de Tseuzier, Valais",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
+    engagement: "personal / editorial",
+  },
+  {
+    slug: "zermatt-panorama-01",
+    title: "Mountain panorama above Zermatt",
+    pillar: "adventure",
+    forOrg: "Personal / Editorial",
+    what: "expedition photo, Switzerland",
     engagement: "personal / editorial",
   },
 ] as const;
@@ -414,20 +493,34 @@ export type Testimonial = {
 export const TESTIMONIALS: readonly Testimonial[] = [
   {
     id: "pitchboulder",
-    quote: "[confirm]",
-    attribution: "[confirm]",
+    // VERBATIM (COPY.md §2.1) — client-authored (Peter Rothschild); permission inherent.
+    quote:
+      "When we created the website for PitchBoulder, we needed a video to capture the spirit of our meetings and the energy in the room. I hired Sindbad Horizon to create a piece that would address these requirements. Did he ever! The video is sensational, and I could not be more pleased.",
+    attribution: "Peter Rothschild, Founder of PitchBoulder",
     relationshipId: "pitchboulder",
     context: "The primary proof anchor.",
   },
-  {
-    // A coverage endorsement from the car owner — NOT from Pebble Beach.
-    // The Ledger forbids attributing anything to the event itself.
-    id: "pebble-beach-owner",
-    quote: "[confirm]",
-    attribution: "[confirm]",
-    relationshipId: "pebble-beach",
-    context: "A coverage endorsement from the car owner.",
-  },
+  // ---------------------------------------------------------------------------
+  // TESTIMONIALS[1] — Pebble Beach / Jack Bell — RESERVED (COPY.md §2.2).
+  //
+  // Operator instruction: ship this slot reserved; never invent. The
+  // `pebble-beach-owner` entry is therefore REMOVED from the array (and its
+  // `testimonialId` references dropped from the Shelby case + entertainment E4
+  // room) so no [confirm] can block a production build.
+  //
+  // STAGED CANDIDATE — already published on his live site (adventure-media-v2,
+  // Work page, live at the apex today), awaiting operator one-word approval to
+  // activate. Do NOT render this string. To activate: paste it verbatim as a
+  // TESTIMONIALS[1] entry (id "pebble-beach-owner", relationshipId
+  // "pebble-beach") and re-wire `testimonialId` into the Shelby case study and
+  // the entertainment E4 room.
+  //
+  //   "Working with Sindbad Horizon of Adventure Storytelling Media was a great
+  //   experience. He not only captured stunning footage and photographs of the
+  //   Cobra at Pebble Beach, but also brought the story and character of the car
+  //   to life through his editing and creative direction. The results went far
+  //   beyond documentation." — Jack Bell, Owner, 1967 Shelby Cobra 427 S/C
+  // ---------------------------------------------------------------------------
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -484,7 +577,9 @@ export type CaseStudyData = {
   ask: CaseStudySection;
   work: CaseStudySection & { proof: ProofLine };
   outcome: CaseStudySection;
-  testimonialId: string;
+  /** Optional — omitted when a case's testimonial is RESERVED (e.g. Shelby /
+   *  Jack Bell, COPY.md §2.2). CaseStudy.astro guards its render. */
+  testimonialId?: string;
   cta: Cta;
 };
 
@@ -637,9 +732,10 @@ export const PAGES = {
     },
     territory: {
       heading: "The territory",
-      // Honest current footprint: Italy & Switzerland only. "So far" signals
-      // growth without claiming more.
-      body: "So far the work has taken me deepest through the Alps — Italy and Switzerland — shooting on the ground and from the air.",
+      // Authored positioning (COPY.md §5.1), grounded in the photos on the page:
+      // Alps (Italy + Switzerland) + Colorado's Front Range. Widened to cover
+      // the Colorado aerials now in the gallery.
+      body: "The work so far runs deepest through the Alps — Italy and Switzerland — and across Colorado's Front Range at home, shooting on the ground and from the air.",
     },
     // A3 — Licensed vs Personal nesting (Mark Clennon model).
     licensed: {
@@ -700,15 +796,14 @@ export const PAGES = {
       intro: "The rest is honest about itself.",
       items: [
         {
-          // context carries the same framing as TESTIMONIALS["pebble-beach-owner"]
-          // — the single LegendMark on this room states it once (Testimonial's
-          // own proof line is suppressed via showProof={false} to avoid a
-          // back-to-back duplicate; see entertainment.astro E4).
+          // Pebble Beach room. The testimonial (Jack Bell) is RESERVED per
+          // operator (COPY.md §2.2) — the `pebble-beach-owner` testimonial entry
+          // is removed until his one-word approval, so no `testimonialId` here.
+          // The proof line + context still state the relationship once, honestly.
           proof: {
             relationshipId: "pebble-beach",
             context: "A coverage endorsement from the car owner.",
           } as ProofLine,
-          testimonialId: "pebble-beach-owner",
         },
         { proof: { relationshipId: "seriesfest" } as ProofLine },
         { proof: { relationshipId: "afm" } as ProofLine },
@@ -746,11 +841,11 @@ export const PAGES = {
         hook: "The work I do for PitchBoulder, start to finish.",
         context: {
           heading: "Who they are",
-          body: "[confirm]",
+          body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. I've been in that room for nearly three years, across dozens of weekly pitch events, watching the gap between what a founder says and what the room actually hears.",
         },
         ask: {
           heading: "The ask",
-          body: "[confirm]",
+          body: "When PitchBoulder built their website, they needed one video that could stand for three years of weekly founder energy — something an investor or a founder could watch and instantly understand what the room feels like.",
         },
         work: {
           heading: "The work",
@@ -759,9 +854,41 @@ export const PAGES = {
         },
         outcome: {
           heading: "The outcome",
-          body: "[confirm]", // plain honest statement or one real metric — never invented
+          body: "The commercial now runs as PitchBoulder's primary website asset — commissioned directly by Peter, produced end to end. The event coverage and recaps continue week to week.",
         },
         testimonialId: "pitchboulder",
+        cta: { label: "Forge your saga", href: "/forge-the-saga" },
+      },
+      // ---- Shelby / Pebble Beach case study (NEW — COPY.md §4). ------------
+      // Honesty rails: relationship tier = `attended`; the proof line carries
+      // the only status claim; prose never implies an official Pebble Beach
+      // engagement. Testimonial (Jack Bell) is RESERVED per operator (§2.2) —
+      // `testimonialId` omitted (the field is optional on CaseStudyData).
+      shelbyPebbleBeach: {
+        meta: {
+          title: "A restored Shelby at Pebble Beach",
+          description:
+            "Covering a one-of-a-kind 1967 Shelby Cobra 427 S/C at the Concours d'Elegance — a story of legacy and craftsmanship, told on screen.",
+        },
+        hook: "One car, one lawn, and a story worth more than a spec sheet.",
+        context: {
+          heading: "The car",
+          body: "A one-of-a-kind restored 1967 Shelby Cobra 427 S/C, bound for the Concours d'Elegance at Pebble Beach — the most prestigious lawn in the automotive world. Its owner, Jack Bell, had spent years bringing the machine back.",
+        },
+        ask: {
+          heading: "The ask",
+          body: "Jack didn't want documentation. He wanted the car's legacy and craftsmanship to come through on screen — the story of the machine, not a walkaround.",
+        },
+        work: {
+          heading: "The work",
+          proof: { relationshipId: "pebble-beach" } as ProofLine,
+          body: "I shot the Cobra on the lawn, then shaped the footage into a narrative built on emotion and craftsmanship — what the car means, not just what it is.",
+        },
+        outcome: {
+          heading: "The outcome",
+          body: "Jack got a finished cinematic film of his car — the machine's story and character on screen, delivered. It's below; watch it.",
+        },
+        // testimonialId omitted until §2.2 resolves (Jack Bell approval).
         cta: { label: "Forge your saga", href: "/forge-the-saga" },
       },
     },

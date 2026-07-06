@@ -27,13 +27,16 @@ interface Props {
 }
 const { study, base, commercialVideoId } = Astro.props;
 
+// The "Words" chapter only exists when the case supplies a testimonialId — a
+// RESERVED testimonial (Shelby / Jack Bell, COPY.md §2.2) omits it, so the rail
+// must not carry a dead jump-link to a section that isn't rendered.
 const rail = [
   { id: "context", label: "Context" },
   { id: "ask", label: "The Ask" },
   { id: "work", label: "The Work" },
   { id: "outcome", label: "Outcome" },
-  { id: "words", label: "Words" },
-] as const;
+  ...(study.testimonialId ? [{ id: "words", label: "Words" }] : []),
+];
 
 // An honest-outcome slot still awaiting Sindbad's real content renders as a
 // visible pending marker, never as fabricated copy. Keeps the literal
@@ -139,13 +142,19 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     </div>
   </section>
 
-  <!-- 05 · Words — the testimonial -->
-  <section id="words" class="case-chapter" data-chapter>
-    <div class="case-chapter__inner">
-      <p class="hud-label mb-4">05 · Words</p>
-      <Testimonial testimonialId={study.testimonialId} class="panel p-6" />
-    </div>
-  </section>
+  <!-- 05 · Words — the testimonial. Rendered only when the case supplies a
+       testimonialId; a RESERVED testimonial (e.g. Shelby / Jack Bell, COPY.md
+       §2.2) omits the field and the whole chapter, asserting nothing. -->
+  {
+    study.testimonialId && (
+      <section id="words" class="case-chapter" data-chapter>
+        <div class="case-chapter__inner">
+          <p class="hud-label mb-4">05 · Words</p>
+          <Testimonial testimonialId={study.testimonialId} class="panel p-6" />
+        </div>
+      </section>
+    )
+  }
 
   <!-- Single CTA -->
   <section class="case-chapter">
