@@ -1,213 +1,649 @@
 ---
 /**
- * Entertainment — credibility lane, "the industry" (BUILD-PLAN.md §1.4).
- * Standard Contour Survey tokens (no scoped dialect — §3.3 only names Forge
- * and Adventure lane treatments). Every relationship renders through
- * LegendMark; the visible LegendKey makes the tier symbols decodable.
- * Testimonial #2 (the Pebble Beach car-owner quote, OD-5) sits in the rooms
- * list, framed as the owner's endorsement — never Pebble Beach's.
+ * Entertainment — P7 (V1-UPGRADE-PLAN): REBUILT to the irinamoi.com grammar,
+ * Sindbad's chosen reference for this lane. Her grammar, his world:
+ *
+ *   - GIANT single-weight grotesque caps INTERLEAVED with an elegant serif
+ *     italic for the connective words (her FoundersGrotesk × Romie → our
+ *     DM Sans × Fraunces italic — brand faces in the reference's two roles)
+ *   - scattered ghost letterforms that assemble as a section arrives
+ *   - a CONTINUOUS background-color morph between scroll chapters (her
+ *     burgundy→mauve→black→blue ride → our dark cinematic jewel tones)
+ *   - numbered work chapters: serif index corners (01 … /02), mono client
+ *     kicker, giant two-line OFFSET title, serif italic type-tag, and a
+ *     collage of overlapping media cards with slight scroll parallax
+ *   - the playground's scattered-letters + confetti as "The rooms"
+ *
+ * HONESTY (unchanged contract): every sentence is verbatim from consts —
+ * the mixed-face emphasis inside them is presentational only. Every
+ * relationship still renders through LegendMark; LegendKey still decodes
+ * the tiers; the Pebble Beach quote stays the car owner's, never the
+ * Concours'. The pebble-beach proof line moves from the rooms list into
+ * work chapter 02 (same strings, same device, richer stage).
+ *
+ * Fallbacks: no-JS/reduced motion → every section keeps its own static
+ * ground color, letters sit in their final positions, collages render as
+ * plain stacked media. The morph/assembly/parallax are enhancement-only.
  */
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES } from "../consts";
+import { PAGES, WORK } from "../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.entertainment;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// R8 visual lift — reuse the real industry-room photos (published event
-// frames: SeriesFest red carpet + American Film Market panel) already exported
-// for the home tableau. Hero band uses the SeriesFest frame; the "rooms"
-// section break uses the AFM frame. Build-time existence check (cwd-anchored);
-// each band renders only when its image is present. No invented claims — these
-// are honest "attended" event photos matching the page's relationship tiers.
-const indDir = join(process.cwd(), "public", "media", "home", "industry");
-const heroBand = existsSync(join(indDir, "background.avif"))
-  ? { avif: `${base}/media/home/industry/background.avif`, webp: `${base}/media/home/industry/background.webp` }
-  : undefined;
-const roomsBand = existsSync(join(indDir, "midground.avif"))
-  ? { avif: `${base}/media/home/industry/midground.avif`, webp: `${base}/media/home/industry/midground.webp` }
-  : undefined;
+// build-time media gating (cwd-anchored, per repo convention): a card only
+// renders when its file shipped. avif+webp pairs preferred; lone files ride
+// as-is (hook-poster has no webp export; bts frames are webp-only).
+const mediaRoot = join(process.cwd(), "public", "media");
+const media = (rel: string) => (existsSync(join(mediaRoot, ...rel.split("/"))) ? `${base}/media/${rel}` : undefined);
+const pair = (relBase: string) => {
+  const avif = media(`${relBase}.avif`);
+  const webp = media(`${relBase}.webp`);
+  return avif || webp ? { avif, webp } : undefined;
+};
 
-// R3.7 — one floating still beside the E3 panel (>=1024px only): the real
-// PitchBoulder context frame as a small drifting card (amp 0.8).
-const pbDir = join(process.cwd(), "public", "media", "work", "pitchboulder");
-const pbStill = existsSync(join(pbDir, "context.avif"))
-  ? { avif: `${base}/media/work/pitchboulder/context.avif`, webp: `${base}/media/work/pitchboulder/context.webp` }
-  : undefined;
+// chapter 01 — PitchBoulder (E3, the primary proof anchor)
+const pbPoster = pair("work/pitchboulder/hook-poster");
+const pbContext = pair("work/pitchboulder/context");
+// chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room)
+const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
+const shPoster = pair("work/shelby-pebble-beach/poster");
+const shBts1 = media("work/shelby-pebble-beach/bts/f-002.webp");
+const shBts2 = media("work/shelby-pebble-beach/bts/f-007.webp");
+// the rooms — honest published event frames (SeriesFest carpet, AFM panel)
+const roomSeries = pair("home/industry/background");
+const roomAfm = pair("home/industry/midground");
+
+// the pebble-beach proof (with its owner-endorsement context) relocates from
+// the rooms list to chapter 02; the remaining rooms keep the list.
+const pebbleRoom = p.rooms.items.find((r) => r.proof.relationshipId === "pebble-beach");
+const otherRooms = p.rooms.items.filter((r) => r.proof.relationshipId !== "pebble-beach");
+
+// scattered ghost letters are drawn FROM the page's own words (presentational
+// letterforms, not new copy): the hero scatters PULSE, the rooms scatter ROOMS.
+const heroGhost = ["P", "U", "L", "S", "E"];
+const roomsGhost = ["R", "O", "O", "M", "S"];
+
+// chapter ground colors — the reference's jewel-tone ride, our dark family
+const GROUNDS = {
+  intro: "#101020",
+  meme: "#0c2723",
+  ch01: "#191031",
+  ch02: "#261118",
+  rooms: "#10141f",
+  handoff: "#0f1118",
+};
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <!-- E1 — hero image band (R8). The SeriesFest frame sits behind the headline
-       under a legibility scrim; when the image is absent the hero degrades to
-       the plain centered treatment. -->
-  <section class={`filmtv-hero ${heroBand ? "filmtv-hero--banded" : ""}`} data-filmtv-hero>
-    {
-      heroBand && (
-        <picture class="filmtv-hero__bg" aria-hidden="true">
-          <source srcset={heroBand.avif} type="image/avif" />
-          <img src={heroBand.webp} alt="" loading="eager" decoding="async" data-filmtv-hero-img />
-        </picture>
-      )
-    }
-    <!-- R3.7 marquee — cinema letterbox bars that OPEN as you arrive (scaleY
-         1→0 over the first 55vh, scrubbed). display:none <=640px / reduced motion. -->
-    <div class="marquee-bar marquee-bar--top" data-marquee-bar aria-hidden="true"></div>
-    <div class="marquee-bar marquee-bar--btm" data-marquee-bar aria-hidden="true"></div>
-    <div class="filmtv-hero__inner mx-auto max-w-3xl space-y-4 p-8 text-center">
-      <p class="hud-label">{p.hero.eyebrow}</p>
-      <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
-      <p class="text-lg text-ink">{p.hero.subline}</p>
-    </div>
-  </section>
+  <!-- the morphing ground: fixed behind everything; the engine animates its
+       color between chapters. Until the engine mounts (adds .im-live), each
+       section paints its OWN ground — no-JS never sees a wrong color. -->
+  <div class="im-ground" data-im-ground aria-hidden="true" style={`background:${GROUNDS.intro}`}></div>
 
-  <!-- E2 — MEME (the most formal role) -->
-  <section class="mx-auto max-w-3xl space-y-3 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold" data-reveal>{p.meme.heading}</h2>
-    <div class="panel p-5 filmtv-ping-row" data-reveal>
-      <LegendMark proof={p.meme.proof} />
-      <p class="mt-2 text-ink">{p.meme.body}</p>
-    </div>
-  </section>
-
-  <!-- E3 — PitchBoulder feature (primary proof anchor). A floating still drifts
-       beside the panel at >=1024px (R3.7). -->
-  <section class="filmtv-e3 mx-auto max-w-3xl space-y-3 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold" data-reveal>{p.pitchboulder.heading}</h2>
-    <div class="panel space-y-3 p-5" data-reveal>
-      <LegendMark proof={p.pitchboulder.proof} />
-      <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
-      <a href={`${base}${p.pitchboulder.link.href}`} class="link">
-        {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
-      </a>
-    </div>
-    {
-      pbStill && (
-        <figure class="filmtv-float map-inset" data-drift data-drift-amp="0.8" data-rate="8" aria-hidden="true">
-          <picture>
-            <source srcset={pbStill.avif} type="image/avif" />
-            <img src={pbStill.webp} alt="" loading="lazy" decoding="async" />
-          </picture>
-        </figure>
-      )
-    }
-  </section>
-
-  <!-- Visual break (R8) — the American Film Market panel frame as a full-width
-       band between the PitchBoulder feature and the rooms. One visual break per
-       scroll depth; honest published event photo (an attended room). -->
-  {
-    roomsBand && (
-      <div class="filmtv-band" data-filmtv-rooms aria-hidden="true">
-        <picture>
-          <source srcset={roomsBand.avif} type="image/avif" />
-          <img src={roomsBand.webp} alt="" loading="lazy" decoding="async" data-filmtv-rooms-img />
-        </picture>
+  <main class="im" data-im>
+    <!-- ═══ S1 · INTRODUCTION — the typographic collage hero ═══ -->
+    <section class="im-sec im-intro" data-im-section data-ground={GROUNDS.intro} style={`--sec-ground:${GROUNDS.intro}`}>
+      <div class="im-ghosts" aria-hidden="true">
+        {heroGhost.map((ch, i) => <span class="im-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
       </div>
-    )
-  }
+      <p class="hud-label im-kicker" data-reveal>{p.hero.eyebrow}</p>
+      <!-- the LOCKED headline, composed in the reference's two voices:
+           "I keep a pulse on the industry." — caps carry the nouns, the
+           serif italic carries the connective words. Verbatim, re-dressed. -->
+      <h1 class="im-headline" data-reveal>
+        <span class="im-line">I <span class="im-turn">keep a</span> PULSE</span>
+        <span class="im-line im-line--push"><span class="im-turn">on the</span> INDUSTRY.</span>
+      </h1>
+      <p class="im-turn im-intro-sub" data-reveal>{p.hero.subline}</p>
+    </section>
 
-  <!-- E4 — the rooms; testimonial #2 lives here (OD-5), framed as the car
-       owner's endorsement, never attributed to Pebble Beach itself -->
-  <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold" data-reveal>{p.rooms.heading}</h2>
-    <p class="text-ink" data-reveal>{p.rooms.intro}</p>
-    <ul class="space-y-4">
-      {
-        p.rooms.items.map((room) => (
-          <li class="panel space-y-2 p-4 filmtv-ping-row" data-reveal data-reveal-stagger="70">
-            <LegendMark proof={room.proof} />
-            {"testimonialId" in room && room.testimonialId && (
-              <Testimonial testimonialId={room.testimonialId} showProof={false} class="mt-2" />
-            )}
-          </li>
-        ))
-      }
-    </ul>
-    <LegendKey />
-  </section>
+    <!-- ═══ S2 · MEME — the focus statement (her BOLD & THOUGHTFUL slot) ═══ -->
+    <section class="im-sec im-meme" data-im-section data-ground={GROUNDS.meme} style={`--sec-ground:${GROUNDS.meme}`}>
+      <p class="hud-label im-kicker" data-reveal>{p.meme.heading}</p>
+      <!-- meme.body verbatim: "The role I hold most formally in this world." -->
+      <h2 class="im-statement" data-reveal>
+        THE ROLE I HOLD <span class="im-turn">most formally</span> IN THIS WORLD.
+      </h2>
+      <div class="im-proof" data-reveal>
+        <LegendMark proof={p.meme.proof} />
+      </div>
+    </section>
 
-  <!-- E5 — soft handoff -->
-  <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
-    <p class="text-lg italic text-ink">{p.handoff.body}</p>
-    <a href={`${base}${p.handoff.cta.href}`} class="btn">{p.handoff.cta.label}</a>
-  </section>
+    <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══ -->
+    <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch01} style={`--sec-ground:${GROUNDS.ch01}`}>
+      <span class="im-index im-turn" aria-hidden="true">01</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <div class="im-chapter-stage">
+        <div class="im-collage" aria-hidden="true">
+          {
+            pbPoster && (
+              <figure class="im-card im-card--tall" data-im-card data-depth="1.4">
+                <picture>
+                  {pbPoster.avif && <source srcset={pbPoster.avif} type="image/avif" />}
+                  <img src={pbPoster.webp ?? pbPoster.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            pbContext && (
+              <figure class="im-card im-card--wide" data-im-card data-depth="0.7">
+                <picture>
+                  {pbContext.avif && <source srcset={pbContext.avif} type="image/avif" />}
+                  <img src={pbContext.webp ?? pbContext.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+        </div>
+        <div class="im-chapter-type">
+          <!-- heading "PitchBoulder", split at its own seam — her TWIN/MOTION -->
+          <h2 class="im-title" data-reveal>
+            <span class="im-line">PITCH</span>
+            <span class="im-line im-line--push">BOULDER</span>
+          </h2>
+          <p class="im-turn im-tag" data-reveal>{p.pitchboulder.proof.context}</p>
+        </div>
+        <div class="im-chapter-meta" data-reveal>
+          <LegendMark proof={p.pitchboulder.proof} />
+          <div class="im-quote">
+            <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
+          </div>
+          <a href={`${base}${p.pitchboulder.link.href}`} class="link">
+            {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch02} style={`--sec-ground:${GROUNDS.ch02}`}>
+      <span class="im-index im-turn" aria-hidden="true">02</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <div class="im-chapter-stage">
+        <div class="im-collage" aria-hidden="true">
+          {
+            shPoster && (
+              <figure class="im-card im-card--wide" data-im-card data-depth="1.2">
+                <picture>
+                  {shPoster.avif && <source srcset={shPoster.avif} type="image/avif" />}
+                  <img src={shPoster.webp ?? shPoster.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {shBts1 && (
+            <figure class="im-card im-card--tall" data-im-card data-depth="0.6">
+              <img src={shBts1} alt="" loading="lazy" decoding="async" />
+            </figure>
+          )}
+          {shBts2 && (
+            <figure class="im-card im-card--small" data-im-card data-depth="1.8">
+              <img src={shBts2} alt="" loading="lazy" decoding="async" />
+            </figure>
+          )}
+        </div>
+        <div class="im-chapter-type">
+          <!-- the WORK item's title verbatim, giant word carried by the caps:
+               "A restored Shelby at Pebble Beach" -->
+          <h2 class="im-title" data-reveal>
+            <span class="im-line"><span class="im-turn">A restored</span> SHELBY</span>
+            <span class="im-line im-line--push"><span class="im-turn">at</span> PEBBLE BEACH</span>
+          </h2>
+          {pebbleRoom && <p class="im-turn im-tag" data-reveal>{pebbleRoom.proof.context}</p>}
+        </div>
+        <div class="im-chapter-meta" data-reveal>
+          {pebbleRoom && <LegendMark proof={pebbleRoom.proof} />}
+          {
+            shelby?.href && (
+              <a href={`${base}${shelby.href}`} class="link">
+                {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ S4 · THE ROOMS — her playground, his honest list ═══ -->
+    <section class="im-sec im-rooms" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
+      <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
+        {roomsGhost.map((ch, i) => <span class="im-ghost im-ghost--room" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
+        <span class="im-confetti" data-im-confetti style="--ci:0"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:1"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:2"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:3"></span>
+      </div>
+      <p class="hud-label im-kicker" data-reveal>{p.rooms.heading}</p>
+      <p class="im-turn im-rooms-intro" data-reveal>{p.rooms.intro}</p>
+      <div class="im-rooms-stage">
+        <ul class="im-rooms-list">
+          {
+            otherRooms.map((room) => (
+              <li class="im-room" data-reveal data-reveal-stagger="80">
+                <LegendMark proof={room.proof} />
+              </li>
+            ))
+          }
+        </ul>
+        <div class="im-rooms-photos" aria-hidden="true">
+          {
+            roomSeries && (
+              <figure class="im-card im-card--wide" data-im-card data-depth="0.8">
+                <picture>
+                  {roomSeries.avif && <source srcset={roomSeries.avif} type="image/avif" />}
+                  <img src={roomSeries.webp ?? roomSeries.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            roomAfm && (
+              <figure class="im-card im-card--small" data-im-card data-depth="1.5">
+                <picture>
+                  {roomAfm.avif && <source srcset={roomAfm.avif} type="image/avif" />}
+                  <img src={roomAfm.webp ?? roomAfm.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+        </div>
+      </div>
+      <div class="im-key" data-reveal><LegendKey /></div>
+    </section>
+
+    <!-- ═══ S5 · HANDOFF — one soft exit, back to base ground ═══ -->
+    <section class="im-sec im-handoff" data-im-section data-ground={GROUNDS.handoff} style={`--sec-ground:${GROUNDS.handoff}`}>
+      <p class="im-turn im-handoff-line" data-reveal>{p.handoff.body}</p>
+      <a href={`${base}${p.handoff.cta.href}`} class="btn" data-reveal>{p.handoff.cta.label}</a>
+    </section>
+  </main>
 </Base>
 
+<style>
+  /* ── the morphing ground ── */
+  .im-ground {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    transition: none; /* GSAP owns the morph; CSS must not fight it */
+  }
+  .im-sec {
+    position: relative;
+    background: var(--sec-ground); /* static fallback ground per section */
+    overflow: clip;
+  }
+  /* once the engine is live, sections go clear and the fixed ground shows
+     through — the color RIDES between chapters instead of cutting */
+  :global(html.js) .im-live .im-sec {
+    background: transparent;
+  }
+
+  /* ── the two reference voices, our faces ── */
+  .im-headline,
+  .im-statement,
+  .im-title {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.96;
+    letter-spacing: 0.008em;
+    color: #f2f4f8;
+  }
+  .im-turn {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #eef1f6;
+  }
+  .im-kicker {
+    letter-spacing: 0.3em;
+    color: color-mix(in srgb, #e8f6f3 78%, transparent);
+  }
+
+  /* ── S1 intro ── */
+  .im-intro {
+    min-height: 92svh;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 1.6rem;
+    padding: 7rem 2rem 6rem;
+    text-align: center;
+  }
+  .im-headline {
+    font-size: clamp(3rem, 9.5vw, 9.5rem);
+    display: grid;
+    gap: 0.05em;
+  }
+  .im-headline .im-turn,
+  .im-title .im-turn {
+    font-size: 0.42em;
+    vertical-align: 0.22em;
+    margin-inline: 0.12em;
+  }
+  .im-line {
+    display: block;
+  }
+  .im-line--push {
+    transform: translateX(6vw);
+  }
+  .im-intro-sub {
+    max-width: 34rem;
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    line-height: 1.45;
+    justify-self: end;
+    text-align: right;
+    margin-top: 1.5rem;
+  }
+  /* ghost letters: final resting places are set here (no-JS = already home);
+     the engine only ADDS the scatter-and-assemble journey */
+  .im-ghosts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .im-ghost {
+    position: absolute;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: clamp(6rem, 16vw, 15rem);
+    color: color-mix(in srgb, #ffffff 7%, transparent);
+    line-height: 1;
+  }
+  .im-ghost:nth-child(1) { left: 6%; top: 14%; }
+  .im-ghost:nth-child(2) { left: 26%; top: 62%; }
+  .im-ghost:nth-child(3) { left: 48%; top: 8%; }
+  .im-ghost:nth-child(4) { left: 68%; top: 58%; }
+  .im-ghost:nth-child(5) { left: 86%; top: 22%; }
+
+  /* ── S2 meme ── */
+  .im-meme {
+    min-height: 70svh;
+    display: grid;
+    align-content: center;
+    gap: 1.6rem;
+    padding: 7rem clamp(2rem, 8vw, 9rem);
+  }
+  .im-statement {
+    font-size: clamp(2.2rem, 6vw, 5.4rem);
+    max-width: 18ch;
+  }
+  .im-statement .im-turn {
+    font-size: 0.62em;
+  }
+  .im-proof {
+    max-width: 40rem;
+  }
+
+  /* ── S3 chapters ── */
+  .im-chapter {
+    min-height: 130svh;
+    padding: 10rem clamp(1.5rem, 6vw, 7rem);
+  }
+  .im-index {
+    position: sticky;
+    top: 5.5rem;
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    float: left;
+    color: color-mix(in srgb, #ffffff 85%, transparent);
+  }
+  .im-index--of {
+    float: right;
+    top: 70vh;
+  }
+  .im-chapter-stage {
+    position: relative;
+    max-width: 78rem;
+    margin-inline: auto;
+    min-height: 90svh;
+    display: grid;
+    align-content: center;
+  }
+  .im-collage {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .im-card {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 24px 80px -24px rgba(0, 0, 0, 0.55);
+  }
+  .im-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .im-card--tall { width: clamp(160px, 22vw, 320px); aspect-ratio: 9 / 14; left: 4%; top: 6%; }
+  .im-card--wide { width: clamp(240px, 34vw, 520px); aspect-ratio: 16 / 10; right: 2%; top: 14%; }
+  .im-card--small { width: clamp(130px, 16vw, 240px); aspect-ratio: 4 / 3; left: 18%; bottom: 4%; }
+  .im-chapter-type {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  .im-title {
+    font-size: clamp(2.6rem, 8vw, 8rem);
+    display: grid;
+    gap: 0.04em;
+  }
+  .im-tag {
+    margin-top: 0.8rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    text-align: right;
+    margin-inline: auto;
+    max-width: 60rem;
+    padding-right: clamp(0rem, 6vw, 5rem);
+  }
+  .im-chapter-meta {
+    position: relative;
+    z-index: 2;
+    margin-top: 3.5rem;
+    max-width: 34rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .im-quote {
+    font-style: italic;
+  }
+
+  /* ── S4 rooms ── */
+  .im-rooms {
+    min-height: 100svh;
+    padding: 9rem clamp(2rem, 7vw, 8rem);
+    display: grid;
+    align-content: center;
+    gap: 1.6rem;
+  }
+  .im-ghost--room {
+    font-size: clamp(4.5rem, 11vw, 10rem);
+    color: color-mix(in srgb, #ffffff 6%, transparent);
+  }
+  .im-ghosts--rooms .im-ghost:nth-child(1) { left: 8%; top: 10%; }
+  .im-ghosts--rooms .im-ghost:nth-child(2) { left: 30%; top: 20%; }
+  .im-ghosts--rooms .im-ghost:nth-child(3) { left: 52%; top: 8%; }
+  .im-ghosts--rooms .im-ghost:nth-child(4) { left: 70%; top: 18%; }
+  .im-ghosts--rooms .im-ghost:nth-child(5) { left: 86%; top: 10%; }
+  .im-confetti {
+    position: absolute;
+    width: clamp(34px, 4vw, 64px);
+    aspect-ratio: 1;
+    background: var(--color-accent, #38f8ec);
+    opacity: 0.14;
+    border-radius: 4px;
+  }
+  .im-confetti:nth-of-type(1) { left: 14%; top: 40%; }
+  .im-confetti:nth-of-type(2) { left: 44%; top: 34%; background: #0da79b; }
+  .im-confetti:nth-of-type(3) { left: 66%; top: 44%; background: #8fb7d8; }
+  .im-confetti:nth-of-type(4) { left: 88%; top: 36%; }
+  .im-rooms-intro {
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+  }
+  .im-rooms-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: start;
+    margin-top: 1.5rem;
+  }
+  .im-rooms-list {
+    display: grid;
+    gap: 1.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .im-room {
+    border-top: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    padding-top: 1.1rem;
+  }
+  .im-rooms-photos {
+    position: relative;
+    min-height: 380px;
+  }
+  .im-rooms-photos .im-card--wide { width: 100%; right: 0; top: 0; position: absolute; }
+  .im-rooms-photos .im-card--small { left: -6%; bottom: -8%; }
+  .im-key {
+    margin-top: 2rem;
+  }
+
+  /* ── S5 handoff ── */
+  .im-handoff {
+    min-height: 60svh;
+    display: grid;
+    place-content: center;
+    gap: 2rem;
+    text-align: center;
+    padding: 6rem 2rem;
+  }
+  .im-handoff-line {
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    max-width: 30ch;
+  }
+
+  /* ── small screens: collages stack, pushes relax ── */
+  @media (max-width: 760px) {
+    .im-line--push { transform: none; }
+    .im-intro-sub { justify-self: center; text-align: center; }
+    .im-collage { position: relative; inset: auto; display: grid; gap: 0.8rem; grid-template-columns: 1fr 1fr; margin-bottom: 2rem; pointer-events: auto; }
+    .im-card, .im-rooms-photos .im-card--wide { position: relative; inset: auto; width: 100%; }
+    .im-chapter { min-height: 0; padding-top: 6rem; }
+    .im-chapter-stage { min-height: 0; }
+    .im-rooms-stage { grid-template-columns: 1fr; }
+    .im-rooms-photos { min-height: 0; display: grid; gap: 0.8rem; }
+    .im-ghost { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .im-ghost,
+    .im-confetti,
+    .im-card {
+      transform: none !important;
+    }
+  }
+</style>
+
 <script>
-  // R3.7 — Film & TV signature: the marquee. Progressive enhancement; reduced
-  // motion / no-JS → bars absent (CSS display:none), bands static, all visible.
+  // P7 enhancement layer: ground morph, ghost assembly, collage parallax.
+  // Everything below only ADDS motion to an already-correct static page.
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { ensureSmoothScroll } from "../lib/smooth-scroll";
 
   async function init() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (window.matchMedia("(max-width: 640px)").matches) {
-      // mobile: no marquee/parallax; drift self-gates. Still mount reveals via
-      // the global engine (already handles data-reveal). Nothing else here.
-      return;
-    }
+    const im = document.querySelector<HTMLElement>("[data-im]");
+    const ground = document.querySelector<HTMLElement>("[data-im-ground]");
+    if (!im || !ground) return;
+
     gsap.registerPlugin(ScrollTrigger);
     const lenis = await ensureSmoothScroll();
     if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
 
-    const hero = document.querySelector<HTMLElement>("[data-filmtv-hero]");
-    const heroImg = document.querySelector<HTMLElement>("[data-filmtv-hero-img]");
-    const bars = document.querySelectorAll<HTMLElement>("[data-marquee-bar]");
-
-    // The marquee open — letterbox bars scaleY 1→0 over the first 55vh of scroll
-    // (scrubbed → reverses naturally), while the hero image scales 1.06→1.
-    if (hero && bars.length) {
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: hero, start: "top top", end: "+=55%", scrub: true },
+    // ── the ground morph: sections hand their color to the fixed layer as
+    // they enter (0.8s ride, the reference's signature). .im-live flips the
+    // sections transparent only now — if this script never runs, the static
+    // per-section grounds were already correct. ──
+    im.classList.add("im-live");
+    document.querySelectorAll<HTMLElement>("[data-im-section]").forEach((sec) => {
+      const color = sec.dataset.ground!;
+      ScrollTrigger.create({
+        trigger: sec,
+        start: "top 55%",
+        end: "bottom 55%",
+        onEnter: () => gsap.to(ground, { backgroundColor: color, duration: 0.8, ease: "power2.out" }),
+        onEnterBack: () => gsap.to(ground, { backgroundColor: color, duration: 0.8, ease: "power2.out" }),
       });
-      tl.fromTo(bars, { scaleY: 1 }, { scaleY: 0, ease: "none" }, 0);
-      if (heroImg) tl.fromTo(heroImg, { scale: 1.06 }, { scale: 1, ease: "none" }, 0);
-    }
+    });
 
-    // Band parallax — hero bg + rooms band images drift yPercent ±6 over their
-    // own viewport transit; base scale 1.08 overscan (set in CSS) hides edges.
-    const bandImg = (sel: string) => document.querySelector<HTMLElement>(sel);
-    const heroBg = bandImg("[data-filmtv-hero-img]");
-    const roomsImg = bandImg("[data-filmtv-rooms-img]");
-    [heroBg, roomsImg].forEach((img) => {
-      if (!img) return;
-      const band = img.closest("section, [data-filmtv-rooms]") as HTMLElement | null;
-      if (!band) return;
+    // ── ghost letters: scatter-in assembly on their section's arrival, then
+    // a slow idle float (living at rest). Final positions live in CSS. ──
+    document.querySelectorAll<HTMLElement>("[data-im-ghost]").forEach((g, i) => {
+      const dx = (i % 2 ? 1 : -1) * (40 + (i % 3) * 30);
       gsap.fromTo(
-        img,
-        { yPercent: 6 },
+        g,
+        { x: dx, y: 60 + (i % 3) * 30, opacity: 0, rotation: (i % 2 ? 1 : -1) * 6 },
         {
-          yPercent: -6,
-          ease: "none",
-          scrollTrigger: { trigger: band, start: "top bottom", end: "bottom top", scrub: true },
+          x: 0,
+          y: 0,
+          opacity: 1,
+          rotation: 0,
+          duration: 1.1,
+          ease: "power3.out",
+          delay: i * 0.07,
+          scrollTrigger: { trigger: g.parentElement, start: "top 75%", once: true },
+          onComplete: () => {
+            gsap.to(g, {
+              y: (i % 2 ? -1 : 1) * 10,
+              duration: 5 + (i % 3) * 1.5,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          },
         },
       );
     });
 
-    // Rooms band clip reveal — inset(12% 6%) → inset(0) over its own transit.
-    const roomsBand = document.querySelector<HTMLElement>("[data-filmtv-rooms]");
-    if (roomsBand) {
-      gsap.fromTo(
-        roomsBand,
-        { clipPath: "inset(12% 6%)" },
-        {
-          clipPath: "inset(0% 0%)",
-          ease: "none",
-          scrollTrigger: { trigger: roomsBand, start: "top 90%", end: "top 35%", scrub: true },
-        },
-      );
-    }
+    // ── confetti drift (the playground's shapes, kept quiet) ──
+    document.querySelectorAll<HTMLElement>("[data-im-confetti]").forEach((c, i) => {
+      gsap.to(c, {
+        y: (i % 2 ? -1 : 1) * 18,
+        rotation: (i % 2 ? 1 : -1) * 14,
+        duration: 6 + i * 1.3,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    });
 
-    // Drift on the E3 floating still (>=1024px; the engine self-gates too).
-    const mountAmbient = () =>
-      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
-    if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
-    else setTimeout(mountAmbient, 1500);
+    // ── collage parallax: cards ride at different depths across their
+    // chapter's transit (her overlapping-cards feel, transform-only) ──
+    if (!window.matchMedia("(max-width: 760px)").matches) {
+      document.querySelectorAll<HTMLElement>("[data-im-card]").forEach((card) => {
+        const depth = Number(card.dataset.depth ?? 1);
+        const sec = card.closest("[data-im-section]");
+        if (!sec) return;
+        gsap.fromTo(
+          card,
+          { yPercent: 8 * depth },
+          {
+            yPercent: -8 * depth,
+            ease: "none",
+            scrollTrigger: { trigger: sec, start: "top bottom", end: "bottom top", scrub: true },
+          },
+        );
+      });
+    }
   }
   void init();
 </script>
