@@ -37,7 +37,7 @@ interface Props {
   driftAmp?: number;
 }
 const { chapter, index, base, nodeId, shots, driftAmp = 1.0 } = Astro.props;
-const no = String(index + 1).padStart(2, "0");
+const no = String(index + 1).padStart(3, "0"); // ASCENT V2: 001-003 (Gate is 000)
 const ampAttr = String(driftAmp);
 ---
 
@@ -53,7 +53,7 @@ const ampAttr = String(driftAmp);
          its own data-rate. Order back→front so nearer shots sit above. -->
     {
       shots.valley && (
-        <figure class="float float--valley" data-float data-rate="6" data-drift data-drift-amp={ampAttr}>
+        <figure class="float float--valley" data-chip="VALLEY" data-float data-rate="6" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.valley.avif} type="image/avif" />
             <img src={shots.valley.webp} alt="" loading="lazy" decoding="async" />
@@ -63,7 +63,7 @@ const ampAttr = String(driftAmp);
     }
     {
       shots.loop ? (
-        <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
+        <figure class="float float--loop" data-chip="LIVE · FIELD LOOP" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
           <video
             class="float-loop"
             data-cluster-loop-video
@@ -80,7 +80,7 @@ const ampAttr = String(driftAmp);
         </figure>
       ) : (
         shots.lake && (
-          <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
+          <figure class="float float--loop" data-chip="LAKE" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
             <picture>
               <source srcset={shots.lake.avif} type="image/avif" />
               <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />
@@ -91,7 +91,7 @@ const ampAttr = String(driftAmp);
     }
     {
       shots.peak && (
-        <figure class="float float--peak" data-float data-rate="13" data-drift data-drift-amp={ampAttr}>
+        <figure class="float float--peak" data-chip="PEAK" data-float data-rate="13" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.peak.avif} type="image/avif" />
             <img src={shots.peak.webp} alt="" loading="lazy" decoding="async" />
@@ -101,7 +101,7 @@ const ampAttr = String(driftAmp);
     }
     {
       shots.ridge && (
-        <figure class="float float--ridge" data-float data-rate="16" data-drift data-drift-amp={ampAttr}>
+        <figure class="float float--ridge" data-chip="RIDGE" data-float data-rate="16" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.ridge.avif} type="image/avif" />
             <img src={shots.ridge.webp} alt="" loading="lazy" decoding="async" />
@@ -112,7 +112,7 @@ const ampAttr = String(driftAmp);
     {
       /* the lake as a small extra near-shot when the loop occupies its slot */
       shots.loop && shots.lake && (
-        <figure class="float float--lake" data-float data-rate="19" data-drift data-drift-amp={ampAttr}>
+        <figure class="float float--lake" data-chip="LAKE" data-float data-rate="19" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.lake.avif} type="image/avif" />
             <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />
@@ -124,7 +124,7 @@ const ampAttr = String(driftAmp);
     <!-- Copy column — never parallaxes; sits on a small local backdrop for
          legibility (not a full-frame scrim). -->
     <div class="cluster-content tableau-content" data-tableau-content>
-      <p class="hud-label">{no} · {chapter.terrain}</p>
+      <p class="hud-label ch-no" data-decode>{no} · {chapter.terrain.toUpperCase()}</p>
       <h2 class="cluster-headline tableau-headline" data-tableau-headline>{chapter.headline}</h2>
       <div class="tableau-reveal">
         <p class="mx-auto max-w-md text-lg text-ink">{chapter.body}</p>

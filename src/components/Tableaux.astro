@@ -20,7 +20,22 @@ import TableauCluster from "./TableauCluster.astro";
 import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// SITE ROOT that is correct in BOTH modes (the v2 dev-server lesson):
+//   - `astro build` runs with cwd = package root, but import.meta.url points
+//     into dist/.prerender/chunks (bundled) -> cwd is right, url is wrong.
+//   - `astro dev` may be launched with a DIFFERENT cwd (editor tooling,
+//     preview harnesses), but import.meta.url is the real src file -> url is
+//     right, cwd may be wrong.
+// So: prefer whichever candidate actually contains public/media.
+const CANDIDATE_ROOTS = [
+  process.cwd(),
+  resolve(dirname(fileURLToPath(import.meta.url)), "..", ".."),
+];
+const SITE_ROOT =
+  CANDIDATE_ROOTS.find((r) => existsSync(join(r, "public", "media"))) ?? process.cwd();
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
@@ -31,14 +46,14 @@ const chapters = PAGES.home.tableaux;
 // a chapter clusters when its public/media/home/<slug>/cluster/ has >=2 shots.
 // Build-time check (frontmatter runs server-side), anchored to cwd.
 function clusterShot(slug: string, id: string) {
-  const dir = join(process.cwd(), "public", "media", "home", slug, "cluster");
+  const dir = join(SITE_ROOT, "public", "media", "home", slug, "cluster");
   const has = existsSync(join(dir, `${id}.avif`)) && existsSync(join(dir, `${id}.webp`));
   return has
     ? { avif: `${base}/media/home/${slug}/cluster/${id}.avif`, webp: `${base}/media/home/${slug}/cluster/${id}.webp` }
     : undefined;
 }
 function clusterShotsFor(slug: string) {
-  const wildDir = join(process.cwd(), "public", "media", "home", "wild");
+  const wildDir = join(SITE_ROOT, "public", "media", "home", "wild");
   const hasLoop =
     slug === "wild" &&
     existsSync(join(wildDir, "matterhorn-loop.mp4")) &&
@@ -78,7 +93,7 @@ const terrainSlug = (terrain: string) => terrain.toLowerCase().replace(/^the\s+/
 const LAYER_NAMES = ["background", "midground", "foreground"] as const;
 function findLayerImages(terrain: string): (TableauImage | null)[] {
   const slug = terrain.toLowerCase().replace(/^the\s+/, "");
-  const dir = join(process.cwd(), "public", "media", "home", slug);
+  const dir = join(SITE_ROOT, "public", "media", "home", slug);
   return LAYER_NAMES.map((name) => {
     const hasAvif = existsSync(join(dir, `${name}.avif`));
     const hasWebp = existsSync(join(dir, `${name}.webp`));

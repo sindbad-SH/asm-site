@@ -167,6 +167,10 @@ const jsonLd = {
       // reduced motion. Scroll-animation islands share this same instance.
       import { ensureSmoothScroll } from "../lib/smooth-scroll";
       void ensureSmoothScroll();
+      // Ascent grammar (V2): [data-decode] survey-telemetry text resolve.
+      // Static text is always present; this only churns it briefly on reveal.
+      import { mountDecode } from "../lib/decode-text";
+      mountDecode();
     </script>
   </body>
 </html>
