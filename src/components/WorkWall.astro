@@ -217,13 +217,30 @@ const isAdventureLane = pillar === "adventure";
           );
         };
 
+        // Sequence token: rapid re-filtering invalidates in-flight animations
+        // and their backstops (only the latest change may land state).
+        let seq = 0;
         select.addEventListener("change", () => {
           const filter = select.value;
+          const mySeq = ++seq;
+          let landed = false;
+          // WALL-CLOCK BACKSTOP (site discipline): GSAP's ticker rides rAF,
+          // which hidden/throttled tabs freeze — without this, the class
+          // toggle at the end of the fade-through would simply never happen
+          // there. Timers still fire, so the filter STATE always lands.
+          const land = () => {
+            if (landed || mySeq !== seq) return;
+            landed = true;
+            gsap.killTweensOf(tiles);
+            gsap.set(tiles, { clearProps: "opacity,transform" });
+            applyFilter(filter);
+            reflowDistortion();
+          };
+          setTimeout(land, (D_OUT + D_IN) * 1000 + 400);
 
           // Reduced motion (or no GSAP): snap — filter + reflow, no animation.
           if (reduce) {
-            applyFilter(filter);
-            reflowDistortion();
+            land();
             return;
           }
 
@@ -235,6 +252,7 @@ const isAdventureLane = pillar === "adventure";
             duration: D_OUT,
             ease: EASE_SWIFT,
             onComplete: () => {
+              if (landed || mySeq !== seq) return;
               // 2 · re-flow while the wall is invisible — survivors jump to their
               //     new slots with zero on-screen motion, so no edge can clip.
               applyFilter(filter);
@@ -247,7 +265,11 @@ const isAdventureLane = pillar === "adventure";
                 duration: D_IN,
                 ease: EASE_SURVEY,
                 clearProps: "opacity,transform",
-                onComplete: reflowDistortion,
+                onComplete: () => {
+                  if (mySeq !== seq) return;
+                  landed = true;
+                  reflowDistortion();
+                },
               });
             },
           });
