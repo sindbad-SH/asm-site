@@ -31,21 +31,32 @@ const heroBand = existsSync(join(indDir, "background.avif"))
 const roomsBand = existsSync(join(indDir, "midground.avif"))
   ? { avif: `${base}/media/home/industry/midground.avif`, webp: `${base}/media/home/industry/midground.webp` }
   : undefined;
+
+// R3.7 — one floating still beside the E3 panel (>=1024px only): the real
+// PitchBoulder context frame as a small drifting card (amp 0.8).
+const pbDir = join(process.cwd(), "public", "media", "work", "pitchboulder");
+const pbStill = existsSync(join(pbDir, "context.avif"))
+  ? { avif: `${base}/media/work/pitchboulder/context.avif`, webp: `${base}/media/work/pitchboulder/context.webp` }
+  : undefined;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
   <!-- E1 — hero image band (R8). The SeriesFest frame sits behind the headline
        under a legibility scrim; when the image is absent the hero degrades to
        the plain centered treatment. -->
-  <section class={`filmtv-hero ${heroBand ? "filmtv-hero--banded" : ""}`}>
+  <section class={`filmtv-hero ${heroBand ? "filmtv-hero--banded" : ""}`} data-filmtv-hero>
     {
       heroBand && (
         <picture class="filmtv-hero__bg" aria-hidden="true">
           <source srcset={heroBand.avif} type="image/avif" />
-          <img src={heroBand.webp} alt="" loading="eager" decoding="async" />
+          <img src={heroBand.webp} alt="" loading="eager" decoding="async" data-filmtv-hero-img />
         </picture>
       )
     }
+    <!-- R3.7 marquee — cinema letterbox bars that OPEN as you arrive (scaleY
+         1→0 over the first 55vh, scrubbed). display:none <=640px / reduced motion. -->
+    <div class="marquee-bar marquee-bar--top" data-marquee-bar aria-hidden="true"></div>
+    <div class="marquee-bar marquee-bar--btm" data-marquee-bar aria-hidden="true"></div>
     <div class="filmtv-hero__inner mx-auto max-w-3xl space-y-4 p-8 text-center">
       <p class="hud-label">{p.hero.eyebrow}</p>
       <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
@@ -55,23 +66,34 @@ const roomsBand = existsSync(join(indDir, "midground.avif"))
 
   <!-- E2 — MEME (the most formal role) -->
   <section class="mx-auto max-w-3xl space-y-3 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold">{p.meme.heading}</h2>
-    <div class="panel p-5">
+    <h2 class="text-2xl font-bold" data-reveal>{p.meme.heading}</h2>
+    <div class="panel p-5 filmtv-ping-row" data-reveal>
       <LegendMark proof={p.meme.proof} />
       <p class="mt-2 text-ink">{p.meme.body}</p>
     </div>
   </section>
 
-  <!-- E3 — PitchBoulder feature (primary proof anchor) -->
-  <section class="mx-auto max-w-3xl space-y-3 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold">{p.pitchboulder.heading}</h2>
-    <div class="panel space-y-3 p-5">
+  <!-- E3 — PitchBoulder feature (primary proof anchor). A floating still drifts
+       beside the panel at >=1024px (R3.7). -->
+  <section class="filmtv-e3 mx-auto max-w-3xl space-y-3 border-t border-hairline p-8">
+    <h2 class="text-2xl font-bold" data-reveal>{p.pitchboulder.heading}</h2>
+    <div class="panel space-y-3 p-5" data-reveal>
       <LegendMark proof={p.pitchboulder.proof} />
       <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
       <a href={`${base}${p.pitchboulder.link.href}`} class="link">
         {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
       </a>
     </div>
+    {
+      pbStill && (
+        <figure class="filmtv-float map-inset" data-drift data-drift-amp="0.8" data-rate="8" aria-hidden="true">
+          <picture>
+            <source srcset={pbStill.avif} type="image/avif" />
+            <img src={pbStill.webp} alt="" loading="lazy" decoding="async" />
+          </picture>
+        </figure>
+      )
+    }
   </section>
 
   <!-- Visual break (R8) — the American Film Market panel frame as a full-width
@@ -79,10 +101,10 @@ const roomsBand = existsSync(join(indDir, "midground.avif"))
        scroll depth; honest published event photo (an attended room). -->
   {
     roomsBand && (
-      <div class="filmtv-band" aria-hidden="true">
+      <div class="filmtv-band" data-filmtv-rooms aria-hidden="true">
         <picture>
           <source srcset={roomsBand.avif} type="image/avif" />
-          <img src={roomsBand.webp} alt="" loading="lazy" decoding="async" />
+          <img src={roomsBand.webp} alt="" loading="lazy" decoding="async" data-filmtv-rooms-img />
         </picture>
       </div>
     )
@@ -91,12 +113,12 @@ const roomsBand = existsSync(join(indDir, "midground.avif"))
   <!-- E4 — the rooms; testimonial #2 lives here (OD-5), framed as the car
        owner's endorsement, never attributed to Pebble Beach itself -->
   <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-8">
-    <h2 class="text-2xl font-bold">{p.rooms.heading}</h2>
-    <p class="text-ink">{p.rooms.intro}</p>
+    <h2 class="text-2xl font-bold" data-reveal>{p.rooms.heading}</h2>
+    <p class="text-ink" data-reveal>{p.rooms.intro}</p>
     <ul class="space-y-4">
       {
         p.rooms.items.map((room) => (
-          <li class="panel space-y-2 p-4">
+          <li class="panel space-y-2 p-4 filmtv-ping-row" data-reveal data-reveal-stagger="70">
             <LegendMark proof={room.proof} />
             {"testimonialId" in room && room.testimonialId && (
               <Testimonial testimonialId={room.testimonialId} showProof={false} class="mt-2" />
@@ -114,3 +136,78 @@ const roomsBand = existsSync(join(indDir, "midground.avif"))
     <a href={`${base}${p.handoff.cta.href}`} class="btn">{p.handoff.cta.label}</a>
   </section>
 </Base>
+
+<script>
+  // R3.7 — Film & TV signature: the marquee. Progressive enhancement; reduced
+  // motion / no-JS → bars absent (CSS display:none), bands static, all visible.
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { ensureSmoothScroll } from "../lib/smooth-scroll";
+
+  async function init() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      // mobile: no marquee/parallax; drift self-gates. Still mount reveals via
+      // the global engine (already handles data-reveal). Nothing else here.
+      return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+    const lenis = await ensureSmoothScroll();
+    if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
+
+    const hero = document.querySelector<HTMLElement>("[data-filmtv-hero]");
+    const heroImg = document.querySelector<HTMLElement>("[data-filmtv-hero-img]");
+    const bars = document.querySelectorAll<HTMLElement>("[data-marquee-bar]");
+
+    // The marquee open — letterbox bars scaleY 1→0 over the first 55vh of scroll
+    // (scrubbed → reverses naturally), while the hero image scales 1.06→1.
+    if (hero && bars.length) {
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: hero, start: "top top", end: "+=55%", scrub: true },
+      });
+      tl.fromTo(bars, { scaleY: 1 }, { scaleY: 0, ease: "none" }, 0);
+      if (heroImg) tl.fromTo(heroImg, { scale: 1.06 }, { scale: 1, ease: "none" }, 0);
+    }
+
+    // Band parallax — hero bg + rooms band images drift yPercent ±6 over their
+    // own viewport transit; base scale 1.08 overscan (set in CSS) hides edges.
+    const bandImg = (sel: string) => document.querySelector<HTMLElement>(sel);
+    const heroBg = bandImg("[data-filmtv-hero-img]");
+    const roomsImg = bandImg("[data-filmtv-rooms-img]");
+    [heroBg, roomsImg].forEach((img) => {
+      if (!img) return;
+      const band = img.closest("section, [data-filmtv-rooms]") as HTMLElement | null;
+      if (!band) return;
+      gsap.fromTo(
+        img,
+        { yPercent: 6 },
+        {
+          yPercent: -6,
+          ease: "none",
+          scrollTrigger: { trigger: band, start: "top bottom", end: "bottom top", scrub: true },
+        },
+      );
+    });
+
+    // Rooms band clip reveal — inset(12% 6%) → inset(0) over its own transit.
+    const roomsBand = document.querySelector<HTMLElement>("[data-filmtv-rooms]");
+    if (roomsBand) {
+      gsap.fromTo(
+        roomsBand,
+        { clipPath: "inset(12% 6%)" },
+        {
+          clipPath: "inset(0% 0%)",
+          ease: "none",
+          scrollTrigger: { trigger: roomsBand, start: "top 90%", end: "top 35%", scrub: true },
+        },
+      );
+    }
+
+    // Drift on the E3 floating still (>=1024px; the engine self-gates too).
+    const mountAmbient = () =>
+      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
+    if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
+    else setTimeout(mountAmbient, 1500);
+  }
+  void init();
+</script>

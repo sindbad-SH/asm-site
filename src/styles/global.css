@@ -1629,6 +1629,64 @@
     position: relative;
     z-index: 2;
   }
+  /* R3.7 — marquee letterbox bars over the hero. scaleY 1→0 scrubbed as you
+     arrive (JS). display:none <=640px / reduced motion (bars simply absent). */
+  .marquee-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 18%;
+    background: var(--color-base);
+    z-index: 1;
+    transform-origin: top;
+    will-change: transform;
+  }
+  .marquee-bar--top {
+    top: 0;
+  }
+  .marquee-bar--btm {
+    bottom: 0;
+    transform-origin: bottom;
+  }
+  @media (max-width: 640px), (prefers-reduced-motion: reduce) {
+    .marquee-bar {
+      display: none;
+    }
+  }
+  /* base overscan on the hero image so parallax never exposes an edge (R3.7) */
+  .filmtv-hero__bg img {
+    transform: scale(1.08);
+  }
+
+  /* R3.7 — one floating still beside the E3 panel (>=1024px only). */
+  .filmtv-e3 {
+    position: relative;
+  }
+  .filmtv-float {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .filmtv-float {
+      display: block;
+      position: absolute;
+      top: 3.5rem;
+      right: -1rem;
+      width: clamp(200px, 18vw, 280px);
+      z-index: 2;
+      will-change: transform;
+    }
+    .filmtv-float img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+    }
+  }
+  /* legend-symbol ping on arrival (R3.7 — same device as home H4, one grammar) */
+  html.js .filmtv-ping-row[data-reveal].is-revealed .legend-mark .symbol::after {
+    animation: survey-ping 1200ms var(--ease-swift) 1;
+  }
+
   /* Full-width visual break band between chapters. */
   .filmtv-band {
     position: relative;
@@ -1643,6 +1701,7 @@
     max-height: 42vh;
     object-fit: cover;
     object-position: center 40%;
+    transform: scale(1.08); /* R3.7 overscan for band parallax */
   }
 
   /* ── Field note (R3.4) — a first-person location story on the gallery card,
