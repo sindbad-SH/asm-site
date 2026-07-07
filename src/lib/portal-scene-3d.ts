@@ -61,8 +61,12 @@ export interface PortalSceneController {
 const MEDIA_ASPECT = 16 / 9;
 const CAM_Z = 10;
 const VIEW_H = 8; // world units of viewport height at z=0
-const OVERSCAN = 1.03; // plane cover margin so camera sway never shows edges
-// (every point of overscan is extra magnification of the source — keep minimal)
+// P1.4 — overscan is nearly gone: it zooms the GL scene relative to the DOM
+// still and the portal-window layer (both plain cover), and that mismatch
+// reads as the scene "changing shape" during the intro cross-fades. 1.5%
+// covers most camera sway; the rare extreme deflection costs a ~1% clamped-
+// edge smear in dark sky instead of a permanent zoom mismatch.
+const OVERSCAN = 1.015;
 
 /* seeded PRNG (same shape as PortalHero's build-time stars) so the particle
    field is stable run-to-run — QA screenshots stay diffable */

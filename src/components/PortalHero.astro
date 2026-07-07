@@ -55,9 +55,28 @@
  * live composite is one code path and works at every aspect.
  */
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// P1.4 — CACHE-BUSTED media URLs. public/ assets keep their filenames across
+// re-exports, so a returning browser can hold the OLD poster while the GL
+// tier shows the NEW one — during the intro the two copies alternate through
+// the mask/void layers and the scene visibly "changes mountains" mid-reveal
+// (Sindbad's round-4 report). Versioning by file mtime makes every layer pull
+// the same, current bytes; the suffix changes automatically whenever
+// scripts/make-portal-loop.mjs re-exports. cwd-anchored like all build-time
+// media checks (see Tableaux.astro).
+import { statSync } from "node:fs";
+import { join } from "node:path";
+const homeMedia = join(process.cwd(), "public", "media", "home");
+const v = (file: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(homeMedia, file)).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
 const scene = {
-  avif: `${base}/media/home/portal-scene.avif`,
-  webp: `${base}/media/home/portal-scene.webp`,
+  avif: `${base}/media/home/portal-scene.avif${v("portal-scene.avif")}`,
+  webp: `${base}/media/home/portal-scene.webp${v("portal-scene.webp")}`,
 };
 const mark = `${base}/logo-mark.png`;
 
@@ -93,7 +112,13 @@ const stars = Array.from({ length: 34 }, () => {
 });
 ---
 
-<section class="portal" data-portal data-mark-src={mark} data-loop-src={`${base}/media/home/portal-loop.mp4`} data-depth-src={`${base}/media/home/portal-depth.png`}>
+<section
+  class="portal"
+  data-portal
+  data-mark-src={mark}
+  data-loop-src={`${base}/media/home/portal-loop.mp4${v("portal-loop.mp4")}`}
+  data-depth-src={`${base}/media/home/portal-depth.png${v("portal-depth.png")}`}
+>
   <div class="portal-stage">
     <!-- 1 · the living world (still + ambient overlays; scales as one group) -->
     <div class="portal-world" data-portal-world>
@@ -263,14 +288,24 @@ const stars = Array.from({ length: 34 }, () => {
       const wIn = seg(p, 0.15, 0.35);
       const wOut = 1 - seg(p, 0.85, 1);
       windowEl.style.opacity = String(Math.min(wIn, wOut));
-      const size = S0 + (SF - S0) * seg(p, 0.2, 1);
+      // P1.4 — the window now carries the settle transform (below), which
+      // would scale its logo-shaped mask off the solid mark; divide the mask
+      // size by the settle scale so the visual mask stays exactly as designed
+      const settleScale = 1.08 - 0.08 * p;
+      const size = (S0 + (SF - S0) * seg(p, 0.2, 1)) / settleScale;
       windowEl.style.setProperty("-webkit-mask-size", `${size}px`);
       windowEl.style.setProperty("mask-size", `${size}px`);
       // the void dissolve = the true reveal
       voidEl.style.opacity = String(1 - seg(p, 0.45, 0.95));
       // the world (still + living overlays) settles as it rises through, and on
       // scroll-out RECEDES by exitY (§4.3) — composed into the one transform.
-      worldEl.style.transform = `translateY(${exitY}%) scale(${1.08 - 0.08 * p})`;
+      // P1.4 — the portal-window layer moves in LOCKSTEP: it shows a second
+      // copy of the scene, and any zoom difference between the copies reads
+      // as the mountain "changing shape" mid-reveal (round-4 report). One
+      // settle, applied to both layers, so the cross-fades are pixel-true.
+      const settle = `translateY(${exitY}%) scale(${settleScale})`;
+      worldEl.style.transform = settle;
+      windowEl.style.transform = settle;
       // R3.6a §4.2 — content arrival fires once the scene is essentially open
       // (add-only; the 4s watchdog's .portal-forced covers engine failure).
       if (p > 0.55) root.classList.add("portal-arrived");
