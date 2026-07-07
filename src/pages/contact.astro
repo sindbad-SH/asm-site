@@ -12,17 +12,44 @@ import { PAGES, SITE } from "../consts";
 
 const p = PAGES.contact;
 const formReady = SITE.formEndpoint !== "[confirm]";
+
+// Socials row (SITE.socials) — the quiet camp keeps every real link together
+// (email, Calendly, socials) with generous air, mono labels throughout.
+const socials = Object.entries(SITE.socials).map(([key, href]) => ({
+  label: key.charAt(0).toUpperCase() + key.slice(1),
+  href,
+}));
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <section class="mx-auto max-w-xl space-y-6 p-8">
-    <h1 class="text-3xl font-bold">{p.headline}</h1>
-    <p>{p.body}</p>
+  <section class="mx-auto max-w-xl space-y-7 p-8 pt-16 text-center sm:pt-24">
+    <p class="hud-label ch-no" data-decode data-reveal>THE QUIET CAMP</p>
+    <h1 class="text-4xl font-bold sm:text-6xl" data-reveal>{p.headline}</h1>
+    <p class="mx-auto max-w-md text-lg text-ink" data-reveal>{p.body}</p>
 
     <!-- Primary action (DIRECTION §2.9 / COPY.md §9): booking = the primary CTA;
          the brand contract's only sanctioned CTA label. Opens Calendly. -->
-    <div class="pt-1">
+    <div class="pt-2" data-reveal>
       <a href={SITE.bookACall} class="btn" rel="noopener">Book a Strategy Call</a>
+    </div>
+
+    <!-- Email + socials — quiet, mono, generous air. -->
+    <div class="space-y-2 pt-4" data-reveal>
+      <p class="hud-label">Or reach me directly</p>
+      <a href={`mailto:${p.email}`} class="link text-base">{p.email}</a>
+      {
+        socials.length > 0 && (
+          <ul class="flex flex-wrap justify-center gap-x-5 gap-y-1.5 pt-1">
+            {socials.map((s) => (
+              <li>
+                <a href={s.href} class="link" rel="noopener">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </div>
 
     <!-- The form remains present but visually secondary; it stays inert until
@@ -30,7 +57,7 @@ const formReady = SITE.formEndpoint !== "[confirm]";
          designed behavior). While inert, an honest pending marker names the
          reserved endpoint (this is the "formEndpoint-driven form state" the
          production gate is expected to catch — BUILD-ORDERS Task 10/11). -->
-    <div class="space-y-4 border-t border-hairline pt-6">
+    <div class="space-y-4 border-t border-hairline pb-16 pt-10 text-left sm:pb-24">
       <p class="hud-label normal-case text-ink-muted">Or send a note</p>
 
       {
@@ -57,18 +84,6 @@ const formReady = SITE.formEndpoint !== "[confirm]";
       </div>
       <button type="submit" disabled={!formReady} class="btn-quiet border border-hairline px-4 py-2">Send</button>
     </form>
-
-      {
-        /* Inert-form email line (COPY.md §9) — shown ONLY while the form is
-           inert (formReady === false). Remove-once-live is automatic: the line
-           disappears the moment SITE.formEndpoint resolves. */
-        !formReady && (
-          <p class="text-sm text-ink-muted">
-            Prefer email? <a href={`mailto:${p.email}`} class="link">{p.email}</a> — or book a call
-            above.
-          </p>
-        )
-      }
     </div>
   </section>
 </Base>

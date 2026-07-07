@@ -14,13 +14,16 @@ import { SITE } from "../consts";
   title="Privacy"
   description="What this site does and doesn't collect. Short version: almost nothing."
 >
-  <section class="mx-auto max-w-2xl space-y-6 p-8">
-    <h1 class="text-3xl font-bold">Privacy</h1>
-    <p class="text-ink">
-      Short version: this site collects almost nothing, and I'd like to keep it that way.
-    </p>
+  <section class="mx-auto max-w-2xl space-y-8 p-8 pb-20 pt-16 sm:pt-20">
+    <div class="space-y-4">
+      <p class="hud-label ch-no" data-decode data-reveal>THE FINE PRINT</p>
+      <h1 class="text-3xl font-bold sm:text-4xl" data-reveal>Privacy</h1>
+      <p class="text-ink" data-reveal>
+        Short version: this site collects almost nothing, and I'd like to keep it that way.
+      </p>
+    </div>
 
-    <div class="space-y-2">
+    <div class="space-y-2 border-t border-hairline pt-6">
       <h2 class="text-xl font-bold">Analytics & cookies</h2>
       <p class="text-ink">
         {
@@ -31,7 +34,7 @@ import { SITE } from "../consts";
       </p>
     </div>
 
-    <div class="space-y-2">
+    <div class="space-y-2 border-t border-hairline pt-6">
       <h2 class="text-xl font-bold">Embedded video</h2>
       <p class="text-ink">
         Where the site embeds a video from YouTube, nothing is loaded from YouTube — and no
@@ -41,7 +44,7 @@ import { SITE } from "../consts";
       </p>
     </div>
 
-    <div class="space-y-2">
+    <div class="space-y-2 border-t border-hairline pt-6">
       <h2 class="text-xl font-bold">Contact</h2>
       <p class="text-ink">
         If you email me, I have your email — that's it, and I use it to reply. The contact form,
@@ -50,7 +53,7 @@ import { SITE } from "../consts";
       </p>
     </div>
 
-    <div class="space-y-2">
+    <div class="space-y-2 border-t border-hairline pt-6">
       <h2 class="text-xl font-bold">Hosting</h2>
       <p class="text-ink">
         This site is a static site served by GitHub Pages. Like any web host, GitHub may keep
@@ -59,7 +62,7 @@ import { SITE } from "../consts";
       </p>
     </div>
 
-    <p class="text-sm text-ink-muted">
+    <p class="text-sm text-ink-muted border-t border-hairline pt-6">
       Questions? <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
     </p>
   </section>

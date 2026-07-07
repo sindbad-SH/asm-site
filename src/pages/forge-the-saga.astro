@@ -45,17 +45,21 @@ function parsePrice(price: string) {
          Orange is SANCTIONED in the forge lane; CSS-only, compositor (opacity). -->
     <div class="forge-ember" aria-hidden="true"></div>
 
-    <!-- F1 — belief hero. Headline reveals via masked-line rise (splitLines). -->
-    <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
-      <h1 class="text-4xl font-bold sm:text-6xl" data-forge-h1>{p.hero.headline}</h1>
+    <!-- F1 — belief hero. Telemetry eyebrow (Ascent camp grammar) + headline at
+         the Ascent scale, generous air. Headline reveals via masked-line rise
+         (splitLines). -->
+    <section class="mx-auto max-w-3xl space-y-7 p-8 pt-16 text-center sm:pt-24">
+      <p class="hud-label ch-no" data-decode data-reveal>THE FORGE</p>
+      <h1 class="tableau-headline mx-auto" data-forge-h1>{p.hero.headline}</h1>
       <p class="mx-auto max-w-xl text-lg text-ink" data-reveal>{p.hero.subline}</p>
       <a href={`${base}${p.hero.cta.href}`} class="btn" data-reveal>{p.hero.cta.label}</a>
     </section>
 
     <!-- F2 — who it's for -->
-    <section class="mx-auto max-w-3xl space-y-5 border-t border-hairline p-8">
-      <h2 class="text-2xl font-bold">{p.whoFor.heading}</h2>
-      <p class="text-ink">{p.whoFor.body}</p>
+    <section class="mx-auto max-w-3xl space-y-5 border-t border-hairline p-10 sm:p-16">
+      <p class="hud-label ch-no" data-decode data-reveal>01 · WHO IT'S FOR</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.whoFor.heading}</h2>
+      <p class="text-ink" data-reveal>{p.whoFor.body}</p>
       <ul class="grid gap-3 sm:grid-cols-3">
         {
           p.whoFor.items.map((item) => (
@@ -66,10 +70,11 @@ function parsePrice(price: string) {
     </section>
 
     <!-- F3 — the five stages: horizontal temper-line stepper -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-      <h2 class="text-2xl font-bold">{p.stages.heading}</h2>
-      <p class="text-ink">{p.stages.body}</p>
-      <p class="hud-label text-accent-deep">{p.stages.anchor}</p>
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-10 sm:p-16">
+      <p class="hud-label ch-no" data-decode data-reveal>02 · THE FIVE STAGES</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.stages.heading}</h2>
+      <p class="text-ink" data-reveal>{p.stages.body}</p>
+      <p class="hud-label text-accent-deep" data-reveal>{p.stages.anchor}</p>
 
       <div class="temper mt-4" data-temper>
         <!-- track: hidden until JS + wide viewport enable the stepper -->
@@ -140,8 +145,9 @@ function parsePrice(price: string) {
     -->
 
     <!-- F5 — proof: PitchBoulder case + delivered-work cards (honest labels) -->
-    <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-8">
-      <h2 class="text-2xl font-bold">{p.proof.heading}</h2>
+    <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-10 sm:p-16">
+      <p class="hud-label ch-no" data-decode data-reveal>03 · PROOF</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.proof.heading}</h2>
       <Testimonial testimonialId={p.proof.testimonialId} class="panel p-5" />
       <div class="grid gap-5 sm:grid-cols-2">
         {
@@ -162,16 +168,17 @@ function parsePrice(price: string) {
     </section>
 
     <!-- F6 — pricing (OD-4: exact "from $X"; per-stage figures live in F3) -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-      <h2 class="text-2xl font-bold">{p.pricing.heading}</h2>
-      <p class="text-lg text-ink">{p.pricing.body}</p>
-      <p class="text-sm text-ink-muted">{p.pricing.note}</p>
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-10 sm:p-16">
+      <p class="hud-label ch-no" data-decode data-reveal>04 · PRICING</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.pricing.heading}</h2>
+      <p class="text-lg text-ink" data-reveal>{p.pricing.body}</p>
+      <p class="text-sm text-ink-muted" data-reveal>{p.pricing.note}</p>
     </section>
 
     <!-- F7 — CTA -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
-      <h2 class="text-2xl font-bold">{p.cta.headline}</h2>
-      <p class="mx-auto max-w-xl text-ink">{p.cta.body}</p>
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-10 pb-24 text-center sm:p-16 sm:pb-28">
+      <h2 class="text-3xl font-bold" data-reveal>{p.cta.headline}</h2>
+      <p class="mx-auto max-w-xl text-ink" data-reveal>{p.cta.body}</p>
       <a href={`${base}${p.cta.cta.href}`} class="btn">{p.cta.cta.label}</a>
     </section>
   </div>
@@ -192,6 +199,13 @@ function parsePrice(price: string) {
 
   // R3.8 — F1 headline masked-line reveal (splitLines util). Runs regardless of
   // the stepper; reduced motion / no-JS show the plain heading (CSS-gated).
+  // V-4: same 4s watchdog as Tableaux.astro — .tableau-headline is hidden under
+  // html.js until .is-split lands; if the async chunk 404s or throws, force it
+  // visible so the hero headline can never stay invisible.
+  setTimeout(() => {
+    const h1 = document.querySelector<HTMLElement>("[data-forge-h1]");
+    if (h1 && !h1.classList.contains("is-split")) h1.classList.add("is-split");
+  }, 4000);
   (async () => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const h1 = document.querySelector<HTMLElement>("[data-forge-h1]");

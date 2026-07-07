@@ -17,12 +17,13 @@ const links = [
 ---
 
 <Base title="404 — off the map">
-  <section class="mx-auto max-w-2xl space-y-6 p-8 text-center">
-    <h1 class="text-3xl font-bold sm:text-5xl">This trail doesn't exist.</h1>
-    <p class="text-lg text-ink">
+  <section class="mx-auto max-w-2xl space-y-7 p-8 py-24 text-center sm:py-32">
+    <p class="hud-label ch-no" data-decode data-reveal>OFF THE MAPPED TRAIL</p>
+    <h1 class="text-3xl font-bold sm:text-5xl" data-reveal>This trail doesn't exist.</h1>
+    <p class="text-lg text-ink" data-reveal>
       The page you're after isn't on the map. Here's where the real ones are.
     </p>
-    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-2">
+    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-2" data-reveal>
       {
         links.map((l) => (
           <li>

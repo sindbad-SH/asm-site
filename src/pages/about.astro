@@ -25,14 +25,18 @@ const personalSocials = [
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <section class="mx-auto max-w-3xl space-y-6 p-8">
+  <section class="mx-auto max-w-3xl space-y-7 p-8 pt-16 text-center sm:pt-24">
+    <p class="hud-label ch-no" data-decode data-reveal>BASE CAMP · THE STORYSMITH</p>
+
     <!-- The develop (R3.10 §3.5): on reveal the portrait goes grayscale→none
          over 900ms (a darkroom develop — the one sanctioned filter animation);
          the frame then drifts at amp 0.5 (barely alive). data-reveal + data-develop
-         share .is-revealed; reduced motion forces the filter off and shows it. -->
+         share .is-revealed; reduced motion forces the filter off and shows it.
+         Ascent camp treatment (V-4): clip-corner .float chrome + a PORTRAIT
+         HUD chip, replacing the plain map-inset frame. -->
     <figure
-      class="map-inset about-portrait mx-auto max-w-sm"
-      style="overflow:clip"
+      class="float about-portrait about-portrait-frame mx-auto max-w-sm"
+      data-chip="PORTRAIT"
       data-reveal
       data-develop
       data-drift
@@ -52,21 +56,21 @@ const personalSocials = [
         />
       </picture>
     </figure>
-    <div class="text-center">
-      <h1 class="text-3xl font-bold">
+    <div>
+      <h1 class="mx-auto max-w-2xl text-3xl font-bold sm:text-5xl" data-reveal>
         {p.bio.name} — {p.bio.persona}
       </h1>
-      <p class="hud-label mt-1">{p.bio.location}</p>
+      <p class="hud-label mt-3" data-reveal>{p.bio.location}</p>
     </div>
 
-    <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink">
+    <div class="mx-auto max-w-2xl space-y-5 pt-4 text-left text-lg text-ink">
       {p.narrative.map((paragraph) => <p data-reveal data-reveal-stagger="90">{paragraph}</p>)}
     </div>
 
     <!-- Personal socials row (COPY.md §6 / DIRECTION §2.8) — "Find me in the
          field": Sindbad's personal channels. Text links, Space Mono label,
          styled like the existing label rows (no new component archetype). -->
-    <div class="mx-auto max-w-2xl space-y-2 border-t border-hairline pt-6">
+    <div class="mx-auto max-w-2xl space-y-2 border-t border-hairline pt-6 text-left">
       <p class="hud-label">FIND ME IN THE FIELD</p>
       <p class="text-ink">The business lives here. I live on these:</p>
       <ul class="flex flex-wrap gap-x-5 gap-y-1.5 pt-1">
@@ -86,7 +90,10 @@ const personalSocials = [
   <!-- Legend-key explainer close: the honesty device stated as trust, backed
        by the real, visible key — not just a claim. On reveal the LegendKey
        symbols ping in sequence (R3.10 §3.5, 100ms apart, once). -->
-  <section class="about-legend mx-auto max-w-2xl space-y-4 border-t border-hairline p-8 text-center" data-about-legend>
+  <section
+    class="about-legend mx-auto max-w-2xl space-y-4 border-t border-hairline p-10 pb-24 text-center sm:p-16 sm:pb-28"
+    data-about-legend
+  >
     <p class="text-lg italic text-ink" data-reveal>{p.legendLine}</p>
     <div class="flex justify-center" data-reveal>
       <LegendKey />

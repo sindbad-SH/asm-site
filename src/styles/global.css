@@ -685,6 +685,21 @@
     color: var(--color-peak);
   }
 
+  /* Ascent camp treatment (V-4): each stage panel reads as a clip-cornered
+     instrument card — same top-right corner cut as .float, but a static block
+     (not absolutely positioned) and quieter (hairline outline only, no HUD
+     chip — the existing hud-label + marker above already state the stage). */
+  [data-lane="forge"] .temper-panel {
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+    padding: 1.75rem 1.5rem;
+    outline: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
+    background: color-mix(in srgb, var(--color-elevated) 55%, transparent);
+  }
+  [data-lane="forge"] .temper:not([data-interactive="true"]) .temper-panel + .temper-panel {
+    margin-top: 1.25rem;
+    border-top: none; /* superseded by the card outline above */
+  }
+
   /* ── AA funnel card logo + Ledger phrasing (R3.2b) ── */
   .aa-funnel-logo {
     height: 44px;
@@ -1883,6 +1898,15 @@
   }
   .about-portrait {
     will-change: transform;
+  }
+  /* Ascent camp treatment (V-4): the portrait rides in a static clip-corner
+     .float frame (PORTRAIT chip) instead of the plain map-inset box. .float's
+     base rules assume an absolutely-positioned cluster shot; this override
+     puts it back in normal flow at a fixed max width. */
+  .about-portrait-frame.float {
+    position: static;
+    width: 100%;
+    z-index: auto;
   }
   /* one-shot survey-ping on an About LegendKey symbol (JS adds .ping-once) */
   .legend-key li > span.ping-once {
