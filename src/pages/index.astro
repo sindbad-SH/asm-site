@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
-import PortalHero from "../components/PortalHero.astro";
+import AscentGate from "../components/AscentGate.astro";
 import Tableaux from "../components/Tableaux.astro";
 import TrailJourney from "../components/TrailJourney.astro";
 import { COPY, PAGES, SAGA_STAGES } from "../consts";
@@ -14,20 +14,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 <Base title={p.meta.title} description={p.meta.description}>
   <!-- Ambient "you-are-here" survey trail (§3.3) — fixed behind content,
-       threads the three pillar sections. Desktop-only, degrades to static. -->
+       threads the three pillar sections. Desktop-only, degrades to static.
+       (V-2 replaces this with the Ascent chapter rail.) -->
   <TrailJourney />
 
-  <!-- H1 — the Portal Hero (§9.2): the mark as a window, A→B→A. Content
-       paints first (LCP) over the void; the dissolve-through plays behind it
-       and reverses on scroll-out as the handoff into the tableaux. -->
-  <PortalHero>
-    <p class="hud-label" data-portal-arrive style="--arrive-delay:0ms">{COPY.hero.kicker}</p>
-    <h1 class="text-4xl font-bold sm:text-6xl" data-portal-arrive style="--arrive-delay:90ms">{COPY.hero.headline}</h1>
-    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:180ms">{COPY.hero.subline}</p>
-    <a href={`${base}/forge-the-saga`} class="btn" data-portal-arrive style="--arrive-delay:270ms">
-      {COPY.paths[0].label}
-    </a>
-  </PortalHero>
+  <!-- V2 §2 — THE GATE + AT ALTITUDE: pass through the mark into the living
+       world; the wordmark engraves behind the peak. (V-1) -->
+  <AscentGate />
 
   <!-- H2 — signpost band (R3.6c): each path gets a Space Mono index, a hairline
        separator, and a hover state where the arrow drifts 6px + the label goes
