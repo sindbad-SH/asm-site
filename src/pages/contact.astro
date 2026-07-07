@@ -1,11 +1,23 @@
 ---
 /**
- * Form structure only. The live endpoint (SITE.formEndpoint) is [confirm] —
- * wiring it to a real service is a separate Phase 3 task (BUILD-PLAN.md §6.3
- * "Contact page + live form wiring"). Until then the form has no `action`,
- * so it can't silently POST to a placeholder URL. Field styling is the
- * system voice (§3 component library): elevated ground, hairline border,
- * mono labels, accent focus ring.
+ * /contact — P10 (V1-UPGRADE-PLAN): rebuilt to the Disal Consulting contact
+ * grammar (disalconsulting.com/en/contatti), the operator's chosen reference.
+ * Their page is the same split two-tone as their services page — so this
+ * page shares the P9 dialect (survey cobalt on dark stone), which keeps the
+ * consulting funnel (forge → contact) speaking one language:
+ *
+ *   - SPLIT SCREEN: left cobalt panel carries the big two-line question
+ *     heading + the MINIMAL FLAT FORM (their translucent field rows);
+ *     right stone panel carries the primary action (their WORK WITH US
+ *     slot → his Book a Strategy Call) + the email, with a quiet contour
+ *     line drawing through (the continuous-line motif).
+ *
+ * UNCHANGED CONTRACTS: the form stays INERT until SITE.formEndpoint
+ * resolves (it's [confirm] — no action attribute, disabled submit, honest
+ * pending marker + email fallback, exactly the prior page's behavior; the
+ * production gate still catches the placeholder). Booking stays the only
+ * sanctioned CTA label. All copy verbatim from consts; the location
+ * decode eyebrow is kept.
  */
 import Base from "../layouts/Base.astro";
 import { PAGES, SITE } from "../consts";
@@ -15,80 +27,254 @@ const formReady = SITE.formEndpoint !== "[confirm]";
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <section class="mx-auto max-w-xl space-y-6 p-8">
-    {
-      /* P5 — mono eyebrow + DECODE, same grammar as /about's location line.
-         No new copy: SITE.location is the existing hud-label string the
-         Footer already renders site-wide, reused here as the top-section
-         kicker (seasoning, not surgery — the page structure is untouched).
-         data-reveal + data-tableau-content: same wiring as about.astro, so
-         decode fires off the site-wide reveal engine, no new JS needed. */
-    }
-    <p class="hud-label" data-reveal data-tableau-content>
-      <span data-decode>{SITE.location}</span>
-    </p>
-    <h1 class="text-3xl font-bold">{p.headline}</h1>
-    <p>{p.body}</p>
+  <main class="ct">
+    <section class="ct-split">
+      <!-- ── left · the question + the form (their cobalt panel) ── -->
+      <div class="ct-panel">
+        <p class="hud-label ct-kicker" data-reveal data-tableau-content>
+          <span data-decode>{SITE.location}</span>
+        </p>
+        <h1 class="ct-headline" data-reveal>{p.headline}</h1>
+        <p class="ct-body" data-reveal>{p.body}</p>
 
-    <!-- Primary action (DIRECTION §2.9 / COPY.md §9): booking = the primary CTA;
-         the brand contract's only sanctioned CTA label. Opens Calendly. -->
-    <div class="pt-1">
-      <a href={SITE.bookACall} class="btn" rel="noopener">Book a Strategy Call</a>
-    </div>
-
-    <!-- The form remains present but visually secondary; it stays inert until
-         SITE.formEndpoint resolves (operator task — the form's existing
-         designed behavior). While inert, an honest pending marker names the
-         reserved endpoint (this is the "formEndpoint-driven form state" the
-         production gate is expected to catch — BUILD-ORDERS Task 10/11). -->
-    <div class="space-y-4 border-t border-hairline pt-6">
-      <p class="hud-label normal-case text-ink-muted">Or send a note</p>
-
-      {
-        !formReady && (
-          <p class="hud-label border border-dashed border-current/30 bg-current/5 p-3 normal-case text-ink-muted">
-            The form is inert until its endpoint is wired ({SITE.formEndpoint}). Use the booking
-            button or email below in the meantime.
-          </p>
-        )
-      }
-
-    <form method="post" action={formReady ? SITE.formEndpoint : undefined} class="space-y-4">
-      <div>
-        <label for="name" class="field">Name</label>
-        <input id="name" name="name" type="text" required class="field-input" />
+        <div class="ct-form-wrap" data-reveal>
+          <p class="hud-label ct-form-label">Or send a note</p>
+          {
+            !formReady && (
+              <p class="ct-inert">
+                The form is inert until its endpoint is wired ({SITE.formEndpoint}). Use the booking
+                button or email in the meantime.
+              </p>
+            )
+          }
+          <form method="post" action={formReady ? SITE.formEndpoint : undefined} class="ct-form">
+            <div class="ct-field">
+              <label for="name" class="sr-only">Name</label>
+              <input id="name" name="name" type="text" required placeholder="Name" />
+            </div>
+            <div class="ct-field">
+              <label for="email" class="sr-only">Email</label>
+              <input id="email" name="email" type="email" required placeholder="Email" />
+            </div>
+            <div class="ct-field">
+              <label for="message" class="sr-only">What are you building?</label>
+              <textarea id="message" name="message" required rows="4" placeholder="What are you building?" />
+            </div>
+            <button type="submit" disabled={!formReady} class="ct-pill ct-pill--form">Send</button>
+          </form>
+          {
+            !formReady && (
+              <p class="ct-mail-line">
+                Prefer email? <a href={`mailto:${p.email}`} class="link">{p.email}</a> — or book a call.
+              </p>
+            )
+          }
+        </div>
       </div>
-      <div>
-        <label for="email" class="field">Email</label>
-        <input id="email" name="email" type="email" required class="field-input" />
-      </div>
-      <div>
-        <label for="message" class="field">What are you building?</label>
-        <textarea id="message" name="message" required rows="5" class="field-input" />
-      </div>
-      <button type="submit" disabled={!formReady} class="btn-quiet border border-hairline px-4 py-2">Send</button>
-    </form>
 
-      {
-        /* Inert-form email line (COPY.md §9) — shown ONLY while the form is
-           inert (formReady === false). Remove-once-live is automatic: the line
-           disappears the moment SITE.formEndpoint resolves. */
-        !formReady && (
-          <p class="text-sm text-ink-muted">
-            Prefer email? <a href={`mailto:${p.email}`} class="link">{p.email}</a> — or book a call
-            above.
-          </p>
-        )
-      }
-    </div>
-  </section>
+      <!-- ── right · the primary action (their paper panel, our stone) ── -->
+      <div class="ct-canvas">
+        <svg class="ct-lines" viewBox="0 0 900 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
+          <path
+            data-ct-line
+            d="M-40,620 L90,540 L200,590 L330,500 L450,560 L580,470 L700,540 L820,490 L940,550"
+            stroke="var(--color-accent, #38f8ec)"
+            stroke-opacity="0.35"
+            stroke-width="1.6"
+            stroke-linecap="round"></path>
+        </svg>
+        <div class="ct-action" data-reveal>
+          <a href={SITE.bookACall} class="ct-pill" rel="noopener">Book a Strategy Call</a>
+          <a href={`mailto:${p.email}`} class="ct-mail">{p.email}</a>
+        </div>
+      </div>
+    </section>
+  </main>
 </Base>
 
+<style>
+  .ct {
+    --ct-cobalt: #14406b; /* shared with the P9 forge dialect */
+    --ct-stone: #191a17;
+  }
+  .ct-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    min-height: 88svh;
+  }
+  .ct-panel {
+    background: var(--ct-cobalt);
+    padding: clamp(2.5rem, 6vw, 6rem);
+    display: grid;
+    align-content: center;
+    gap: 1.2rem;
+  }
+  .ct-kicker {
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, #e8f3f6 75%, transparent);
+  }
+  .ct-headline {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+    line-height: 1.08;
+    color: #f4f7fa;
+    max-width: 14ch;
+  }
+  .ct-body {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.35vw, 1.18rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, #f4f7fa 86%, transparent);
+    max-width: 46ch;
+  }
+
+  /* the minimal flat form — their translucent field rows */
+  .ct-form-wrap {
+    margin-top: 1.6rem;
+    display: grid;
+    gap: 0.9rem;
+    max-width: 34rem;
+  }
+  .ct-form-label {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #e8f3f6 62%, transparent);
+  }
+  .ct-inert {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #e8f3f6 68%, transparent);
+    border: 1px dashed color-mix(in srgb, #e8f3f6 30%, transparent);
+    border-radius: 6px;
+    padding: 0.8rem 0.9rem;
+  }
+  .ct-form {
+    display: grid;
+    gap: 0.7rem;
+  }
+  .ct-field input,
+  .ct-field textarea {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+    color: #f4f7fa;
+    background: color-mix(in srgb, #ffffff 9%, transparent);
+    border: none;
+    border-radius: 6px;
+    padding: 0.95rem 1.05rem;
+    resize: vertical;
+  }
+  .ct-field input::placeholder,
+  .ct-field textarea::placeholder {
+    color: color-mix(in srgb, #eef4f7 55%, transparent);
+  }
+  .ct-field input:focus-visible,
+  .ct-field textarea:focus-visible {
+    outline: 2px solid var(--color-accent, #38f8ec);
+    outline-offset: 1px;
+  }
+  .ct-pill {
+    display: inline-block;
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #071018;
+    background: var(--color-accent, #38f8ec);
+    border-radius: 999px;
+    padding: 0.85rem 1.7rem;
+    transition:
+      transform 240ms var(--ease-swift, ease-out),
+      opacity 240ms var(--ease-swift, ease-out);
+  }
+  .ct-pill:hover {
+    transform: translateY(-2px);
+  }
+  .ct-pill--form:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .ct-mail-line {
+    font-size: 0.92rem;
+    color: color-mix(in srgb, #f4f7fa 72%, transparent);
+  }
+
+  /* the action canvas — stone, contour line, one big move */
+  .ct-canvas {
+    position: relative;
+    background: var(--ct-stone);
+    display: grid;
+    place-content: center;
+    overflow: clip;
+  }
+  .ct-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .ct-action {
+    position: relative;
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+    text-align: center;
+    padding: 3rem 2rem;
+  }
+  .ct-action .ct-pill {
+    justify-self: center;
+    font-size: 0.88rem;
+    padding: 1.1rem 2.2rem;
+  }
+  .ct-mail {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.4vw, 1.2rem);
+    color: color-mix(in srgb, #eef4f7 78%, transparent);
+  }
+  .ct-mail:hover {
+    color: var(--color-accent, #38f8ec);
+  }
+
+  @media (max-width: 860px) {
+    .ct-split {
+      grid-template-columns: 1fr;
+    }
+    .ct-canvas {
+      min-height: 40svh;
+    }
+  }
+</style>
+
 <script>
-  // P5 — mount the chapter-slate DECODE effect (the one [data-decode] eyebrow
-  // above the headline). Same idle-window mount as Tableaux.astro/about.astro:
-  // off the LCP path, no-op under reduced motion (decode-text.ts's own gate).
+  // P10 enhancement: decode eyebrow (idle mount, self-gating) + the contour
+  // line drawing itself on arrival (fully drawn without JS / reduced motion).
+  import { gsap } from "gsap";
+
   const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
   if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
   else setTimeout(mountDecodeLabels, 1500);
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll<SVGPathElement>("[data-ct-line]").forEach((path) => {
+      const L = path.getTotalLength();
+      path.style.strokeDasharray = String(L);
+      gsap.fromTo(
+        path,
+        { strokeDashoffset: L },
+        {
+          strokeDashoffset: 0,
+          duration: 2.4,
+          delay: 0.5,
+          ease: "power2.inOut",
+          onComplete: () => {
+            gsap.to(path, { y: 5, duration: 7, ease: "sine.inOut", yoyo: true, repeat: -1 });
+          },
+        },
+      );
+    });
+  }
 </script>
