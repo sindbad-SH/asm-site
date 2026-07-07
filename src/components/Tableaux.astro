@@ -20,22 +20,8 @@ import TableauCluster from "./TableauCluster.astro";
 import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
 import { existsSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
-// SITE ROOT that is correct in BOTH modes (the v2 dev-server lesson):
-//   - `astro build` runs with cwd = package root, but import.meta.url points
-//     into dist/.prerender/chunks (bundled) -> cwd is right, url is wrong.
-//   - `astro dev` may be launched with a DIFFERENT cwd (editor tooling,
-//     preview harnesses), but import.meta.url is the real src file -> url is
-//     right, cwd may be wrong.
-// So: prefer whichever candidate actually contains public/media.
-const CANDIDATE_ROOTS = [
-  process.cwd(),
-  resolve(dirname(fileURLToPath(import.meta.url)), "..", ".."),
-];
-const SITE_ROOT =
-  CANDIDATE_ROOTS.find((r) => existsSync(join(r, "public", "media"))) ?? process.cwd();
+import { join } from "node:path";
+import { SITE_ROOT } from "../lib/site-root";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;

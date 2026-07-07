@@ -31,6 +31,7 @@ import Card from "./Card.astro";
 import DistortionLayer from "./DistortionLayer.astro";
 import { WORK, PILLARS, type PillarId } from "../consts";
 import { existsSync } from "node:fs";
+import { SITE_ROOT } from "../lib/site-root";
 import { join } from "node:path";
 
 interface Props {
@@ -77,7 +78,7 @@ const GALLERY_WIDTHS = {
   vertical: [800, 1120, 1600],
 } as const;
 function wallMedia(slug: string, orientation: "landscape" | "vertical") {
-  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  const g = join(SITE_ROOT, "public", "media", "adventure", "gallery");
   if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
   const widths = GALLERY_WIDTHS[orientation].filter((w) =>
     existsSync(join(g, `${slug}-${w}.avif`)),
