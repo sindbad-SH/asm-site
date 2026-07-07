@@ -321,9 +321,6 @@ const stars = Array.from({ length: 34 }, () => {
       // R3.6a §4.2 — content arrival fires once the scene is essentially open
       // (add-only; the 4s watchdog's .portal-forced covers engine failure).
       if (p > 0.55) root.classList.add("portal-arrived");
-      // P1.5 — GL canvas fade waits out the reveal (glLive guard keeps this
-      // safe before revealGl is defined; render(0) runs earlier than it)
-      if (glLive) revealGl();
       // living portrait fades in only once the scene is essentially open, so
       // the intro dissolve and the scroll-out bookend both stay clean; once
       // the video loop is rendering, the CSS overlays stand down entirely
@@ -361,12 +358,10 @@ const stars = Array.from({ length: 34 }, () => {
         render(proxy.p); // stands the CSS overlays down
       });
       loopEl.src = root.dataset.loopSrc!;
-      setLiving(proxy.p > 0.05); // P1.6: playback starts with the dissolve
-    };
-    // add the canvas fade class only once the reveal is essentially done —
-    // called from mountScene (already-open case) and render() (mid-intro case)
-    const revealGl = () => {
-      if (glLive && proxy.p > 0.9) root.classList.add("portal-gl-live");
+      // P1.7 — play NOW, not at a p-threshold: the loop must already be in
+      // motion behind the void when the window opens. setLiving() takes over
+      // stewardship (pause off-screen etc.) from the first render after this.
+      loopEl.play().catch(() => {}); // autoplay refusal → overlays carry it
     };
     // GPU context lost mid-visit → stand the DOM tiers back up seamlessly:
     // the loop (if it was playing) or the CSS overlays over the still.
@@ -400,13 +395,15 @@ const stars = Array.from({ length: 34 }, () => {
       }
       if (gl) {
         glLive = true;
-        // P1.5 — the canvas fade-in WAITS for the intro: its own 900ms fade
-        // landing mid-dissolve was one more cross-fade during the reveal.
-        // revealGl() runs now if the scene is already open, else render(p)
-        // fires it the moment p clears the void (0.9).
-        revealGl();
+        // P1.7 — the canvas goes live IMMEDIATELY, and runs from frame one:
+        // it mounts behind the still-opaque void, so its own fade is never
+        // seen, and when the logo-window opens it opens onto the LIVING
+        // world. (The P1.5 wait-for-intro gate was the round-7 "one second
+        // of static image": the window revealed the poster, and life only
+        // faded in afterwards.)
+        root.classList.add("portal-gl-live");
+        gl.setActive(true);
         render(proxy.p); // overlays stand down
-        gl.setActive(proxy.p > 0.8);
         mountVideo(() => gl?.useVideo()); // loop becomes the scene texture; DOM video stays hidden
       } else {
         mountVideo(() => root.classList.add("portal-video-live")); // CSS fades the loop in over the identical poster frame

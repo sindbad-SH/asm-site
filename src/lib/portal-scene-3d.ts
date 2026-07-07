@@ -226,13 +226,15 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     }
     starNorm.push({ u, v });
     starPos[i * 3 + 2] = 0.6 + rng() * 2.2; // just in front of the plane
-    // a few brighter stars among many faint — the sky reads layered, not uniform
-    starSize[i] = 1.0 + rng() * rng() * 2.6;
-    // deeper twinkle: min dips near-dark so some stars visibly wink; rates
-    // spread wide so the field never pulses in unison
-    starTw[i * 3] = 0.05 + rng() * 0.18; // o0 (dim floor)
-    starTw[i * 3 + 1] = 0.6 + rng() * 0.4; // o1 (bright peak)
-    starTw[i * 3 + 2] = 0.6 + rng() * 2.2; // twinkle rate
+    // P1.7 — a dozen HERO twinklers among the field: bigger, near-black dim
+    // floor, slow deep breathing. The 4K loop's baked stars are static, so
+    // these carry the "did that star just wink?" moments the operator asked
+    // for; the rest stay a subtle layered shimmer.
+    const hero = i < 12;
+    starSize[i] = hero ? 2.4 + rng() * 1.5 : 1.0 + rng() * rng() * 2.6;
+    starTw[i * 3] = hero ? 0.02 : 0.05 + rng() * 0.18; // o0 (dim floor)
+    starTw[i * 3 + 1] = hero ? 0.95 : 0.6 + rng() * 0.4; // o1 (bright peak)
+    starTw[i * 3 + 2] = hero ? 0.45 + rng() * 0.7 : 0.6 + rng() * 2.2; // rate
   }
   const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
@@ -260,8 +262,15 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     fragmentShader: /* glsl */ `
       varying float vA;
       void main() {
-        float r = length(gl_PointCoord - 0.5);
-        float a = smoothstep(0.5, 0.06, r) * vA;
+        vec2 pc = gl_PointCoord - 0.5;
+        float r = length(pc);
+        float core = smoothstep(0.5, 0.06, r);
+        // P1.7 — a faint 4-point flare; only reads on the big hero twinklers
+        // at full brightness, giving their winks a star-like sparkle
+        float cross =
+          smoothstep(0.5, 0.0, abs(pc.x)) * smoothstep(0.11, 0.0, abs(pc.y)) +
+          smoothstep(0.5, 0.0, abs(pc.y)) * smoothstep(0.11, 0.0, abs(pc.x));
+        float a = (core + cross * 0.3 * vA) * vA;
         gl_FragColor = vec4(vec3(0.88, 0.93, 1.0) * a, a);
       }`,
   });
@@ -367,6 +376,72 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
   motes.renderOrder = 3;
   scene.add(motes);
 
+  /* ── 4b · the occasional shooting star (P1.7, operator request): a thin
+        additive streak crossing the upper sky every ~9–17s, ~1.1s long, with
+        a bright head and fading tail. Schedule and paths come from the same
+        seeded rng, driven by the pause-aware clock — deterministic, and
+        frozen whenever the scene is inactive (never burns in a hidden tab). ── */
+  const meteorGeo = new THREE.PlaneGeometry(1, 1);
+  const meteorMat = new THREE.ShaderMaterial({
+    uniforms: { uAlpha: { value: 0 } },
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uAlpha;
+      varying vec2 vUv;
+      void main() {
+        float along = pow(vUv.x, 2.4); // tail thins away behind the head
+        float head = smoothstep(0.9, 1.0, vUv.x) * 1.4; // the bright head
+        float across = pow(max(0.0, 1.0 - abs(vUv.y - 0.5) * 2.0), 1.8);
+        float a = (along + head) * across * uAlpha;
+        gl_FragColor = vec4(vec3(0.86, 0.93, 1.0) * a, a);
+      }`,
+  });
+  const meteor = new THREE.Mesh(meteorGeo, meteorMat);
+  meteor.renderOrder = 1; // among the stars, behind haze/motes
+  meteor.visible = false;
+  scene.add(meteor);
+  const MET_DUR = 1.1;
+  let metNextAt = 6 + rng() * 4; // first pass lands while the visitor watches
+  let metT0 = -1;
+  const metFrom = new THREE.Vector2();
+  const metDir = new THREE.Vector2();
+  const meteorStep = (t: number) => {
+    if (metT0 < 0) {
+      if (t < metNextAt) return;
+      metT0 = t;
+      // spawn high in the sky band, streaking shallow-diagonally down;
+      // alternates sides via the seeded rng, never below the ridgeline
+      const side = rng() < 0.5 ? -1 : 1;
+      metFrom.set(side * (0.05 + rng() * 0.3) * planeW, (0.16 + rng() * 0.2) * planeH);
+      const ang = (0.32 + rng() * 0.2) * Math.PI; // 58°–94° from +x, mirrored by side
+      metDir.set(Math.cos(ang) * -side, -Math.sin(ang) * 0.42).normalize();
+      const len = 2.1 + rng() * 0.8;
+      meteor.scale.set(len, 0.05, 1);
+      meteor.rotation.z = Math.atan2(metDir.y, metDir.x);
+      meteor.visible = true;
+    }
+    const k = (t - metT0) / MET_DUR;
+    if (k >= 1) {
+      meteor.visible = false;
+      metT0 = -1;
+      metNextAt = t + 9 + rng() * 8;
+      meteorMat.uniforms.uAlpha.value = 0;
+      return;
+    }
+    const travel = 4.2;
+    meteor.position.set(metFrom.x + metDir.x * k * travel, metFrom.y + metDir.y * k * travel, 0.8);
+    meteorMat.uniforms.uAlpha.value = Math.sin(k * Math.PI) * 0.55;
+  };
+
   /* ── layout: cover-fit the plane, place stars from image-space, size haze ── */
   let planeW = MEDIA_ASPECT;
   let planeH = 1;
@@ -456,6 +531,7 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     moteMat.uniforms.uTime.value = t;
     (hazeA.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
     (hazeB.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
+    meteorStep(t);
 
     renderer.render(scene, camera);
     frames++;
@@ -503,8 +579,8 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     setActive(false);
     ro.disconnect();
     window.removeEventListener("pointermove", onPointer);
-    [worldGeo, starGeo, hazeGeo, moteGeo].forEach((g) => g.dispose());
-    [worldMat, starMat, moteMat, hazeA.material, hazeB.material].forEach((m) => (m as THREE.Material).dispose());
+    [worldGeo, starGeo, hazeGeo, moteGeo, meteorGeo].forEach((g) => g.dispose());
+    [worldMat, starMat, moteMat, meteorMat, hazeA.material, hazeB.material].forEach((m) => (m as THREE.Material).dispose());
     [stillTex, depthTex, videoTex].forEach((tx) => tx?.dispose());
     renderer.dispose();
     canvas.remove();
