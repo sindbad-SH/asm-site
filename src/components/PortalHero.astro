@@ -10,16 +10,18 @@
  * Layer stack (bottom→top):
  *   1. .portal-scene   — the beauty-shot still (frame-grabbed from the
  *                        horizontal sting → AVIF 26KB + WebP fallback)
- *   2. .portal-void    — the --hero-void curtain; its DISSOLVE does the true
- *                        full reveal (the mark's interior is partially
- *                        transparent, so a pure mask-zoom could never fully
- *                        clear the viewport — same reason the sting itself is
- *                        dissolve-driven, "no hard cuts")
- *   3. .portal-window  — RETIRED from the intro at P1.5 (kept in markup at
- *                        opacity:0): revealing the scene through the mark's
- *                        own mountain silhouette read as shape flip-flops.
- *                        The intro is now one continuous cross-dissolve —
- *                        mark bloom + void thinning, no masked pass.
+ *   2. .portal-void    — the --hero-void curtain. P1.6: the "mark becomes a
+ *                        window" accent lives HERE now — a logo-shaped hole
+ *                        (two-layer mask, composite: exclude) grows from the
+ *                        mark's footprint past the corners, revealing the
+ *                        ONE live world beneath. A late opacity fade (p .82→1)
+ *                        cleans up the last of the curtain. If mask-composite
+ *                        is unsupported the layers union and the void simply
+ *                        dissolves — the P1.5 single-dissolve, still correct.
+ *   3. .portal-window  — RETIRED (kept in markup at opacity:0). It was the
+ *                        accent's old implementation — a SECOND masked COPY
+ *                        of the scene — and two copies can never stay
+ *                        identical (rounds 4–5: "changing mountains").
  *   4. .portal-mark    — the solid mark (state A / ghost re-form)
  *   5. scrim + content
  *
@@ -233,14 +235,36 @@ const stars = Array.from({ length: 34 }, () => {
     }
     root.setAttribute("data-portal-live", "true");
 
-    // P1.5 — the logo-window accent is RETIRED from the intro. Revealing the
-    // scene through the mark's own mountain-silhouette mask made the reveal
-    // read as shape flip-flops (logo-mountains → wide scene → logo-mountains
-    // → wide scene; Sindbad round 5: "disorienting… should look more
-    // seamless"). The .portal-window layer stays in the markup at its
-    // endcard-safe opacity:0; the intro is now ONE continuous cross-dissolve
-    // (mark bloom + void thinning, nothing changes shape mid-reveal).
-    window.addEventListener("resize", () => render(proxy.p));
+    // P1.6 — the portal window, done RIGHT this time. Rounds 4–5 taught us:
+    // the beloved "mark becomes a window" accent flip-flopped because it was
+    // built as a SECOND COPY of the scene (a masked static image) revealed
+    // over the live world — two backgrounds can never stay identical. Now the
+    // accent is a logo-shaped HOLE punched in the void curtain itself
+    // (two-layer CSS mask, composite: exclude), so what shows through the
+    // growing window is the ONE live world underneath — still, video, or GL,
+    // always the same pixels. If mask-composite is unsupported the layers
+    // union to full coverage and the void simply dissolves (P1.5 behavior).
+    const stage = root.querySelector<HTMLElement>(".portal-stage")!;
+    voidEl.style.setProperty("mask-image", `url(${root.dataset.markSrc}), linear-gradient(#fff 0 0)`);
+    voidEl.style.setProperty("-webkit-mask-image", `url(${root.dataset.markSrc}), linear-gradient(#fff 0 0)`);
+    voidEl.style.setProperty("mask-repeat", "no-repeat, no-repeat");
+    voidEl.style.setProperty("-webkit-mask-repeat", "no-repeat, no-repeat");
+    voidEl.style.setProperty("mask-position", "center, center");
+    voidEl.style.setProperty("-webkit-mask-position", "center, center");
+    voidEl.style.setProperty("mask-composite", "exclude");
+    voidEl.style.setProperty("-webkit-mask-composite", "xor");
+    let S0 = 0;
+    let SF = 0;
+    const measure = () => {
+      const r = stage.getBoundingClientRect();
+      S0 = Math.min(r.width, r.height) * 0.38; // the mark's own footprint
+      SF = Math.hypot(r.width, r.height) * 2.2; // past every corner
+    };
+    measure();
+    window.addEventListener("resize", () => {
+      measure();
+      render(proxy.p);
+    });
 
     // sub-range helper: 0→1 across [a,b] of p
     const seg = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
@@ -281,8 +305,15 @@ const stars = Array.from({ length: 34 }, () => {
       // overlap — the eye tracks one move, not a sequence of layers.
       markEl.style.opacity = String(1 - seg(p, 0.22, 0.62));
       markEl.style.transform = `translate(-50%, -50%) scale(${1 + seg(p, 0.22, 0.62) * 0.16 + p * 0.03})`;
-      // the void dissolve IS the reveal — it starts under the mark's bloom
-      voidEl.style.opacity = String(1 - seg(p, 0.28, 0.9));
+      // P1.6 — the reveal: a logo-shaped hole in the void grows from the
+      // mark's own footprint past the corners. Through it: the ONE live
+      // world. (At rest before the bloom, the world already glints through
+      // the mark's semi-transparent interior — the sting's opening pose.)
+      const hole = S0 + (SF - S0) * seg(p, 0.28, 0.95);
+      voidEl.style.setProperty("mask-size", `${hole}px, 100% 100%`);
+      voidEl.style.setProperty("-webkit-mask-size", `${hole}px, 100% 100%`);
+      // the curtain itself only fades at the very end — cleanup, not reveal
+      voidEl.style.opacity = String(1 - seg(p, 0.82, 1));
       const settleScale = 1.08 - 0.08 * p;
       // the world (still + living overlays) settles as it rises through, and on
       // scroll-out RECEDES by exitY (§4.3) — composed into the one transform.
@@ -297,7 +328,12 @@ const stars = Array.from({ length: 34 }, () => {
       // the intro dissolve and the scroll-out bookend both stay clean; once
       // the video loop is rendering, the CSS overlays stand down entirely
       lifeEl.style.opacity = videoLive || glLive ? "0" : String(seg(p, 0.82, 1));
-      setLiving(p > 0.8);
+      // P1.6 — living starts as soon as the dissolve begins (not p>0.8): the
+      // loop must already be PLAYING when the window opens, or the visitor
+      // stares at the static poster pose for a beat and reads it as "a
+      // different background" (round-6 report). The scroll-out bookend's own
+      // setLiving(progress<0.6) still wins while scrolling away.
+      setLiving(p > 0.05);
       scrimEl.style.opacity = String(seg(p, 0.5, 1));
     }
     render(0);
@@ -325,7 +361,7 @@ const stars = Array.from({ length: 34 }, () => {
         render(proxy.p); // stands the CSS overlays down
       });
       loopEl.src = root.dataset.loopSrc!;
-      setLiving(proxy.p > 0.8); // starts playback if we're already open
+      setLiving(proxy.p > 0.05); // P1.6: playback starts with the dissolve
     };
     // add the canvas fade class only once the reveal is essentially done —
     // called from mountScene (already-open case) and render() (mid-intro case)
@@ -460,14 +496,17 @@ const stars = Array.from({ length: 34 }, () => {
         /* bookend is enhancement; the intro already ran */
       }
     };
-    const mountEnhancements = () => {
-      void mountBookend();
-      void mountScene();
-    };
+    // P1.6 — the scene (GL + video) mounts IMMEDIATELY, not at idle: the loop
+    // must be playing by the time the window opens (~1.5s in), or the reveal
+    // lands on the static poster pose. This does not touch first paint — the
+    // LCP headline is server-rendered and painted before this script runs;
+    // the chunk import and media fetch are async and off the critical path.
+    // The scroll bookend keeps its idle mount (it matters only on scroll).
+    void mountScene();
     if ("requestIdleCallback" in window) {
-      requestIdleCallback(mountEnhancements, { timeout: 2500 });
+      requestIdleCallback(() => void mountBookend(), { timeout: 2500 });
     } else {
-      setTimeout(mountEnhancements, 1200);
+      setTimeout(() => void mountBookend(), 1200);
     }
 
     // QA surface (harness tabs pause rAF; render(p) is deterministic)
