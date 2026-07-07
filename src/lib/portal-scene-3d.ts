@@ -448,6 +448,9 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     videoTex.minFilter = THREE.LinearFilter;
     videoTex.generateMipmaps = false;
     worldUniforms.uMedia.value = videoTex;
+    // the unsharp kernel follows the actual source resolution, so a higher-res
+    // loop export (1080p/4K) is a pure file swap — no retune needed
+    if (videoEl.videoWidth > 0) worldUniforms.uTexel.value.set(1 / videoEl.videoWidth, 1 / videoEl.videoHeight);
   };
 
   const dispose = () => {

@@ -1,0 +1,152 @@
+---
+/**
+ * PageVeil (P2, V1-UPGRADE-PLAN) — the site's entry & navigation ritual, in
+ * Everswap's gate spirit but riding the REAL load (never fake delay):
+ *
+ *   ENTRY (subpages only — the home page's ritual is the Portal Hero):
+ *     under html.js the veil is opaque at first paint (global.css is inlined,
+ *     so there is no unstyled flash), holds only until the DOM is ready plus
+ *     two rAFs, then fades. Total added time on a warm load ≈ 0.4s of fade
+ *     that overlaps content settling — the "gate" is the load itself.
+ *
+ *   EXIT (all pages): same-tab internal navigations veil IN (280ms) before
+ *     the browser leaves, so page-to-page reads as one world passing through
+ *     the void instead of a white-flash teleport.
+ *
+ * Discipline (the reveal-engine rules apply here too):
+ *   - no-JS        → display:none (content is never hostage to the ritual)
+ *   - reduced motion → display:none, exit veil skipped
+ *   - wall-clock backstop: an INLINE 1.4s timeout forces the veil down even
+ *     if the module script never runs (the 4s-watchdog philosophy)
+ *   - bfcache: pageshow(persisted) clears every veil state instantly
+ */
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+interface Props {
+  /** false on the home page — the Portal Hero owns that entry */
+  entry?: boolean;
+}
+const { entry = true } = Astro.props;
+---
+
+<div class="veil" data-veil data-veil-entry={entry ? "true" : null} aria-hidden="true">
+  <img class="veil-mark" src={`${base}/logo-mark.png`} alt="" width="512" height="512" loading="eager" decoding="async" />
+</div>
+
+<!-- backstop OUTSIDE the module chunk: the veil may never strand a visitor -->
+<script is:inline>
+  setTimeout(() => {
+    const v = document.querySelector("[data-veil]");
+    if (v && !v.hasAttribute("data-veil-live")) v.classList.add("veil-done");
+  }, 1400);
+</script>
+
+<script>
+  const veil = document.querySelector<HTMLElement>("[data-veil]");
+  if (veil) init(veil);
+
+  function init(veil: HTMLElement) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    veil.setAttribute("data-veil-live", "true");
+
+    // ── ENTRY: fade once the document has actually arrived ──
+    const settle = () => {
+      // two rAFs: the first frame after ready paints the page UNDER the veil,
+      // so the fade always reveals finished content (soft, never a pop).
+      // PLUS a wall-clock twin: rAF starves in hidden/backgrounded tabs, and
+      // the veil must fall on the clock even when frames don't tick.
+      requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add("veil-done")));
+      setTimeout(() => veil.classList.add("veil-done"), 700);
+    };
+    if (document.readyState === "complete" || document.readyState === "interactive") settle();
+    else document.addEventListener("DOMContentLoaded", settle, { once: true });
+
+    // bfcache restore (back/forward): no ritual, just the page
+    window.addEventListener("pageshow", (e) => {
+      if (e.persisted) {
+        veil.classList.add("veil-done");
+        veil.classList.remove("veil-out");
+      }
+    });
+
+    // ── EXIT: veil in before same-tab internal navigations ──
+    if (reduce) return; // reduced motion: navigations stay instant
+    document.addEventListener("click", (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a[href]");
+      if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+      const href = a.getAttribute("href")!;
+      const url = new URL(href, location.href);
+      if (url.origin !== location.origin) return;
+      // same-page hash hops scroll, they don't travel
+      if (url.pathname === location.pathname && url.hash) return;
+      e.preventDefault();
+      veil.classList.remove("veil-done");
+      veil.classList.add("veil-out");
+      // navigate on a fixed clock, NOT transitionend — the veil must never
+      // be able to strand the visitor if the transition is interrupted
+      setTimeout(() => location.assign(url.href), 260);
+    });
+  }
+</script>
+
+<style is:global>
+  .veil {
+    position: fixed;
+    inset: 0;
+    z-index: 90; /* over content, under nothing that matters mid-travel */
+    display: grid;
+    place-items: center;
+    background: var(--hero-void, #101020);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 460ms var(--ease-survey),
+      visibility 0s linear 460ms;
+  }
+  .veil-mark {
+    width: 46px;
+    height: 46px;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 18px rgba(56, 248, 236, 0.28));
+    animation: veil-breath 1.6s ease-in-out infinite alternate;
+  }
+  @keyframes veil-breath {
+    from {
+      transform: scale(1);
+      opacity: 0.72;
+    }
+    to {
+      transform: scale(1.07);
+      opacity: 1;
+    }
+  }
+  /* ENTRY state: subpages under html.js start veiled (no transition — it is
+     simply the first paint), then .veil-done fades it away */
+  html.js .veil[data-veil-entry] {
+    opacity: 1;
+    visibility: visible;
+  }
+  html.js .veil.veil-done {
+    opacity: 0;
+    visibility: hidden;
+  }
+  /* EXIT state: any page, veil rises before the browser travels */
+  html.js .veil.veil-out {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 280ms var(--ease-survey),
+      visibility 0s;
+  }
+  /* the ritual never gates content for no-JS or reduced-motion visitors */
+  html.no-js .veil,
+  html.js .veil:not([data-veil-entry]):not(.veil-out) {
+    visibility: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .veil {
+      display: none;
+    }
+  }
+</style>

@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import MobileMenu from "../components/MobileMenu.astro";
+import PageVeil from "../components/PageVeil.astro";
 import { SITE } from "../consts";
 // Hashed URLs for the two paint-critical font files (display + body), so we
 // can preload them — text is the LCP on most pages, and early font arrival
@@ -116,6 +117,9 @@ const jsonLd = {
   </head>
   <body class="min-h-screen">
     <a href="#main" class="sr-only focus:not-sr-only">Skip to content</a>
+    <!-- P2 — entry/navigation ritual. The home page's entry belongs to the
+         Portal Hero, so the veil only holds first paint on subpages. -->
+    <PageVeil entry={pagePath !== "/"} />
     <Nav />
     <MobileMenu />
     <main id="main">
