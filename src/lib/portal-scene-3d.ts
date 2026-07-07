@@ -61,8 +61,8 @@ export interface PortalSceneController {
 const MEDIA_ASPECT = 16 / 9;
 const CAM_Z = 10;
 const VIEW_H = 8; // world units of viewport height at z=0
-const OVERSCAN = 1.05; // plane cover margin so camera sway never shows edges
-// (every point of overscan is extra upscale of the 720p source — keep minimal)
+const OVERSCAN = 1.03; // plane cover margin so camera sway never shows edges
+// (every point of overscan is extra magnification of the source — keep minimal)
 
 /* seeded PRNG (same shape as PortalHero's build-time stars) so the particle
    field is stable run-to-run — QA screenshots stay diffable */
@@ -116,8 +116,19 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
   stillTex.colorSpace = THREE.NoColorSpace;
   stillTex.minFilter = THREE.LinearFilter;
   stillTex.generateMipmaps = false;
-  if (stillEl.complete && stillEl.naturalWidth > 0) stillTex.needsUpdate = true;
-  else stillEl.addEventListener("load", () => (stillTex.needsUpdate = true), { once: true });
+  const adoptStill = () => {
+    stillTex.needsUpdate = true;
+    if (stillEl.naturalWidth > 0) {
+      mediaW = stillEl.naturalWidth;
+      mediaH = stillEl.naturalHeight;
+      fitSharp();
+    }
+  };
+  // NOTE: for an already-complete image adoptStill must NOT run here — it
+  // calls fitSharp(), which is defined below (TDZ). The synchronous adopt
+  // happens right after the first layout() call; only the async load path
+  // (fires after this whole function body) is registered now.
+  stillEl.addEventListener("load", adoptStill, { once: true });
 
   const depthTex = await new Promise<THREE.Texture | null>((resolve) => {
     new THREE.TextureLoader().load(
@@ -146,8 +157,8 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     uDepth: { value: depthTex },
     uOffset: { value: new THREE.Vector2(0, 0) }, // camera sway, normalized
     uAmp: { value: 0.011 }, // max UV displacement — parallax, not distortion
-    uTexel: { value: new THREE.Vector2(1 / 1280, 1 / 720) }, // media texel size
-    uSharp: { value: 0.5 }, // unsharp gain — counters bilinear upscale softness
+    uTexel: { value: new THREE.Vector2(1 / 1920, 1 / 1080) }, // media texel size
+    uSharp: { value: 0.3 }, // unsharp gain — set adaptively by fitSharp() below
   };
   const worldMat = new THREE.ShaderMaterial({
     uniforms: worldUniforms,
@@ -355,6 +366,22 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
   /* ── layout: cover-fit the plane, place stars from image-space, size haze ── */
   let planeW = MEDIA_ASPECT;
   let planeH = 1;
+  // live media dimensions (poster now, video once playing) — drive both the
+  // unsharp kernel's texel size and the ADAPTIVE sharpening gain below
+  let mediaW = 1920;
+  let mediaH = 1080;
+  // P1.3 — sharpening must follow actual magnification: an UPSCALED source
+  // needs real edge help, but a DOWNSCALED one (the 1440p loop on most
+  // displays) barely needs any — over-sharpening a downscale amplifies codec
+  // artifacts and reads as "pixely/stretched", which was the review note.
+  const fitSharp = () => {
+    const canvasH = (worldEl.clientHeight || 1) * renderer.getPixelRatio();
+    const visibleRows = mediaH * (VIEW_H / planeH); // source rows shown in-view
+    const mag = canvasH / visibleRows; // >1 upscaling, <1 downscaling
+    const t = Math.min(1, Math.max(0, (mag - 0.7) / 0.5)); // 0 @≤0.7 → 1 @≥1.2
+    worldUniforms.uSharp.value = 0.12 + t * 0.38;
+    worldUniforms.uTexel.value.set(1 / mediaW, 1 / mediaH);
+  };
   const layout = () => {
     const w = worldEl.clientWidth || 1;
     const h = worldEl.clientHeight || 1;
@@ -381,8 +408,11 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     hazeA.position.set(0, -VIEW_H * 0.36, 1.2);
     hazeB.scale.set(viewW * 1.6, VIEW_H * 0.28, 1);
     hazeB.position.set(0, -VIEW_H * 0.42, 2.1);
+
+    fitSharp(); // magnification changed with the viewport
   };
   layout();
+  if (stillEl.complete && stillEl.naturalWidth > 0) adoptStill(); // see NOTE above
   const ro = new ResizeObserver(layout);
   ro.observe(worldEl);
 
@@ -410,8 +440,8 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     // never a jolt. Cursor adds on top, heavily lerped (soft, rule 2).
     const idleX = Math.sin(t * 0.16) * 0.1;
     const idleY = Math.cos(t * 0.11) * 0.06;
-    const tx = idleX + pointer.x * 0.26; // stays inside the (reduced) overscan
-    const ty = idleY - pointer.y * 0.16;
+    const tx = idleX + pointer.x * 0.2; // stays inside the (tighter) overscan
+    const ty = idleY - pointer.y * 0.13;
     cam.x += (tx - cam.x) * 0.035;
     cam.y += (ty - cam.y) * 0.035;
     camera.position.set(cam.x, cam.y, CAM_Z);
@@ -454,9 +484,13 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     videoTex.minFilter = THREE.LinearFilter;
     videoTex.generateMipmaps = false;
     worldUniforms.uMedia.value = videoTex;
-    // the unsharp kernel follows the actual source resolution, so a higher-res
-    // loop export (1080p/4K) is a pure file swap — no retune needed
-    if (videoEl.videoWidth > 0) worldUniforms.uTexel.value.set(1 / videoEl.videoWidth, 1 / videoEl.videoHeight);
+    // texel + sharpening follow the actual source resolution, so a higher-res
+    // loop export (1440p/4K) is a pure file swap — no retune needed
+    if (videoEl.videoWidth > 0) {
+      mediaW = videoEl.videoWidth;
+      mediaH = videoEl.videoHeight;
+      fitSharp();
+    }
   };
 
   const dispose = () => {

@@ -103,8 +103,8 @@ const stars = Array.from({ length: 34 }, () => {
           class="portal-scene"
           src={scene.webp}
           alt=""
-          width="1280"
-          height="720"
+          width="1920"
+          height="1080"
           loading="eager"
           decoding="async"
           fetchpriority="high"
@@ -127,8 +127,8 @@ const stars = Array.from({ length: 34 }, () => {
         loop
         playsinline
         preload="none"
-        width="1920"
-        height="1080"
+        width="2560"
+        height="1440"
         aria-hidden="true"></video>
 
       <!-- LP-1 living portrait, fallback: additive light over the still,
@@ -317,7 +317,12 @@ const stars = Array.from({ length: 34 }, () => {
       if (videoLive && loopEl.readyState >= 2) root.classList.add("portal-video-live");
       render(proxy.p);
     };
+    let sceneMounted = false;
     const mountScene = async () => {
+      // idempotent: the idle mount and the QA forceLoop surface can both call
+      // this — a second run would stack a second canvas + video listener
+      if (sceneMounted) return;
+      sceneMounted = true;
       if (!wideAndUnsaved()) return;
       if (params.get("portal") !== "nogl") {
         try {
