@@ -1005,13 +1005,30 @@
       transform: translateX(3%);
     }
   }
+  /* R3.6a §4.4 — an 18s living-breath scale loop on the world while ambient.
+     Uses the independent `scale` property so it never touches worldEl's
+     transform bookkeeping (which render(p) owns via `transform`). */
+  .portal-ambient [data-portal-world] > picture,
+  .portal-ambient .portal-loop {
+    animation: portal-breathe 18s ease-in-out infinite alternate;
+  }
+  @keyframes portal-breathe {
+    from {
+      scale: 1;
+    }
+    to {
+      scale: 1.012;
+    }
+  }
   /* reduced motion: the living portrait holds perfectly still (belt-and-braces
      with the JS gate, which also never arms .portal-ambient under reduce) */
   @media (prefers-reduced-motion: reduce) {
     .portal-star,
     .portal-aurora::before,
     .portal-aurora::after,
-    .portal-haze {
+    .portal-haze,
+    .portal-ambient [data-portal-world] > picture,
+    .portal-ambient .portal-loop {
       animation: none;
     }
   }
@@ -1078,6 +1095,31 @@
     display: grid;
     gap: 1.25rem;
     justify-items: center;
+  }
+
+  /* R3.6a §4.2 — staggered content arrival as the void clears (kicker→h1→
+     subline→CTA, per-element --arrive-delay). html.js-scoped so no-JS shows
+     the endcard content immediately; arrivals are one-way (portal-arrived is
+     add-only). Reduced motion: instant. */
+  html.js [data-portal] [data-portal-arrive] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms var(--ease-arrival) var(--arrive-delay, 0ms),
+      transform 700ms var(--ease-arrival) var(--arrive-delay, 0ms);
+  }
+  html.js [data-portal].portal-arrived [data-portal-arrive],
+  html.js .portal-forced [data-portal-arrive],
+  html.no-js [data-portal-arrive] {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-portal] [data-portal-arrive] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 
   /* state A (mark on void) — only while JS is confirmed present */
@@ -1669,6 +1711,181 @@
     .fn-glyph,
     .field-note-body p {
       transition: none;
+    }
+  }
+
+  /* ── Homepage section lifts (R3.6c) ── */
+
+  /* H2 signpost band — Space Mono index, hairline separators, arrow drifts +
+     label goes accent on hover. */
+  .signpost {
+    display: flex;
+    flex-direction: column;
+  }
+  .signpost > li + li {
+    border-top: 1px solid var(--color-hairline);
+  }
+  .signpost-link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0.25rem;
+    font-family: var(--font-mono);
+    color: var(--color-ink-muted);
+  }
+  .signpost-no {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--color-accent-deep);
+    flex-shrink: 0;
+  }
+  .signpost-label {
+    flex: 1;
+    letter-spacing: 0.04em;
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .signpost-arrow {
+    display: inline-block;
+    color: var(--color-accent-deep);
+    transition:
+      transform var(--dur-hover) var(--ease-swift),
+      color var(--dur-hover) var(--ease-swift);
+  }
+  .signpost-link:hover .signpost-label,
+  .signpost-link:focus-visible .signpost-label {
+    color: var(--color-accent);
+  }
+  .signpost-link:hover .signpost-arrow,
+  .signpost-link:focus-visible .signpost-arrow {
+    transform: translateX(6px);
+    color: var(--color-accent);
+  }
+
+  /* H4 proof band — testimonial gains a contour rule that draws in on reveal;
+     each legend symbol pings once as its row reveals. */
+  .proof-quote {
+    position: relative;
+    padding-left: 1rem;
+  }
+  .proof-quote::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-accent), var(--color-accent-deep));
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  html.js .proof-quote[data-reveal].is-revealed::before {
+    transform: scaleY(1);
+    transition: transform var(--dur-geological) var(--ease-survey);
+  }
+  html.no-js .proof-quote::before {
+    transform: scaleY(1);
+  }
+  /* one-shot survey-ping on the legend symbol when its proof row reveals */
+  html.js .proof-row[data-reveal].is-revealed .legend-mark .symbol::after {
+    animation: survey-ping 1200ms var(--ease-swift) 1;
+  }
+
+  /* H5 forge teaser — a temper-line rule (accent gradient — NOT orange; accent
+     discipline holds on home) scales X in on reveal, stage names stagger in. */
+  .forge-teaser-line {
+    margin: 0.5rem 0;
+  }
+  .temper-rule {
+    display: block;
+    height: 2px;
+    background: linear-gradient(to right, var(--color-accent-deep), var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  html.js .forge-teaser-line[data-reveal].is-revealed .temper-rule {
+    transform: scaleX(1);
+    transition: transform 900ms var(--ease-survey);
+  }
+  html.no-js .temper-rule {
+    transform: scaleX(1);
+  }
+  .temper-stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    margin-top: 0.7rem;
+    list-style: none;
+  }
+  .temper-stage {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+    opacity: 0;
+  }
+  html.js .forge-teaser-line[data-reveal].is-revealed .temper-stage {
+    opacity: 1;
+    transition: opacity 500ms var(--ease-arrival) var(--stage-delay, 0ms);
+  }
+  html.no-js .temper-stage {
+    opacity: 1;
+  }
+
+  /* H6 about teaser — 2-col at >=768px (text left, floating portrait right); the
+     portrait card drifts (amp 0.7 via drift-engine). Stacks on mobile. */
+  .about-teaser {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .about-teaser {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  .about-teaser-figure {
+    display: block;
+    justify-self: center;
+  }
+  .about-portrait-float {
+    width: clamp(140px, 22vw, 200px);
+    will-change: transform;
+  }
+
+  /* H7 contact CTA — a survey-ping pulse ring every 6s (one ping, 1.2s, then
+     4.8s rest). Reduced motion: none. */
+  .cta-pulse {
+    position: relative;
+    overflow: visible;
+  }
+  .cta-pulse::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    animation: cta-ping var(--ping-idle, 6s) var(--ease-survey) infinite;
+  }
+  @keyframes cta-ping {
+    0% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    20% {
+      opacity: 0;
+      transform: scale(1.08);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.08);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-pulse::after {
+      animation: none;
     }
   }
 

@@ -25,35 +25,45 @@ import { join } from "node:path";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
 
-// R5 — the "wild" chapter renders as a FLOATING SHOT CLUSTER (TableauCluster)
-// when its cluster assets exist on disk, replacing the old full-bleed layered
-// scene. Build-time check (frontmatter runs server-side), anchored to cwd.
-const clusterDir = join(process.cwd(), "public", "media", "home", "wild", "cluster");
-const wildDir = join(process.cwd(), "public", "media", "home", "wild");
-function clusterShot(id: string) {
-  const has = existsSync(join(clusterDir, `${id}.avif`)) && existsSync(join(clusterDir, `${id}.webp`));
+// R5/R3.6b — a chapter renders as a FLOATING SHOT CLUSTER (TableauCluster) when
+// its cluster assets exist on disk, replacing the old full-bleed layered scene.
+// Generalized in R3.6b from wild-only to any chapter dir (wild|market|industry):
+// a chapter clusters when its public/media/home/<slug>/cluster/ has >=2 shots.
+// Build-time check (frontmatter runs server-side), anchored to cwd.
+function clusterShot(slug: string, id: string) {
+  const dir = join(process.cwd(), "public", "media", "home", slug, "cluster");
+  const has = existsSync(join(dir, `${id}.avif`)) && existsSync(join(dir, `${id}.webp`));
   return has
-    ? { avif: `${base}/media/home/wild/cluster/${id}.avif`, webp: `${base}/media/home/wild/cluster/${id}.webp` }
+    ? { avif: `${base}/media/home/${slug}/cluster/${id}.avif`, webp: `${base}/media/home/${slug}/cluster/${id}.webp` }
     : undefined;
 }
-const hasLoop =
-  existsSync(join(wildDir, "matterhorn-loop.mp4")) &&
-  existsSync(join(wildDir, "matterhorn-loop-poster.avif"));
-const clusterShots = {
-  peak: clusterShot("peak"),
-  valley: clusterShot("valley"),
-  lake: clusterShot("lake"),
-  ridge: clusterShot("ridge"),
-  loop: hasLoop
-    ? {
-        mp4: `${base}/media/home/wild/matterhorn-loop.mp4`,
-        poster: `${base}/media/home/wild/matterhorn-loop-poster.avif`,
-      }
-    : undefined,
-};
-// The cluster is "live" only if at least the peak + one more shot exist; else
-// the wild chapter falls back to the classic layered TableauChapter.
-const clusterLive = !!(clusterShots.peak && (clusterShots.valley || clusterShots.ridge));
+function clusterShotsFor(slug: string) {
+  const wildDir = join(process.cwd(), "public", "media", "home", "wild");
+  const hasLoop =
+    slug === "wild" &&
+    existsSync(join(wildDir, "matterhorn-loop.mp4")) &&
+    existsSync(join(wildDir, "matterhorn-loop-poster.avif"));
+  return {
+    peak: clusterShot(slug, "peak"),
+    valley: clusterShot(slug, "valley"),
+    lake: clusterShot(slug, "lake"),
+    ridge: clusterShot(slug, "ridge"),
+    loop: hasLoop
+      ? {
+          mp4: `${base}/media/home/wild/matterhorn-loop.mp4`,
+          poster: `${base}/media/home/wild/matterhorn-loop-poster.avif`,
+        }
+      : undefined,
+  };
+}
+// A chapter's cluster is "live" when at least 2 of its shots exist (valley/lake/
+// ridge/peak/loop); else that chapter falls back to the classic layered scene.
+function clusterLiveFor(shots: ReturnType<typeof clusterShotsFor>) {
+  const n = [shots.peak, shots.valley, shots.lake, shots.ridge, shots.loop].filter(Boolean).length;
+  return n >= 2;
+}
+// Map chapter terrain → media slug (the wild/market/industry dir names).
+const terrainSlug = (terrain: string) => terrain.toLowerCase().replace(/^the\s+/, "");
 
 // Media self-service (MEDIA-GUIDE.md "Home tableaux"): each layer's real art
 // lives at public/media/home/<slug>/<layer>.{avif,webp}. Checked at BUILD
@@ -114,13 +124,24 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
 <section class="tableaux" data-tableaux aria-label="Three terrains, one craft">
   {
     chapters.map((chapter, i) => {
-      const isWild = chapter.terrain.toLowerCase() === "the wild";
+      const slug = terrainSlug(chapter.terrain);
+      const shots = clusterShotsFor(slug);
+      const clusterLive = clusterLiveFor(shots);
+      // Drift amp per the R3.5 wire-up map: wild 1.0, market/industry 0.9.
+      const driftAmp = slug === "wild" ? 1.0 : 0.9;
       const nodeId = pillarByTerrain[chapter.terrain.toLowerCase()];
       return (
         <Fragment>
           {i > 0 && <ContourDivider class="mx-auto max-w-3xl px-8" />}
-          {isWild && clusterLive ? (
-            <TableauCluster chapter={chapter} index={i} base={base} nodeId={nodeId} shots={clusterShots} />
+          {clusterLive ? (
+            <TableauCluster
+              chapter={chapter}
+              index={i}
+              base={base}
+              nodeId={nodeId}
+              shots={shots}
+              driftAmp={driftAmp}
+            />
           ) : (
             <TableauChapter
               chapter={chapter}
@@ -208,7 +229,34 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
         const amp = Math.min(rate, 24) / 2; // cap at 24% (DIRECTION §1.2)
         tl.fromTo(f, { yPercent: amp }, { yPercent: -amp, ease: "none" }, 0);
       });
+
+      // R3.6b §3.1 — cluster shot ENTRANCE POP: on first entry the floats scale
+      // in from a random scatter (never a row-by-row grid arrival). Runs BEFORE
+      // drift mounts (idle), so the two never fight.
+      ScrollTrigger.create({
+        trigger: cluster,
+        start: "top 78%",
+        once: true,
+        onEnter: () =>
+          gsap.from(floats, {
+            scale: 0.92,
+            opacity: 0,
+            duration: 0.9,
+            ease: "power2.out", // = --ease-arrival
+            stagger: { each: 0.11, from: "random" },
+          }),
+      });
     });
+
+    // R3.5 — mount the ambient drift engine on ALL [data-drift] on the page at
+    // idle (cluster floats + the H6 about-teaser portrait card). Zero bytes/work
+    // on the LCP path; the engine hard-gates itself off under reduced motion /
+    // <=640px. Scoped to document so the about-teaser card (outside [data-tableaux])
+    // is included — the engine is idempotent per element.
+    const mountAmbient = () =>
+      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
+    if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
+    else setTimeout(mountAmbient, 1500);
 
     section.querySelectorAll<HTMLElement>("[data-tableau]:not([data-cluster])").forEach((tableau) => {
       const pin = tableau.querySelector<HTMLElement>(".tableau-pin");

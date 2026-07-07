@@ -215,6 +215,9 @@ const stars = Array.from({ length: 34 }, () => {
     const seg = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
 
     const proxy = { p: 0 };
+    // R3.6a §4.3 — the world recedes on scroll-out (0→8%); render() composes it
+    // into the world transform. Module-scope so the bookend onUpdate can set it.
+    let exitY = 0;
     // Living-portrait ladder: video loop (primary) > still + CSS overlays
     // (fallback) > still (base). videoLive flips once the loop is actually
     // rendering frames; the overlays stand down then (the video already IS
@@ -248,8 +251,12 @@ const stars = Array.from({ length: 34 }, () => {
       windowEl.style.setProperty("mask-size", `${size}px`);
       // the void dissolve = the true reveal
       voidEl.style.opacity = String(1 - seg(p, 0.45, 0.95));
-      // the world (still + living overlays) settles as it rises through
-      worldEl.style.transform = `scale(${1.08 - 0.08 * p})`;
+      // the world (still + living overlays) settles as it rises through, and on
+      // scroll-out RECEDES by exitY (§4.3) — composed into the one transform.
+      worldEl.style.transform = `translateY(${exitY}%) scale(${1.08 - 0.08 * p})`;
+      // R3.6a §4.2 — content arrival fires once the scene is essentially open
+      // (add-only; the 4s watchdog's .portal-forced covers engine failure).
+      if (p > 0.55) root.classList.add("portal-arrived");
       // living portrait fades in only once the scene is essentially open, so
       // the intro dissolve and the scroll-out bookend both stay clean; once
       // the video loop is rendering, the CSS overlays stand down entirely
@@ -276,15 +283,22 @@ const stars = Array.from({ length: 34 }, () => {
       setLiving(proxy.p > 0.8); // starts playback if we're already open
     };
 
-    // intro: the sting's opening — hold on the mark, then dissolve through
+    // intro: the sting's opening — hold on the mark (now with a subtle BREATH,
+    // R3.6a §4.1), then dissolve through. The breath runs on the compositor via
+    // a direct transform write during the 0.8s hold; render(p) overwrites the
+    // mark transform from p=0.2 on, so the handoff is seamless (breath amplitude
+    // 1.5% is below the dissolve-scale ramp).
     let introKilled = false;
-    const intro = gsap.to(proxy, {
-      p: 1,
-      duration: 2.0,
-      delay: 0.8,
-      ease: "power2.inOut",
-      onUpdate: () => render(proxy.p),
-    });
+    const intro = gsap.timeline();
+    intro
+      .to(markEl, {
+        duration: 0.8,
+        ease: "sine.inOut",
+        onUpdate: function () {
+          markEl.style.transform = `translate(-50%, -50%) scale(${1 + 0.015 * Math.sin(this.progress() * Math.PI)})`;
+        },
+      }, 0)
+      .to(proxy, { p: 1, duration: 2.0, ease: "power2.inOut", onUpdate: () => render(proxy.p) }, 0.8);
 
     // scroll-out (LP-2 + R6): the living scene RECEDES with the section while
     // the content fades for a clean handoff into the tableaux. R6 — the load-in
@@ -330,6 +344,21 @@ const stars = Array.from({ length: 34 }, () => {
             }
             const exit = smooth(Math.min(1, Math.max(0, (self.progress - FADE_FROM) / (FADE_TO - FADE_FROM))));
             contentEl.style.opacity = String(1 - exit);
+
+            // R3.6a §4.3 — the A→B→A bookend, now actually visible:
+            // (1) the world recedes 0→8% over the exit, and
+            // (2) the mark GHOST re-forms over the last quarter of the exit (the
+            //     sting's endcard). Only when the load-in mark is already gone
+            //     (introScrubbed false), so this never fights the R6 mark-exit
+            //     scrub. render() re-applies exitY via the world transform.
+            exitY = smooth(self.progress) * 8;
+            const ghost = smooth(Math.min(1, Math.max(0, (self.progress - 0.78) / 0.22)));
+            if (!introScrubbed && proxy.p > 0.999) {
+              markEl.style.opacity = String(ghost * 0.22);
+              markEl.style.transform = `translate(-50%, -50%) scale(${1.19 - 0.16 * ghost})`;
+            }
+            render(proxy.p); // re-render with the new exitY (cheap; transform-only)
+
             setLiving(self.progress < 0.6); // pause the loop / overlays once mostly scrolled away
           },
         });

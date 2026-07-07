@@ -32,9 +32,13 @@ interface Props {
     ridge?: { avif: string; webp: string };
     loop?: { mp4: string; poster: string };
   };
+  /** Ambient drift amplitude for this cluster's floats (R3.5 wire-up map:
+   *  wild 1.0, market/industry 0.9). */
+  driftAmp?: number;
 }
-const { chapter, index, base, nodeId, shots } = Astro.props;
+const { chapter, index, base, nodeId, shots, driftAmp = 1.0 } = Astro.props;
 const no = String(index + 1).padStart(2, "0");
+const ampAttr = String(driftAmp);
 ---
 
 <article
@@ -49,7 +53,7 @@ const no = String(index + 1).padStart(2, "0");
          its own data-rate. Order back→front so nearer shots sit above. -->
     {
       shots.valley && (
-        <figure class="float float--valley" data-float data-rate="6">
+        <figure class="float float--valley" data-float data-rate="6" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.valley.avif} type="image/avif" />
             <img src={shots.valley.webp} alt="" loading="lazy" decoding="async" />
@@ -59,7 +63,7 @@ const no = String(index + 1).padStart(2, "0");
     }
     {
       shots.loop ? (
-        <figure class="float float--loop" data-float data-rate="9">
+        <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
           <video
             class="float-loop"
             data-cluster-loop-video
@@ -76,7 +80,7 @@ const no = String(index + 1).padStart(2, "0");
         </figure>
       ) : (
         shots.lake && (
-          <figure class="float float--loop" data-float data-rate="9">
+          <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
             <picture>
               <source srcset={shots.lake.avif} type="image/avif" />
               <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />
@@ -87,7 +91,7 @@ const no = String(index + 1).padStart(2, "0");
     }
     {
       shots.peak && (
-        <figure class="float float--peak" data-float data-rate="13">
+        <figure class="float float--peak" data-float data-rate="13" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.peak.avif} type="image/avif" />
             <img src={shots.peak.webp} alt="" loading="lazy" decoding="async" />
@@ -97,7 +101,7 @@ const no = String(index + 1).padStart(2, "0");
     }
     {
       shots.ridge && (
-        <figure class="float float--ridge" data-float data-rate="16">
+        <figure class="float float--ridge" data-float data-rate="16" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.ridge.avif} type="image/avif" />
             <img src={shots.ridge.webp} alt="" loading="lazy" decoding="async" />
@@ -108,7 +112,7 @@ const no = String(index + 1).padStart(2, "0");
     {
       /* the lake as a small extra near-shot when the loop occupies its slot */
       shots.loop && shots.lake && (
-        <figure class="float float--lake" data-float data-rate="19">
+        <figure class="float float--lake" data-float data-rate="19" data-drift data-drift-amp={ampAttr}>
           <picture>
             <source srcset={shots.lake.avif} type="image/avif" />
             <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />
