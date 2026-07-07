@@ -1816,6 +1816,35 @@
     }
   }
 
+  /* ── About page (R3.10 §3.5) ── */
+  /* The develop — portrait goes grayscale(1) brightness(1.14) → none over 900ms
+     on reveal (the one sanctioned filter animation, once). Driven by the shared
+     reveal engine (.is-revealed). */
+  html.js [data-develop] img {
+    filter: grayscale(1) brightness(1.14);
+    transition: filter 900ms var(--ease-survey);
+  }
+  html.js [data-develop].is-revealed img {
+    filter: none;
+  }
+  .about-portrait {
+    will-change: transform;
+  }
+  /* one-shot survey-ping on an About LegendKey symbol (JS adds .ping-once) */
+  .legend-key li > span.ping-once {
+    position: relative;
+  }
+  .legend-key li > span.ping-once::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    animation: survey-ping 1000ms var(--ease-swift) 1;
+  }
+
   /* ── Homepage section lifts (R3.6c) ── */
 
   /* H2 signpost band — Space Mono index, hairline separators, arrow drifts +
@@ -2135,6 +2164,11 @@ html.js .contour-draw.is-revealed path {
   }
   .legend-mark:hover .symbol::after {
     animation: none;
+  }
+  /* R3.10 — the About develop is the one filter animation; force it off + show */
+  html.js [data-develop] img {
+    filter: none !important;
+    transition: none;
   }
   [data-lane="forge"] .heat {
     transition: none;

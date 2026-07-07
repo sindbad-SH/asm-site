@@ -26,7 +26,18 @@ const personalSocials = [
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-3xl space-y-6 p-8">
-    <figure class="map-inset mx-auto max-w-sm" style="overflow:clip">
+    <!-- The develop (R3.10 §3.5): on reveal the portrait goes grayscale→none
+         over 900ms (a darkroom develop — the one sanctioned filter animation);
+         the frame then drifts at amp 0.5 (barely alive). data-reveal + data-develop
+         share .is-revealed; reduced motion forces the filter off and shows it. -->
+    <figure
+      class="map-inset about-portrait mx-auto max-w-sm"
+      style="overflow:clip"
+      data-reveal
+      data-develop
+      data-drift
+      data-drift-amp="0.5"
+    >
       <picture>
         <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
         <img
@@ -48,8 +59,8 @@ const personalSocials = [
       <p class="hud-label mt-1">{p.bio.location}</p>
     </div>
 
-    <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink" data-reveal>
-      {p.narrative.map((paragraph) => <p>{paragraph}</p>)}
+    <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink">
+      {p.narrative.map((paragraph) => <p data-reveal data-reveal-stagger="90">{paragraph}</p>)}
     </div>
 
     <!-- Personal socials row (COPY.md §6 / DIRECTION §2.8) — "Find me in the
@@ -73,11 +84,47 @@ const personalSocials = [
   </section>
 
   <!-- Legend-key explainer close: the honesty device stated as trust, backed
-       by the real, visible key — not just a claim. -->
-  <section class="mx-auto max-w-2xl space-y-4 border-t border-hairline p-8 text-center">
-    <p class="text-lg italic text-ink">{p.legendLine}</p>
-    <div class="flex justify-center">
+       by the real, visible key — not just a claim. On reveal the LegendKey
+       symbols ping in sequence (R3.10 §3.5, 100ms apart, once). -->
+  <section class="about-legend mx-auto max-w-2xl space-y-4 border-t border-hairline p-8 text-center" data-about-legend>
+    <p class="text-lg italic text-ink" data-reveal>{p.legendLine}</p>
+    <div class="flex justify-center" data-reveal>
       <LegendKey />
     </div>
   </section>
 </Base>
+
+<script>
+  // R3.10 §3.5 — About page signature moments.
+  import { ensureSmoothScroll } from "../lib/smooth-scroll";
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Drift on the portrait figure (amp 0.5) — the engine self-gates off under
+  // reduced motion / <=640px; mount at idle so it never touches the LCP path.
+  if (!reduce) {
+    void ensureSmoothScroll();
+    const mountAmbient = () =>
+      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
+    if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
+    else setTimeout(mountAmbient, 1500);
+  }
+
+  // Legend-key symbol ping-in on reveal (100ms apart, once). The symbols are the
+  // LegendKey <span>s; a scoped .ping-once class runs the survey-ping keyframe.
+  const legendSection = document.querySelector<HTMLElement>("[data-about-legend]");
+  if (legendSection && !reduce && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries, obs) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const symbols = legendSection.querySelectorAll<HTMLElement>(".legend-key li > span:first-child");
+          symbols.forEach((s, i) => setTimeout(() => s.classList.add("ping-once"), i * 100));
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
+    );
+    io.observe(legendSection);
+  }
+</script>
