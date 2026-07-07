@@ -16,6 +16,17 @@ const formReady = SITE.formEndpoint !== "[confirm]";
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-xl space-y-6 p-8">
+    {
+      /* P5 — mono eyebrow + DECODE, same grammar as /about's location line.
+         No new copy: SITE.location is the existing hud-label string the
+         Footer already renders site-wide, reused here as the top-section
+         kicker (seasoning, not surgery — the page structure is untouched).
+         data-reveal + data-tableau-content: same wiring as about.astro, so
+         decode fires off the site-wide reveal engine, no new JS needed. */
+    }
+    <p class="hud-label" data-reveal data-tableau-content>
+      <span data-decode>{SITE.location}</span>
+    </p>
     <h1 class="text-3xl font-bold">{p.headline}</h1>
     <p>{p.body}</p>
 
@@ -72,3 +83,12 @@ const formReady = SITE.formEndpoint !== "[confirm]";
     </div>
   </section>
 </Base>
+
+<script>
+  // P5 — mount the chapter-slate DECODE effect (the one [data-decode] eyebrow
+  // above the headline). Same idle-window mount as Tableaux.astro/about.astro:
+  // off the LCP path, no-op under reduced motion (decode-text.ts's own gate).
+  const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
+  else setTimeout(mountDecodeLabels, 1500);
+</script>

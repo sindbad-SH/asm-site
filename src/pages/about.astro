@@ -56,7 +56,18 @@ const personalSocials = [
       <h1 class="text-3xl font-bold">
         {p.bio.name} — {p.bio.persona}
       </h1>
-      <p class="hud-label mt-1">{p.bio.location}</p>
+      {
+        /* P5 — mono eyebrow gets the DECODE treatment (same grammar as the home
+           tableaux chapter-slate): the existing hud-label location line is
+           already a ch-stable mono context, so it's a decode target as-is —
+           no new copy, no restructure. data-reveal puts it under the site-wide
+           reveal engine (Base.astro); data-tableau-content is the stable
+           ancestor hook decode-text.ts's closest() looks for (see that file's
+           header) so the scramble fires the moment this line reveals. */
+      }
+      <p class="hud-label mt-1" data-reveal data-tableau-content>
+        <span data-decode>{p.bio.location}</span>
+      </p>
     </div>
 
     <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink">
@@ -109,6 +120,14 @@ const personalSocials = [
     if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
     else setTimeout(mountAmbient, 1500);
   }
+
+  // P5 — mount the chapter-slate DECODE effect (the one [data-decode] label
+  // in the top section). Same idle-window mount as Tableaux.astro: off the
+  // LCP path, no-op under reduced motion (decode-text.ts's own gate), and
+  // idempotent per element.
+  const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
+  else setTimeout(mountDecodeLabels, 1500);
 
   // Legend-key symbol ping-in on reveal (100ms apart, once). The symbols are the
   // LegendKey <span>s; a scoped .ping-once class runs the survey-ping keyframe.

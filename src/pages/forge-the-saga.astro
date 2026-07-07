@@ -98,8 +98,38 @@ function parsePrice(price: string) {
                   id={`forge-stage-${stage.no}`}
                   style={`--node-color:${nodeColor(i)}`}
                 >
-                  <p class="hud-label">
-                    <span class="marker" aria-hidden="true">◆</span> {stage.no} · {stage.sub}
+                  {
+                    /* P5 — numbered editorial slate, carried over from the home
+                       tableaux (chapter-slate: mono index + hairline rule + a
+                       DECODE label). stage.name renders in the serif .heat
+                       heading below, so decode applies only here to stage.sub
+                       (an existing mono/hud-label context) — never to the serif
+                       name. --node-color (already computed per stage) substitutes
+                       for --chapter-tint so the rule + index carry the same
+                       hot→set temperature progression as the rest of F3.
+
+                       Reveal wiring: data-reveal puts this <p> under the SITE-
+                       WIDE reveal engine (Base.astro) — same IO + 4s watchdog
+                       + reduced-motion skip as every other data-reveal element
+                       on this page. data-tableau-content is the stable ancestor
+                       hook decode-text.ts's closest() looks for (see its header
+                       comment); the label decodes the moment this slate's
+                       is-revealed lands, exactly like the home tableaux. */
+                  }
+                  <p
+                    class="chapter-slate hud-label"
+                    style={`--chapter-tint:0deg`}
+                    data-reveal
+                    data-tableau-content
+                  >
+                    <span class="marker" aria-hidden="true">◆</span>
+                    <span class="chapter-index" style={`color:var(--node-color);filter:none`}>{stage.no}</span>
+                    <span
+                      class="chapter-rule"
+                      aria-hidden="true"
+                      style={`background:linear-gradient(to right, var(--node-color), transparent);filter:none`}
+                    ></span>
+                    <span class="chapter-label" data-decode>{stage.sub}</span>
                   </p>
                   <h3 class="heat is-cold mt-1 text-2xl font-bold">{stage.name}</h3>
                   <p class="mt-2 text-ink">{stage.process}</p>
@@ -189,6 +219,15 @@ function parsePrice(price: string) {
 
   const root = document.querySelector<HTMLElement>("[data-temper]");
   if (root) init(root);
+
+  // P5 — mount the chapter-slate DECODE effect (the five stage-sub labels in
+  // F3). Same idle-window mount as Tableaux.astro: off the LCP path, no-op
+  // under reduced motion (decode-text.ts's own gate). Scoped to document, not
+  // just [data-temper], since the fallback stacked panels + the interactive
+  // tablist both live inside it — the engine is idempotent per element either way.
+  const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
+  else setTimeout(mountDecodeLabels, 1500);
 
   // R3.8 — F1 headline masked-line reveal (splitLines util). Runs regardless of
   // the stepper; reduced motion / no-JS show the plain heading (CSS-gated).
