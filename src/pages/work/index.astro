@@ -53,8 +53,8 @@ const filters = [
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-3xl space-y-4 p-8">
-    <h1 class="text-3xl font-bold">{p.intro.heading}</h1>
-    <p class="text-ink">{p.intro.body}</p>
+    <h1 class="text-3xl font-bold" data-reveal>{p.intro.heading}</h1>
+    <p class="text-ink" data-reveal>{p.intro.body}</p>
   </section>
 
   <!-- Lane filters (Matchstic model) — inert without JS; every card already
@@ -95,6 +95,8 @@ const filters = [
             proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
             ctaLabel={item.href ? "See the work" : undefined}
             pillar={item.pillar}
+            reveal
+            revealStagger={60}
           />
         ))
       }
@@ -126,20 +128,19 @@ const filters = [
 
 <script>
   // Filter enhancement only — every card starts visible (see file header).
+  import { gsap } from "gsap";
+
   const grid = document.querySelector<HTMLElement>("[data-work-grid]");
   const bar = document.querySelector<HTMLElement>("[data-work-filters]");
   const empty = document.querySelector<HTMLElement>("[data-work-empty]");
   if (grid && bar) {
     const cards = [...grid.querySelectorAll<HTMLElement>("[data-pillar]")];
     const buttons = [...bar.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    bar.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
-      if (!btn) return;
-      const filter = btn.dataset.filter!;
-
-      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-
+    // The existing instant toggle — the no-JS-adjacent fallback, byte-identical
+    // to before. FLIP wraps this to animate survivors between grid positions.
+    function applyFilter(filter: string) {
       let visibleCount = 0;
       cards.forEach((card) => {
         const show = filter === "all" || card.dataset.pillar === filter;
@@ -147,6 +148,43 @@ const filters = [
         if (show) visibleCount++;
       });
       if (empty) empty.hidden = visibleCount > 0;
+    }
+
+    // R3.9 — Filter FLIP: animate survivors to their new grid positions with
+    // GSAP Flip (dynamic import on first click, same lazy pattern as elsewhere).
+    // If the import fails, the instant toggle remains — already correct.
+    let FlipMod: typeof import("gsap/Flip") | null = null;
+    let flipFailed = false;
+
+    bar.addEventListener("click", async (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
+      if (!btn) return;
+      const filter = btn.dataset.filter!;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+
+      if (!FlipMod && !flipFailed && !reduce) {
+        try {
+          FlipMod = await import("gsap/Flip");
+          gsap.registerPlugin(FlipMod.Flip);
+        } catch {
+          flipFailed = true; // fall back to instant, permanently
+        }
+      }
+
+      if (FlipMod && !reduce) {
+        const state = FlipMod.Flip.getState(cards);
+        applyFilter(filter);
+        FlipMod.Flip.from(state, {
+          duration: 0.45,
+          ease: "power2.out", // = --ease-swift
+          absolute: true,
+          onEnter: (els) =>
+            gsap.fromTo(els, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.25 }),
+          onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.96, duration: 0.2 }),
+        });
+      } else {
+        applyFilter(filter);
+      }
     });
   }
 </script>
