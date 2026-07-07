@@ -1,149 +1,428 @@
 ---
 /**
- * /about — the single-arc StorySmith narrative (BUILD-PLAN.md §1.6). First
- * person throughout (verifiable facts only, per research-brief §1). Closes
- * by turning the honesty-legend device into an explicit trust statement,
- * backed by the actual visible LegendKey so the claim is demonstrable, not
- * just asserted.
+ * /about — P8 (V1-UPGRADE-PLAN): rebuilt to the irinamoi.com/about grammar,
+ * the operator's chosen reference for this page. Her grammar, his voice:
+ *
+ *   - scattered ghost letterforms naming the page (A B O U T up top,
+ *     B O U L D E R at the close — both drawn from the page's own words)
+ *   - a calm SINGLE ground color (her burgundy → our deep survey teal-void;
+ *     the about page holds still while the rest of the site travels)
+ *   - staggered editorial columns of serif ITALIC narrative, arriving as
+ *     you scroll — her three-column bio ballet with his StorySmith arc
+ *   - the circle motif: her decorative dots become HIS PORTRAIT in a big
+ *     circle (the operator asked for his photo, "vibed by him") + quiet
+ *     brand-tone confetti dots
+ *   - her "Recognitions" slot inverted honestly: his recognition section
+ *     IS the honesty ledger — the trust statement + the real LegendKey
+ *
+ * HONESTY: every sentence verbatim from consts (narrative, legendLine,
+ * socials rows). The develop effect on the portrait (grayscale→color) and
+ * the decode on the location line are KEPT from the previous page — they
+ * were operator-approved moves. Personal socials remain staging-gated per
+ * COPY.md §6 (production needs Sindbad's confirmation — unchanged rule).
+ *
+ * Fallbacks: no-JS/reduced-motion → letters at rest, columns visible,
+ * portrait full-color, static ground. Motion is enhancement only.
  */
 import Base from "../layouts/Base.astro";
 import LegendKey from "../components/LegendKey.astro";
-import { PAGES } from "../consts";
+import { PAGES, SITE } from "../consts";
 
 const p = PAGES.about;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Personal socials (COPY.md §6) — Sindbad's own channels (personal socials
-// belong on About per operator directive). Text links, Space Mono label style,
-// no brand-colored icons. Order is operator-provided (2026-07-04).
+// Personal socials (COPY.md §6) — operator-provided order (2026-07-04).
 const personalSocials = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/sindbad-horizon-b19b4a264" },
   { label: "YouTube", href: "https://www.youtube.com/@SindbadSightsAndStories" },
   { label: "Instagram", href: "https://www.instagram.com/sindbad_sights_and_stories/" },
   { label: "TikTok", href: "https://www.tiktok.com/@sindbadsightsandstories" },
 ] as const;
+
+// ghost letters, drawn from the page's own words (presentational letterforms)
+const aboutGhost = ["A", "B", "O", "U", "T"];
+const closeGhost = ["B", "O", "U", "L", "D", "E", "R"];
+
+const [opener, ...restNarrative] = p.narrative;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <section class="mx-auto max-w-3xl space-y-6 p-8">
-    <!-- The develop (R3.10 §3.5): on reveal the portrait goes grayscale→none
-         over 900ms (a darkroom develop — the one sanctioned filter animation);
-         the frame then drifts at amp 0.5 (barely alive). data-reveal + data-develop
-         share .is-revealed; reduced motion forces the filter off and shows it. -->
-    <figure
-      class="map-inset about-portrait mx-auto max-w-sm"
-      style="overflow:clip"
-      data-reveal
-      data-develop
-      data-drift
-      data-drift-amp="0.5"
-    >
-      <picture>
-        <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
-        <img
-          src={`${base}/media/about/portrait.webp`}
-          alt="Sindbad Horizon, The StorySmith"
-          class="block w-full"
-          style="aspect-ratio:4/5;object-fit:cover"
-          width="1600"
-          height="2000"
-          loading="eager"
-          decoding="async"
-        />
-      </picture>
-    </figure>
-    <div class="text-center">
-      <h1 class="text-3xl font-bold">
-        {p.bio.name} — {p.bio.persona}
-      </h1>
-      {
-        /* P5 — mono eyebrow gets the DECODE treatment (same grammar as the home
-           tableaux chapter-slate): the existing hud-label location line is
-           already a ch-stable mono context, so it's a decode target as-is —
-           no new copy, no restructure. data-reveal puts it under the site-wide
-           reveal engine (Base.astro); data-tableau-content is the stable
-           ancestor hook decode-text.ts's closest() looks for (see that file's
-           header) so the scramble fires the moment this line reveals. */
-      }
-      <p class="hud-label mt-1" data-reveal data-tableau-content>
-        <span data-decode>{p.bio.location}</span>
-      </p>
-    </div>
+  <main class="ab">
+    <!-- ═══ S1 · the introduction — portrait circle, opener, reach ═══ -->
+    <section class="ab-sec ab-head">
+      <div class="ab-ghosts" aria-hidden="true">
+        {aboutGhost.map((ch, i) => <span class="ab-ghost" data-ab-ghost style={`--gi:${i}`}>{ch}</span>)}
+      </div>
+      <div class="ab-head-grid">
+        <div class="ab-col ab-col--portrait">
+          <!-- her circle motif carries HIS photo. The develop (grayscale→
+               color on reveal) + faint drift are kept from the prior page. -->
+          <figure class="ab-portrait" data-reveal data-develop data-drift data-drift-amp="0.5">
+            <picture>
+              <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
+              <img
+                src={`${base}/media/about/portrait.webp`}
+                alt="Sindbad Horizon, The StorySmith"
+                width="1600"
+                height="2000"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
+          </figure>
+          <h1 class="ab-name" data-reveal>
+            {p.bio.name} <span class="ab-name-sep">—</span> {p.bio.persona}
+          </h1>
+          <p class="hud-label ab-loc" data-reveal data-tableau-content>
+            <span data-decode>{p.bio.location}</span>
+          </p>
+        </div>
+        <div class="ab-col ab-col--opener">
+          <p class="ab-opener" data-reveal>{opener}</p>
+        </div>
+        <div class="ab-col ab-col--reach" data-reveal>
+          <a class="ab-mail" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <p class="hud-label ab-social-kicker">FIND ME IN THE FIELD</p>
+          <p class="ab-social-note">The business lives here. I live on these:</p>
+          <ul class="ab-socials">
+            {
+              personalSocials.map((s, i) => (
+                <li>
+                  {i > 0 && <span class="ab-dot" aria-hidden="true">•</span>}
+                  <a href={s.href} class="link" rel="me noopener">
+                    {s.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
 
-    <div class="mx-auto max-w-2xl space-y-5 text-lg text-ink">
-      {p.narrative.map((paragraph) => <p data-reveal data-reveal-stagger="90">{paragraph}</p>)}
-    </div>
-
-    <!-- Personal socials row (COPY.md §6 / DIRECTION §2.8) — "Find me in the
-         field": Sindbad's personal channels. Text links, Space Mono label,
-         styled like the existing label rows (no new component archetype). -->
-    <div class="mx-auto max-w-2xl space-y-2 border-t border-hairline pt-6">
-      <p class="hud-label">FIND ME IN THE FIELD</p>
-      <p class="text-ink">The business lives here. I live on these:</p>
-      <ul class="flex flex-wrap gap-x-5 gap-y-1.5 pt-1">
+    <!-- ═══ S2 · the narrative — staggered italic columns ═══ -->
+    <section class="ab-sec ab-story">
+      <span class="ab-confetti" data-ab-confetti style="--ci:0" aria-hidden="true"></span>
+      <span class="ab-confetti ab-confetti--b" data-ab-confetti style="--ci:1" aria-hidden="true"></span>
+      <span class="ab-confetti ab-confetti--c" data-ab-confetti style="--ci:2" aria-hidden="true"></span>
+      <div class="ab-story-grid">
         {
-          personalSocials.map((s) => (
-            <li>
-              <a href={s.href} class="link" rel="me noopener">
-                {s.label}
-              </a>
-            </li>
+          restNarrative.map((paragraph, i) => (
+            <p class={`ab-para ab-para--${i}`} data-reveal data-reveal-stagger="120">
+              {paragraph}
+            </p>
           ))
         }
-      </ul>
-    </div>
-  </section>
+      </div>
+    </section>
 
-  <!-- Legend-key explainer close: the honesty device stated as trust, backed
-       by the real, visible key — not just a claim. On reveal the LegendKey
-       symbols ping in sequence (R3.10 §3.5, 100ms apart, once). -->
-  <section class="about-legend mx-auto max-w-2xl space-y-4 border-t border-hairline p-8 text-center" data-about-legend>
-    <p class="text-lg italic text-ink" data-reveal>{p.legendLine}</p>
-    <div class="flex justify-center" data-reveal>
-      <LegendKey />
-    </div>
-  </section>
+    <!-- ═══ S3 · her "Recognitions" slot, inverted honestly: the ledger ═══ -->
+    <section class="ab-sec ab-ledger">
+      <p class="ab-ledger-line" data-reveal>{p.legendLine}</p>
+      <div class="ab-key" data-reveal>
+        <LegendKey />
+      </div>
+    </section>
+
+    <!-- ═══ S4 · the close — home base, scattered ═══ -->
+    <section class="ab-sec ab-close">
+      <div class="ab-ghosts ab-ghosts--close" aria-hidden="true">
+        {closeGhost.map((ch, i) => <span class="ab-ghost ab-ghost--close" data-ab-ghost style={`--gi:${i}`}>{ch}</span>)}
+      </div>
+    </section>
+  </main>
 </Base>
 
+<style>
+  .ab {
+    /* her single calm burgundy → our deep survey teal-void, page-static */
+    background: #0d1d21;
+  }
+  .ab-sec {
+    position: relative;
+    overflow: clip;
+  }
+
+  /* ── voices: serif italic carries the narrative (her Romie role) ── */
+  .ab-opener,
+  .ab-para,
+  .ab-ledger-line,
+  .ab-name,
+  .ab-social-note {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    color: #eef2f4;
+  }
+
+  /* ── ghosts ── */
+  .ab-ghosts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ab-ghost {
+    position: absolute;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 1;
+    color: color-mix(in srgb, #ffffff 6%, transparent);
+  }
+  .ab-ghosts:not(.ab-ghosts--close) .ab-ghost:nth-child(1) { left: 40%; top: 4%; }
+  .ab-ghosts:not(.ab-ghosts--close) .ab-ghost:nth-child(2) { left: 50%; top: 9%; }
+  .ab-ghosts:not(.ab-ghosts--close) .ab-ghost:nth-child(3) { left: 58%; top: 3%; }
+  .ab-ghosts:not(.ab-ghosts--close) .ab-ghost:nth-child(4) { left: 66%; top: 10%; }
+  .ab-ghosts:not(.ab-ghosts--close) .ab-ghost:nth-child(5) { left: 74%; top: 5%; }
+
+  /* ── S1 head grid: portrait | opener | reach — staggered like hers ── */
+  .ab-head {
+    padding: 8rem clamp(1.5rem, 6vw, 7rem) 4rem;
+  }
+  .ab-head-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    max-width: 82rem;
+    margin-inline: auto;
+  }
+  .ab-col--opener {
+    margin-top: 9rem;
+  } /* the reference's staggered column rhythm */
+  .ab-col--reach {
+    margin-top: 3.5rem;
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  .ab-portrait {
+    width: clamp(200px, 22vw, 320px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: clip;
+    margin: 0 0 1.6rem;
+    box-shadow: 0 22px 70px -28px rgba(0, 0, 0, 0.7);
+  }
+  .ab-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 22%; /* the 4:5 studio crop, framed for a circle */
+  }
+  .ab-name {
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    line-height: 1.25;
+  }
+  .ab-name-sep {
+    opacity: 0.55;
+  }
+  .ab-loc {
+    margin-top: 0.4rem;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+  }
+  .ab-opener {
+    font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+    line-height: 1.4;
+  }
+  .ab-mail {
+    font-family: var(--font-sans);
+    font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+    color: var(--color-accent, #38f8ec);
+  }
+  .ab-social-kicker {
+    margin-top: 1.6rem;
+    letter-spacing: 0.26em;
+  }
+  .ab-social-note {
+    font-size: 1.02rem;
+    color: color-mix(in srgb, #eef2f4 78%, transparent);
+  }
+  .ab-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    list-style: none;
+    padding: 0;
+    margin: 0.3rem 0 0;
+  }
+  .ab-socials li {
+    display: inline-flex;
+    gap: 0.55rem;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .ab-dot {
+    opacity: 0.5;
+  }
+
+  /* ── S2 narrative columns, staggered ── */
+  .ab-story {
+    padding: 5rem clamp(1.5rem, 6vw, 7rem);
+  }
+  .ab-story-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(2rem, 5vw, 5rem);
+    max-width: 82rem;
+    margin-inline: auto;
+  }
+  .ab-para {
+    font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, #eef2f4 88%, transparent);
+  }
+  .ab-para--1 {
+    margin-top: 5.5rem;
+  }
+  .ab-para--2 {
+    margin-top: 11rem;
+  }
+  .ab-confetti {
+    position: absolute;
+    width: clamp(40px, 4.5vw, 72px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-accent, #38f8ec);
+    opacity: 0.12;
+    left: 8%;
+    top: 12%;
+  }
+  .ab-confetti--b {
+    background: #0da79b;
+    left: 56%;
+    top: 72%;
+  }
+  .ab-confetti--c {
+    background: #8fb7d8;
+    left: 88%;
+    top: 30%;
+  }
+
+  /* ── S3 the ledger as recognition ── */
+  .ab-ledger {
+    padding: 6rem clamp(1.5rem, 6vw, 7rem);
+    display: grid;
+    justify-items: center;
+    gap: 2.2rem;
+    text-align: center;
+  }
+  .ab-ledger-line {
+    font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+    line-height: 1.5;
+    max-width: 46ch;
+  }
+  .ab-key {
+    max-width: 40rem;
+  }
+
+  /* ── S4 close ── */
+  .ab-close {
+    min-height: 34svh;
+  }
+  .ab-ghost--close {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    color: color-mix(in srgb, #ffffff 7%, transparent);
+  }
+  .ab-ghosts--close .ab-ghost:nth-child(1) { left: 6%; top: 30%; }
+  .ab-ghosts--close .ab-ghost:nth-child(2) { left: 20%; top: 55%; }
+  .ab-ghosts--close .ab-ghost:nth-child(3) { left: 34%; top: 26%; }
+  .ab-ghosts--close .ab-ghost:nth-child(4) { left: 48%; top: 58%; }
+  .ab-ghosts--close .ab-ghost:nth-child(5) { left: 62%; top: 30%; }
+  .ab-ghosts--close .ab-ghost:nth-child(6) { left: 76%; top: 54%; }
+  .ab-ghosts--close .ab-ghost:nth-child(7) { left: 88%; top: 32%; }
+
+  /* ── small screens: single column, rhythm relaxes ── */
+  @media (max-width: 860px) {
+    .ab-head-grid,
+    .ab-story-grid {
+      grid-template-columns: 1fr;
+    }
+    .ab-col--opener,
+    .ab-col--reach,
+    .ab-para--1,
+    .ab-para--2 {
+      margin-top: 0;
+    }
+    .ab-ghost {
+      display: none;
+    }
+    .ab-head {
+      padding-top: 6rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ab-ghost,
+    .ab-confetti {
+      transform: none !important;
+    }
+  }
+</style>
+
 <script>
-  // R3.10 §3.5 — About page signature moments.
+  // P8 enhancement: ghost scatter-assembly + confetti drift + the existing
+  // develop/drift/decode engines. All motion rides over a static-correct page.
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { ensureSmoothScroll } from "../lib/smooth-scroll";
 
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  async function init() {
+    // develop + drift + decode are their own self-gating engines — mount them
+    // regardless of reduced motion (they handle it internally)
+    const idle = (fn: () => void) =>
+      "requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 1500);
+    idle(() => {
+      void import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
+      void import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+    });
 
-  // Drift on the portrait figure (amp 0.5) — the engine self-gates off under
-  // reduced motion / <=640px; mount at idle so it never touches the LCP path.
-  if (!reduce) {
-    void ensureSmoothScroll();
-    const mountAmbient = () =>
-      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
-    if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
-    else setTimeout(mountAmbient, 1500);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.registerPlugin(ScrollTrigger);
+    const lenis = await ensureSmoothScroll();
+    if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
+
+    // ghost letters assemble on arrival, then float (same grammar as P7)
+    document.querySelectorAll<HTMLElement>("[data-ab-ghost]").forEach((g, i) => {
+      gsap.fromTo(
+        g,
+        { x: (i % 2 ? 1 : -1) * (30 + (i % 3) * 24), y: 50 + (i % 3) * 24, opacity: 0, rotation: (i % 2 ? 1 : -1) * 5 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          rotation: 0,
+          duration: 1,
+          ease: "power3.out",
+          delay: i * 0.06,
+          scrollTrigger: { trigger: g.parentElement, start: "top 80%", once: true },
+          onComplete: () => {
+            gsap.to(g, {
+              y: (i % 2 ? -1 : 1) * 9,
+              duration: 5 + (i % 3) * 1.4,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          },
+        },
+      );
+    });
+
+    document.querySelectorAll<HTMLElement>("[data-ab-confetti]").forEach((c, i) => {
+      gsap.to(c, {
+        y: (i % 2 ? -1 : 1) * 16,
+        duration: 6 + i * 1.2,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    });
   }
-
-  // P5 — mount the chapter-slate DECODE effect (the one [data-decode] label
-  // in the top section). Same idle-window mount as Tableaux.astro: off the
-  // LCP path, no-op under reduced motion (decode-text.ts's own gate), and
-  // idempotent per element.
-  const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
-  if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
-  else setTimeout(mountDecodeLabels, 1500);
-
-  // Legend-key symbol ping-in on reveal (100ms apart, once). The symbols are the
-  // LegendKey <span>s; a scoped .ping-once class runs the survey-ping keyframe.
-  const legendSection = document.querySelector<HTMLElement>("[data-about-legend]");
-  if (legendSection && !reduce && "IntersectionObserver" in window) {
-    const io = new IntersectionObserver(
-      (entries, obs) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          const symbols = legendSection.querySelectorAll<HTMLElement>(".legend-key li > span:first-child");
-          symbols.forEach((s, i) => setTimeout(() => s.classList.add("ping-once"), i * 100));
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
-    );
-    io.observe(legendSection);
-  }
+  void init();
 </script>
