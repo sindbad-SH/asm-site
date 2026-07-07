@@ -36,10 +36,23 @@ interface Props {
 }
 const { chapter, index, layers, images, base, nodeId } = Astro.props;
 const isStub = !layers || layers.length === 0;
-const no = String(index + 1).padStart(2, "0");
+// P3 — three-digit editorial chapter index (001/002/003). Presentational only
+// (a numeral, not a copy claim), so it's composed here rather than in consts.ts.
+const no = String(index + 1).padStart(3, "0");
+// P3 — per-chapter accent tint. A hue rotation off the base --color-accent,
+// keyed to the chapter index so each terrain reads with its own faint temper
+// without inventing new palette tokens. Applied only where the markup already
+// carries an accent (the slate rule + index), never to body copy.
+const tintDeg = [0, 14, -18][index] ?? 0;
 ---
 
-<article class="tableau" data-tableau data-chapter={chapter.terrain} data-trail-node={nodeId}>
+<article
+  class="tableau"
+  data-tableau
+  data-chapter={chapter.terrain}
+  data-trail-node={nodeId}
+  style={`--chapter-tint:${tintDeg}deg`}
+>
   <div class="tableau-pin">
     {
       isStub ? (
@@ -77,7 +90,15 @@ const no = String(index + 1).padStart(2, "0");
     }
 
     <div class="tableau-content" data-tableau-content>
-      <p class="hud-label">{no} · {chapter.terrain}</p>
+      {/* P3 — numbered editorial slate: mono chapter index + hairline rule +
+          the terrain label as a DECODE target. The index is a presentational
+          numeral; the label copy is chapter.terrain verbatim from consts. The
+          rule + index carry the per-chapter accent tint. */}
+      <p class="chapter-slate hud-label">
+        <span class="chapter-index">{no}</span>
+        <span class="chapter-rule" aria-hidden="true"></span>
+        <span class="chapter-label" data-decode>{chapter.terrain}</span>
+      </p>
       <h2 class="tableau-headline" data-tableau-headline>{chapter.headline}</h2>
       <div class="tableau-reveal">
         <p class="mx-auto max-w-xl text-lg text-ink">{chapter.body}</p>

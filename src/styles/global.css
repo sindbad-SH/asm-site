@@ -1587,6 +1587,49 @@
     justify-items: center;
   }
 
+  /* ── P3 · numbered chapter slate ──
+     The "numbered editorial chapter" grammar: a mono chapter index (001/002/
+     003), a hairline rule, then the terrain label (the decode target). Built
+     on the existing .hud-label voice (--font-mono, uppercase, wide tracking) —
+     it IS a hud-label, laid out as an inline row. The index + rule carry the
+     per-chapter accent tint (--chapter-tint, set on the article); the label
+     stays in the muted ink so the decode scramble reads as instrument text,
+     not decoration. */
+  .chapter-slate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    /* the slate never wraps mid-label, so the decode scramble (same length as
+       the original) can never reflow the row */
+    white-space: nowrap;
+  }
+  .chapter-index {
+    /* the index takes the accent, tinted per chapter; tabular so 001/002/003
+       hold the same width */
+    color: color-mix(in srgb, var(--color-accent) 82%, var(--color-ink-muted));
+    filter: hue-rotate(var(--chapter-tint, 0deg));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.18em;
+  }
+  .chapter-rule {
+    display: inline-block;
+    width: 2.4rem;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-accent) 55%, transparent),
+      color-mix(in srgb, var(--color-accent) 12%, transparent)
+    );
+    filter: hue-rotate(var(--chapter-tint, 0deg));
+  }
+  .chapter-label {
+    /* ch-stable mono context: the decode scramble substitutes glyphs in place
+       (same length), so reserving on the label alone keeps the row rock-steady.
+       min-width in ch guarantees no shift even between proportional-looking
+       mono glyphs. */
+    font-variant-numeric: tabular-nums;
+  }
+
   /* ── Wild floating shot cluster (R5) ── */
   /* The "wild" chapter as a scatter of bright, mixed-aspect shots that drift at
      different parallax rates around the headline. No full-frame scrim; the copy
@@ -2180,6 +2223,22 @@ html.js .tableau-headline {
 html.js .tableau-headline.is-split {
   opacity: 1;
 }
+/* P3 — chapter-slate arrival. First beat of the chapter cascade (index →
+   headline → body): the slate lifts + fades in on .is-revealed, BEFORE the
+   headline's masked lines rise. Same reveal grammar / ease as everything
+   else; no new engine — it rides the .is-revealed the tableaux engine already
+   sets. Reduced motion / no-JS force it visible below. */
+html.js .tableau-content .chapter-slate {
+  opacity: 0;
+  transform: translateY(0.9rem);
+  transition:
+    opacity var(--dur-reveal) var(--ease-survey) 60ms,
+    transform var(--dur-reveal) var(--ease-survey) 60ms;
+}
+html.js .tableau-content.is-revealed .chapter-slate {
+  opacity: 1;
+  transform: none;
+}
 html.js .tableau-content .tableau-reveal {
   opacity: 0;
   transform: translateY(1.7rem); /* LP-3: tableaux body travel up (was 1.25rem) */
@@ -2226,7 +2285,8 @@ html.js .contour-draw.is-revealed path {
   }
   /* the engine no-ops under reduced motion, so these must show unconditionally */
   html.js .tableau-headline,
-  html.js .tableau-content .tableau-reveal {
+  html.js .tableau-content .tableau-reveal,
+  html.js .tableau-content .chapter-slate {
     opacity: 1;
     transform: none;
     transition: none;

@@ -253,8 +253,17 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
     // on the LCP path; the engine hard-gates itself off under reduced motion /
     // <=640px. Scoped to document so the about-teaser card (outside [data-tableaux])
     // is included — the engine is idempotent per element.
+    //
+    // P3 — the chapter-slate DECODE labels ([data-decode]) mount here too: same
+    // idle window (off the LCP path), and each label piggybacks on the reveal
+    // engine's is-revealed class (set at top 78% above), so decode fires with
+    // the chapter's arrival, not on load. Idempotent per element; no-ops under
+    // reduced motion (the server-rendered label already shows its real text).
     const mountAmbient = () =>
-      import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document));
+      Promise.all([
+        import("../lib/drift-engine").then(({ mountDrift }) => mountDrift(document)),
+        import("../lib/decode-text").then(({ mountDecode }) => mountDecode(section)),
+      ]);
     if ("requestIdleCallback" in window) requestIdleCallback(mountAmbient, { timeout: 3000 });
     else setTimeout(mountAmbient, 1500);
 

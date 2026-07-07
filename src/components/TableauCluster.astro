@@ -37,8 +37,11 @@ interface Props {
   driftAmp?: number;
 }
 const { chapter, index, base, nodeId, shots, driftAmp = 1.0 } = Astro.props;
-const no = String(index + 1).padStart(2, "0");
+// P3 — three-digit editorial chapter index (001/002/003); presentational only.
+const no = String(index + 1).padStart(3, "0");
 const ampAttr = String(driftAmp);
+// P3 — per-chapter accent tint (see TableauChapter.astro for the rationale).
+const tintDeg = [0, 14, -18][index] ?? 0;
 ---
 
 <article
@@ -47,6 +50,7 @@ const ampAttr = String(driftAmp);
   data-cluster
   data-chapter={chapter.terrain}
   data-trail-node={nodeId}
+  style={`--chapter-tint:${tintDeg}deg`}
 >
   <div class="cluster-stage" data-cluster-stage>
     <!-- Floating shots. Positions/sizes are set in CSS by slot; each drifts at
@@ -124,7 +128,13 @@ const ampAttr = String(driftAmp);
     <!-- Copy column — never parallaxes; sits on a small local backdrop for
          legibility (not a full-frame scrim). -->
     <div class="cluster-content tableau-content" data-tableau-content>
-      <p class="hud-label">{no} · {chapter.terrain}</p>
+      {/* P3 — numbered editorial slate (same grammar as TableauChapter): mono
+          index + hairline rule + terrain label as a DECODE target. */}
+      <p class="chapter-slate hud-label">
+        <span class="chapter-index">{no}</span>
+        <span class="chapter-rule" aria-hidden="true"></span>
+        <span class="chapter-label" data-decode>{chapter.terrain}</span>
+      </p>
       <h2 class="cluster-headline tableau-headline" data-tableau-headline>{chapter.headline}</h2>
       <div class="tableau-reveal">
         <p class="mx-auto max-w-md text-lg text-ink">{chapter.body}</p>
