@@ -117,7 +117,8 @@ const personalSocials = [
     else setTimeout(mountAmbient, 1500);
   }
 
-  // Legend-key symbol ping-in on reveal (100ms apart, once). The symbols are the
+  // Legend-key symbol ping-in on reveal (90ms apart, once — top step of the
+  // 40/55/70/90 site scale, matching the forge node cascade). The symbols are the
   // LegendKey <span>s; a scoped .ping-once class runs the survey-ping keyframe.
   const legendSection = document.querySelector<HTMLElement>("[data-about-legend]");
   if (legendSection && !reduce && "IntersectionObserver" in window) {
@@ -126,7 +127,7 @@ const personalSocials = [
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           const symbols = legendSection.querySelectorAll<HTMLElement>(".legend-key li > span:first-child");
-          symbols.forEach((s, i) => setTimeout(() => s.classList.add("ping-once"), i * 100));
+          symbols.forEach((s, i) => setTimeout(() => s.classList.add("ping-once"), i * 90));
           obs.disconnect();
         }
       },

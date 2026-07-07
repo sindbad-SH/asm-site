@@ -244,7 +244,7 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
             opacity: 0,
             duration: 0.9,
             ease: "power2.out", // = --ease-arrival
-            stagger: { each: 0.11, from: "random" },
+            stagger: { each: 0.09, from: "random" }, // V-5: 90ms — top step of the 40/55/70/90 site scale
           }),
       });
     });

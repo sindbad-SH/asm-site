@@ -869,7 +869,7 @@
      entrance affordance, not perpetual motion (only ambient loops (P5) run
      perpetually on this site). */
   .hero-video__cue .chev {
-    animation: hero-bob 2.4s var(--ease-in-out, ease-in-out) 3;
+    animation: hero-bob 2.6s ease-in-out 3; /* V-5: matches the AscentGate scroll cue (2.6s); phantom --ease-in-out var removed */
     animation-fill-mode: forwards;
   }
   @keyframes hero-bob {

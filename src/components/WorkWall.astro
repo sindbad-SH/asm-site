@@ -19,9 +19,11 @@
  *   Every tile the view is scoped to renders visible in the DOM with NO js.
  *   The FILTER dropdown is a real <select> that does nothing without JS — the
  *   "show everything in scope" baseline is already correct. Reduced-motion is
- *   fine (CSS distortion fallback + no FLIP). Filtering dispatches a `resize`
- *   so the distortion engine re-measures (its rectsDirty path) and the overlay
- *   never desyncs from the re-flowed wall.
+ *   fine (CSS distortion fallback + no animation — the filter snaps). Filtering
+ *   FADES THROUGH (out-in in place, never a positional flight — owner rule
+ *   "transitions never clip"), then dispatches a `resize` so the distortion
+ *   engine re-measures (its rectsDirty path) and the overlay never desyncs from
+ *   the re-flowed wall.
  *
  * HONESTY LEDGER (BINDING): engagement labels are printed verbatim from
  *   WORK[].engagement; any relationship statement flows only through LegendMark
@@ -170,10 +172,15 @@ const isAdventureLane = pillar === "adventure";
   showFilter && (
     <script>
       {/* FILTER dropdown enhancement — every tile starts visible (no-JS
-          baseline). On change we toggle .hidden, FLIP survivors between grid
-          slots, then dispatch a `resize` so the shared distortion engine hits
-          its rectsDirty path and re-measures the re-flowed wall (its overlay
-          would otherwise sit on stale rects). */}
+          baseline). On change we FADE-THROUGH: outgoing tiles fade+scale out in
+          place, the wall re-flows while hidden (no positional travel), then the
+          survivors fade in at their new slots. NOTHING translates across the
+          viewport, so re-filtering can never clip a tile mid-flight at an edge
+          (owner rule "transitions never clip"; V-5 replaced the absolute-FLIP
+          that could). After the reflow a `resize` fires so the shared distortion
+          engine hits its rectsDirty path and re-measures the re-flowed wall.
+          Timings ride the reveal family + --ease-survey so the wall re-settles
+          in the site's geological grammar, not a bespoke tempo. */}
       // @ts-nocheck
       import { gsap } from "gsap";
 
@@ -183,6 +190,12 @@ const isAdventureLane = pillar === "adventure";
       if (grid && select) {
         const tiles = [...grid.querySelectorAll("[data-pillar]")];
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // GSAP-string equivalents of the site's motion tokens (§3.3):
+        //   --ease-survey (expo.out) = geological settle · --ease-swift (power2.out) = exit.
+        const EASE_SURVEY = "expo.out";
+        const EASE_SWIFT = "power2.out";
+        const D_OUT = 0.22; // swift exit — outgoing tiles clear fast
+        const D_IN = 0.36; // survey settle — survivors arrive on the reveal family
 
         const applyFilter = (filter) => {
           let visible = 0;
@@ -192,6 +205,7 @@ const isAdventureLane = pillar === "adventure";
             if (show) visible++;
           });
           if (empty) empty.hidden = visible > 0;
+          return visible;
         };
 
         // Re-measure the distortion overlay after the wall re-flows: a `resize`
@@ -203,41 +217,40 @@ const isAdventureLane = pillar === "adventure";
           );
         };
 
-        let FlipMod = null;
-        let flipFailed = false;
-
-        select.addEventListener("change", async () => {
+        select.addEventListener("change", () => {
           const filter = select.value;
 
-          if (!FlipMod && !flipFailed && !reduce) {
-            try {
-              FlipMod = await import("gsap/Flip");
-              gsap.registerPlugin(FlipMod.Flip);
-            } catch {
-              flipFailed = true;
-            }
-          }
-
-          if (FlipMod && !reduce) {
-            const state = FlipMod.Flip.getState(tiles);
-            applyFilter(filter);
-            FlipMod.Flip.from(state, {
-              duration: 0.5,
-              ease: "power2.out",
-              absolute: true,
-              onEnter: (els) =>
-                gsap.fromTo(
-                  els,
-                  { opacity: 0, scale: 0.96 },
-                  { opacity: 1, scale: 1, duration: 0.28 },
-                ),
-              onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.96, duration: 0.22 }),
-              onComplete: reflowDistortion,
-            });
-          } else {
+          // Reduced motion (or no GSAP): snap — filter + reflow, no animation.
+          if (reduce) {
             applyFilter(filter);
             reflowDistortion();
+            return;
           }
+
+          // 1 · fade the currently-visible tiles out in place (no travel).
+          const leaving = tiles.filter((t) => !t.classList.contains("hidden"));
+          gsap.to(leaving, {
+            opacity: 0,
+            scale: 0.97,
+            duration: D_OUT,
+            ease: EASE_SWIFT,
+            onComplete: () => {
+              // 2 · re-flow while the wall is invisible — survivors jump to their
+              //     new slots with zero on-screen motion, so no edge can clip.
+              applyFilter(filter);
+              const surviving = tiles.filter((t) => !t.classList.contains("hidden"));
+              gsap.set(surviving, { opacity: 0, scale: 0.97 });
+              // 3 · fade survivors in on the survey settle, then re-measure.
+              gsap.to(surviving, {
+                opacity: 1,
+                scale: 1,
+                duration: D_IN,
+                ease: EASE_SURVEY,
+                clearProps: "opacity,transform",
+                onComplete: reflowDistortion,
+              });
+            },
+          });
         });
       }
     </script>
