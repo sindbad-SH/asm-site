@@ -919,6 +919,24 @@
   .portal-video-live .portal-loop {
     opacity: 1;
   }
+  /* P1 top tier: the WebGL 2.5D scene canvas. The engine appends it to
+     [data-portal-world] and renders a finished frame BEFORE .portal-gl-live
+     lands, so this fade always reveals the identical scene, never a black
+     canvas. Under GL the DOM loop stays at opacity 0 (no .portal-video-live)
+     and keeps playing as the scene's texture source. */
+  .portal-gl {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-survey);
+    pointer-events: none;
+  }
+  .portal-gl-live .portal-gl {
+    opacity: 1;
+  }
   /* LP-1 living portrait — additive light over the still. Default (endcard /
      no-JS / reduced motion) renders it statically with motion PAUSED; the
      engine drives .portal-life opacity and adds .portal-ambient to run the

@@ -33,6 +33,16 @@
  *   - reduced motion       → CSS forces the endcard back; script bails
  *   - chunk-load failure   → 4s inline watchdog forces .portal-forced endcard
  *   - ?portal=static       → endcard, no animation (QA)
+ *   - ?portal=nogl         → skip the WebGL tier, DOM ladder only (QA)
+ *
+ * P1 (V1-UPGRADE-PLAN): the scene's top tier is now a WebGL 2.5D world
+ * (src/lib/portal-scene-3d.ts) — the still/video depth-displaced by
+ * media/home/portal-depth.png, GPU stars + foreground motes + drifting haze,
+ * camera swaying at idle and answering the cursor. It mounts at idle inside
+ * .portal-world (so render(p)'s transform still owns settle/recede) and
+ * fades in via .portal-gl-live; the DOM video keeps playing UNDERNEATH as
+ * the scene's texture source. Every refusal path lands on the pre-P1 DOM
+ * ladder unchanged.
  * Debug: window.__PORTAL { p(), set(p) } — set() drives render directly
  * (harness tabs pause rAF; render is deterministic).
  *
@@ -83,7 +93,7 @@ const stars = Array.from({ length: 34 }, () => {
 });
 ---
 
-<section class="portal" data-portal data-mark-src={mark} data-loop-src={`${base}/media/home/portal-loop.mp4`}>
+<section class="portal" data-portal data-mark-src={mark} data-loop-src={`${base}/media/home/portal-loop.mp4`} data-depth-src={`${base}/media/home/portal-depth.png`}>
   <div class="portal-stage">
     <!-- 1 · the living world (still + ambient overlays; scales as one group) -->
     <div class="portal-world" data-portal-world>
@@ -168,6 +178,7 @@ const stars = Array.from({ length: 34 }, () => {
 
 <script>
   import { gsap } from "gsap";
+  import type { PortalSceneController } from "../lib/portal-scene-3d";
 
   const root = document.querySelector<HTMLElement>("[data-portal]");
   if (root) init(root);
@@ -218,11 +229,14 @@ const stars = Array.from({ length: 34 }, () => {
     // R3.6a §4.3 — the world recedes on scroll-out (0→8%); render() composes it
     // into the world transform. Module-scope so the bookend onUpdate can set it.
     let exitY = 0;
-    // Living-portrait ladder: video loop (primary) > still + CSS overlays
-    // (fallback) > still (base). videoLive flips once the loop is actually
-    // rendering frames; the overlays stand down then (the video already IS
-    // the living aurora — doubling them would over-glow).
+    // Living-portrait ladder (P1): WebGL 2.5D scene (top tier) > video loop >
+    // still + CSS overlays > still. videoLive flips once the loop is actually
+    // rendering frames; glLive once the WebGL scene has mounted. The overlays
+    // stand down when either upper tier carries the life (doubling them would
+    // over-glow).
     let videoLive = false;
+    let glLive = false;
+    let gl: PortalSceneController | null = null;
     // Drive the living layers (video loop + CSS overlay fallback). `active` is
     // true while the hero is open and near the top; the intro drives it by p,
     // the scroll-out bookend by scroll position. Pausing off-screen keeps the
@@ -230,6 +244,7 @@ const stars = Array.from({ length: 34 }, () => {
     // IntersectionObserver gate was tried but is redundant here.)
     function setLiving(active: boolean) {
       root.classList.toggle("portal-ambient", active);
+      gl?.setActive(active); // the WebGL scene's rAF runs only while living
       if (loopEl.src) {
         if (active && loopEl.paused) loopEl.play().catch(() => {}); // autoplay may be blocked → overlays carry it
         else if (!active && !loopEl.paused) loopEl.pause();
@@ -260,27 +275,71 @@ const stars = Array.from({ length: 34 }, () => {
       // living portrait fades in only once the scene is essentially open, so
       // the intro dissolve and the scroll-out bookend both stay clean; once
       // the video loop is rendering, the CSS overlays stand down entirely
-      lifeEl.style.opacity = videoLive ? "0" : String(seg(p, 0.82, 1));
+      lifeEl.style.opacity = videoLive || glLive ? "0" : String(seg(p, 0.82, 1));
       setLiving(p > 0.8);
       scrimEl.style.opacity = String(seg(p, 0.5, 1));
     }
     render(0);
 
-    // mount the living-painting loop at idle: wide viewports only (§9.7 —
-    // mobile keeps the weightless CSS overlays over the still; the 16:9 crop
-    // hides most of the aurora-S there anyway) and never under Save-Data.
-    // preload="none" + src-at-idle keeps the ~1MB clip off the LCP path.
-    const mountLoop = () => {
+    // mount the living scene at idle: wide viewports only (§9.7 — mobile keeps
+    // the weightless CSS overlays over the still; the 16:9 crop hides most of
+    // the aurora-S there anyway) and never under Save-Data. preload="none" +
+    // src-at-idle keeps the ~1MB clip off the LCP path.
+    //
+    // P1: the WebGL 2.5D scene is the new top tier — depth-parallax on the
+    // scene texture, GPU star field, foreground motes, drifting haze, camera
+    // that sways at idle and answers the cursor. The three.js chunk loads at
+    // idle only; ANY refusal (no WebGL, software rasterizer, missing depth
+    // map, ?portal=nogl, chunk failure) falls through to the DOM video path
+    // unchanged. The video still mounts under GL — as the scene's texture.
+    const wideAndUnsaved = () => {
       const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
-      if (conn?.saveData || !window.matchMedia("(min-width: 768px)").matches) return;
+      return !conn?.saveData && window.matchMedia("(min-width: 768px)").matches;
+    };
+    const mountVideo = (onPlaying: () => void) => {
       loopEl.addEventListener("playing", () => {
         if (videoLive) return;
         videoLive = true;
-        root.classList.add("portal-video-live"); // CSS fades the loop in over the identical poster frame
+        onPlaying();
         render(proxy.p); // stands the CSS overlays down
       });
       loopEl.src = root.dataset.loopSrc!;
       setLiving(proxy.p > 0.8); // starts playback if we're already open
+    };
+    // GPU context lost mid-visit → stand the DOM tiers back up seamlessly:
+    // the loop (if it was playing) or the CSS overlays over the still.
+    const glFallback = () => {
+      gl = null;
+      glLive = false;
+      root.classList.remove("portal-gl-live");
+      if (videoLive && loopEl.readyState >= 2) root.classList.add("portal-video-live");
+      render(proxy.p);
+    };
+    const mountScene = async () => {
+      if (!wideAndUnsaved()) return;
+      if (params.get("portal") !== "nogl") {
+        try {
+          const { mountPortalScene } = await import("../lib/portal-scene-3d");
+          gl = await mountPortalScene({
+            worldEl,
+            stillEl: root.querySelector<HTMLImageElement>("[data-portal-scene]")!,
+            videoEl: loopEl,
+            depthSrc: root.dataset.depthSrc!,
+            onContextLost: glFallback,
+          });
+        } catch {
+          gl = null; // engine chunk/init failure → DOM ladder, as before P1
+        }
+      }
+      if (gl) {
+        glLive = true;
+        root.classList.add("portal-gl-live"); // CSS fades the canvas in over the identical still
+        render(proxy.p); // overlays stand down
+        gl.setActive(proxy.p > 0.8);
+        mountVideo(() => gl?.useVideo()); // loop becomes the scene texture; DOM video stays hidden
+      } else {
+        mountVideo(() => root.classList.add("portal-video-live")); // CSS fades the loop in over the identical poster frame
+      }
     };
 
     // intro: the sting's opening — hold on the mark (now with a subtle BREATH,
@@ -368,7 +427,7 @@ const stars = Array.from({ length: 34 }, () => {
     };
     const mountEnhancements = () => {
       void mountBookend();
-      mountLoop();
+      void mountScene();
     };
     if ("requestIdleCallback" in window) {
       requestIdleCallback(mountEnhancements, { timeout: 2500 });
@@ -393,7 +452,12 @@ const stars = Array.from({ length: 34 }, () => {
         paused: loopEl.paused,
         readyState: loopEl.readyState,
       }),
-      forceLoop: () => mountLoop(), // QA: mount regardless of idle timing
+      gl: () => (gl ? gl.stats() : { live: false, glLive }),
+      // QA: draw n deterministic GL frames (harness tabs pause rAF)
+      glRender: (n = 1, dt = 1 / 60) => {
+        for (let i = 0; i < n; i++) gl?.renderOnce(dt);
+      },
+      forceLoop: () => void mountScene(), // QA: mount regardless of idle timing
     };
   }
 </script>
