@@ -483,6 +483,49 @@
   }
 
   /* ── Forge dialect (scoped) — heat is the only warm light (§3.3/§6) ── */
+  /* R3.8 F1 ember — fixed radial glow breathing behind the page. Orange is
+     SANCTIONED in the forge lane; compositor-only (animate opacity). */
+  [data-lane="forge"] .forge-ember {
+    position: fixed;
+    inset: -20%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      600px 480px at 50% 18%,
+      color-mix(in srgb, var(--color-forge-heat) 9%, transparent),
+      transparent 70%
+    );
+    opacity: 0.06;
+    animation: ember-breathe 9s ease-in-out infinite alternate;
+  }
+  @keyframes ember-breathe {
+    from {
+      opacity: 0.05;
+    }
+    to {
+      opacity: 0.09;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-lane="forge"] .forge-ember {
+      display: none;
+    }
+  }
+  /* R3.8 — temper nodes rest dimmed pre-ignition (only when interactive/JS on a
+     wide viewport); the ignition ScrollTrigger fires them to full once. The
+     stacked-panel fallback never dims. Watchdog + reduced-motion force 1. */
+  html.js [data-lane="forge"] .temper[data-interactive="true"] .temper-node {
+    opacity: 0.4;
+  }
+  html.js [data-lane="forge"] .temper[data-interactive="true"].is-ignited .temper-node {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-lane="forge"] .temper[data-interactive="true"] .temper-node {
+      opacity: 1;
+    }
+  }
+
   [data-lane="forge"] .temper-line {
     height: 1px;
     border: 0;

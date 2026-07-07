@@ -41,11 +41,15 @@ function parsePrice(price: string) {
 
 <Base title={p.meta.title} description={p.meta.description}>
   <div data-lane="forge">
-    <!-- F1 — belief hero -->
+    <!-- F1 ember (R3.8) — a fixed radial ember glow breathing behind the page.
+         Orange is SANCTIONED in the forge lane; CSS-only, compositor (opacity). -->
+    <div class="forge-ember" aria-hidden="true"></div>
+
+    <!-- F1 — belief hero. Headline reveals via masked-line rise (splitLines). -->
     <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
-      <h1 class="text-4xl font-bold sm:text-6xl">{p.hero.headline}</h1>
-      <p class="mx-auto max-w-xl text-lg text-ink">{p.hero.subline}</p>
-      <a href={`${base}${p.hero.cta.href}`} class="btn">{p.hero.cta.label}</a>
+      <h1 class="text-4xl font-bold sm:text-6xl" data-forge-h1>{p.hero.headline}</h1>
+      <p class="mx-auto max-w-xl text-lg text-ink" data-reveal>{p.hero.subline}</p>
+      <a href={`${base}${p.hero.cta.href}`} class="btn" data-reveal>{p.hero.cta.label}</a>
     </section>
 
     <!-- F2 — who it's for -->
@@ -55,7 +59,7 @@ function parsePrice(price: string) {
       <ul class="grid gap-3 sm:grid-cols-3">
         {
           p.whoFor.items.map((item) => (
-            <li class="panel p-4 text-sm text-ink">{item}</li>
+            <li class="panel p-4 text-sm text-ink" data-reveal data-reveal-stagger="70">{item}</li>
           ))
         }
       </ul>
@@ -148,6 +152,8 @@ function parsePrice(price: string) {
               title={`For ${item.forOrg} · ${item.what}`}
               proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
               ctaLabel={item.href ? "See the work" : undefined}
+              reveal
+              revealStagger={70}
             />
           ))
         }
@@ -176,8 +182,76 @@ function parsePrice(price: string) {
   // panels are the accessible fallback; this upgrades them to a WAI-ARIA
   // tablist on wide viewports only. Reduced motion → no count-up; hidden tab →
   // price resting value stays correct (rAF may not fire).
+  // R3.8 — lazily-loaded GSAP (shared by the panel crossfade + the temper-line
+  // ignition). Loaded once when the stepper first goes interactive on wide.
+  let gsapRef: typeof import("gsap").gsap | null = null;
+  let ignited = false;
+
   const root = document.querySelector<HTMLElement>("[data-temper]");
   if (root) init(root);
+
+  // R3.8 — F1 headline masked-line reveal (splitLines util). Runs regardless of
+  // the stepper; reduced motion / no-JS show the plain heading (CSS-gated).
+  (async () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const h1 = document.querySelector<HTMLElement>("[data-forge-h1]");
+    if (!h1) return;
+    if (document.fonts?.ready) await document.fonts.ready;
+    const { splitLines } = await import("../lib/split-lines");
+    splitLines(h1);
+    // reveal after a short beat so the mask-rise reads (matches §3.3)
+    setTimeout(() => h1.classList.add("is-revealed"), 300);
+  })();
+
+  // R3.8 — the temper-line ignition: on first entry of F3 the line draws
+  // scaleX 0→1, then the 5 nodes ignite in sequence with a one-time glow flare.
+  // Once only (never re-fires on tab switches). Requires the interactive stepper
+  // (wide + JS); the stacked fallback never dims and needs no ignition.
+  async function ignite(temper: HTMLElement) {
+    if (ignited || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    ignited = true;
+    if (!gsapRef) gsapRef = (await import("gsap")).gsap;
+    const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+    gsapRef.registerPlugin(ScrollTrigger);
+    ScrollTrigger.create({
+      trigger: temper,
+      start: "top 70%",
+      once: true,
+      onEnter: () => {
+        const line = temper.querySelector(".temper-line");
+        const nodes = temper.querySelectorAll(".temper-node");
+        const dots = temper.querySelectorAll(".temper-node .dot");
+        const tl = gsapRef!.timeline({
+          // once the reveal completes, hand opacity back to CSS (.is-ignited)
+          // and clear the inline styles GSAP set, so nothing lingers.
+          onComplete: () => {
+            temper.classList.add("is-ignited");
+            gsapRef!.set(nodes, { clearProps: "opacity" });
+          },
+        });
+        if (line)
+          tl.fromTo(
+            line,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 1.2, ease: "expo.out", transformOrigin: "left center" },
+          );
+        tl.to(nodes, { opacity: 1, duration: 0.4, stagger: 0.12, ease: "power2.out" }, "-=0.55");
+        tl.fromTo(
+          dots,
+          { boxShadow: "0 0 0 0 transparent" },
+          {
+            boxShadow: "0 0 14px 2px var(--node-color)",
+            duration: 0.35,
+            stagger: 0.12,
+            yoyo: true,
+            repeat: 1,
+            ease: "power2.out",
+          },
+          "<",
+        );
+      },
+    });
+  }
 
   function init(root: HTMLElement) {
     const track = root.querySelector<HTMLElement>("[data-temper-track]");
@@ -224,7 +298,15 @@ function parsePrice(price: string) {
         name?.classList.remove("is-cold", "is-hot", "is-set");
         // hot at the working (early) end, set (aqua) at the finished end
         name?.classList.add(j !== i ? "is-cold" : i < 3 ? "is-hot" : "is-set");
-        if (j === i) countUp(panel);
+        if (j === i) {
+          countUp(panel);
+          // R3.8 — 240ms opacity crossfade on the newly visible panel (skipped
+          // under reduced motion; keyboard tab-switching stays instant otherwise
+          // — opacity only, no layout tax). Lazy GSAP; CSS heat-flash unchanged.
+          if (!reduce && gsapRef) {
+            gsapRef.fromTo(panel, { opacity: 0 }, { opacity: 1, duration: 0.24, ease: "power2.out" });
+          }
+        }
       });
     }
 
@@ -244,6 +326,18 @@ function parsePrice(price: string) {
     function enable() {
       root.setAttribute("data-interactive", "true");
       track!.hidden = false;
+      // R3.8 — load GSAP for the crossfade + fire the temper-line ignition once.
+      if (!reduce) {
+        void (async () => {
+          if (!gsapRef) gsapRef = (await import("gsap")).gsap;
+          void ignite(root);
+        })();
+        // Watchdog: if the ignition never runs (chunk 404 / F3 never scrolled to
+        // / a throw), force the nodes to full so they can't stay dimmed forever.
+        setTimeout(() => {
+          if (!root.classList.contains("is-ignited")) root.classList.add("is-ignited");
+        }, 4000);
+      }
       // ARIA tablist wiring — only meaningful (and only present) while
       // interactive, so disable() can strip it cleanly on resize back to narrow.
       track!.setAttribute("role", "tablist");
