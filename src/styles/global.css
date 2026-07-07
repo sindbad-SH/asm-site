@@ -29,6 +29,7 @@
 @import "tailwindcss";
 
 /* Type (§3.2) — self-hosted variable fonts, latin, font-display: swap. */
+@import "@fontsource/anton"; /* display-condensed — P1 hero lockup (KPR grammar, ported per V1-UPGRADE-PLAN) */
 @import "@fontsource-variable/fraunces/opsz.css"; /* display — engraved map-title voice */
 @import "@fontsource-variable/dm-sans"; /* body/UI — KEEP from v1 */
 @import "@fontsource/space-mono/latin-400.css"; /* labels — surveyor's instrument voice */
@@ -54,6 +55,7 @@
         fallback face (defined below the @theme block) so the swap doesn't
         shift layout (§4 "font-display: swap + fallback metrics"). ── */
   --font-display: "Fraunces Variable", "Fraunces Fallback", ui-serif, Georgia, serif;
+  --font-display-condensed: "Anton", "Arial Narrow", "DM Sans Variable", sans-serif;
   --font-sans: "DM Sans Variable", "DM Sans Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
 
@@ -1133,7 +1135,15 @@
     z-index: 4;
     pointer-events: none;
     opacity: 1; /* endcard: legibility over the scene */
+    /* P1.1 legibility: a soft pool of void directly behind the content column
+       (first layer) — the aurora stays bright at the edges, the words own the
+       center. Edge vignette + bottom band as before, slightly deepened. */
     background:
+      radial-gradient(
+        52% 42% at 50% 47%,
+        color-mix(in srgb, var(--hero-void) 44%, transparent),
+        transparent 76%
+      ),
       radial-gradient(
         110% 80% at 50% 62%,
         transparent 30%,
@@ -1144,18 +1154,59 @@
         color-mix(in srgb, var(--hero-void) 40%, transparent),
         transparent 30%,
         transparent 62%,
-        color-mix(in srgb, var(--hero-void) 78%, transparent)
+        color-mix(in srgb, var(--hero-void) 82%, transparent)
       );
   }
   .portal-content {
     position: relative;
     z-index: 5;
-    max-width: 48rem;
+    max-width: 52rem;
     padding: 3rem 2rem;
     text-align: center;
     display: grid;
     gap: 1.25rem;
     justify-items: center;
+    /* P1.1 legibility: a grounded shadow under every glyph — the scrim pool
+       handles area contrast, this handles edge contrast against aurora light */
+    text-shadow:
+      0 1px 2px color-mix(in srgb, var(--hero-void) 60%, transparent),
+      0 8px 34px color-mix(in srgb, var(--hero-void) 70%, transparent);
+  }
+  /* P1.1 — the kicker must survive the aurora behind it: brighter, wider
+     tracking, a breath of the brand teal. Same instrument voice, more signal. */
+  .portal-content > .hud-label {
+    color: color-mix(in srgb, #d8f4ef 88%, transparent);
+    letter-spacing: 0.34em;
+  }
+  /* P1.1 — the hero lockup. The LOCKED headline, composed in two brand
+     voices: the name in condensed display caps (the ported KPR grammar's
+     first beachhead in v1), the promise as the engraved serif turn. */
+  .portal-headline {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: center;
+  }
+  .portal-headline-lead {
+    font-family: var(--font-display-condensed);
+    font-weight: 400;
+    text-transform: uppercase;
+    /* vw-clamped so the name always holds ONE line — a split "THE /
+       STORYSMITH." reads as an accident, not a lockup */
+    font-size: clamp(2.9rem, 7.2vw, 7rem);
+    white-space: nowrap;
+    line-height: 0.92;
+    letter-spacing: 0.014em;
+    color: #f4f8fb;
+  }
+  .portal-headline-turn {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.35rem, 2.6vw, 2.3rem);
+    line-height: 1.22;
+    color: color-mix(in srgb, #f4f8fb 92%, transparent);
+    text-wrap: balance;
+    max-width: 26ch;
   }
 
   /* R3.6a §4.2 — staggered content arrival as the void clears (kicker→h1→

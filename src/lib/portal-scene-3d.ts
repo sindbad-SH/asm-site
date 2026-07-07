@@ -61,7 +61,8 @@ export interface PortalSceneController {
 const MEDIA_ASPECT = 16 / 9;
 const CAM_Z = 10;
 const VIEW_H = 8; // world units of viewport height at z=0
-const OVERSCAN = 1.07; // plane cover margin so camera sway never shows edges
+const OVERSCAN = 1.05; // plane cover margin so camera sway never shows edges
+// (every point of overscan is extra upscale of the 720p source — keep minimal)
 
 /* seeded PRNG (same shape as PortalHero's build-time stars) so the particle
    field is stable run-to-run — QA screenshots stay diffable */
@@ -96,7 +97,9 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     renderer.dispose();
     return null;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  // full device resolution (capped at 2) — anything less reads soft next to
+  // the browser's own video scaler, which is exactly the P1 regression report
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
   const canvas = renderer.domElement;
   canvas.className = "portal-gl";
@@ -143,6 +146,8 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     uDepth: { value: depthTex },
     uOffset: { value: new THREE.Vector2(0, 0) }, // camera sway, normalized
     uAmp: { value: 0.011 }, // max UV displacement — parallax, not distortion
+    uTexel: { value: new THREE.Vector2(1 / 1280, 1 / 720) }, // media texel size
+    uSharp: { value: 0.5 }, // unsharp gain — counters bilinear upscale softness
   };
   const worldMat = new THREE.ShaderMaterial({
     uniforms: worldUniforms,
@@ -159,12 +164,25 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
       uniform sampler2D uDepth;
       uniform vec2 uOffset;
       uniform float uAmp;
+      uniform vec2 uTexel;
+      uniform float uSharp;
       varying vec2 vUv;
       void main() {
         float d = texture2D(uDepth, vUv).r;
         // pivot around mid-depth so sky and foreground counter-move
         vec2 par = uOffset * uAmp * (d - 0.35);
-        gl_FragColor = vec4(texture2D(uMedia, vUv + par).rgb, 1.0);
+        vec2 duv = vUv + par;
+        // unsharp mask at media resolution: the 720p source is upscaled well
+        // past 1:1 here, and bilinear-only sampling reads soft — this restores
+        // the edge contrast the browser's own video scaler would have kept
+        vec3 c = texture2D(uMedia, duv).rgb;
+        vec3 nb = (
+          texture2D(uMedia, duv + vec2(uTexel.x, 0.0)).rgb +
+          texture2D(uMedia, duv - vec2(uTexel.x, 0.0)).rgb +
+          texture2D(uMedia, duv + vec2(0.0, uTexel.y)).rgb +
+          texture2D(uMedia, duv - vec2(0.0, uTexel.y)).rgb
+        ) * 0.25;
+        gl_FragColor = vec4(clamp(c + (c - nb) * uSharp, 0.0, 1.0), 1.0);
       }`,
   });
   const worldGeo = new THREE.PlaneGeometry(MEDIA_ASPECT, 1);
@@ -386,8 +404,8 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     // never a jolt. Cursor adds on top, heavily lerped (soft, rule 2).
     const idleX = Math.sin(t * 0.16) * 0.1;
     const idleY = Math.cos(t * 0.11) * 0.06;
-    const tx = idleX + pointer.x * 0.3;
-    const ty = idleY - pointer.y * 0.18;
+    const tx = idleX + pointer.x * 0.26; // stays inside the (reduced) overscan
+    const ty = idleY - pointer.y * 0.16;
     cam.x += (tx - cam.x) * 0.035;
     cam.y += (ty - cam.y) * 0.035;
     camera.position.set(cam.x, cam.y, CAM_Z);
