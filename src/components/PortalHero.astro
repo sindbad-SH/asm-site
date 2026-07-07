@@ -112,8 +112,10 @@ const stars = Array.from({ length: 34 }, () => {
         />
       </picture>
 
-      <!-- LP-1 living portrait, primary: the looping living-painting render
-           (seamless tail→head crossfade of the brand sting scene, ~13s ≤1MB).
+      <!-- LP-1 living portrait, primary: the looping living-painting render.
+           Now the 4K-sourced 1080p H.264 loop (~4.5MB) — a seamless 12.1s
+           tail→head crossfade cut at the frame where the aurora returns to
+           the brand S-pose (scripts note: built from the Higgsfield 4K master).
            No src in markup — the engine mounts it at idle on wide viewports
            only, so no-JS / reduced-motion / save-data / mobile never download
            a byte. Its first frame IS the poster still below, so the fade-in
@@ -125,8 +127,8 @@ const stars = Array.from({ length: 34 }, () => {
         loop
         playsinline
         preload="none"
-        width="1280"
-        height="720"
+        width="1920"
+        height="1080"
         aria-hidden="true"></video>
 
       <!-- LP-1 living portrait, fallback: additive light over the still,

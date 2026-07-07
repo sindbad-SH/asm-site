@@ -172,9 +172,9 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
         // pivot around mid-depth so sky and foreground counter-move
         vec2 par = uOffset * uAmp * (d - 0.35);
         vec2 duv = vUv + par;
-        // unsharp mask at media resolution: the 720p source is upscaled well
-        // past 1:1 here, and bilinear-only sampling reads soft — this restores
-        // the edge contrast the browser's own video scaler would have kept
+        // unsharp mask at media resolution: even the 1080p source is upscaled
+        // past 1:1 on wide displays, and bilinear-only sampling reads soft —
+        // this restores the edge contrast the browser's own video scaler kept
         vec3 c = texture2D(uMedia, duv).rgb;
         vec3 nb = (
           texture2D(uMedia, duv + vec2(uTexel.x, 0.0)).rgb +
@@ -190,10 +190,13 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
   worldMesh.renderOrder = 0;
   scene.add(worldMesh);
 
-  /* ── 2 · stars: sparse, sky-band only, clear of the headline column —
-        the same discipline as the CSS stars they replace ── */
+  /* ── 2 · stars: sky-band only, clear of the headline column. These carry
+        the SKY'S LIFE now: the 4K brand loop has beautiful but STATIC baked
+        stars, so this overlay twinkles over them to restore the "alive sky"
+        the old render had. Denser + deeper twinkle than the CSS field it
+        replaced — one notch above minimal (taste rule 3), never a light show. ── */
   const rng = mulberry32(20260707);
-  const STAR_N = 64;
+  const STAR_N = 130;
   const starNorm: Array<{ u: number; v: number }> = [];
   const starPos = new Float32Array(STAR_N * 3);
   const starSize = new Float32Array(STAR_N);
@@ -203,15 +206,18 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     let v = 0.3;
     for (let tries = 0; tries < 14; tries++) {
       u = 0.02 + rng() * 0.96;
-      v = 0.04 + rng() * 0.48; // sky band of the image only
+      v = 0.04 + rng() * 0.5; // sky band of the image only
       if (!(u > 0.33 && u < 0.67 && v > 0.24)) break; // clear the mark/headline
     }
     starNorm.push({ u, v });
     starPos[i * 3 + 2] = 0.6 + rng() * 2.2; // just in front of the plane
-    starSize[i] = 1.1 + rng() * 1.7;
-    starTw[i * 3] = 0.14 + rng() * 0.2;
-    starTw[i * 3 + 1] = 0.55 + rng() * 0.4;
-    starTw[i * 3 + 2] = 0.9 + rng() * 1.6;
+    // a few brighter stars among many faint — the sky reads layered, not uniform
+    starSize[i] = 1.0 + rng() * rng() * 2.6;
+    // deeper twinkle: min dips near-dark so some stars visibly wink; rates
+    // spread wide so the field never pulses in unison
+    starTw[i * 3] = 0.05 + rng() * 0.18; // o0 (dim floor)
+    starTw[i * 3 + 1] = 0.6 + rng() * 0.4; // o1 (bright peak)
+    starTw[i * 3 + 2] = 0.6 + rng() * 2.2; // twinkle rate
   }
   const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
