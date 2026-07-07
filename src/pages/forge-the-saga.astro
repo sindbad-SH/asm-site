@@ -1,537 +1,535 @@
 ---
 /**
- * /forge-the-saga — P9 (V1-UPGRADE-PLAN): rebuilt to the Disal Consulting
- * services grammar (disalconsulting.com/en/cosa-facciamo), the operator's
- * chosen reference for this page. Their grammar, his method:
+ * /forge-the-saga — P11 "THE TEMPERING" (V1-UPGRADE-PLAN): the operator
+ * asked for an ORIGINAL page ("go nuts") after the Disal-grammar P9 read
+ * too basic. This one is built from the brand's own metaphor instead of a
+ * reference: the page IS the method.
  *
- *   - the SPLIT HERO: a saturated statement panel beside a calm panel where
- *     a single continuous LINE draws itself (their telescope man → our
- *     ridge contours, straight from the Contour Survey identity)
- *   - a row of tall DUOTONE cards with hover-rise reveals (their three
- *     service pillars → his three "who it's for" scenarios)
- *   - a saturated BAND with fine contour-line texture holding a horizontal
- *     carousel of artifacts (their OUR PAPERS → his FIVE STAGES, each
- *     stage as a paper-white method card with deliverable + price)
- *   - a calm band with the proof artifact + pill CTA (their books/DISCOVER
- *     → his PitchBoulder proof + See the work)
+ *   A story is forged down the page. THE TEMPER LINE — a glowing stroke —
+ *   runs through the five stations. It starts white-hot and wandering
+ *   (raw research), gets hammered straighter and COOLER at every stage
+ *   (the v1 heat→aqua thermal progression, resurrected with meaning), and
+ *   at the end bends into the AURORA-S OF THE LOGO: the raw material
+ *   becomes the saga, and the saga is literally the mark.
  *
- * Palette adaptation ("vibed by him"): their cobalt-on-paper daylight
- * becomes survey cobalt (#14406b) on dark stone — the site stays cinematic
- * while the two-tone split reads immediately as the reference.
+ *   - smithy ground: near-black ember dark; a lightweight 2D-canvas ember
+ *     field drifts upward in the hero (living at rest; desktop, idle-
+ *     mounted, paused off-screen, absent under reduced motion/save-data)
+ *   - the spine: an SVG temper line drawn by scroll (scrubbed dash), its
+ *     gradient running forge-heat → brand aqua top to bottom, wandering
+ *     early and straightening late (forged as you read)
+ *   - five stations along the spine: ember-glass stage cards, node FLARES
+ *     + a small spark burst as each station arrives (the hammer strike)
+ *   - finale: the cooled line draws into the brand S-curve (the same S
+ *     the home page draws at #talk) and hands off to the one CTA
  *
- * HONESTY: all copy verbatim from consts (hero/whoFor/stages/proof/pricing/
- * cta + SAGA_STAGES fields). Prices are the OD-4 exact "from $X" values.
- * The Echo Panel pretest stays shelved (F4, rendered:false). Proof still
- * renders through LegendMark + Testimonial.
+ * HONESTY: all copy verbatim from consts (hero/whoFor/stages/SAGA_STAGES/
+ * proof/pricing/cta; OD-4 exact prices). Echo Panel STAYS SHELVED (OD-2,
+ * F4 rendered:false) — the operator mentioned it in passing but has not
+ * reversed the shelf decision; stage 04's own copy carries the idea.
  *
- * Fallbacks: no-JS/reduced-motion → lines fully drawn, cards static with
- * meta visible, carousel is native scroll-snap (no JS required at all).
+ * Fallbacks: no-JS / reduced motion → the temper line renders FULLY
+ * FORGED (solid, final state), stations all visible via the reveal
+ * engine's watchdog, no canvas, no flares. The page reads perfectly cold.
  */
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
 import { PAGES, SAGA_STAGES } from "../consts";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const n = SAGA_STAGES.length;
 
-// duotone card art — the market cluster frames (existence-gated, cwd-anchored)
-const clusterDir = join(process.cwd(), "public", "media", "home", "market", "cluster");
-const cardArt = ["lake", "ridge", "valley"].map((name) =>
-  existsSync(join(clusterDir, `${name}.avif`))
-    ? {
-        avif: `${base}/media/home/market/cluster/${name}.avif`,
-        webp: `${base}/media/home/market/cluster/${name}.webp`,
-      }
-    : undefined,
-);
+// Each station's temper color — the v1 thermal progression, hot working end
+// to set aqua end. Used for node cores, card accents, and price marks.
+const temper = (i: number) => `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (n - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
 
-// the ridge contour paths — the same line family as the home hero's SVG
-// ridge, so the self-drawing line is OUR line, not a borrowed illustration
-const contours = [
-  "M0,150 L110,96 L205,132 L320,72 L430,120 L540,58 L660,110 L780,76 L900,124 L1020,88 L1140,128",
-  "M0,196 L95,152 L210,184 L330,132 L470,176 L610,120 L750,168 L890,136 L1030,178 L1140,150",
-];
+/**
+ * The spine path: wanders hard between early stations (raw story), then
+ * straightens as it cools (forged story). Stations sit at even vertical
+ * intervals in a 200×2000 viewBox; the x-wobble decays per segment.
+ * Coordinates are hand-tuned so node dots (at the station rows' anchor
+ * points) land ON the line.
+ */
+const SPINE = "M100,0 C 40,90 168,150 96,240 C 30,320 176,370 104,460 C 52,530 152,590 100,660 C 68,720 136,790 100,860 C 84,920 116,990 100,1060 C 92,1120 108,1190 100,1260 C 96,1330 104,1400 100,1470 C 98,1540 102,1620 100,1700 C 100,1780 100,1900 100,2000";
+// node anchor Ys in the same viewBox space (5 stations, even-ish spacing)
+const NODE_Y = [240, 660, 1060, 1470, 1860];
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
-  <main class="fs">
-    <!-- ═══ F1 · the split hero — statement panel + self-drawing ridge ═══ -->
-    <section class="fs-hero">
-      <div class="fs-hero-panel">
-        <h1 class="fs-headline" data-reveal>{p.hero.headline}</h1>
-        <p class="fs-sub" data-reveal>{p.hero.subline}</p>
-        <a href={`${base}${p.hero.cta.href}`} class="fs-pill" data-reveal>{p.hero.cta.label}</a>
-      </div>
-      <div class="fs-hero-canvas" aria-hidden="true">
-        <svg class="fs-lines" viewBox="0 0 1140 260" preserveAspectRatio="xMidYMid meet" fill="none">
-          {contours.map((d) => <path class="fs-line" data-fs-line d={d} stroke="var(--color-accent, #38f8ec)" stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round" />)}
-        </svg>
+  <main class="fg" data-fg>
+    <!-- ═══ T1 · THE SMITHY — ember dark, one belief ═══ -->
+    <section class="fg-hero" data-fg-hero>
+      <canvas class="fg-embers" data-fg-embers aria-hidden="true"></canvas>
+      <div class="fg-hero-glow" aria-hidden="true"></div>
+      <div class="fg-hero-inner">
+        <p class="hud-label fg-kicker" data-reveal data-tableau-content>
+          <span data-decode>{p.stages.heading}</span>
+        </p>
+        <h1 class="fg-headline" data-reveal>{p.hero.headline}</h1>
+        <p class="fg-sub" data-reveal>{p.hero.subline}</p>
+        <a href={`${base}${p.hero.cta.href}`} class="fg-pill" data-reveal>{p.hero.cta.label}</a>
       </div>
     </section>
 
-    <!-- ═══ F2 · who it's for — the three duotone scenario cards ═══ -->
-    <section class="fs-sec fs-who">
-      <h2 class="fs-h2" data-reveal>{p.whoFor.heading}</h2>
-      <p class="fs-body" data-reveal>{p.whoFor.body}</p>
-      <div class="fs-cards">
+    <!-- ═══ T2 · WHO IT'S FOR — three ember chips before the anvil ═══ -->
+    <section class="fg-sec fg-who">
+      <h2 class="fg-h2" data-reveal>{p.whoFor.heading}</h2>
+      <p class="fg-body" data-reveal>{p.whoFor.body}</p>
+      <ul class="fg-chips">
         {
           p.whoFor.items.map((item, i) => (
-            <article class="fs-card" data-reveal data-reveal-stagger="90">
-              {cardArt[i] && (
-                <picture class="fs-card-art" aria-hidden="true">
-                  <source srcset={cardArt[i]!.avif} type="image/avif" />
-                  <img src={cardArt[i]!.webp} alt="" loading="lazy" decoding="async" />
-                </picture>
-              )}
-              <span class="fs-card-no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-              <p class="fs-card-line">{item}</p>
-            </article>
+            <li class="fg-chip" data-reveal data-reveal-stagger="90" style={`--chip-heat:${temper(Math.min(i, n - 1))}`}>
+              <span class="fg-chip-no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              {item}
+            </li>
           ))
         }
+      </ul>
+    </section>
+
+    <!-- ═══ T3 · THE TEMPERING — the spine + five stations ═══ -->
+    <section class="fg-sec fg-anvil" data-fg-anvil>
+      <p class="fg-body fg-anvil-intro" data-reveal>{p.stages.body}</p>
+
+      <div class="fg-forge">
+        <!-- the temper line: drawn by scroll, hot→aqua, wander→straight -->
+        <svg class="fg-spine" viewBox="0 0 200 2000" preserveAspectRatio="xMidYMax meet" aria-hidden="true" fill="none">
+          <defs>
+            <linearGradient id="fg-temper" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="var(--color-forge-heat, #ff9d45)" />
+              <stop offset="0.55" stop-color="#c9b26a" />
+              <stop offset="1" stop-color="var(--color-accent, #38f8ec)" />
+            </linearGradient>
+          </defs>
+          <!-- the unforged ghost: where the story is going -->
+          <path d={SPINE} stroke="#ffffff" stroke-opacity="0.07" stroke-width="1.5" stroke-dasharray="3 7" />
+          <!-- the forged line: scrub-drawn over the ghost -->
+          <path data-fg-spine d={SPINE} stroke="url(#fg-temper)" stroke-width="2.5" stroke-linecap="round" />
+          {NODE_Y.map((y, i) => <circle class="fg-node" data-fg-node cx="100" cy={y} r="7" fill="#0f0d0b" stroke={temper(i)} stroke-width="2.5" />)}
+        </svg>
+
+        <ol class="fg-stations">
+          {
+            SAGA_STAGES.map((stage, i) => (
+              <li class="fg-station" data-fg-station style={`--heat:${temper(i)}`}>
+                <article class="fg-card" data-reveal>
+                  <header class="fg-card-head">
+                    <span class="fg-no" aria-hidden="true">{stage.no}</span>
+                    <h3 class="fg-name">{stage.name}</h3>
+                    <p class="hud-label fg-sublabel" data-tableau-content>
+                      <span data-decode>{stage.sub}</span>
+                    </p>
+                  </header>
+                  <p class="fg-process">{stage.process}</p>
+                  <dl class="fg-meta">
+                    <div>
+                      <dt class="hud-label">Deliverable</dt>
+                      <dd>{stage.deliverable}</dd>
+                    </div>
+                    <div>
+                      <dt class="hud-label">Best for</dt>
+                      <dd>{stage.bestFor}</dd>
+                    </div>
+                  </dl>
+                  <p class="fg-price">{stage.price}</p>
+                  {stage.no === "04" && <p class="fg-anchor">{p.stages.anchor}</p>}
+                </article>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="fg-pricing" data-reveal>
+        <h3 class="fg-h3">{p.pricing.heading}</h3>
+        <p class="fg-body">{p.pricing.body}</p>
+        <p class="fg-note">{p.pricing.note}</p>
       </div>
     </section>
 
-    <!-- ═══ F3 · the five stages — the cobalt band + method carousel ═══ -->
-    <section class="fs-sec fs-band">
-      <svg class="fs-band-texture" viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true" fill="none">
-        <path d="M-60,420 Q 320,180 760,340 T 1500,260" stroke="#ffffff" stroke-opacity="0.07" stroke-width="1.4" />
-        <path d="M-60,520 Q 400,300 860,440 T 1500,380" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1.4" />
-        <path d="M-60,180 Q 380,60 820,190 T 1500,110" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1.4" />
-      </svg>
-      <!-- the LOCKED heading, split in the reference's serif+sans manner -->
-      <h2 class="fs-band-title" data-reveal>
-        <span class="fs-band-serif">The five</span>
-        <span class="fs-band-caps">STAGES</span>
-      </h2>
-      <p class="fs-body fs-band-intro" data-reveal>{p.stages.body}</p>
-
-      <div class="fs-rail" data-fs-rail tabindex="0" aria-label="The five stages of Forge the Saga">
-        {
-          SAGA_STAGES.map((stage) => (
-            <article class="fs-stage" data-reveal data-reveal-stagger="70">
-              <header class="fs-stage-head">
-                <span class="fs-stage-no">{stage.no}</span>
-                <h3 class="fs-stage-name">{stage.name}</h3>
-                <p class="hud-label fs-stage-sub" data-tableau-content>
-                  <span data-decode>{stage.sub}</span>
-                </p>
-              </header>
-              <p class="fs-stage-process">{stage.process}</p>
-              <dl class="fs-stage-meta">
-                <div>
-                  <dt class="hud-label">Deliverable</dt>
-                  <dd>{stage.deliverable}</dd>
-                </div>
-                <div>
-                  <dt class="hud-label">Best for</dt>
-                  <dd>{stage.bestFor}</dd>
-                </div>
-              </dl>
-              <p class="fs-stage-price">{stage.price}</p>
-              {stage.no === "04" && <p class="fs-stage-anchor">{p.stages.anchor}</p>}
-            </article>
-          ))
-        }
-      </div>
-
-      <div class="fs-pricing" data-reveal>
-        <h3 class="fs-h3">{p.pricing.heading}</h3>
-        <p class="fs-body">{p.pricing.body}</p>
-        <p class="fs-note">{p.pricing.note}</p>
-      </div>
-    </section>
-
-    <!-- ═══ F5 · proof — the calm artifact band ═══ -->
-    <section class="fs-sec fs-proof">
-      <h2 class="fs-h2 fs-h2--serif" data-reveal>{p.proof.heading}</h2>
-      <div class="fs-proof-card" data-reveal>
+    <!-- ═══ T4 · PROOF — one ember-glass artifact ═══ -->
+    <section class="fg-sec fg-proof">
+      <h2 class="fg-h2 fg-h2--serif" data-reveal>{p.proof.heading}</h2>
+      <div class="fg-proof-card" data-reveal>
         <LegendMark proof={p.proof.anchor} />
         <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
-        <a href={`${base}/work/pitchboulder`} class="fs-pill fs-pill--quiet">
+        <a href={`${base}/work/pitchboulder`} class="fg-pill fg-pill--quiet">
           See the work <span aria-hidden="true">→</span>
         </a>
       </div>
-      <p class="fs-note" data-reveal>{p.proof.note}</p>
+      <p class="fg-note" data-reveal>{p.proof.note}</p>
     </section>
 
-    <!-- ═══ F7 · the close — statement panel again, one CTA ═══ -->
-    <section class="fs-sec fs-cta">
-      <h2 class="fs-headline fs-headline--close" data-reveal>{p.cta.headline}</h2>
-      <p class="fs-sub" data-reveal>{p.cta.body}</p>
-      <a href={`${base}${p.cta.cta.href}`} class="fs-pill" data-reveal>{p.cta.cta.label}</a>
+    <!-- ═══ T5 · THE SAGA — the cooled line becomes the mark ═══ -->
+    <section class="fg-sec fg-saga" data-fg-saga>
+      <svg class="fg-s" viewBox="0 0 400 800" fill="none" aria-hidden="true">
+        <path
+          data-fg-s
+          d="M330 46 C 110 130, 110 330, 255 400 C 400 470, 400 670, 170 754"
+          stroke="var(--color-accent, #38f8ec)"
+          stroke-opacity="0.5"
+          stroke-width="3"
+          stroke-linecap="round"></path>
+      </svg>
+      <div class="fg-saga-inner">
+        <h2 class="fg-headline fg-headline--close" data-reveal>{p.cta.headline}</h2>
+        <p class="fg-sub" data-reveal>{p.cta.body}</p>
+        <a href={`${base}${p.cta.cta.href}`} class="fg-pill" data-reveal>{p.cta.cta.label}</a>
+      </div>
     </section>
   </main>
 </Base>
 
 <style>
-  .fs {
-    /* the two working grounds: survey cobalt + dark stone (the reference's
-       cobalt + paper, brought into the site's night) */
-    --fs-cobalt: #14406b;
-    --fs-stone: #191a17;
-    --fs-paper: #edece4; /* stage cards keep the reference's paper */
-    background: var(--fs-stone);
+  .fg {
+    /* the smithy: near-black with an ember undertone — darker and warmer
+       than the site base, so the lane has its own air without leaving the
+       night. Heat is scarce and always MEANS temperature. */
+    --fg-ground: #100d0b;
+    --fg-glass: color-mix(in srgb, #ffffff 4%, transparent);
+    background: var(--fg-ground);
   }
-  .fs-sec {
+  .fg-sec {
     position: relative;
     overflow: clip;
   }
 
-  /* ── F1 split hero ── */
-  .fs-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    min-height: 86svh;
-  }
-  .fs-hero-panel {
-    background: var(--fs-cobalt);
+  /* ── T1 the smithy ── */
+  .fg-hero {
+    position: relative;
+    min-height: 92svh;
     display: grid;
     align-content: center;
-    justify-items: start;
-    gap: 1.4rem;
-    padding: clamp(2.5rem, 7vw, 7rem);
+    overflow: clip;
   }
-  .fs-headline {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(2.1rem, 3.6vw, 3.4rem);
-    line-height: 1.12;
-    color: #f4f7fa;
-    max-width: 16ch;
-  }
-  .fs-sub {
-    font-family: var(--font-sans);
-    font-size: clamp(1.02rem, 1.35vw, 1.2rem);
-    line-height: 1.55;
-    color: color-mix(in srgb, #f4f7fa 88%, transparent);
-    max-width: 44ch;
-  }
-  .fs-pill {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #071018;
-    background: var(--color-accent, #38f8ec);
-    border-radius: 999px;
-    padding: 0.85rem 1.7rem;
-    transition: transform 240ms var(--ease-swift, ease-out);
-  }
-  .fs-pill:hover {
-    transform: translateY(-2px);
-  }
-  .fs-pill--quiet {
-    background: transparent;
-    color: var(--color-accent, #38f8ec);
-    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-  }
-  .fs-hero-canvas {
-    display: grid;
-    align-items: center;
-    background: var(--fs-stone);
-    padding: clamp(1.5rem, 4vw, 4rem);
-  }
-  .fs-lines {
-    width: 100%;
-    height: auto;
-  }
-  /* the self-draw: dash values are set by JS from real path lengths; without
-     JS (or under reduced motion) the lines are simply fully drawn */
-  .fs-line {
-    stroke-dasharray: none;
-  }
-
-  /* ── F2 who it's for — duotone cards ── */
-  .fs-who {
-    padding: 6rem clamp(1.5rem, 6vw, 7rem);
-    display: grid;
-    gap: 1.2rem;
-    max-width: 88rem;
-    margin-inline: auto;
-  }
-  .fs-h2 {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
-    color: #eef2f5;
-  }
-  .fs-h2--serif {
-    font-family: var(--font-display);
-    font-weight: 520;
-    font-style: italic;
-  }
-  .fs-h3 {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: #eef2f5;
-  }
-  .fs-body {
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, 1.3vw, 1.15rem);
-    line-height: 1.6;
-    color: color-mix(in srgb, #eef2f5 82%, transparent);
-    max-width: 56ch;
-  }
-  .fs-note {
-    font-family: var(--font-sans);
-    font-size: 0.92rem;
-    color: color-mix(in srgb, #eef2f5 62%, transparent);
-    max-width: 60ch;
-  }
-  .fs-cards {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(0.9rem, 1.6vw, 1.5rem);
-    margin-top: 1.8rem;
-  }
-  .fs-card {
-    position: relative;
-    min-height: clamp(340px, 44vw, 520px);
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--fs-cobalt);
-    isolation: isolate;
-  }
-  .fs-card-art {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
-  .fs-card-art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* the duotone: desaturated art under a cobalt wash (their exact move) */
-    filter: grayscale(1) contrast(1.05);
-    opacity: 0.5;
-    transition:
-      opacity 500ms var(--ease-survey, ease),
-      transform 900ms var(--ease-survey, ease);
-  }
-  .fs-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--fs-cobalt) 92%, #000) 0%,
-      color-mix(in srgb, var(--fs-cobalt) 55%, transparent) 60%
-    );
-    z-index: 0;
-  }
-  .fs-card-no {
-    position: absolute;
-    top: 18px;
-    left: 20px;
-    z-index: 1;
-    font-family: var(--font-sans);
-    font-size: 2rem;
-    font-weight: 300;
-    color: #ffffff;
-    /* thin-stroke numeral — the line-art icon slot, drawn with type */
-    -webkit-text-stroke: 1px #fff;
-    -webkit-text-fill-color: transparent;
-    opacity: 0.9;
-  }
-  .fs-card-line {
-    position: absolute;
-    inset-inline: 20px;
-    bottom: 20px;
-    z-index: 1;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
-    line-height: 1.4;
-    color: #f4f7fa;
-    transition: transform 420ms var(--ease-survey, ease);
-  }
-  @media (hover: hover) {
-    .fs-card:hover .fs-card-line {
-      transform: translateY(-8px);
-    }
-    .fs-card:hover .fs-card-art img {
-      opacity: 0.68;
-      transform: scale(1.03);
-    }
-  }
-
-  /* ── F3 the band + stage carousel ── */
-  .fs-band {
-    background: var(--fs-cobalt);
-    padding: 6rem clamp(1.5rem, 6vw, 7rem) 5rem;
-  }
-  .fs-band-texture {
+  .fg-embers {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
   }
-  .fs-band-title {
+  /* the forge glow: breathes at rest (living portrait rule) — a low warm
+     light from below the frame, as if the forge is just out of shot */
+  .fg-hero-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      90% 55% at 50% 108%,
+      color-mix(in srgb, var(--color-forge-heat, #ff9d45) 22%, transparent),
+      transparent 70%
+    );
+    animation: fg-breathe 7s ease-in-out infinite alternate;
+  }
+  @keyframes fg-breathe {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fg-hero-glow {
+      animation: none;
+    }
+  }
+  .fg-hero-inner {
     position: relative;
     display: grid;
-    line-height: 0.95;
-    margin-bottom: 1.4rem;
+    gap: 1.4rem;
+    justify-items: start;
+    max-width: 64rem;
+    margin-inline: auto;
+    padding: 7rem clamp(1.5rem, 6vw, 4rem) 5rem;
   }
-  .fs-band-serif {
+  .fg-kicker {
+    letter-spacing: 0.3em;
+    color: color-mix(in srgb, var(--color-forge-heat, #ff9d45) 75%, #fff);
+  }
+  .fg-headline {
     font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-size: clamp(2rem, 4vw, 3.6rem);
-    color: #f4f7fa;
+    font-weight: 560;
+    font-size: clamp(2.4rem, 5vw, 4.6rem);
+    line-height: 1.06;
+    color: #f6f2ec;
+    max-width: 15ch;
+    /* lit by the forge: a warm underglow on the type itself */
+    text-shadow: 0 6px 40px color-mix(in srgb, var(--color-forge-heat, #ff9d45) 30%, transparent);
   }
-  .fs-band-caps {
+  .fg-sub {
+    font-family: var(--font-sans);
+    font-size: clamp(1.02rem, 1.35vw, 1.2rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, #f6f2ec 85%, transparent);
+    max-width: 46ch;
+  }
+  .fg-pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #140f0a;
+    background: linear-gradient(100deg, var(--color-forge-heat, #ff9d45), var(--color-accent, #38f8ec) 160%);
+    border-radius: 999px;
+    padding: 0.9rem 1.8rem;
+    transition: transform 240ms var(--ease-swift, ease-out);
+  }
+  .fg-pill:hover {
+    transform: translateY(-2px);
+  }
+  .fg-pill--quiet {
+    background: transparent;
+    color: var(--color-accent, #38f8ec);
+    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+
+  /* ── shared type ── */
+  .fg-h2 {
     font-family: var(--font-sans);
     font-weight: 600;
-    font-size: clamp(2.6rem, 5.4vw, 5rem);
-    letter-spacing: 0.02em;
-    color: #f4f7fa;
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    color: #f0ece6;
   }
-  .fs-band-intro {
-    position: relative;
-    margin-bottom: 2.6rem;
+  .fg-h2--serif {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 520;
   }
-  .fs-rail {
-    position: relative;
+  .fg-h3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #f0ece6;
+  }
+  .fg-body {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, #f0ece6 82%, transparent);
+    max-width: 56ch;
+  }
+  .fg-note {
+    font-size: 0.92rem;
+    color: color-mix(in srgb, #f0ece6 60%, transparent);
+    max-width: 60ch;
+  }
+
+  /* ── T2 who it's for ── */
+  .fg-who {
+    max-width: 64rem;
+    margin-inline: auto;
+    padding: 4rem clamp(1.5rem, 6vw, 4rem);
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: clamp(280px, 30vw, 380px);
-    gap: 1.2rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 1.2rem;
-    scrollbar-width: thin;
+    gap: 1.1rem;
   }
-  .fs-stage {
-    scroll-snap-align: start;
-    background: var(--fs-paper);
-    color: #17181c;
-    border-radius: 6px;
-    padding: 1.6rem 1.5rem 1.4rem;
+  .fg-chips {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
     display: grid;
-    gap: 0.9rem;
-    align-content: start;
-    box-shadow: 0 18px 50px -22px rgba(0, 0, 0, 0.5);
+    gap: 0.8rem;
   }
-  .fs-stage-no {
+  .fg-chip {
+    position: relative;
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.5;
+    color: #f0ece6;
+    background: var(--fg-glass);
+    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border-left: 2px solid var(--chip-heat);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem 1.1rem 3.4rem;
+  }
+  .fg-chip-no {
+    position: absolute;
+    left: 1.2rem;
+    top: 1.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--chip-heat);
+  }
+
+  /* ── T3 the tempering ── */
+  .fg-anvil {
+    padding: 4rem clamp(1.5rem, 6vw, 4rem) 5rem;
+    max-width: 74rem;
+    margin-inline: auto;
+  }
+  .fg-anvil-intro {
+    margin-bottom: 3rem;
+  }
+  .fg-forge {
+    display: grid;
+    grid-template-columns: clamp(90px, 14vw, 200px) minmax(0, 1fr);
+    gap: clamp(0.5rem, 3vw, 2.5rem);
+  }
+  .fg-spine {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+  }
+  /* no-JS / reduced motion: the line is FULLY FORGED (final state). The
+     engine sets the dash bookkeeping only when it's actually going to draw. */
+  [data-fg-spine] {
+    stroke-dasharray: none;
+  }
+  .fg-node {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, currentcolor 60%, transparent));
+  }
+  .fg-stations {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: clamp(3rem, 8vh, 6rem);
+  }
+  .fg-card {
+    background: var(--fg-glass);
+    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border-radius: 10px;
+    padding: 1.7rem 1.6rem 1.5rem;
+    display: grid;
+    gap: 0.95rem;
+    max-width: 40rem;
+    /* each card sits in its own heat: a faint left glow in station color */
+    box-shadow: inset 3px 0 0 var(--heat);
+  }
+  .fg-no {
     font-family: var(--font-sans);
     font-weight: 300;
-    font-size: 1.7rem;
-    color: var(--fs-cobalt);
-    -webkit-text-stroke: 1px var(--fs-cobalt);
+    font-size: 1.8rem;
+    color: var(--heat);
+    -webkit-text-stroke: 1px var(--heat);
     -webkit-text-fill-color: transparent;
   }
-  .fs-stage-name {
+  .fg-name {
     font-family: var(--font-sans);
     font-weight: 650;
-    font-size: 1.3rem;
-    margin-top: 0.2rem;
+    font-size: 1.35rem;
+    color: #f4f0ea;
+    margin-top: 0.15rem;
   }
-  .fs-stage-sub {
-    color: color-mix(in srgb, #17181c 62%, transparent);
+  .fg-sublabel {
     letter-spacing: 0.18em;
+    color: color-mix(in srgb, #f0ece6 60%, transparent);
   }
-  .fs-stage-process {
-    font-size: 0.95rem;
+  .fg-process {
+    font-size: 0.97rem;
     line-height: 1.55;
-    color: color-mix(in srgb, #17181c 84%, transparent);
+    color: color-mix(in srgb, #f0ece6 85%, transparent);
   }
-  .fs-stage-meta {
+  .fg-meta {
     display: grid;
-    gap: 0.7rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.9rem;
     margin: 0;
-    border-top: 1px solid color-mix(in srgb, #17181c 14%, transparent);
-    padding-top: 0.9rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    padding-top: 0.95rem;
   }
-  .fs-stage-meta dt {
-    color: color-mix(in srgb, #17181c 55%, transparent);
+  .fg-meta dt {
+    color: color-mix(in srgb, #f0ece6 52%, transparent);
     letter-spacing: 0.16em;
   }
-  .fs-stage-meta dd {
-    margin: 0.15rem 0 0;
+  .fg-meta dd {
+    margin: 0.2rem 0 0;
     font-size: 0.95rem;
     line-height: 1.45;
+    color: color-mix(in srgb, #f0ece6 88%, transparent);
   }
-  .fs-stage-price {
+  .fg-price {
     font-family: var(--font-mono);
     font-size: 0.9rem;
     letter-spacing: 0.08em;
-    color: var(--fs-cobalt);
+    color: var(--heat);
   }
-  .fs-stage-anchor {
+  .fg-anchor {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 0.98rem;
-    color: color-mix(in srgb, #17181c 72%, transparent);
-    border-left: 2px solid var(--fs-cobalt);
-    padding-left: 0.8rem;
+    font-size: 1rem;
+    color: color-mix(in srgb, #f0ece6 75%, transparent);
+    border-left: 2px solid var(--heat);
+    padding-left: 0.85rem;
   }
-  .fs-pricing {
-    position: relative;
-    margin-top: 2.6rem;
+  .fg-pricing {
+    margin-top: 3.5rem;
     display: grid;
     gap: 0.6rem;
   }
 
-  /* ── F5 proof ── */
-  .fs-proof {
-    padding: 6rem clamp(1.5rem, 6vw, 7rem);
+  /* ── T4 proof ── */
+  .fg-proof {
+    padding: 3rem clamp(1.5rem, 6vw, 4rem) 5rem;
     max-width: 60rem;
     margin-inline: auto;
     display: grid;
-    gap: 1.4rem;
+    gap: 1.3rem;
   }
-  .fs-proof-card {
+  .fg-proof-card {
     display: grid;
     gap: 1.1rem;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    border-radius: 8px;
+    background: var(--fg-glass);
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    border-radius: 10px;
     padding: 1.8rem;
-    background: color-mix(in srgb, #ffffff 3%, transparent);
   }
 
-  /* ── F7 close ── */
-  .fs-cta {
-    background: var(--fs-cobalt);
+  /* ── T5 the saga (the S finale) ── */
+  .fg-saga {
+    min-height: 88svh;
     display: grid;
-    justify-items: center;
-    text-align: center;
+    align-content: center;
+    padding: 6rem clamp(1.5rem, 6vw, 4rem);
+  }
+  .fg-s {
+    position: absolute;
+    right: 3%;
+    top: 50%;
+    height: 82%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent));
+  }
+  [data-fg-s] {
+    stroke-dasharray: none; /* fully drawn without the engine */
+  }
+  .fg-saga-inner {
+    position: relative;
+    display: grid;
     gap: 1.3rem;
-    padding: 6.5rem clamp(1.5rem, 6vw, 7rem);
+    justify-items: start;
+    max-width: 64rem;
+    margin-inline: auto;
+    width: 100%;
   }
-  .fs-headline--close {
-    max-width: 22ch;
-  }
-  .fs-cta .fs-sub {
-    max-width: 50ch;
+  .fg-headline--close {
+    max-width: 18ch;
   }
 
-  /* ── small screens ── */
-  @media (max-width: 860px) {
-    .fs-hero {
+  /* ── small screens: spine hides, stations stack clean ── */
+  @media (max-width: 760px) {
+    .fg-forge {
       grid-template-columns: 1fr;
     }
-    .fs-hero-canvas {
-      min-height: 34svh;
+    .fg-spine {
+      display: none;
     }
-    .fs-cards {
-      grid-template-columns: 1fr;
-    }
-    .fs-card {
-      min-height: 260px;
+    .fg-s {
+      opacity: 0.35;
+      right: -12%;
     }
   }
 </style>
 
 <script>
-  // P9 enhancement: the self-drawing contour lines (their continuous-line
-  // signature). Real path lengths measured at runtime; reduced motion and
-  // no-JS leave the lines fully drawn (CSS default).
+  // P11 enhancement — the tempering. Everything below rides over a page
+  // that is already fully forged without JS.
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { ensureSmoothScroll } from "../lib/smooth-scroll";
@@ -543,29 +541,152 @@ const contours = [
       void import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
     });
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
     gsap.registerPlugin(ScrollTrigger);
     const lenis = await ensureSmoothScroll();
     if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
 
-    document.querySelectorAll<SVGPathElement>("[data-fs-line]").forEach((path, i) => {
-      const L = path.getTotalLength();
-      path.style.strokeDasharray = String(L);
+    // ── the temper line: scrub-drawn down the anvil's transit ──
+    const spine = document.querySelector<SVGPathElement>("[data-fg-spine]");
+    const anvil = document.querySelector<HTMLElement>("[data-fg-anvil]");
+    if (spine && anvil) {
+      const L = spine.getTotalLength();
+      spine.style.strokeDasharray = String(L);
       gsap.fromTo(
-        path,
+        spine,
         { strokeDashoffset: L },
         {
           strokeDashoffset: 0,
-          duration: 2.2,
-          delay: 0.4 + i * 0.5,
-          ease: "power2.inOut",
-          scrollTrigger: { trigger: path.closest("section"), start: "top 75%", once: true },
-          onComplete: () => {
-            // once drawn, the ridge breathes — a slow vertical drift
-            gsap.to(path, { y: i % 2 ? -4 : 4, duration: 6 + i, ease: "sine.inOut", yoyo: true, repeat: -1 });
-          },
+          ease: "none",
+          scrollTrigger: { trigger: anvil, start: "top 60%", end: "bottom 75%", scrub: 0.6 },
         },
       );
+    }
+
+    // ── station arrivals: the hammer strike — node flare + card settle ──
+    document.querySelectorAll<HTMLElement>("[data-fg-station]").forEach((station, i) => {
+      const node = document.querySelectorAll<SVGCircleElement>("[data-fg-node]")[i];
+      ScrollTrigger.create({
+        trigger: station,
+        start: "top 70%",
+        once: true,
+        onEnter: () => {
+          if (node) {
+            gsap.fromTo(
+              node,
+              { attr: { r: 7 }, opacity: 0.6 },
+              { attr: { r: 11 }, opacity: 1, duration: 0.18, ease: "power3.out", yoyo: true, repeat: 1 },
+            );
+          }
+          // one soft strike on the card — a 6px drop that settles, never clips
+          const card = station.querySelector(".fg-card");
+          if (card) {
+            gsap.fromTo(card, { y: -6 }, { y: 0, duration: 0.5, ease: "power3.out" });
+          }
+        },
+      });
+    });
+
+    // ── the finale S: draws as the saga section arrives (the home page's
+    // #talk gesture, completing the arc: forged line → the mark) ──
+    const sPath = document.querySelector<SVGPathElement>("[data-fg-s]");
+    const saga = document.querySelector<HTMLElement>("[data-fg-saga]");
+    if (sPath && saga) {
+      const L = sPath.getTotalLength();
+      sPath.style.strokeDasharray = String(L);
+      gsap.fromTo(
+        sPath,
+        { strokeDashoffset: L },
+        {
+          strokeDashoffset: 0,
+          ease: "none",
+          scrollTrigger: { trigger: saga, start: "top 85%", end: "center 45%", scrub: 0.5 },
+        },
+      );
+    }
+
+    // ── the embers: a featherweight 2D canvas field in the hero. Rises,
+    // flickers, pauses off-screen and in hidden tabs. Wide viewports only;
+    // never under Save-Data. (~70 particles, transform-free, one pass.) ──
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData || !window.matchMedia("(min-width: 768px)").matches) return;
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-fg-embers]");
+    const hero = document.querySelector<HTMLElement>("[data-fg-hero]");
+    if (!canvas || !hero) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    let W = 0;
+    let H = 0;
+    const fit = () => {
+      W = hero.clientWidth;
+      H = hero.clientHeight;
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    };
+    fit();
+    new ResizeObserver(fit).observe(hero);
+
+    type Ember = { x: number; y: number; r: number; v: number; sway: number; ph: number; a: number; hot: boolean };
+    const embers: Ember[] = Array.from({ length: 70 }, () => ({
+      x: Math.random() * 1, // normalized; scaled by W each frame
+      y: Math.random() * 1,
+      r: 0.6 + Math.random() * 1.7,
+      v: 8 + Math.random() * 22, // px/s upward
+      sway: 6 + Math.random() * 18,
+      ph: Math.random() * Math.PI * 2,
+      a: 0.1 + Math.random() * 0.4,
+      hot: Math.random() < 0.75, // most embers warm, a few already cooled aqua
+    }));
+
+    let running = false;
+    let raf = 0;
+    let last = 0;
+    let t = 0;
+    const tick = (now: number) => {
+      if (!running) return;
+      raf = requestAnimationFrame(tick);
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      t += dt;
+      ctx.clearRect(0, 0, W, H);
+      for (const e of embers) {
+        e.y -= (e.v * dt) / H;
+        if (e.y < -0.02) {
+          e.y = 1.02;
+          e.x = Math.random();
+        }
+        const x = e.x * W + Math.sin(t * 0.7 + e.ph) * e.sway;
+        const y = e.y * H;
+        const flicker = 0.65 + 0.35 * Math.sin(t * 2.3 + e.ph * 3);
+        ctx.globalAlpha = e.a * flicker;
+        ctx.fillStyle = e.hot ? "#ffb066" : "#59e6da";
+        ctx.beginPath();
+        ctx.arc(x, y, e.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    };
+    const setRunning = (v: boolean) => {
+      if (v === running) return;
+      running = v;
+      if (v) {
+        last = performance.now();
+        raf = requestAnimationFrame(tick);
+      } else {
+        cancelAnimationFrame(raf);
+      }
+    };
+    // run only while the hero is on screen and the tab is visible
+    new IntersectionObserver(([entry]) => setRunning(entry.isIntersecting && !document.hidden), {
+      threshold: 0.05,
+    }).observe(hero);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) setRunning(false);
+      else if (hero.getBoundingClientRect().bottom > 0) setRunning(true);
     });
   }
   void init();
