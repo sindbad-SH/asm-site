@@ -107,10 +107,12 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     </ol>
   </nav>
 
-  <!-- 01 · Context -->
+  <!-- 01 · Context — Ascent grammar: mono ch-no chapter label decodes in; the
+       context still rides in a clip-corner .float card with a HUD data-chip
+       (descriptive only, never a claim). -->
   <section id="context" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">01 · Context</p>
+      <p class="hud-label ch-no" data-decode data-reveal>01 · CONTEXT</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.context.heading}</h2>
       {
         isPending(study.context.body) ? (
@@ -121,11 +123,10 @@ const isPending = (body: string) => body.trim() === "[confirm]";
       }
       {
         contextImage ? (
-          <figure class="map-inset mt-4">
+          <figure class="case-float float mt-4" data-chip="CONTEXT STILL" data-reveal>
             <img
               src={contextImage}
               alt=""
-              class="block w-full"
               style="aspect-ratio:16/9;object-fit:cover"
               width="1600"
               height="900"
@@ -143,7 +144,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   <!-- 02 · The Ask -->
   <section id="ask" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">02 · The Ask</p>
+      <p class="hud-label ch-no" data-decode data-reveal>02 · THE ASK</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.ask.heading}</h2>
       {
         isPending(study.ask.body) ? (
@@ -158,7 +159,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   <!-- 03 · The Work — the rich chapter: BTS scrub + commercial + proof -->
   <section id="work" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-6">
-      <p class="hud-label">03 · The Work</p>
+      <p class="hud-label ch-no" data-decode data-reveal>03 · THE WORK</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.work.heading}</h2>
       <p class="text-lg text-ink" data-reveal>{study.work.body}</p>
       <LegendMark proof={study.work.proof} />
@@ -183,7 +184,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     {
       (commercialVideoId || !fullFilmVideoId) && (
         <div class="case-chapter__inner space-y-3">
-          <p class="hud-label">The commercial</p>
+          <p class="hud-label ch-no" data-decode data-reveal>THE COMMERCIAL</p>
           <YouTubeEmbed
             videoId={commercialVideoId}
             title="The commercial"
@@ -196,7 +197,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     {
       fullFilmVideoId && (
         <div class="case-chapter__inner space-y-3">
-          <p class="hud-label">The film</p>
+          <p class="hud-label ch-no" data-decode data-reveal>THE FILM</p>
           <YouTubeEmbed
             videoId={fullFilmVideoId}
             title="The film"
@@ -210,7 +211,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   <!-- 04 · Outcome — honest, never an invented metric -->
   <section id="outcome" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">04 · Outcome</p>
+      <p class="hud-label ch-no" data-decode data-reveal>04 · OUTCOME</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.outcome.heading}</h2>
       {
         isPending(study.outcome.body) ? (
@@ -231,7 +232,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     study.testimonialId && (
       <section id="words" class="case-chapter" data-chapter>
         <div class="case-chapter__inner">
-          <p class="hud-label mb-4">05 · Words</p>
+          <p class="hud-label ch-no mb-4" data-decode data-reveal>05 · WORDS</p>
           <Testimonial testimonialId={study.testimonialId} class="panel p-6" />
         </div>
       </section>

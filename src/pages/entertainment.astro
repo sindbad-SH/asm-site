@@ -11,6 +11,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
+import WorkWall from "../components/WorkWall.astro";
 import { PAGES } from "../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -109,6 +110,14 @@ const pbStill = existsSync(join(pbDir, "context.avif"))
       </div>
     )
   }
+
+  <!-- The industry-lane work wall (V-3) — the SAME shared WorkWall, pre-filtered
+       to the entertainment pillar: the delivered pieces as live tiles with the
+       hover-distortion + Ledger engagement labels, each linking to its case
+       study. Sits between the PitchBoulder feature and the rooms. -->
+  <div class="border-t border-hairline">
+    <WorkWall pillar="entertainment" heading="The work" />
+  </div>
 
   <!-- E4 — the rooms; testimonial #2 lives here (OD-5), framed as the car
        owner's endorsement, never attributed to Pebble Beach itself -->

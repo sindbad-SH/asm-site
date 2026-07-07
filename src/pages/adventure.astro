@@ -1,38 +1,34 @@
 ---
 /**
- * Adventure — credibility lane, "the wild" (BUILD-PLAN.md §1.3, amended §9.3
- * + §9.5). Runs the Adventure dialect via data-lane="adventure" (§3.3/§6
- * synthesis): flight-line dividers + violet-slate map-insets.
+ * Adventure — credibility lane, "the wild" (V-3, V2-PLAN §2 Work B).
  *
- * A1 is now the GLOBE HERO (moved here from home, §9.3) — "where the stories
- * are told" is native to this lane. Compact headline + subline + GlobeHero,
- * wrapped in its own <section> so the globe's scroll-handoff retargets to
- * THIS section automatically (GlobeHero.astro targets `root.closest("section")`).
+ * A PRE-FILTERED lane view of the shared WorkWall, wrapped in the lane's own
+ * hero beats: the globe hero (§9.3 — "where the stories are told" is native
+ * here), the territory + licensed/personal sections, and the AA funnel outro.
+ * Only the old bespoke gallery is replaced — its tiles, hover-distortion, warm
+ * amber dialect, and field-note flyouts now come from WorkWall (pillar
+ * "adventure"), so the wall is ONE engine across /work, /adventure, /entertainment.
  *
- * Photo-first (§9.5): the gallery is the page's main surface — widened,
- * ready to grow to 20–40 real selects (S2). The ambient reel is now
- * optional/selective and sits below the gallery, not as the page opener.
+ * The adventure dialect is applied by the page shell (data-lane="adventure",
+ * flight-line dividers + violet-slate map-insets) and by WorkWall's own
+ * data-lane-dialect="wild" (warm amber captions, field-note flyouts kept).
  */
 import Base from "../layouts/Base.astro";
-import Card from "../components/Card.astro";
-import DistortionLayer from "../components/DistortionLayer.astro";
+import WorkWall from "../components/WorkWall.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
-import { PAGES, WORK } from "../consts";
+import { PAGES } from "../consts";
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const adventureWork = WORK.filter((item) => item.pillar === "adventure");
 
-// Ambient reel: SKIPPED by default (DIRECTION §2.3) — the on-disk loop
-// candidates were unverified content. The section renders only if a real reel
-// is dropped at public/media/adventure/reel-loop.mp4 (+ poster). No sources =
-// no section (not a placeholder box). Checked at build time (frontmatter runs
-// server-side); anchored to process.cwd() like Tableaux.astro.
+// Ambient reel: SKIPPED by default (DIRECTION §2.3) — renders only if a real
+// reel is dropped at public/media/adventure/reel-loop.mp4 (+ poster). Checked
+// at build time (frontmatter runs server-side), anchored to process.cwd().
 const reelDir = join(process.cwd(), "public", "media", "adventure");
 const reelHasLoop = existsSync(join(reelDir, "reel-loop.mp4"));
 const reelHasPoster = existsSync(join(reelDir, "reel-poster.avif"));
@@ -40,32 +36,12 @@ const reelSources = reelHasLoop
   ? [{ src: `${base}/media/adventure/reel-loop.mp4`, type: "video/mp4" }]
   : [];
 const reelPoster = reelHasPoster ? `${base}/media/adventure/reel-poster.avif` : undefined;
-
-// Slug → gallery media map. Round 2 (R3): widths are orientation-aware —
-// landscape cards export 800/1400/2200 (3:2), vertical cards 800/1120/1600
-// (4:5). A responsive <picture> renders only when the exported set exists.
-const GALLERY_WIDTHS = {
-  landscape: [800, 1400, 2200],
-  vertical: [800, 1120, 1600],
-} as const;
-function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
-  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
-  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
-  const widths = GALLERY_WIDTHS[orientation];
-  return {
-    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
-    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
-    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
-  };
-}
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
   <div data-lane="adventure">
-    <!-- A1 — globe hero (§2a, relocated §9.3). Headline paints first (LCP);
-         the globe streams in behind it and the poster covers every fallback
-         state. Compact vs. home's old treatment — this is a lane header,
-         not a full-bleed moment. -->
+    <!-- A1 — globe hero (relocated §9.3). Headline paints first (LCP); the globe
+         streams in behind it, the poster covers every fallback state. -->
     <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
       <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
       <p class="mx-auto max-w-2xl text-lg text-ink">{p.hero.subline}</p>
@@ -92,43 +68,17 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
       </div>
     </section>
 
-    <!-- A4 — the gallery: the page's MAIN SURFACE (§9.5 photo-first). Widened
-         from the connective-page max-w-3xl since this is now the primary
-         content, not a teaser; ready to grow to 20–40 real S2 selects. -->
-    <section class="border-t border-hairline p-8">
-      <hr class="flight-line mb-6" aria-hidden="true" />
-      <h2 class="mx-auto mb-4 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
-      <!-- Mixed-aspect gallery wall (R3): native orientation honored, never
-           letterbox-squished. Vertical cards (Matterhorn, Gornergrat glacier)
-           span two grid rows and render 4/5; landscape cards render 3/2 and
-           span one row. object-fit:cover inside each card, no stretch. -->
-      <div class="gallery-wall mx-auto max-w-5xl" data-distort-grid>
-        {
-          adventureWork.map((item) => {
-            const orientation = item.orientation ?? "landscape";
-            const isVertical = orientation === "vertical";
-            return (
-              <Card
-                class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}
-                mediaRatio={isVertical ? "4/5" : "3/2"}
-                mediaSrc={galleryMedia(item.slug, orientation)}
-                mediaAlt={item.title}
-                mediaLabel={`${item.title} — gallery still (§2b/§2e)`}
-                eyebrow={item.engagement}
-                title={item.title}
-                meta={item.what}
-                fieldNote={item.fieldNote}
-                fieldNoteOpen={item.fieldNoteOpen}
-                reveal
-                revealStagger={50}
-              />
-            );
-          })
-        }
-      </div>
-      <!-- AA funnel outro (operator exclusivity handling): the gallery is a
-           teaser referral to the agency that licenses the full collection. -->
-      <div class="mx-auto mt-8 max-w-5xl">
+    <!-- A4 — the field: the shared wall, pre-filtered to the wild. The warm
+         amber dialect + field-note flyouts now come from WorkWall; the AA
+         funnel outro below is unchanged. -->
+    <div class="border-t border-hairline">
+      <hr class="flight-line mx-auto max-w-5xl" aria-hidden="true" />
+      <WorkWall pillar="adventure" heading={p.gallery.heading} />
+
+      <!-- AA funnel outro (operator exclusivity handling): the wall is a teaser
+           referral to the agency that licenses the full collection. Ledger
+           phrasing verbatim, adjacent to the real AA mark. -->
+      <div class="mx-auto mt-4 max-w-5xl px-6 pb-8 sm:px-8">
         <div class="panel aa-funnel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
           <div class="flex items-center gap-4">
             <img
@@ -151,13 +101,10 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
           </a>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Ambient reel — OPTIONAL / selective (§9.5 / DIRECTION §2.3). SKIPPED by
-         default: the only loop candidates on disk are unverified content, so
-         per DIRECTION the reel renders NOTHING (not a placeholder box) unless
-         real sources are supplied. To activate: set `reelSources` (+ poster)
-         below — the section returns with zero other markup change. -->
+    <!-- Ambient reel — OPTIONAL / selective (§9.5). SKIPPED unless real sources
+         are supplied (set reelSources + poster above). -->
     {
       reelSources.length > 0 && (
         <section class="border-t border-hairline p-8">
@@ -177,16 +124,13 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
       <a href={`${base}${p.handoff.cta.href}`} class="btn">{p.handoff.cta.label}</a>
     </section>
   </div>
-
-  <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
-  <DistortionLayer />
 </Base>
 
 <script>
   // Field-note toggle (R3.4) — one delegated listener; the grid-rows CSS does
   // the expand/collapse. No-JS renders every note open (CSS), so this is pure
-  // enhancement. The note sits outside .map-inset, so the gallery hover warp is
-  // untouched.
+  // enhancement. The note sits outside .map-inset, so the wall hover warp is
+  // untouched. (WorkWall renders the same field-note markup in the wild lane.)
   document.addEventListener("click", (e) => {
     const btn = (e.target as HTMLElement).closest<HTMLElement>(".field-note-toggle");
     if (!btn) return;

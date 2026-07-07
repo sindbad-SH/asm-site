@@ -1,0 +1,244 @@
+---
+/**
+ * WorkWall — the shared Resn-grammar work wall (V-3, V2-PLAN §2 "Work").
+ *
+ * ONE engine, three portfolios. resn.co.nz/#!/work/all translated to ASM:
+ * a near-black wall on a faint contour ground (.topo-lines), a "FILTER /
+ * All work ⌄" dropdown, a 2-column wall of live media tiles running the
+ * existing WebGL hover-distortion ([data-distort-grid] / .map-inset), with
+ * captions beneath in small caps — TITLE / forOrg — plus the honest
+ * engagement label verbatim from WORK[].
+ *
+ * `pillar` prop selects the view:
+ *   • undefined      → /work: ALL tiles, FILTER dropdown visible.
+ *   • "adventure"    → pre-filtered lane view (warm amber dialect + field-note
+ *                      flyouts kept), NO dropdown — the lane hero already framed it.
+ *   • "entertainment"→ pre-filtered lane view (industry dialect), NO dropdown.
+ *
+ * PROGRESSIVE ENHANCEMENT (binding, V2-PLAN §2 / BRAND-BIBLE §5):
+ *   Every tile the view is scoped to renders visible in the DOM with NO js.
+ *   The FILTER dropdown is a real <select> that does nothing without JS — the
+ *   "show everything in scope" baseline is already correct. Reduced-motion is
+ *   fine (CSS distortion fallback + no FLIP). Filtering dispatches a `resize`
+ *   so the distortion engine re-measures (its rectsDirty path) and the overlay
+ *   never desyncs from the re-flowed wall.
+ *
+ * HONESTY LEDGER (BINDING): engagement labels are printed verbatim from
+ *   WORK[].engagement; any relationship statement flows only through LegendMark
+ *   (permittedPhrasing). No composed copy here.
+ */
+import Card from "./Card.astro";
+import DistortionLayer from "./DistortionLayer.astro";
+import { WORK, PILLARS, type PillarId } from "../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+interface Props {
+  /** Scope the wall to one lane; omit for the full cross-lane /work wall. */
+  pillar?: PillarId;
+  /** Heading + note above the wall (all authored copy comes from the caller). */
+  heading?: string;
+  note?: string;
+}
+const { pillar, heading, note } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Which items this wall renders. A lane view is pre-filtered at build time so
+// the no-JS baseline for /adventure or /entertainment is already the lane, not
+// the whole index.
+const items = pillar ? WORK.filter((w) => w.pillar === pillar) : WORK;
+
+// FILTER dropdown options (only on the full /work wall). Canonical PILLARS
+// order, limited to pillars that actually have WORK items — no dead option.
+// Labels use the lane dialect names from V2-PLAN: All work / The wild /
+// The market / The industry (mapping to adventure / consulting / entertainment).
+const LANE_LABEL: Record<PillarId, string> = {
+  adventure: "The wild",
+  consulting: "The market",
+  entertainment: "The industry",
+};
+const presentPillars = new Set(items.map((w) => w.pillar));
+const filterOptions = pillar
+  ? []
+  : [
+      { id: "all", label: "All work" },
+      ...PILLARS.filter((p) => presentPillars.has(p.id)).map((p) => ({
+        id: p.id,
+        label: LANE_LABEL[p.id],
+      })),
+    ];
+const showFilter = filterOptions.length > 1;
+
+// Slug → responsive gallery media (shared with the adventure gallery exports).
+// A tile renders a real <picture> only when its 800w export exists on disk
+// (checked at build time, cwd-anchored); otherwise the Card keeps a placeholder.
+const GALLERY_WIDTHS = {
+  landscape: [800, 1400, 2200],
+  vertical: [800, 1120, 1600],
+} as const;
+function wallMedia(slug: string, orientation: "landscape" | "vertical") {
+  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  const widths = GALLERY_WIDTHS[orientation].filter((w) =>
+    existsSync(join(g, `${slug}-${w}.avif`)),
+  );
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
+  };
+}
+
+// A tile carries the warm amber lane dialect (captions + field-note flyout)
+// only in the adventure lane; market/industry tiles use the forge/industry
+// dialect. Set as a data-attr the wall scopes its CSS by.
+const isAdventureLane = pillar === "adventure";
+---
+
+<section class="work-wall topo-lines">
+  <div class="work-wall__head mx-auto max-w-5xl">
+    {heading && <h2 class="text-2xl font-bold" data-reveal>{heading}</h2>}
+    {note && <p class="text-ink" data-reveal>{note}</p>}
+
+    {
+      showFilter && (
+        <div class="wall-filter" data-work-filter>
+          <label class="hud-label" for="work-filter-select">
+            Filter
+          </label>
+          <div class="wall-filter__select">
+            {/* Real <select> — the Resn "All work ⌄" control. Pure enhancement:
+                inert without JS, and every in-scope tile already shows, so a
+                no-JS visit sees the complete wall. */}
+            <select id="work-filter-select" data-filter-select aria-label="Filter work by lane">
+              {filterOptions.map((o) => (
+                <option value={o.id}>{o.label}</option>
+              ))}
+            </select>
+            <span class="wall-filter__caret" aria-hidden="true">⌄</span>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <div
+    class={`work-wall__grid mx-auto max-w-5xl ${isAdventureLane ? "" : "work-wall__grid--index"}`}
+    data-distort-grid
+    data-work-grid
+    data-lane-dialect={isAdventureLane ? "wild" : "forge"}
+  >
+    {
+      items.map((item) => {
+        const orientation = item.orientation ?? "landscape";
+        const isVertical = orientation === "vertical";
+        // Small-caps caption: TITLE / forOrg. In the adventure lane the tile
+        // keeps its field-note flyout; the engagement label is verbatim.
+        return (
+          <Card
+            class={`wall-tile ${isVertical ? "wall-tile--tall" : ""}`}
+            mediaRatio={isVertical ? "4/5" : "3/2"}
+            mediaSrc={wallMedia(item.slug, orientation)}
+            mediaAlt={item.title}
+            mediaLabel={`${item.title} — ${LANE_LABEL[item.pillar]}`}
+            href={item.href ? `${base}${item.href}` : undefined}
+            eyebrow={item.title}
+            title={`For ${item.forOrg}`}
+            meta={item.engagement}
+            proof={item.relationshipId ? { relationshipId: item.relationshipId } : undefined}
+            fieldNote={isAdventureLane ? item.fieldNote : undefined}
+            fieldNoteOpen={isAdventureLane ? item.fieldNoteOpen : undefined}
+            ctaLabel={item.href ? "See the work" : undefined}
+            pillar={item.pillar}
+            reveal
+            revealStagger={55}
+          />
+        );
+      })
+    }
+  </div>
+
+  <p class="mx-auto mt-4 max-w-5xl text-sm text-ink-muted" data-work-empty hidden>
+    Nothing in this lane yet.
+  </p>
+
+  <DistortionLayer />
+</section>
+
+{
+  showFilter && (
+    <script>
+      {/* FILTER dropdown enhancement — every tile starts visible (no-JS
+          baseline). On change we toggle .hidden, FLIP survivors between grid
+          slots, then dispatch a `resize` so the shared distortion engine hits
+          its rectsDirty path and re-measures the re-flowed wall (its overlay
+          would otherwise sit on stale rects). */}
+      // @ts-nocheck
+      import { gsap } from "gsap";
+
+      const grid = document.querySelector("[data-work-grid]");
+      const select = document.querySelector("[data-filter-select]");
+      const empty = document.querySelector("[data-work-empty]");
+      if (grid && select) {
+        const tiles = [...grid.querySelectorAll("[data-pillar]")];
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const applyFilter = (filter) => {
+          let visible = 0;
+          tiles.forEach((tile) => {
+            const show = filter === "all" || tile.dataset.pillar === filter;
+            tile.classList.toggle("hidden", !show);
+            if (show) visible++;
+          });
+          if (empty) empty.hidden = visible > 0;
+        };
+
+        // Re-measure the distortion overlay after the wall re-flows: a `resize`
+        // sets rectsDirty in distort-engine, so the shader planes track the
+        // survivors' new boxes on the next frame instead of the pre-filter ones.
+        const reflowDistortion = () => {
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => window.dispatchEvent(new Event("resize"))),
+          );
+        };
+
+        let FlipMod = null;
+        let flipFailed = false;
+
+        select.addEventListener("change", async () => {
+          const filter = select.value;
+
+          if (!FlipMod && !flipFailed && !reduce) {
+            try {
+              FlipMod = await import("gsap/Flip");
+              gsap.registerPlugin(FlipMod.Flip);
+            } catch {
+              flipFailed = true;
+            }
+          }
+
+          if (FlipMod && !reduce) {
+            const state = FlipMod.Flip.getState(tiles);
+            applyFilter(filter);
+            FlipMod.Flip.from(state, {
+              duration: 0.5,
+              ease: "power2.out",
+              absolute: true,
+              onEnter: (els) =>
+                gsap.fromTo(
+                  els,
+                  { opacity: 0, scale: 0.96 },
+                  { opacity: 1, scale: 1, duration: 0.28 },
+                ),
+              onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.96, duration: 0.22 }),
+              onComplete: reflowDistortion,
+            });
+          } else {
+            applyFilter(filter);
+            reflowDistortion();
+          }
+        });
+      }
+    </script>
+  )
+}

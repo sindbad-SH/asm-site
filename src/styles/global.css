@@ -1292,6 +1292,20 @@
     color: var(--color-ink-muted);
   }
 
+  /* Case-study media as an Ascent clip-corner card (V-3): reuses the .float
+     clip-corner + data-chip chrome, but STATIC block flow (the cluster .float
+     is absolutely positioned; here the media rides in the document). The
+     top-left HUD chip is descriptive-only — never a claim. */
+  .case-float.float {
+    position: static;
+    width: 100%;
+    z-index: auto;
+  }
+  .case-float.float img {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
   /* YouTube click-to-load facade (§4) — no request to YouTube until click */
   .yt {
     position: relative;
@@ -2080,6 +2094,174 @@
     margin: 0 0 1rem;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
+  }
+
+  /* ── The work wall (V-3, Resn grammar) ──
+     ONE component across /work, /adventure, /entertainment. Near-black ground
+     with the faint contour texture (.topo-lines is applied in markup); a FILTER
+     dropdown; a masonry wall of live media tiles carrying the existing
+     hover-distortion; captions in small caps (TITLE / forOrg) + the honest
+     engagement label. Lane dialect is scoped by [data-lane-dialect]. */
+  .work-wall {
+    position: relative;
+    padding: 2.5rem 1.5rem 1rem;
+  }
+  @media (min-width: 640px) {
+    .work-wall {
+      padding: 3rem 2rem 1.5rem;
+    }
+  }
+  .work-wall__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .work-wall__head > :where(h2, p) {
+    max-width: 46rem;
+  }
+
+  /* Wall opener headline — giant engraved-serif, KPR/Ascent scale, tight. */
+  .wall-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 5vw, 3.6rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--color-peak);
+    max-width: 18ch;
+  }
+
+  /* FILTER dropdown — the Resn "All work ⌄" control. A styled native <select>
+     (real form control: keyboard + screen-reader friendly), mono voice, hairline
+     frame, the caret drawn as a sibling glyph so it reads in the survey dialect.
+     Inert without JS; every in-scope tile already shows. */
+  .wall-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+  }
+  .wall-filter > .hud-label {
+    color: var(--color-ink-muted);
+  }
+  .wall-filter__select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .wall-filter__select select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-hairline);
+    border-radius: 2px;
+    padding: 0.5rem 2.2rem 0.5rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-peak);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-hover) var(--ease-swift),
+      color var(--dur-hover) var(--ease-swift),
+      box-shadow var(--dur-hover) var(--ease-swift);
+  }
+  .wall-filter__select select:hover,
+  .wall-filter__select select:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 20px -8px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+  .wall-filter__caret {
+    position: absolute;
+    right: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-accent-deep);
+    pointer-events: none;
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .wall-filter__select select:hover ~ .wall-filter__caret,
+  .wall-filter__select select:focus-visible ~ .wall-filter__caret {
+    color: var(--color-accent);
+  }
+
+  /* The wall grid — CSS multi-column masonry, same bulletproof engine as the
+     adventure gallery: every tile keeps its native aspect (landscape 3:2,
+     vertical 4:5), portrait stills stand tall beside landscape ones, no squish,
+     no row-span math. Generous dark spacing (Resn). */
+  .work-wall__grid {
+    column-count: 2;
+    column-gap: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .work-wall__grid {
+      column-count: 3;
+    }
+  }
+  /* The cross-lane /work index is a calmer 2-col wall (fewer, denser tiles read
+     as an index rather than a photo gallery). */
+  @media (min-width: 768px) {
+    .work-wall__grid--index {
+      column-count: 2;
+      column-gap: 1.5rem;
+    }
+  }
+  .work-wall__grid > .wall-tile {
+    display: flex;
+    width: 100%;
+    margin: 0 0 1.25rem;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+
+  /* Tile caption dialect — small caps TITLE / forOrg. The Card renders the
+     title into .card-eyebrow (small-caps mono line) and "For [org]" into
+     .card-title; the engagement label sits in .card-meta. */
+  .wall-tile .card-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--color-peak);
+    text-transform: none; /* keep the real title's case; the caps come from tracking */
+  }
+  .wall-tile .card-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted);
+  }
+  .wall-tile .card-meta {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+  }
+
+  /* WILD dialect (adventure lane): warm amber tile frames + amber caption
+     accents, matching the adventure map-inset treatment. Field-note flyouts are
+     rendered by the Card in this dialect only. */
+  [data-lane-dialect="wild"] .wall-tile .map-inset {
+    border-color: color-mix(in srgb, var(--color-adventure-warm) 30%, transparent);
+  }
+  [data-lane-dialect="wild"] .wall-tile .card-eyebrow {
+    color: var(--color-adventure-warm);
+  }
+
+  /* FORGE / INDUSTRY dialect (market + industry lanes on the /work index and
+     the entertainment wall): cool peak linework, no amber — the forge/industry
+     voice. Kept deliberately restrained (accent stays scarce; orange is Forge-
+     lane-only and never escapes here). */
+  [data-lane-dialect="forge"] .wall-tile .map-inset {
+    border-color: color-mix(in srgb, var(--color-peak) 20%, transparent);
+  }
+  [data-lane-dialect="forge"] .wall-tile .card-eyebrow {
+    color: var(--color-peak);
   }
 }
 
