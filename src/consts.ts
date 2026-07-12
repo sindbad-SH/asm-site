@@ -357,6 +357,21 @@ export const WORK: readonly WorkItem[] = [
     relationshipId: "pebble-beach",
     href: "/work/shelby-pebble-beach",
   },
+  // P13d — Knights of Mayhem (operator direction 2026-07-08): the jousting
+  // showcase he cut at the Colorado Medieval Festival (Longmont). Made on a
+  // handshake ("send us the piece and maybe we'll talk"), never commissioned —
+  // he's proud of the piece and wants it shown WITH that truth intact.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED for the three strings below (title,
+  // what, and the final engagement wording — engagement ships "[confirm]",
+  // which blocks production until he supplies his word).
+  {
+    slug: "knights-of-mayhem",
+    title: "Knights of Mayhem — full-contact jousting at the Colorado Medieval Festival",
+    pillar: "entertainment",
+    forOrg: "Knights of Mayhem",
+    what: "covered the jousting troupe and cut their showcase piece",
+    engagement: "[confirm]",
+  },
   {
     slug: "pitchboulder",
     title: "PitchBoulder — coverage, recaps & the commercial",

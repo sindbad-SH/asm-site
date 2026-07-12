@@ -66,14 +66,20 @@ function caseMedia(slug: string) {
 // tall, aerial landscapes stay wide. Deterministic, art-directed, no random.
 type Shape = "feature" | "wide" | "tall";
 const tiles = WORK.map((item, i) => {
-  const isCase = !!item.href;
+  // P13d — feature treatment follows the MEDIA, not the link: an item with
+  // case-grade exports (work/<slug>/ poster + loop) reads as a cinematic
+  // feature tile even before its case page exists (Knights of Mayhem ships
+  // tile-first; its page can come later). caseMedia is existence-gated, so
+  // gallery items without a work/ folder are untouched.
+  const caseArt = caseMedia(item.slug);
+  const isCase = !!item.href || !!caseArt;
   const shape: Shape = isCase ? "feature" : item.orientation === "vertical" ? "tall" : "wide";
   return {
     item,
     index: String(i + 1).padStart(3, "0"),
     shape,
     media: isCase ? undefined : gridMedia(item.slug, item.orientation ?? "landscape"),
-    caseArt: isCase ? caseMedia(item.slug) : undefined,
+    caseArt: isCase ? caseArt : undefined,
     pillarName: PILLARS.find((pl) => pl.id === item.pillar)?.name ?? item.pillar,
   };
 });
