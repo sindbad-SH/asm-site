@@ -1,0 +1,352 @@
+---
+/**
+ * /venture/ko-law-workshops — P12-KO: a LIGHT venture story. Sibling to
+ * /venture/amazing-aerial + /venture/meme (same venture-article grammar:
+ * slate, italic title, LegendMark proof, short paragraphs, photo band,
+ * ← Venture backlink + prominent CTAs with the arrow-slide grammar).
+ *
+ * CONTEXT (2026-07-12): the operator confirmed he covered FOUR of KO Law's
+ * 2026 startup workshops (video + photos) and lifted the former "ko law" audit
+ * exclusion. His framing: "just create a light story … a page about the
+ * workshops they're doing." So this stays modest — coverage of a workshop
+ * series, NEVER an embedded/ongoing body of work, NO client-endorsement claim.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every prose string below (slate, title,
+ * the three paragraphs) is NEW copy, staging-only until he reads it. The
+ * relationship status renders ONLY through LegendMark from the LOCKED
+ * permittedPhrasing in consts ("workshop-coverage" → KO Law · four 2026
+ * sessions). The four session titles are FACTUAL, sourced: Jan 29 + Feb 26
+ * from the operator's own edit filenames; Apr 30 ("Formation: Building the
+ * Foundation") + Jun 25 ("Building Your Team") read verbatim off the KO-branded
+ * title slide visible in his own event photos.
+ *
+ * FIRM VERIFIED from its own site: KO Law PC (kofirm.com) — a corporate /
+ * transactional business-law firm in Boulder + Denver, Colorado, serving
+ * founders and emerging companies; Ian Kuliasha is a Partner there. The page
+ * names the FIRM only; it never names a person and claims no Pitch Boulder tie.
+ *
+ * Photos: real event stills the operator shot at the four sessions, exported by
+ * scripts/make-ko-law-story.mjs (avif+webp, EXIF auto-oriented). Native 1:1
+ * (the frames are square as shot). The HERO is an audience-from-behind frame
+ * (no identifiable faces) facing the KO-branded "Startup Workshop" screen.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { existsSync, statSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const ko = PAGES.entertainment.rooms.items.find(
+  (r) => r.proof.relationshipId === "workshop-coverage",
+)!; // proof = { relationshipId: "workshop-coverage" }
+
+// ── media (existence-gated, cache-busted like the rest of the site) ──
+const VDIR = join(process.cwd(), "public", "media", "venture", "ko-law-workshops");
+const WIDTHS = [900, 1600];
+const bust = (slug: string, w: number, ext: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(VDIR, `${slug}-${w}.${ext}`)).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
+function shot(slug: string) {
+  if (!existsSync(join(VDIR, `${slug}-900.avif`))) return undefined;
+  const widths = WIDTHS.filter((w) => existsSync(join(VDIR, `${slug}-${w}.avif`)));
+  const set = (ext: string) =>
+    widths
+      .map((w) => `${base}/media/venture/ko-law-workshops/${slug}-${w}.${ext}${bust(slug, w, ext)} ${w}w`)
+      .join(", ");
+  const w0 = widths[0];
+  return {
+    avif: set("avif"),
+    webp: set("webp"),
+    src: `${base}/media/venture/ko-law-workshops/${slug}-${w0}.webp${bust(slug, w0, "webp")}`,
+  };
+}
+const hero = shot("hero");
+const collage = ["stage-team", "venue-wide", "workshop-slide", "boardroom", "roundtable"]
+  .map((slug) => shot(slug))
+  .filter((s): s is NonNullable<typeof s> => !!s);
+
+// ── THE ARTICLE (all new sentences — see the approval note above) ──
+const ARTICLE = {
+  slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
+  title: "Four startup workshops, on camera.",
+  paragraphs: [
+    "KO Law is a business-law firm in Boulder and Denver, and part of what they do is teach — a startup workshop series that walks founders through the fundamentals of building a company.",
+    "Across 2026 I covered four of those sessions, on video and in photographs — from an early boardroom to a full room under stage lights.",
+    "It's light, honest coverage: I show up, catch the session as it happens, and cut it into something that lasts.",
+  ],
+};
+
+// Session index — FACTUAL titles (see the approval note). Jan/Feb from the
+// operator's edit filenames; Apr/Jun read off the on-screen KO title slide.
+const SESSIONS = [
+  { date: "Jan 29, 2026", title: "Modeling the Exit" },
+  { date: "Feb 26, 2026", title: "Mapping Your Business's Lifecycle" },
+  { date: "Apr 30, 2026", title: "Formation: Building the Foundation" },
+  { date: "Jun 25, 2026", title: "Building Your Team" },
+];
+
+const CTAS = [
+  { label: "See the venture lane", href: `${base}/entertainment`, external: false },
+  { label: "About KO Law", href: "https://kofirm.com", external: true },
+];
+---
+
+<Base
+  title="KO Law startup workshops — a venture story"
+  description="Light, honest coverage of KO Law's 2026 startup workshop series — four sessions, on video and in photographs, from the boardroom to the stage."
+>
+  <main class="ko-story">
+    <article class="ko-inner">
+      <a href={`${base}/entertainment`} class="link ko-back">← Venture</a>
+
+      <p class="hud-label ko-slate" data-reveal>
+        <span data-decode>{ARTICLE.slate}</span>
+      </p>
+      <h1 class="ko-title" data-reveal>{ARTICLE.title}</h1>
+      <div class="ko-proof" data-reveal>
+        <LegendMark proof={ko.proof} />
+      </div>
+
+      {
+        hero && (
+          <figure class="ko-hero" data-reveal>
+            <picture>
+              <source type="image/avif" srcset={hero.avif} sizes="(max-width: 720px) 100vw, 46rem" />
+              <source type="image/webp" srcset={hero.webp} sizes="(max-width: 720px) 100vw, 46rem" />
+              <img src={hero.src} alt="A KO Law startup workshop in session, the room facing the branded screen." loading="eager" decoding="async" />
+            </picture>
+          </figure>
+        )
+      }
+
+      {ARTICLE.paragraphs.map((para) => <p class="ko-para" data-reveal>{para}</p>)}
+
+      <ul class="ko-sessions" data-reveal aria-label="The four 2026 sessions I covered">
+        {
+          SESSIONS.map((s) => (
+            <li class="ko-session">
+              <span class="ko-session-date">{s.date}</span>
+              <span class="ko-session-title">{s.title}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        collage.length > 0 && (
+          <figure class="ko-collage-wrap" data-reveal>
+            <div class="ko-collage">
+              {collage.map((s) => (
+                <div class="ko-shot">
+                  <picture>
+                    <source type="image/avif" srcset={s.avif} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 15rem" />
+                    <source type="image/webp" srcset={s.webp} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 15rem" />
+                    <img src={s.src} alt="" loading="lazy" decoding="async" />
+                  </picture>
+                </div>
+              ))}
+            </div>
+            <figcaption class="hud-label ko-collage-cap">From the 2026 sessions — Boulder + Denver</figcaption>
+          </figure>
+        )
+      }
+
+      <nav class="ko-ctas" data-reveal>
+        {
+          CTAS.map((c) => (
+            <a
+              href={c.href}
+              class="ko-cta"
+              rel={c.external ? "noopener" : undefined}
+              target={c.external ? "_blank" : undefined}
+            >
+              <span>{c.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </nav>
+      <a href={`${base}/entertainment`} class="link ko-back">← Venture</a>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .ko-story {
+    background: #11131c; /* the venture rooms family — a dark, quiet ground */
+    min-height: 100svh;
+  }
+  .ko-inner {
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: 7rem 2rem 6rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .ko-back {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .ko-slate {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+    margin: 0;
+  }
+  .ko-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    line-height: 1.12;
+    color: #f2f4f8;
+  }
+
+  /* lead hero — native square frame, cropped to a calmer landscape band so the
+     branded screen + room read without the column running impossibly tall */
+  .ko-hero {
+    margin: 0.4rem 0 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .ko-hero img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: center 42%;
+  }
+
+  .ko-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+  }
+
+  /* session index — a clean mono list, four rows, NOT links (no per-session
+     pages yet). Date in accent-quiet, title in the reading color. */
+  .ko-sessions {
+    list-style: none;
+    margin: 0.4rem 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .ko-session {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.85rem 0.2rem;
+    border-bottom: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+  }
+  .ko-session-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #d9f2ec 72%, transparent);
+  }
+  .ko-session-title {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.3vw, 1.12rem);
+    color: color-mix(in srgb, #eef2f5 90%, transparent);
+  }
+
+  /* photo collage — native 1:1 tiles (the frames are square as shot), a tidy
+     responsive grid, lazy + avif/webp responsive sources */
+  .ko-collage-wrap {
+    margin: 0.6rem 0 0;
+  }
+  .ko-collage {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  .ko-shot {
+    border-radius: 6px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .ko-shot img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  .ko-collage-cap {
+    margin-top: 0.8rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #d9f2ec 60%, transparent);
+  }
+
+  /* CTA row — shared button grammar: 1px border, Space Mono caps, arrow slides
+     6px on hover, accent hover, visible at rest, ≥44px tall */
+  .ko-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    padding-top: 1.4rem;
+    margin-top: 0.4rem;
+  }
+  .ko-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.7rem 1.15rem;
+    border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #eef2f5 88%, transparent);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .ko-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .ko-cta:hover,
+  .ko-cta:focus-visible {
+    border-color: var(--color-accent, #38f8ec);
+    color: var(--color-accent, #38f8ec);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .ko-cta:hover .arrow,
+  .ko-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 640px) {
+    .ko-collage { grid-template-columns: repeat(2, 1fr); }
+    .ko-session { grid-template-columns: 7rem 1fr; gap: 0.7rem; }
+    .ko-cta { flex: 1 1 100%; justify-content: space-between; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ko-cta .arrow { transition: none; }
+  }
+</style>
+
+<script>
+  // enhancement only: decode the slate label (matches the sibling venture pages)
+  const mountDecode = () => import("../../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecode, { timeout: 3000 });
+  else setTimeout(mountDecode, 1500);
+</script>

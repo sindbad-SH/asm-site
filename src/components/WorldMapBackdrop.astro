@@ -1,0 +1,201 @@
+---
+/**
+ * WorldMapBackdrop — P12.6 · the faint world behind THE TERRITORY constellation.
+ *
+ * ATMOSPHERE, NOT A RE-PROJECTION. The constellation (adventure.astro) is a
+ * surveyor's sunflower spray, not a geographic map; this layer sits BEHIND it as
+ * a hairline equirectangular world outline in the page's cartography grammar —
+ * low-poly coastlines + a 30° graticule, all at very low opacity in the resting
+ * contour color (--color-accent-deep). It does NOT re-layout the nodes.
+ *
+ * The four real territories get a brighter "you-are-here" ping at their true
+ * lon/lat (honest footprint: Colorado, New Mexico, Switzerland, Italy). These
+ * are decorative/aria-hidden — the accessible territory list is the <ul> in
+ * adventure.astro.
+ *
+ * PROJECTION: equirectangular, viewBox "0 0 360 180", where x = lon + 180 and
+ * y = 90 − lat (so 1 SVG unit = 1°). Coastlines are hand-authored low-poly
+ * silhouettes — coarse on purpose; at this opacity they read as "the world,"
+ * not a survey-grade basemap. Inline, ~4KB, no raster.
+ *
+ * MOTION: a subtle parallax drift (≤ the site's other drift amplitudes) driven
+ * by one rAF-throttled scroll handler that writes --wm-shift. Static under
+ * no-JS (the var defaults to 0) and under reduced motion (the script bails).
+ */
+
+// Low-poly continent silhouettes (x=lon+180, y=90−lat). Coarse by design.
+const CONTINENTS = [
+  // North America
+  "M15,25 L80,17 L115,30 L125,38 L105,53 L99,64 L83,63 L75,70 L92,77 L66,62 L58,54 L56,42 L50,34 L30,30 Z",
+  // Greenland
+  "M135,30 L150,20 L160,14 L135,10 L120,14 L128,22 Z",
+  // South America
+  "M100,82 L120,80 L128,90 L145,96 L140,112 L122,124 L110,142 L107,130 L110,108 L102,96 L99,90 Z",
+  // Africa
+  "M164,75 L180,54 L190,53 L212,59 L223,78 L231,78 L220,94 L220,106 L215,114 L205,124 L198,124 L192,108 L188,86 L174,86 Z",
+  // Europe
+  "M170,54 L171,46 L180,40 L175,32 L185,28 L192,22 L208,20 L220,24 L220,35 L210,45 L208,49 L202,50 L192,45 L183,47 L178,47 Z",
+  // Asia
+  "M220,45 L225,50 L240,65 L248,66 L258,82 L270,68 L280,77 L287,89 L300,75 L302,53 L320,45 L315,35 L340,30 L360,24 L320,17 L280,12 L240,18 L220,24 Z",
+  // Australia
+  "M294,112 L310,102 L322,101 L326,109 L330,128 L320,128 L309,122 L295,124 L293,116 Z",
+];
+
+// 30° graticule.
+const MERIDIANS = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+const PARALLELS = [30, 60, 120, 150]; // 90 (equator) is drawn separately, brighter
+
+// The four real territories, at true lon/lat → x=lon+180, y=90−lat.
+const PINGS = [
+  { label: "Colorado", x: 74.7, y: 50.0 },
+  { label: "New Mexico", x: 74.4, y: 53.6 },
+  { label: "Switzerland", x: 187.4, y: 43.1 },
+  { label: "Italy", x: 189.2, y: 44.1 },
+];
+---
+
+<div class="wm" aria-hidden="true">
+  <svg
+    class="wm-svg"
+    viewBox="0 0 360 180"
+    preserveAspectRatio="xMidYMid slice"
+    focusable="false"
+  >
+    <g class="wm-graticule">
+      {MERIDIANS.map((x) => <line x1={x} y1="0" x2={x} y2="180" />)}
+      {PARALLELS.map((y) => <line x1="0" y1={y} x2="360" y2={y} />)}
+    </g>
+    <line class="wm-equator" x1="0" y1="90" x2="360" y2="90" />
+    <g class="wm-land">
+      {CONTINENTS.map((d) => <path d={d} />)}
+    </g>
+    <g class="wm-pings">
+      {
+        PINGS.map((p) => (
+          <>
+            <circle class="wm-ping-ring" cx={p.x} cy={p.y} r="2.6" />
+            <circle class="wm-ping" cx={p.x} cy={p.y} r="1.1" />
+          </>
+        ))
+      }
+    </g>
+  </svg>
+</div>
+
+<style>
+  /* Clip wrapper: the field itself keeps overflow:visible (chips escape it), so
+     the map gets its OWN clip box to contain the parallax drift. Sits behind the
+     arcs (z-index 0, earlier in DOM) and well behind the nodes (z-index 4). */
+  .wm {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .wm-svg {
+    position: absolute;
+    /* slightly oversized so the parallax shift never reveals an edge */
+    left: -4%;
+    top: -8%;
+    width: 108%;
+    height: 116%;
+    transform: translateY(var(--wm-shift, 0px));
+    will-change: transform;
+  }
+
+  .wm-graticule line {
+    stroke: var(--color-accent-deep);
+    stroke-width: 0.35;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.1;
+  }
+  .wm-equator {
+    stroke: var(--color-accent-deep);
+    stroke-width: 0.5;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.16;
+    stroke-dasharray: 1.5 3;
+  }
+  .wm-land path {
+    fill: color-mix(in srgb, var(--color-accent-deep) 26%, transparent);
+    stroke: var(--color-accent-deep);
+    stroke-width: 0.5;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.5;
+  }
+
+  /* The four real-footprint pings — brighter, in the scarce accent. */
+  .wm-ping {
+    fill: var(--color-adventure-warm);
+    opacity: 0.85;
+  }
+  .wm-ping-ring {
+    fill: none;
+    stroke: var(--color-adventure-warm);
+    stroke-width: 0.6;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.4;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wm-ping-pulse 4.5s var(--ease-survey) infinite;
+  }
+  @keyframes wm-ping-pulse {
+    0%,
+    100% {
+      opacity: 0.42;
+      transform: scale(0.7);
+    }
+    50% {
+      opacity: 0.12;
+      transform: scale(1.35);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wm-svg {
+      transform: none;
+    }
+    .wm-ping-ring {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Subtle parallax: write --wm-shift as the field scrolls through the viewport.
+  // rAF-throttled; bails entirely under reduced motion (leaving the CSS default
+  // of 0px → static). No-JS never runs this at all.
+  (() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const wraps = Array.from(document.querySelectorAll<HTMLElement>(".wm"));
+    if (!wraps.length) return;
+    const AMP = 14; // px — at/under the site's other drift amplitudes
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight || 1;
+      for (const wrap of wraps) {
+        const svg = wrap.querySelector<HTMLElement>(".wm-svg");
+        if (!svg) continue;
+        const r = wrap.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) continue; // offscreen — skip
+        // progress: -1 (below fold) → +1 (above fold), 0 at viewport center
+        const progress = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
+        svg.style.setProperty("--wm-shift", `${(-progress * AMP).toFixed(1)}px`);
+      }
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    update();
+  })();
+</script>

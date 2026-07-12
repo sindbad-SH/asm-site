@@ -218,6 +218,89 @@ export const SAGA_STAGES: readonly SagaStage[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// FORGE_SERVICES — P12.x REPACKAGE (operator-directed). The forge page stopped
+// selling a numbered "secret sauce" process and now sells the SERVICES you can
+// hire a StorySmith for, in two classes:
+//   • engagement  — long-span / retainer, "if you want me in it with you"
+//   • deliverable — "one specific thing I do all the time", priced at a floor
+//
+// Prices are RESEARCHED 2025-26 US market floors set at roughly the 65th-75th
+// percentile ("above the median line, not the most expensive") for a solo,
+// experienced operator, shown as "Starts at $X" / "$X / mo". They ship to
+// STAGING and the operator adjusts from there.
+//
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — every name/price/blurb below is NEW copy.
+//
+// The flagship (`flagship: true`) carries the DEMOTED five-stage method as a
+// names-only strip; SAGA_STAGES stays the source of those names (home H5 also
+// maps them) and its per-stage prices are no longer rendered anywhere.
+// ---------------------------------------------------------------------------
+
+export type ForgeService = {
+  no: string;
+  klass: "engagement" | "deliverable";
+  name: string;
+  price: string;
+  blurb: string;
+  flagship?: boolean;
+  /** VERBATIM Ledger phrasing, when a service touches a real relationship. */
+  note?: string;
+};
+
+export const FORGE_SERVICES: readonly ForgeService[] = [
+  {
+    no: "01",
+    klass: "engagement",
+    name: "Forge the Saga",
+    price: "Starts at $12,000",
+    flagship: true,
+    blurb:
+      "My deepest engagement — the one the whole studio is named for. I take a founder's story from raw market intelligence to a tested Core Narrative Blueprint your team can actually run: the full arc, start to finish. It moves through five stages, and once the spine is set it can carry on as a retainer if there's a reason to keep steering.",
+  },
+  {
+    no: "02",
+    klass: "engagement",
+    name: "The Standing Forge",
+    price: "$4,000 / mo",
+    blurb:
+      "For companies that need the forge kept lit. A standing monthly engagement for the story work that never really finishes — ongoing video and photo, the next campaign, the content that keeps a brand's voice steady while it grows. One retainer, a predictable rhythm, no re-quoting every shoot.",
+  },
+  {
+    no: "03",
+    klass: "deliverable",
+    name: "The Story Intensive",
+    price: "Starts at $3,000",
+    blurb:
+      "The fastest way to work with me. A focused session on one thing — your positioning, your pitch, the story your launch has to carry. You bring the problem; I bring the questions, and you leave with sharp, usable language and a direction you can act on. The front door to everything else here.",
+  },
+  {
+    no: "04",
+    klass: "deliverable",
+    name: "The Brand-Story Film",
+    price: "Starts at $6,500",
+    blurb:
+      "A two-to-four-minute film that tells your story the way it deserves to be told — scripted, shot, and cut by one person who's thought hard about what it needs to say. Founder stories, product films, the piece that anchors your homepage. Pro gear, a real point of view, no committee.",
+  },
+  {
+    no: "05",
+    klass: "deliverable",
+    name: "Event & Conference Coverage",
+    price: "Starts at $2,500",
+    blurb:
+      "I come cover your event — photo and film — and hand back more than a folder of files. Conferences, pitch nights, summits, workshops: the recap that makes people wish they'd been there, plus clean speaker and session clips you can use the same week. One operator, on my feet all day, reading the room.",
+  },
+  {
+    no: "06",
+    klass: "deliverable",
+    name: "Aerial Cinematography",
+    price: "Starts at $2,000 / day",
+    blurb:
+      "Licensed, insured drone work for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye I bring to the ground, lifted a few hundred feet.",
+    note: "Aerial work licensed through Amazing Aerial Agency",
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
 // HONESTY LEGEND + RELATIONSHIPS — the map-legend device (BUILD-PLAN §3.4).
 // Every relationship renders through <LegendMark> with its tier symbol.
 // permittedPhrasing is VERBATIM from the Honesty Ledger — copy, never compose.
@@ -293,11 +376,19 @@ export const RELATIONSHIPS: readonly Relationship[] = [
     permittedPhrasing: "attended with a car owner to cover a restored Shelby",
   },
   /** Never: an embedded/ongoing body of work. */
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — new permittedPhrasing (staging-only
+  // until read). P12-KO (2026-07-12): the operator confirmed the facts and
+  // lifted the "ko law" audit exclusion, so this relationship now names the
+  // firm + the four 2026 workshops it covers. Tier stays "informal" — it is
+  // early coverage, not an embedded/ongoing engagement. Firm verified from its
+  // own site (kofirm.com — a Boulder/Denver business-law firm; Ian Kuliasha,
+  // Partner). Renders on /venture/ko-law-workshops, the home proof band, and —
+  // as the linked story card — the venture rail on /entertainment.
   {
     id: "workshop-coverage",
-    name: "Workshop coverage",
+    name: "KO Law",
     tier: "informal",
-    permittedPhrasing: "a couple of early, informal workshop-coverage pieces",
+    permittedPhrasing: "KO Law's startup workshop series — coverage of four 2026 sessions",
   },
   /** Never: a credentialed coverage role; never "at the table where the industry decides". */
   {
@@ -738,18 +829,27 @@ export const PAGES = {
     },
   },
 
-  // ---- FORGE THE SAGA (§1.2) — primary lane, belief-first. ------------------
+  // ---- FORGE THE SAGA (§1.2) — primary lane, REPACKAGED as services. --------
+  // P12.x: was a numbered "secret sauce" process; now it sells the SERVICES you
+  // hire a StorySmith for, in two classes (Engagements / Deliverables) drawn
+  // from FORGE_SERVICES above. The five-stage method demotes to a names-only
+  // strip inside the flagship engagement.
+  //
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — hero (kicker/headline/subline), both
+  // class taglines, flagshipStrip, and the pricing.body are ALL new copy for
+  // staging. whoFor, pretestShelved, proof, pricing.note, and cta are KEPT.
   forge: {
     meta: {
-      title: "Forge the Saga — narrative strategy for founders",
+      title: "Forge the Saga — what you can hire a StorySmith for",
       description:
-        "A five-stage method for founders: from raw market research to a tested Core Narrative Blueprint. Your product works — let's make the story land.",
+        "The services a StorySmith forges: deep narrative engagements and specific deliverables — brand-story films, event coverage, aerial cinematography. Your product works; let's make the story land.",
     },
-    // F1 — belief hero.
+    // F1 — belief hero, pivoted to the StorySmith definition move.
     hero: {
-      headline: COPY.anchors.belief,
+      kicker: "The StorySmith",
+      headline: "A smith forges steel. A StorySmith forges the saga.",
       subline:
-        "Forge the Saga is my five-stage method for founders — from raw market research to a tested Core Narrative Blueprint your team can actually run.",
+        "Your product works — the story just isn't landing yet. That's the raw material I work. Here's what you can actually hire a StorySmith to forge: a few deep engagements, and a handful of things I do all the time.",
       cta: { label: "Book a call", href: "/contact" },
     },
     // F2 — who it's for.
@@ -762,11 +862,25 @@ export const PAGES = {
         "You're about to spend on ads, and you want to know the story works first.",
       ] as readonly string[],
     },
-    // F3 — the five stages. Presentation maps SAGA_STAGES directly.
-    stages: {
-      heading: "The five stages",
-      body: "One ordered arc, cold research to tested narrative. Stage 02 delivers the Core Narrative Blueprint — the spine everything else is built on.",
-      anchor: COPY.anchors.beliefIsntData, // used at the Story Testing stage
+    // F3 — the two service classes. Cards themselves come from FORGE_SERVICES
+    // (filtered by klass); the copy below is the class framing.
+    classes: {
+      heading: "What you can hire a StorySmith for",
+      engagements: {
+        label: "Engagements",
+        tagline: "When you want me in it with you — over a span, not a single handoff.",
+      },
+      deliverables: {
+        label: "Deliverables",
+        tagline: "One specific thing I do all the time. Here's the floor to bring me in for it.",
+      },
+    },
+    // F3b — the DEMOTED method: the five stage NAMES only (from SAGA_STAGES),
+    // shown as a quiet strip inside the flagship engagement. No per-stage
+    // prices, no how-to — the arc survives as a shape, not a price list.
+    flagshipStrip: {
+      label: "How the flagship runs",
+      note: "Five stages, one ordered arc — raw research to a tested narrative.",
     },
     // F4 — pretest. LAUNCHES AS VARIANT B (OD-2): no standalone section; the
     // pretest idea already lives honestly inside SAGA_STAGES[3] ("curated human
@@ -788,10 +902,11 @@ export const PAGES = {
       deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
       note: "No second consulting testimonial at launch. Everything shown is work I actually delivered, labeled paid or unpaid as it truly was.",
     },
-    // F6 — pricing (OD-4: exact "from $X"). Per-stage prices from SAGA_STAGES.
+    // F6 — pricing. Every service already shows its own "Starts at" floor; this
+    // is the honest note about what the floors mean. body: NEW; note: KEPT verbatim.
     pricing: {
-      heading: "Pricing",
-      body: "Engagements start at $2,500 for a single stage. Most run between $2,500 and $12,500, depending on how far you take the arc.",
+      heading: "On pricing",
+      body: "Every number here is a floor, not a quote. Engagements run deeper the longer the arc; deliverables scale with the shape of the shoot. Tell me what you're building and I'll tell you what it actually takes.",
       note: "Every price is a starting point — the shape of the work sets the rest.",
     },
     // F7 — CTA.

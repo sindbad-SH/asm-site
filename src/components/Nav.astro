@@ -22,12 +22,12 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
     without JS it stays visible and wraps, imperfect but fully functional.
   -->
   <nav aria-label="Primary" data-nav-links>
-    <ul class="nav-links flex flex-wrap gap-x-4 gap-y-2 xl:gap-5">
+    <ul class="nav-links flex flex-wrap items-center gap-x-4 gap-y-2 xl:gap-5">
       {
         NAV.map((item) => {
           const isCurrent = path === item.href || path.startsWith(`${item.href}/`);
           return (
-            <li>
+            <li class="nav-item">
               <a
                 href={`${base}${item.href}`}
                 aria-current={isCurrent ? "page" : undefined}
@@ -57,6 +57,35 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
 </header>
 
 <style>
+  /* P17a — separators between nav items (operator: the repeated "…Stories"
+     labels blend into a sentence). A survey-tick slash in the hairline color,
+     drawn as a pseudo-element so it's purely presentational (never read by
+     screen readers, never a hit target). Sits between items only — no leading
+     or trailing tick. The mobile menu is a different component (unaffected). */
+  .nav-item + .nav-item {
+    display: flex;
+    align-items: center;
+  }
+  .nav-item + .nav-item::before {
+    content: "/";
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: color-mix(in srgb, currentColor 32%, transparent);
+    margin-right: 1rem;
+    transform: skewX(-8deg);
+    pointer-events: none;
+  }
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .nav-item + .nav-item::before {
+      margin-right: 0.7rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .nav-item + .nav-item::before {
+      margin-right: 1.25rem;
+    }
+  }
+
   /* P12.6b — the appended "Stories" nav labels lengthen the inline desktop row.
      The inline list goes live at ≥1024px (MobileMenu collapses it below that),
      so in the tight 1024–1279 band we compress the whole header — nav tracking +

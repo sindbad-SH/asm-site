@@ -1881,6 +1881,8 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    min-height: 44px; /* P12.6 — ≥44px tap target (mobile a11y) */
+    padding: 0.35rem 0;
     cursor: pointer;
     color: var(--color-ink-muted);
   }
@@ -2180,6 +2182,107 @@
   .gallery-card-aa-link:hover,
   .gallery-card-aa-link:focus-visible {
     color: var(--color-accent);
+  }
+
+  /* ── P12.6 · per-story Amazing Aerial license chip ──
+     A compact, repeatable purchase path on every micro-story: small AA logo
+     mark + locked mono line + arrow link. Flush against the card's own border
+     (same hairline/elevated ground as the old aa-link), reading as a quiet
+     footer strip, not a shouting CTA. break-inside:avoid keeps it welded to its
+     card in the masonry columns. */
+  .license-chip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.6rem;
+    margin-top: -1px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-hairline);
+    border-top: none;
+    background: var(--color-elevated);
+    text-decoration: none;
+    color: var(--color-ink-muted);
+    transition:
+      color var(--dur-hover) var(--ease-swift),
+      border-color var(--dur-hover) var(--ease-swift);
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  .license-chip-logo {
+    height: 15px;
+    width: auto;
+    flex-shrink: 0;
+    opacity: 0.72;
+    transition: opacity var(--dur-hover) var(--ease-swift);
+  }
+  .license-chip-text {
+    color: var(--color-ink-muted);
+  }
+  .license-chip-cta {
+    margin-left: auto;
+    color: var(--color-peak);
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .license-chip:hover,
+  .license-chip:focus-visible {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-hairline));
+  }
+  .license-chip:hover .license-chip-cta,
+  .license-chip:focus-visible .license-chip-cta {
+    color: var(--color-accent);
+  }
+  .license-chip:hover .license-chip-logo,
+  .license-chip:focus-visible .license-chip-logo {
+    opacity: 1;
+  }
+
+  /* Secondary story frames (a story may carry up to 3). Plain pictures OUTSIDE
+     any .map-inset — they never count toward the distort engine's ≤20 tile cap. */
+  .story-extra {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+  }
+  .story-extra picture,
+  .story-extra img {
+    display: block;
+    width: 100%;
+  }
+  .story-extra img {
+    border-radius: 2px;
+    border: 1px solid var(--color-hairline);
+  }
+
+  /* AA mid-band (P12.6) — mirrors the funnel panel; its own accent hairline on
+     reveal so the mid-scroll branding reads as a deliberate band. */
+  .aa-band {
+    position: relative;
+  }
+  .aa-band::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--color-accent-deep), var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  html.js .aa-band[data-reveal].is-revealed::before {
+    transform: scaleX(1);
+    transition: transform 600ms var(--ease-survey);
+  }
+  html.no-js .aa-band::before {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aa-band::before {
+      transform: scaleX(1);
+      transition: none;
+    }
   }
 }
 

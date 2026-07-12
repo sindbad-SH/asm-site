@@ -19,15 +19,16 @@ import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
-import { PAGES, WORK } from "../consts";
+import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
+import { PAGES } from "../consts";
 import { TERRITORY, TERRITORY_TOTALS } from "../data/territory";
+import { getCollection } from "astro:content";
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const adventureWork = WORK.filter((item) => item.pillar === "adventure");
 
 /* ─────────────────────────────────────────────────────────────────────────
  * P12.4c — "THE TERRITORY" constellation geometry.
@@ -122,6 +123,43 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
     src: `${base}/media/adventure/gallery/${slug}-800.webp`,
   };
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * P12.6 — MICRO TRAVEL STORIES (data-driven).
+ *
+ * The gallery is now an EVER-EXPANDING set of micro-stories, one markdown file
+ * per place under src/content/field-notes/ (the fieldNotes collection). A note
+ * becomes a story here when it carries `photos`; the operator adds a place by
+ * dropping a file. Same files power /field-notes (the chronological log), so
+ * the collection is no longer empty (the build warning is gone).
+ *
+ * TILE BUDGET (distort-engine.ts ≤20 live-measure rule): each story renders ONE
+ * distort tile — its LEAD photo, via Card's .map-inset. Secondary photos (if a
+ * story ever ships 2–3) render as plain <picture> OUTSIDE any .map-inset, so
+ * they never count as tiles. 7 stories = 7 tiles, well under the 20 that keep
+ * the click-to-expand field note lag-free. If this ever nears 20, split the
+ * wall into per-territory [data-distort-grid] blocks.
+ * ───────────────────────────────────────────────────────────────────────── */
+const WALL_ORDER = [
+  "matterhorn-zermatt",
+  "flatirons-chautauqua",
+  "gornergrat-glacier",
+  "eldorado-springs",
+  "castel-toblino",
+  "varenna-lake-como",
+  "lac-de-tseuzier",
+];
+const stories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => {
+    const ai = WALL_ORDER.indexOf(a.id);
+    const bi = WALL_ORDER.indexOf(b.id);
+    return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+  });
+
+// Mono survey slate: YYYY.MM.DD from UTC parts (matches /field-notes).
+const fmtSlate = (d: Date) =>
+  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -166,13 +204,22 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
           aria-hidden. */}
       <figure class="terr" data-reveal aria-labelledby="terr-kicker">
         <figcaption id="terr-kicker" class="terr-kicker hud-label">
-          {TERRITORY_TOTALS.outings} OUTINGS · 3 COUNTRIES
+          {/* P17 fix — the hardcoded "3 COUNTRIES" undercounted the map's own
+              four nodes (Colorado, New Mexico, Switzerland, Italy).
+              "TERRITORIES" is the section's own grammar AND stays honest
+              (CO + NM share a country); the count now comes from the data so
+              it can't drift again. */}
+          {TERRITORY_TOTALS.outings} OUTINGS · {TERRITORY_TOTALS.territories} TERRITORIES
         </figcaption>
         <p class="sr-only">
           Where this work was shot, by number of outings. Expand a country to
           list its locations; each links out to the licensing portfolio.
         </p>
         <div class="terr-field">
+          {/* P12.6 — faint world-outline backdrop (atmosphere, not a
+              re-projection). Sits behind the arcs + nodes; static under no-JS /
+              reduced motion. */}
+          <WorldMapBackdrop />
           <svg
             class="terr-arcs"
             viewBox="0 0 100 100"
@@ -255,51 +302,125 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
       </div>
     </section>
 
-    <!-- A4 — the gallery: the page's MAIN SURFACE (§9.5 photo-first). Widened
-         from the connective-page max-w-3xl since this is now the primary
-         content, not a teaser; ready to grow to 20–40 real S2 selects. -->
+    {/* AA MID-BAND (P12.6) — the licensing weave appears mid-scroll, not only in
+        the bottom funnel. Logo + locked-phrasing line + portfolio button.
+        ⚠ OPERATOR READ-APPROVAL REQUIRED — one new sentence (staging-only until
+        read): the aa-band-line below. The kicker + button label are existing
+        approved copy. */}
+    <section class="border-t border-hairline p-8">
+      <div class="mx-auto max-w-5xl">
+        <div class="panel aa-band flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+          <div class="flex items-center gap-4">
+            <img
+              src={`${base}/media/adventure/aa-logo.png`}
+              alt="Amazing Aerial Agency"
+              class="aa-funnel-logo shrink-0"
+              width="480"
+              height="158"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="space-y-1">
+              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
+              <p class="aa-band-line max-w-2xl text-sm text-ink">
+                The stills here are watermarked previews — license the
+                full-resolution frames through Amazing Aerial.
+              </p>
+            </div>
+          </div>
+          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
+            {p.aaFunnel.cta.label}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- A4 — the field: micro travel stories (P12.6), the page's MAIN SURFACE
+         (§9.5 photo-first). Data-driven from the fieldNotes collection — one
+         place per markdown file, an ever-expanding set. -->
     <section class="border-t border-hairline p-8">
       <hr class="flight-line mb-6" aria-hidden="true" />
       <h2 class="mx-auto mb-4 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
-      <!-- Mixed-aspect gallery wall (R3): native orientation honored, never
-           letterbox-squished. Vertical cards (Matterhorn, Gornergrat glacier)
-           span two grid rows and render 4/5; landscape cards render 3/2 and
-           span one row. object-fit:cover inside each card, no stretch. -->
+      <!-- Micro-story wall (P12.6): mixed-aspect, native orientation honored.
+           Each card is one place — mono survey slate (date · location), title,
+           an expandable observational field note, its watermarked frame, and a
+           per-story Amazing Aerial license chip. Data-driven from the fieldNotes
+           collection; the operator grows it by adding a markdown file.
+           Tile budget: ONE distort tile per story (the lead photo) → 7 tiles,
+           under the engine's ≤20 live-measure cap that keeps the note expand
+           lag-free. -->
       <div class="gallery-wall mx-auto max-w-5xl" data-distort-grid>
         {
-          adventureWork.map((item) => {
-            const orientation = item.orientation ?? "landscape";
-            const isVertical = orientation === "vertical";
+          stories.map((story, idx) => {
+            const photos = story.data.photos ?? [];
+            const lead = photos[0]!;
+            const isVertical = lead.orientation === "vertical";
+            const slate = `${fmtSlate(story.data.date)} · ${story.data.location}`;
             return (
-              <div class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}>
+              <article class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}>
                 <Card
                   mediaRatio={isVertical ? "4/5" : "3/2"}
-                  mediaSrc={galleryMedia(item.slug, orientation)}
-                  mediaAlt={item.title}
-                  mediaLabel={`${item.title} — gallery still (§2b/§2e)`}
-                  eyebrow={item.engagement}
-                  title={item.title}
-                  meta={item.what}
-                  fieldNote={item.fieldNote}
-                  fieldNoteOpen={item.fieldNoteOpen}
+                  mediaSrc={galleryMedia(lead.slug, lead.orientation)}
+                  mediaAlt={lead.alt}
+                  mediaLabel={`${story.data.title} — gallery still`}
+                  eyebrow={slate}
+                  title={story.data.title}
+                  fieldNote={story.body?.trim()}
+                  fieldNoteOpen={idx === 0}
                   reveal
                   revealStagger={50}
                 />
-                {/* Quiet per-card AA licensing link (P12.4b) — Card has no link
-                    slot, so this rides alongside it at the page level rather
-                    than redesigning Card.astro. Reads as a field-note-style
-                    footer strip flush against the card's own border. Deep
-                    per-image links aren't available from AA, so every card
-                    points at the same operator portfolio URL. */}
-                <a
-                  href={p.aaFunnel.cta.href}
-                  target="_blank"
-                  rel="noopener"
-                  class="gallery-card-aa-link hud-label"
-                >
-                  License via Amazing Aerial <span aria-hidden="true">→</span>
-                </a>
-              </div>
+                {/* Secondary frames (a story may carry up to 3) render OUTSIDE
+                    any .map-inset, so they never count toward the ≤20 tile cap. */}
+                {photos.length > 1 && (
+                  <div class="story-extra">
+                    {photos.slice(1).map((ph) => {
+                      const m = galleryMedia(ph.slug, ph.orientation);
+                      return m ? (
+                        <picture>
+                          <source type="image/avif" srcset={m.avif} sizes="(min-width: 1024px) 30vw, 45vw" />
+                          <source type="image/webp" srcset={m.webp} sizes="(min-width: 1024px) 30vw, 45vw" />
+                          <img
+                            src={m.src}
+                            alt={ph.alt}
+                            loading="lazy"
+                            decoding="async"
+                            style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
+                          />
+                        </picture>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+                {/* Per-story AA license chip (P12.6) — small logo mark + locked
+                    mono line + portfolio link. A visible-but-quiet purchase path
+                    on every story. Deep per-image links aren't available from AA,
+                    so each points at the operator's portfolio.
+                    ⚠ OPERATOR READ-APPROVAL REQUIRED — "License these frames" is
+                    new label copy (staging-only until read). */}
+                {story.data.license && (
+                  <a
+                    href={p.aaFunnel.cta.href}
+                    target="_blank"
+                    rel="noopener"
+                    class="license-chip"
+                  >
+                    <img
+                      src={`${base}/media/adventure/aa-logo.png`}
+                      alt="Amazing Aerial"
+                      class="license-chip-logo"
+                      width="480"
+                      height="158"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span class="license-chip-text hud-label">Licensed through Amazing Aerial</span>
+                    <span class="license-chip-cta hud-label">
+                      License these frames <span class="arrow" aria-hidden="true">→</span>
+                    </span>
+                  </a>
+                )}
+              </article>
             );
           })
         }

@@ -1,84 +1,72 @@
 ---
 /**
- * /forge-the-saga — P11 "THE TEMPERING" (V1-UPGRADE-PLAN): the operator
- * asked for an ORIGINAL page ("go nuts") after the Disal-grammar P9 read
- * too basic. This one is built from the brand's own metaphor instead of a
- * reference: the page IS the method.
+ * /forge-the-saga — P12.x "THE SERVICES" repackage (operator-directed).
  *
- *   A story is forged down the page. THE TEMPER LINE — a glowing stroke —
- *   runs through the five stations. It starts white-hot and wandering
- *   (raw research), gets hammered straighter and COOLER at every stage
- *   (the v1 heat→aqua thermal progression, resurrected with meaning), and
- *   at the end bends into the AURORA-S OF THE LOGO: the raw material
- *   becomes the saga, and the saga is literally the mark.
+ * The page stopped selling a numbered "secret sauce" process and now sells the
+ * SERVICES you can hire a StorySmith for, in the operator's own two classes:
  *
- *   - smithy ground: near-black ember dark; a lightweight 2D-canvas ember
- *     field drifts upward in the hero (living at rest; desktop, idle-
- *     mounted, paused off-screen, absent under reduced motion/save-data)
- *   - the spine: an SVG temper line drawn by scroll (scrubbed dash), its
- *     gradient running forge-heat → brand aqua top to bottom, wandering
- *     early and straightening late (forged as you read)
- *   - five stations along the spine: ember-glass stage cards, node FLARES
- *     + a small spark burst as each station arrives (the hammer strike)
- *   - finale: the cooled line draws into the brand S-curve (the same S
- *     the home page draws at #talk) and hands off to the one CTA
+ *   ENGAGEMENTS  — long-span / retainer ("if you want me in it with you")
+ *   DELIVERABLES — "one specific thing I do all the time", priced at a floor
  *
- * HONESTY: all copy verbatim from consts (hero/whoFor/stages/SAGA_STAGES/
- * proof/pricing/cta; OD-4 exact prices). Echo Panel STAYS SHELVED (OD-2,
- * F4 rendered:false) — the operator mentioned it in passing but has not
- * reversed the shelf decision; stage 04's own copy carries the idea.
+ * Cards come from FORGE_SERVICES (researched market floors, "Starts at $X").
+ * The five-stage method is DEMOTED, not deleted: it survives as a quiet
+ * names-only strip inside the flagship engagement (SAGA_STAGES stays the
+ * source of those names; home H5 still maps them; per-stage prices die).
  *
- * Fallbacks: no-JS / reduced motion → the temper line renders FULLY
- * FORGED (solid, final state), stations all visible via the reveal
- * engine's watchdog, no canvas, no flares. The page reads perfectly cold.
+ * SIGNATURE (evolved, not multiplied): the temper line lives on as ONE
+ * continuous vertical rail down the services column — a heat→aqua gradient
+ * hairline threading both classes, with a node tick beside every card in that
+ * card's own temper color. It's painted in pure CSS (spans the column's real
+ * height automatically), so it's always fully drawn with nothing to fail open
+ * on — no fragile per-station coordinate math. The hero keeps its living
+ * ember field + forge glow, and the closing section keeps the S-finale (the
+ * cooled line drawing into the brand mark). Motion is reveal staggers only.
  *
- * P12.5: below 760px the desktop .fg-spine SVG is display:none (the
- * two-column grid collapses to one), which used to leave mobile with no
- * temper line at all — the page's whole signature gone on the phone the
- * operator actually reviews on. Mobile now gets its own rail: a static
- * heat→aqua gradient painted as a background-image on .fg-stations (spans
- * the list's real rendered height automatically, no JS measuring needed)
- * plus a small node tick beside each card in that station's own --heat.
- * Pure CSS, always fully drawn — nothing to fail open on.
+ * HONESTY: services copy is NEW (⚠ operator read-approval, flagged in consts).
+ * whoFor / proof / pricing.note / cta are KEPT. The Aerial card renders the
+ * VERBATIM Ledger phrasing "Aerial work licensed through Amazing Aerial
+ * Agency" from FORGE_SERVICES[].note. Echo Panel STAYS SHELVED.
+ *
+ * Fallbacks: no-JS / reduced motion → the whole page reads cold. The rail is
+ * CSS-only (always drawn); reveals fail open via the engine's watchdog; the
+ * hero canvas + the S draw are enhancement-only.
  */
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES, SAGA_STAGES } from "../consts";
+import { PAGES, SAGA_STAGES, FORGE_SERVICES } from "../consts";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const n = SAGA_STAGES.length;
 
-// Each station's temper color — the v1 thermal progression, hot working end
-// to set aqua end. Used for node cores, card accents, and price marks.
-const temper = (i: number) => `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (n - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
+const engagements = FORGE_SERVICES.filter((s) => s.klass === "engagement");
+const deliverables = FORGE_SERVICES.filter((s) => s.klass === "deliverable");
+const total = FORGE_SERVICES.length;
 
-/**
- * The spine path: wanders hard between early stations (raw story), then
- * straightens as it cools (forged story). Stations sit at even vertical
- * intervals in a 200×2000 viewBox; the x-wobble decays per segment.
- * Coordinates are hand-tuned so node dots (at the station rows' anchor
- * points) land ON the line.
- */
-const SPINE = "M100,0 C 40,90 168,150 96,240 C 30,320 176,370 104,460 C 52,530 152,590 100,660 C 68,720 136,790 100,860 C 84,920 116,990 100,1060 C 92,1120 108,1190 100,1260 C 96,1330 104,1400 100,1470 C 98,1540 102,1620 100,1700 C 100,1780 100,1900 100,2000";
-// node anchor Ys in the same viewBox space (5 stations, even-ish spacing)
-const NODE_Y = [240, 660, 1060, 1470, 1860];
+// Each card's temper color — the v1 thermal progression across ALL services,
+// hot working end (first engagement) → set aqua end (last deliverable). Keyed
+// by the card's global position so the rail and the ticks agree.
+const temper = (i: number) =>
+  `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (total - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
+const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.indexOf(svc));
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
   <main class="fg" data-fg>
-    <!-- ═══ T1 · THE SMITHY — ember dark, one belief ═══ -->
+    <!-- ═══ T1 · THE SMITHY — ember dark, the definition move ═══ -->
     <section class="fg-hero" data-fg-hero>
       <canvas class="fg-embers" data-fg-embers aria-hidden="true"></canvas>
       <div class="fg-hero-glow" aria-hidden="true"></div>
       <div class="fg-hero-inner">
         <p class="hud-label fg-kicker" data-reveal data-tableau-content>
-          <span data-decode>{p.stages.heading}</span>
+          <span data-decode>{p.hero.kicker}</span>
         </p>
         <h1 class="fg-headline" data-reveal>{p.hero.headline}</h1>
         <p class="fg-sub" data-reveal>{p.hero.subline}</p>
-        <a href={`${base}${p.hero.cta.href}`} class="fg-pill" data-reveal>{p.hero.cta.label}</a>
+        <a href={`${base}${p.hero.cta.href}`} class="btn fg-cta" data-reveal>
+          <span>{p.hero.cta.label}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
       </div>
     </section>
 
@@ -89,7 +77,7 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
       <ul class="fg-chips">
         {
           p.whoFor.items.map((item, i) => (
-            <li class="fg-chip" data-reveal data-reveal-stagger="90" style={`--chip-heat:${temper(Math.min(i, n - 1))}`}>
+            <li class="fg-chip" data-reveal data-reveal-stagger="90" style={`--chip-heat:${temper(Math.min(i, total - 1))}`}>
               <span class="fg-chip-no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               {item}
             </li>
@@ -98,57 +86,72 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
       </ul>
     </section>
 
-    <!-- ═══ T3 · THE TEMPERING — the spine + five stations ═══ -->
-    <section class="fg-sec fg-anvil" data-fg-anvil>
-      <p class="fg-body fg-anvil-intro" data-reveal>{p.stages.body}</p>
+    <!-- ═══ T3 · THE SERVICES — two classes, one temper rail ═══ -->
+    <section class="fg-sec fg-services" data-fg-services>
+      <h2 class="fg-h2 fg-services-head" data-reveal>{p.classes.heading}</h2>
 
-      <div class="fg-forge">
-        <!-- the temper line: drawn by scroll, hot→aqua, wander→straight -->
-        <svg class="fg-spine" viewBox="0 0 200 2000" preserveAspectRatio="xMidYMax meet" aria-hidden="true" fill="none">
-          <defs>
-            <linearGradient id="fg-temper" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="var(--color-forge-heat, #ff9d45)" />
-              <stop offset="0.55" stop-color="#c9b26a" />
-              <stop offset="1" stop-color="var(--color-accent, #38f8ec)" />
-            </linearGradient>
-          </defs>
-          <!-- the unforged ghost: where the story is going -->
-          <path d={SPINE} stroke="#ffffff" stroke-opacity="0.07" stroke-width="1.5" stroke-dasharray="3 7" />
-          <!-- the forged line: scrub-drawn over the ghost -->
-          <path data-fg-spine d={SPINE} stroke="url(#fg-temper)" stroke-width="2.5" stroke-linecap="round" />
-          {NODE_Y.map((y, i) => <circle class="fg-node" data-fg-node cx="100" cy={y} r="7" fill="#0f0d0b" stroke={temper(i)} stroke-width="2.5" />)}
-        </svg>
+      <div class="fg-services-inner">
+        <span class="fg-rail" aria-hidden="true"></span>
 
-        <ol class="fg-stations">
-          {
-            SAGA_STAGES.map((stage, i) => (
-              <li class="fg-station" data-fg-station style={`--heat:${temper(i)}`}>
-                <article class="fg-card" data-reveal>
-                  <header class="fg-card-head">
-                    <span class="fg-no" aria-hidden="true">{stage.no}</span>
-                    <h3 class="fg-name">{stage.name}</h3>
-                    <p class="hud-label fg-sublabel" data-tableau-content>
-                      <span data-decode>{stage.sub}</span>
-                    </p>
-                  </header>
-                  <p class="fg-process">{stage.process}</p>
-                  <dl class="fg-meta">
-                    <div>
-                      <dt class="hud-label">Deliverable</dt>
-                      <dd>{stage.deliverable}</dd>
-                    </div>
-                    <div>
-                      <dt class="hud-label">Best for</dt>
-                      <dd>{stage.bestFor}</dd>
-                    </div>
-                  </dl>
-                  <p class="fg-price">{stage.price}</p>
-                  {stage.no === "04" && <p class="fg-anchor">{p.stages.anchor}</p>}
-                </article>
-              </li>
-            ))
-          }
-        </ol>
+        <!-- ENGAGEMENTS — long-span, "in it with you" -->
+        <div class="fg-class fg-class--engage">
+          <header class="fg-class-head" data-reveal>
+            <span class="hud-label fg-class-label">{p.classes.engagements.label}</span>
+            <p class="fg-class-tag">{p.classes.engagements.tagline}</p>
+          </header>
+          <ol class="fg-cards">
+            {
+              engagements.map((svc) => (
+                <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
+                  <article class="fg-card" data-reveal data-reveal-stagger="80">
+                    <header class="fg-card-head">
+                      <span class="fg-no" aria-hidden="true">{svc.no}</span>
+                      <h3 class="fg-name">{svc.name}</h3>
+                      <p class="fg-price">{svc.price}</p>
+                    </header>
+                    <p class="fg-blurb">{svc.blurb}</p>
+                    {svc.flagship && (
+                      <div class="fg-strip">
+                        <p class="hud-label fg-strip-label">{p.flagshipStrip.label}</p>
+                        <ol class="fg-strip-stages">
+                          {SAGA_STAGES.map((s) => (
+                            <li class="fg-strip-stage">{s.name}</li>
+                          ))}
+                        </ol>
+                        <p class="fg-strip-note">{p.flagshipStrip.note}</p>
+                      </div>
+                    )}
+                  </article>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <!-- DELIVERABLES — one specific thing, a floor -->
+        <div class="fg-class fg-class--deliver">
+          <header class="fg-class-head" data-reveal>
+            <span class="hud-label fg-class-label">{p.classes.deliverables.label}</span>
+            <p class="fg-class-tag">{p.classes.deliverables.tagline}</p>
+          </header>
+          <ol class="fg-cards fg-cards--grid">
+            {
+              deliverables.map((svc) => (
+                <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
+                  <article class="fg-card" data-reveal data-reveal-stagger="80">
+                    <header class="fg-card-head">
+                      <span class="fg-no" aria-hidden="true">{svc.no}</span>
+                      <h3 class="fg-name">{svc.name}</h3>
+                      <p class="fg-price">{svc.price}</p>
+                    </header>
+                    <p class="fg-blurb">{svc.blurb}</p>
+                    {svc.note && <p class="fg-ledger">{svc.note}</p>}
+                  </article>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
       </div>
 
       <div class="fg-pricing" data-reveal>
@@ -164,7 +167,7 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
       <div class="fg-proof-card" data-reveal>
         <LegendMark proof={p.proof.anchor} />
         <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
-        <a href={`${base}/work/pitchboulder`} class="fg-pill fg-pill--quiet">
+        <a href={`${base}/work/pitchboulder`} class="fg-pill--quiet">
           See the work <span aria-hidden="true">→</span>
         </a>
       </div>
@@ -185,7 +188,10 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
       <div class="fg-saga-inner">
         <h2 class="fg-headline fg-headline--close" data-reveal>{p.cta.headline}</h2>
         <p class="fg-sub" data-reveal>{p.cta.body}</p>
-        <a href={`${base}${p.cta.cta.href}`} class="fg-pill" data-reveal>{p.cta.cta.label}</a>
+        <a href={`${base}${p.cta.cta.href}`} class="btn fg-cta" data-reveal>
+          <span>{p.cta.cta.label}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
       </div>
     </section>
   </main>
@@ -193,11 +199,12 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
 
 <style>
   .fg {
-    /* the smithy: near-black with an ember undertone — darker and warmer
-       than the site base, so the lane has its own air without leaving the
-       night. Heat is scarce and always MEANS temperature. */
+    /* the smithy: near-black with an ember undertone — darker and warmer than
+       the site base, so the lane has its own air without leaving the night.
+       Heat is scarce and always MEANS temperature. */
     --fg-ground: #100d0b;
     --fg-glass: color-mix(in srgb, #ffffff 4%, transparent);
+    --fg-hair: color-mix(in srgb, #ffffff 9%, transparent);
     background: var(--fg-ground);
   }
   .fg-sec {
@@ -208,7 +215,7 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
   /* ── T1 the smithy ── */
   .fg-hero {
     position: relative;
-    min-height: 92svh;
+    min-height: 84svh;
     display: grid;
     align-content: center;
     overflow: clip;
@@ -220,8 +227,8 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
     height: 100%;
     pointer-events: none;
   }
-  /* the forge glow: breathes at rest (living portrait rule) — a low warm
-     light from below the frame, as if the forge is just out of shot */
+  /* the forge glow: breathes at rest (living portrait rule) — a low warm light
+     from below the frame, as if the forge is just out of shot */
   .fg-hero-glow {
     position: absolute;
     inset: 0;
@@ -249,11 +256,11 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
   .fg-hero-inner {
     position: relative;
     display: grid;
-    gap: 1.4rem;
+    gap: 1.3rem;
     justify-items: start;
     max-width: 64rem;
     margin-inline: auto;
-    padding: 7rem clamp(1.5rem, 6vw, 4rem) 5rem;
+    padding: 6rem clamp(1.5rem, 6vw, 4rem) 4rem;
   }
   .fg-kicker {
     letter-spacing: 0.3em;
@@ -262,10 +269,10 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
   .fg-headline {
     font-family: var(--font-display);
     font-weight: 560;
-    font-size: clamp(2.4rem, 5vw, 4.6rem);
-    line-height: 1.06;
+    font-size: clamp(2.3rem, 4.8vw, 4.4rem);
+    line-height: 1.07;
     color: #f6f2ec;
-    max-width: 15ch;
+    max-width: 18ch;
     /* lit by the forge: a warm underglow on the type itself */
     text-shadow: 0 6px 40px color-mix(in srgb, var(--color-forge-heat, #ff9d45) 30%, transparent);
   }
@@ -274,27 +281,44 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
     font-size: clamp(1.02rem, 1.35vw, 1.2rem);
     line-height: 1.55;
     color: color-mix(in srgb, #f6f2ec 85%, transparent);
-    max-width: 46ch;
+    max-width: 52ch;
   }
-  .fg-pill {
+
+  /* ── the CTA: the site's button grammar (1px accent border, mono caps, ≥44px)
+     with the shared 6px arrow slide. Warm-tinted at rest so it reads on the
+     ember ground; goes full accent on hover. ── */
+  .fg-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.7rem 1.4rem;
+    color: #f6f2ec;
+  }
+  .fg-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift, ease-out);
+  }
+  .fg-cta:hover .arrow,
+  .fg-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fg-cta .arrow {
+      transition: none;
+    }
+  }
+  .fg-pill--quiet {
     display: inline-block;
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #140f0a;
-    background: linear-gradient(100deg, var(--color-forge-heat, #ff9d45), var(--color-accent, #38f8ec) 160%);
-    border-radius: 999px;
-    padding: 0.9rem 1.8rem;
-    transition: transform 240ms var(--ease-swift, ease-out);
-  }
-  .fg-pill:hover {
-    transform: translateY(-2px);
-  }
-  .fg-pill--quiet {
-    background: transparent;
     color: var(--color-accent, #38f8ec);
-    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+    transition: color var(--dur-hover, 160ms) var(--ease-swift, ease-out);
+  }
+  .fg-pill--quiet:hover {
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 80%, #fff);
   }
 
   /* ── shared type ── */
@@ -332,153 +356,227 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
   .fg-who {
     max-width: 64rem;
     margin-inline: auto;
-    padding: 4rem clamp(1.5rem, 6vw, 4rem);
+    padding: 3.5rem clamp(1.5rem, 6vw, 4rem);
     display: grid;
-    gap: 1.1rem;
+    gap: 1rem;
   }
   .fg-chips {
     list-style: none;
     padding: 0;
-    margin: 1rem 0 0;
+    margin: 0.8rem 0 0;
     display: grid;
-    gap: 0.8rem;
+    gap: 0.7rem;
   }
   .fg-chip {
     position: relative;
     font-family: var(--font-sans);
-    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    font-size: clamp(1rem, 1.3vw, 1.12rem);
     line-height: 1.5;
     color: #f0ece6;
     background: var(--fg-glass);
-    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border: 1px solid var(--fg-hair);
     border-left: 2px solid var(--chip-heat);
     border-radius: 8px;
-    padding: 1.1rem 1.3rem 1.1rem 3.4rem;
+    padding: 1rem 1.3rem 1rem 3.4rem;
   }
   .fg-chip-no {
     position: absolute;
     left: 1.2rem;
-    top: 1.15rem;
+    top: 1.05rem;
     font-family: var(--font-mono);
     font-size: 0.8rem;
     letter-spacing: 0.1em;
     color: var(--chip-heat);
   }
 
-  /* ── T3 the tempering ── */
-  .fg-anvil {
-    padding: 4rem clamp(1.5rem, 6vw, 4rem) 5rem;
+  /* ── T3 the services ── */
+  .fg-services {
     max-width: 74rem;
     margin-inline: auto;
+    padding: 3.5rem clamp(1.5rem, 6vw, 4rem) 4.5rem;
   }
-  .fg-anvil-intro {
-    margin-bottom: 3rem;
+  .fg-services-head {
+    margin-bottom: 2.2rem;
   }
-  .fg-forge {
+  /* the inner holds the temper rail + both classes; the rail hugs its left
+     gutter and spans the whole services column automatically. */
+  .fg-services-inner {
+    position: relative;
+    padding-left: clamp(1.4rem, 3vw, 2.4rem);
     display: grid;
-    grid-template-columns: clamp(90px, 14vw, 200px) minmax(0, 1fr);
-    gap: clamp(0.5rem, 3vw, 2.5rem);
+    gap: 3rem;
   }
-  .fg-spine {
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
+  .fg-rail {
+    position: absolute;
+    left: 3px;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      180deg,
+      var(--color-forge-heat, #ff9d45),
+      #c9b26a 52%,
+      var(--color-accent, #38f8ec)
+    );
+    opacity: 0.9;
   }
-  /* no-JS / reduced motion: the line is FULLY FORGED (final state). The
-     engine sets the dash bookkeeping only when it's actually going to draw. */
-  [data-fg-spine] {
-    stroke-dasharray: none;
+  .fg-class {
+    display: grid;
+    gap: 1.1rem;
   }
-  .fg-node {
-    filter: drop-shadow(0 0 4px color-mix(in srgb, currentcolor 60%, transparent));
+  .fg-class-head {
+    display: grid;
+    gap: 0.35rem;
   }
-  .fg-stations {
+  .fg-class-label {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #f0ece6 66%, transparent);
+  }
+  .fg-class-tag {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+    line-height: 1.35;
+    color: color-mix(in srgb, #f0ece6 88%, transparent);
+    max-width: 44ch;
+  }
+  .fg-cards {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    gap: clamp(3rem, 8vh, 6rem);
+    gap: 1.1rem;
+  }
+  /* deliverables read as a scannable grid of floors; engagements stay full
+     width so the flagship + its strip have room to breathe. */
+  @media (min-width: 720px) {
+    .fg-cards--grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .fg-svc {
+    position: relative;
+  }
+  /* every card gets a node tick sitting ON the rail, in its own temper heat */
+  .fg-svc::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * clamp(1.4rem, 3vw, 2.4rem) - 5px);
+    top: 1.7rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--heat);
+    box-shadow:
+      0 0 0 3px var(--fg-ground),
+      0 0 7px color-mix(in srgb, var(--heat) 65%, transparent);
   }
   .fg-card {
+    height: 100%;
     background: var(--fg-glass);
-    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border: 1px solid var(--fg-hair);
     border-radius: 10px;
-    padding: 1.7rem 1.6rem 1.5rem;
+    padding: 1.5rem 1.5rem 1.4rem;
     display: grid;
-    gap: 0.95rem;
-    max-width: 40rem;
-    /* each card sits in its own heat: a faint left glow in station color */
+    gap: 0.85rem;
+    align-content: start;
+    /* each card sits in its own heat: a faint inset edge in station color */
     box-shadow: inset 3px 0 0 var(--heat);
   }
-  .fg-no {
-    font-family: var(--font-sans);
-    font-weight: 300;
-    font-size: 1.8rem;
-    color: var(--heat);
-    -webkit-text-stroke: 1px var(--heat);
-    -webkit-text-fill-color: transparent;
-  }
-  .fg-name {
-    font-family: var(--font-sans);
-    font-weight: 650;
-    font-size: 1.35rem;
-    color: #f4f0ea;
-    margin-top: 0.15rem;
-  }
-  .fg-sublabel {
-    letter-spacing: 0.18em;
-    color: color-mix(in srgb, #f0ece6 60%, transparent);
-  }
-  .fg-process {
-    font-size: 0.97rem;
-    line-height: 1.55;
-    color: color-mix(in srgb, #f0ece6 85%, transparent);
-  }
-  .fg-meta {
+  .fg-card-head {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.9rem;
-    margin: 0;
-    border-top: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
-    padding-top: 0.95rem;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0.4rem 0.9rem;
   }
-  .fg-meta dt {
-    color: color-mix(in srgb, #f0ece6 52%, transparent);
-    letter-spacing: 0.16em;
-  }
-  .fg-meta dd {
-    margin: 0.2rem 0 0;
-    font-size: 0.95rem;
-    line-height: 1.45;
-    color: color-mix(in srgb, #f0ece6 88%, transparent);
-  }
-  .fg-price {
+  .fg-no {
+    grid-row: span 2;
+    align-self: start;
     font-family: var(--font-mono);
     font-size: 0.9rem;
     letter-spacing: 0.08em;
     color: var(--heat);
+    padding-top: 0.15rem;
   }
-  .fg-anchor {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1rem;
-    color: color-mix(in srgb, #f0ece6 75%, transparent);
-    border-left: 2px solid var(--heat);
-    padding-left: 0.85rem;
+  .fg-name {
+    font-family: var(--font-sans);
+    font-weight: 650;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    color: #f4f0ea;
   }
-  .fg-pricing {
-    margin-top: 3.5rem;
+  .fg-price {
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--heat);
+  }
+  .fg-blurb {
+    font-size: 0.97rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, #f0ece6 85%, transparent);
+  }
+  .fg-ledger {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: color-mix(in srgb, #f0ece6 55%, transparent);
+    padding-top: 0.2rem;
+    border-top: 1px solid var(--fg-hair);
+  }
+
+  /* the demoted method — a quiet, names-only strip inside the flagship card */
+  .fg-strip {
+    margin-top: 0.3rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid var(--fg-hair);
     display: grid;
-    gap: 0.6rem;
+    gap: 0.5rem;
+  }
+  .fg-strip-label {
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #f0ece6 55%, transparent);
+  }
+  .fg-strip-stages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+  }
+  .fg-strip-stage {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, #f0ece6 78%, transparent);
+  }
+  .fg-strip-stage:not(:last-child)::after {
+    content: "→";
+    margin-left: 0.55rem;
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .fg-strip-note {
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #f0ece6 60%, transparent);
+  }
+
+  .fg-pricing {
+    margin-top: 3rem;
+    display: grid;
+    gap: 0.55rem;
   }
 
   /* ── T4 proof ── */
   .fg-proof {
-    padding: 3rem clamp(1.5rem, 6vw, 4rem) 5rem;
+    padding: 3rem clamp(1.5rem, 6vw, 4rem) 4.5rem;
     max-width: 60rem;
     margin-inline: auto;
     display: grid;
-    gap: 1.3rem;
+    gap: 1.2rem;
   }
   .fg-proof-card {
     display: grid;
@@ -491,16 +589,16 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
 
   /* ── T5 the saga (the S finale) ── */
   .fg-saga {
-    min-height: 88svh;
+    min-height: 78svh;
     display: grid;
     align-content: center;
-    padding: 6rem clamp(1.5rem, 6vw, 4rem);
+    padding: 5rem clamp(1.5rem, 6vw, 4rem);
   }
   .fg-s {
     position: absolute;
     right: 3%;
     top: 50%;
-    height: 82%;
+    height: 80%;
     transform: translateY(-50%);
     pointer-events: none;
     filter: drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent));
@@ -511,7 +609,7 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
   .fg-saga-inner {
     position: relative;
     display: grid;
-    gap: 1.3rem;
+    gap: 1.2rem;
     justify-items: start;
     max-width: 64rem;
     margin-inline: auto;
@@ -521,58 +619,22 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
     max-width: 18ch;
   }
 
-  /* ── small screens: spine hides, stations stack clean ── */
-  @media (max-width: 760px) {
-    .fg-forge {
-      grid-template-columns: 1fr;
-    }
-    .fg-spine {
-      display: none;
-    }
+  /* ── small screens ── */
+  @media (max-width: 720px) {
     .fg-s {
       opacity: 0.35;
       right: -12%;
     }
-
-    /* P12.5 — mobile's own temper spine. A background-gradient rail on
-       the list (heat → mid → aqua, the same stops as #fg-temper) hugs
-       the stations column's left edge; it covers the ul's full box
-       automatically, so it stays correct no matter how tall any one
-       card's copy makes it. Each station gets a node tick — a small
-       dot in its own --heat — laid out in normal flow beside the card
-       so the tick and the rail line up without any absolute-position
-       math. Static, no scrub: fully drawn with no JS and no motion. */
-    .fg-stations {
-      background: linear-gradient(180deg, var(--color-forge-heat, #ff9d45), #c9b26a 55%, var(--color-accent, #38f8ec)) no-repeat 4px 0 /
-        2px 100%;
-    }
-    .fg-station {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.85rem;
-    }
-    .fg-station::before {
-      content: "";
-      flex: none;
-      width: 10px;
-      height: 10px;
-      margin-top: 1.7rem;
-      border-radius: 50%;
-      background: var(--heat);
-      box-shadow:
-        0 0 0 3px var(--fg-ground),
-        0 0 6px color-mix(in srgb, var(--heat) 65%, transparent);
-    }
-    .fg-card {
-      flex: 1 1 auto;
-      min-width: 0;
+    .fg-card-head {
+      grid-template-columns: auto 1fr;
     }
   }
 </style>
 
 <script>
-  // P11 enhancement — the tempering. Everything below rides over a page
-  // that is already fully forged without JS.
+  // P12.x enhancement — everything below rides over a page that is already
+  // fully forged (and fully readable) without JS. The temper rail is CSS-only;
+  // the two enhancements here are the hero ember field and the S-finale draw.
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { ensureSmoothScroll } from "../lib/smooth-scroll";
@@ -590,49 +652,8 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
     const lenis = await ensureSmoothScroll();
     if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
 
-    // ── the temper line: scrub-drawn down the anvil's transit ──
-    const spine = document.querySelector<SVGPathElement>("[data-fg-spine]");
-    const anvil = document.querySelector<HTMLElement>("[data-fg-anvil]");
-    if (spine && anvil) {
-      const L = spine.getTotalLength();
-      spine.style.strokeDasharray = String(L);
-      gsap.fromTo(
-        spine,
-        { strokeDashoffset: L },
-        {
-          strokeDashoffset: 0,
-          ease: "none",
-          scrollTrigger: { trigger: anvil, start: "top 60%", end: "bottom 75%", scrub: 0.6 },
-        },
-      );
-    }
-
-    // ── station arrivals: the hammer strike — node flare + card settle ──
-    document.querySelectorAll<HTMLElement>("[data-fg-station]").forEach((station, i) => {
-      const node = document.querySelectorAll<SVGCircleElement>("[data-fg-node]")[i];
-      ScrollTrigger.create({
-        trigger: station,
-        start: "top 70%",
-        once: true,
-        onEnter: () => {
-          if (node) {
-            gsap.fromTo(
-              node,
-              { attr: { r: 7 }, opacity: 0.6 },
-              { attr: { r: 11 }, opacity: 1, duration: 0.18, ease: "power3.out", yoyo: true, repeat: 1 },
-            );
-          }
-          // one soft strike on the card — a 6px drop that settles, never clips
-          const card = station.querySelector(".fg-card");
-          if (card) {
-            gsap.fromTo(card, { y: -6 }, { y: 0, duration: 0.5, ease: "power3.out" });
-          }
-        },
-      });
-    });
-
     // ── the finale S: draws as the saga section arrives (the home page's
-    // #talk gesture, completing the arc: forged line → the mark) ──
+    // #talk gesture, completing the arc: forged services → the mark) ──
     const sPath = document.querySelector<SVGPathElement>("[data-fg-s]");
     const saga = document.querySelector<HTMLElement>("[data-fg-saga]");
     if (sPath && saga) {

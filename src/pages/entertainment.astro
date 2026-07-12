@@ -88,9 +88,13 @@ const pbRoom = bust("work/pitchboulder/room-wide-900", pair("work/pitchboulder/r
 const pbPodium = bust("work/pitchboulder/podium-900", pair("work/pitchboulder/podium-900"));
 
 // the pebble-beach proof (with its owner-endorsement context) relocates from
-// the rooms list to chapter 02; the remaining rooms keep the list.
+// the rooms list to chapter 02. P12-KO — workshop-coverage (KO Law) ALSO leaves
+// this list: it now has its own venture story + a linked rail card above, so the
+// card carries that proof instead of an unlinked line here (the same claim is
+// never rendered twice on this page).
 const pebbleRoom = p.rooms.items.find((r) => r.proof.relationshipId === "pebble-beach");
-const otherRooms = p.rooms.items.filter((r) => r.proof.relationshipId !== "pebble-beach");
+const HANDLED_ELSEWHERE = new Set(["pebble-beach", "workshop-coverage"]);
+const otherRooms = p.rooms.items.filter((r) => !HANDLED_ELSEWHERE.has(r.proof.relationshipId));
 
 // scattered ghost letters are drawn FROM the page's own words (presentational
 // letterforms, not new copy): the hero scatters STORY.
@@ -105,6 +109,10 @@ const coverage = [
   { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story" },
   { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story" },
   { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story" },
+  // P12-KO — the KO Law workshops venture story. slate + title copied VERBATIM
+  // from the article page's own ARTICLE block (already operator-flagged there;
+  // reuse adds no new copy here). Card image resolves as venture/<slug>/hero-900.
+  { href: "/venture/ko-law-workshops", slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026", title: "Four startup workshops, on camera." },
   { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes my aerials to market." },
   // P14b — the MEME venture story (slate + title copied verbatim from the
   // article page's own frontmatter; reuse adds no new copy here).
@@ -411,9 +419,10 @@ const GROUNDS = {
       </div>
 
       <!-- the honesty proofs that lived in the rooms list: seriesfest + afm
-           folded here as a compact list; workshop-coverage stays an UNLINKED
-           line (no article behind it, its subject excluded). Verbatim
-           permittedPhrasing via LegendMark — no new wording. -->
+           folded here as a compact list. (pebble-beach moved to chapter 02;
+           workshop-coverage / KO Law now has its own linked story card in the
+           rail above, so it left this list — the claim renders once, on the
+           card's article.) Verbatim permittedPhrasing via LegendMark. -->
       <ul class="im-rail-proofs" aria-label="How close each relationship is">
         {
           otherRooms.map((room) => (

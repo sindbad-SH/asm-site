@@ -52,6 +52,34 @@ const fieldNotes = defineCollection({
     // prepend the deploy base (`/asm-site` on staging, `/` in production).
     cover: z.string().optional(),
     draft: z.boolean().default(false),
+
+    // ── P12.6 · Adventure micro-story fields ────────────────────────────────
+    // A note becomes an /adventure MICRO-STORY (rendered on the survey wall,
+    // not just the /field-notes log) when it carries `photos`. These fields are
+    // optional so a plain field note still validates. Names/dates stay
+    // consistent with src/data/territory.ts + AA-MEDIA-INVENTORY.md.
+    //
+    // territory — the country group from territory.ts ("Colorado" | "Switzerland"
+    //   | "Italy" | "New Mexico"). Drives the mono territory slate.
+    territory: z.string().optional(),
+    // photos — 1–3 gallery frames for this place. Each `slug` matches an export
+    //   set already in public/media/adventure/gallery/ (e.g. "matterhorn-zermatt-01");
+    //   the page builds the responsive <picture> from it. `orientation` picks the
+    //   export widths (landscape 800/1400/2200, vertical 800/1120/1600). The FIRST
+    //   photo is the lead (the distort tile + the /field-notes cover fallback).
+    photos: z
+      .array(
+        z.object({
+          slug: z.string(),
+          orientation: z.enum(["landscape", "vertical"]).default("landscape"),
+          alt: z.string(),
+        }),
+      )
+      .optional(),
+    // license — show the "Licensed through Amazing Aerial" purchase chip on the
+    //   story. Adventure frames are licensed through the agency; personal notes
+    //   leave this false.
+    license: z.boolean().default(false),
   }),
 });
 

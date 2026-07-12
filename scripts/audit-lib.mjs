@@ -12,9 +12,15 @@ const TEXT_EXTENSIONS = new Set([".html", ".htm", ".txt", ".xml", ".json", ".js"
 /**
  * Hard-excluded terms, lowercase substring match against built output.
  * Sources: research-brief §0 (the AI-ambassador relationship is off the site),
- * §4 HARD EXCLUSION (the real-estate business), §4 UNVERIFIED (the law firm),
+ * §4 HARD EXCLUSION (the real-estate business),
  * §4 POSSIBLE FUTURE (the film group). "makeshift film group" is the full
  * phrase deliberately — MEME's legal name legitimately contains "Makeshift".
+ *
+ * LIFTED 2026-07-12 by operator direction: "ko law" (was §4 UNVERIFIED — the
+ * law firm). He confirmed the relationship himself: coverage of four of their
+ * startup workshops (1/29, 2/26, 4/30, 6/25 2026), likely future work, and
+ * directed a light story page about the workshops. Copy remains gated by the
+ * OPERATOR READ-APPROVAL flow like every other article.
  */
 export const FORBIDDEN_TERMS = [
   "largo",
@@ -22,7 +28,6 @@ export const FORBIDDEN_TERMS = [
   "nextdoorphoto",
   "real estate",
   "real-estate",
-  "ko law",
   "makeshift film group",
 ];
 
