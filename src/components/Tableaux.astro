@@ -19,12 +19,26 @@ import TableauChapter, { type TableauLayer, type TableauImage } from "./TableauC
 import TableauCluster from "./TableauCluster.astro";
 import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
+
+// P14b — CACHE-BUSTED tableaux media (same mechanism as PortalHero.astro).
+// public/ assets keep their filenames across re-exports (the P14b industry
+// re-shoot swapped better wide frames in at the SAME paths), so a returning
+// browser could otherwise hold a STALE crop. Versioning by file mtime makes
+// every reference pull the current bytes; the suffix changes automatically on
+// the next re-export. cwd-anchored like every build-time media read below.
+const mtimeV = (absPath: string) => {
+  try {
+    return `?v=${Math.round(statSync(absPath).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
 
 // P12.6 — read a shot's TRUE pixel ratio at BUILD TIME so its cluster card can
 // take the IMAGE's native aspect, not force the image into a hardcoded box.
@@ -49,11 +63,13 @@ async function aspectOf(file: string): Promise<string | undefined> {
 async function clusterShot(slug: string, id: string) {
   const dir = join(process.cwd(), "public", "media", "home", slug, "cluster");
   const webpPath = join(dir, `${id}.webp`);
-  const has = existsSync(join(dir, `${id}.avif`)) && existsSync(webpPath);
+  const avifPath = join(dir, `${id}.avif`);
+  const has = existsSync(avifPath) && existsSync(webpPath);
   return has
     ? {
-        avif: `${base}/media/home/${slug}/cluster/${id}.avif`,
-        webp: `${base}/media/home/${slug}/cluster/${id}.webp`,
+        // P14b — mtime cache-bust so the re-shot industry cluster shots refresh.
+        avif: `${base}/media/home/${slug}/cluster/${id}.avif${mtimeV(avifPath)}`,
+        webp: `${base}/media/home/${slug}/cluster/${id}.webp${mtimeV(webpPath)}`,
         // P12.6 — native ratio so the card matches the photo (crop-free).
         ar: await aspectOf(webpPath),
       }
@@ -110,12 +126,13 @@ function findLayerImages(terrain: string): (TableauImage | null)[] {
   const slug = terrain.toLowerCase().replace(/^the\s+/, "");
   const dir = join(process.cwd(), "public", "media", "home", slug);
   return LAYER_NAMES.map((name) => {
-    const hasAvif = existsSync(join(dir, `${name}.avif`));
-    const hasWebp = existsSync(join(dir, `${name}.webp`));
-    if (!hasAvif || !hasWebp) return null; // partial fill-in keeps that layer's placeholder
+    const avifPath = join(dir, `${name}.avif`);
+    const webpPath = join(dir, `${name}.webp`);
+    if (!existsSync(avifPath) || !existsSync(webpPath)) return null; // partial fill-in keeps that layer's placeholder
     return {
-      avif: `${base}/media/home/${slug}/${name}.avif`,
-      webp: `${base}/media/home/${slug}/${name}.webp`,
+      // P14b — mtime cache-bust, consistent with the cluster shots above.
+      avif: `${base}/media/home/${slug}/${name}.avif${mtimeV(avifPath)}`,
+      webp: `${base}/media/home/${slug}/${name}.webp${mtimeV(webpPath)}`,
     };
   });
 }

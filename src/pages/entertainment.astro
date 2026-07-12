@@ -30,7 +30,7 @@ import LegendMark from "../components/LegendMark.astro";
 import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
 import { PAGES, WORK } from "../consts";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.entertainment;
@@ -61,9 +61,27 @@ const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
 const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-900");
 const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-900");
 const shLoop = media("work/shelby-pebble-beach/loop.mp4"); // P13c — hover-video on the wide card
-// the rooms — honest published event frames (SeriesFest carpet, AFM panel)
-const roomSeries = pair("home/industry/background");
-const roomAfm = pair("home/industry/midground");
+// the rooms — honest published event frames (SeriesFest panel, AFM panel).
+// P14b — these two industry frames were re-shot to wider, crop-tolerant Tier-1
+// stage shots (the AFM logo + SeriesFest branding now survive the card crops).
+// mtime cache-bust (same mechanism as PortalHero/Tableaux) so a returning
+// browser pulls the new frames instead of a cached stale crop.
+const mtimeV = (rel: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(mediaRoot, ...rel.split("/"))).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
+const bust = (relBase: string, p: ReturnType<typeof pair>) =>
+  p
+    ? {
+        avif: p.avif ? p.avif + mtimeV(`${relBase}.avif`) : undefined,
+        webp: p.webp ? p.webp + mtimeV(`${relBase}.webp`) : undefined,
+      }
+    : undefined;
+const roomSeries = bust("home/industry/background", pair("home/industry/background"));
+const roomAfm = bust("home/industry/midground", pair("home/industry/midground"));
 
 // the pebble-beach proof (with its owner-endorsement context) relocates from
 // the rooms list to chapter 02; the remaining rooms keep the list.
@@ -85,6 +103,9 @@ const coverage = [
   { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story" },
   { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story" },
   { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes my aerials to market." },
+  // P14b — the MEME venture story (slate + title copied verbatim from the
+  // article page's own frontmatter; reuse adds no new copy here).
+  { href: "/venture/meme", slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION", title: "The most formal role I hold in this world." },
 ];
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.

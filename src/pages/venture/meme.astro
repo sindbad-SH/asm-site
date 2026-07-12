@@ -1,0 +1,199 @@
+---
+/**
+ * /venture/meme — P14b: the MEME story. Sibling to /venture/amazing-aerial
+ * (same venture-article grammar: slate, italic title, LegendMark proof, short
+ * paragraphs, external + back links). Typographic only — NO photos exist for
+ * this relationship yet, so the page carries a ghost "M E M E" letter motif
+ * (entertainment.astro's grammar) in place of a media collage.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — the ARTICLE prose below is new copy,
+ * ADAPTED from the operator's own published bio at meme.ngo/meet-the-team
+ * (operator-approved source, 2026-07-12: "reference what it says on the
+ * website", reasonable copy adaptation allowed). Staging-only until he reads
+ * it. Fact base (verbatim from that page): title "Member At-Large"; role
+ * "Strategic Liaison and Scout … first point of contact for new talent";
+ * self-description "a StorySmith, adventurer, and market strategist dedicated
+ * to the art of audience discovery"; founded Adventure Storytelling Media;
+ * cinematic drone work in Switzerland and Italy; the Boulder startup scene.
+ * Org: Makeshift Entertainment Media Education (MEME), a Colorado nonprofit.
+ *
+ * The relationship claim itself renders ONLY through LegendMark, from the
+ * LOCKED permitted phrasing in consts (RELATIONSHIPS "meme" → "Member
+ * At-Large, MEME …, a Colorado nonprofit"). Never overstated to Board Chair
+ * (that is Amber MacPherson — see the honesty note in consts.ts).
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const meme = PAGES.entertainment.meme; // proof = { relationshipId: "meme" }
+
+// ghost letterforms — the page's own subject, scattered as faint backdrop
+// (presentational; assembles under the engine, sits still with no-JS).
+const ghost = ["M", "E", "M", "E"];
+
+// ── THE ARTICLE (all new sentences — see the approval note above) ──
+const ARTICLE = {
+  slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION",
+  title: "The most formal role I hold in this world.",
+  paragraphs: [
+    "MEME — Makeshift Entertainment Media Education — is a Colorado nonprofit, and it holds the most formal title I carry anywhere: Member At-Large.",
+    "The work is to be a Strategic Liaison and Scout — often the first point of contact for new talent. I look for storytellers worth backing, and help them find a way in.",
+    "It runs on the same instinct as everything else I make: a StorySmith's read on what an audience will feel, and a market strategist's read on who that audience actually is.",
+    "The cinematic drone work over Switzerland and Italy, the founders I meet around the Boulder startup scene, and this role at MEME are one practice — pointed at the same question: whose story is this, and who is it for?",
+  ],
+  ctas: [
+    { label: "About the organization →", href: "https://www.meme.ngo", external: true },
+    { label: "See the venture lane →", href: `${base}/entertainment`, external: false },
+  ],
+};
+---
+
+<Base title="MEME — a venture story" description="Member At-Large at MEME (Makeshift Entertainment Media Education), a Colorado nonprofit: Strategic Liaison and Scout for new storytellers.">
+  <main class="meme-story">
+    <div class="meme-ghosts" aria-hidden="true">
+      {ghost.map((ch, i) => <span class="meme-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
+    </div>
+    <article class="meme-inner">
+      <a href={`${base}/entertainment`} class="link meme-back">← Venture</a>
+      <p class="hud-label meme-slate" data-reveal data-tableau-content>
+        <span data-decode>{ARTICLE.slate}</span>
+      </p>
+      <h1 class="meme-title" data-reveal>{ARTICLE.title}</h1>
+      <div class="meme-proof" data-reveal>
+        <LegendMark proof={meme.proof} />
+      </div>
+      {ARTICLE.paragraphs.map((para) => <p class="meme-para" data-reveal>{para}</p>)}
+
+      <nav class="meme-ctas" data-reveal>
+        {
+          ARTICLE.ctas.map((c) => (
+            <a href={c.href} class="link" rel={c.external ? "noopener" : undefined} target={c.external ? "_blank" : undefined}>
+              {c.label}
+            </a>
+          ))
+        }
+      </nav>
+      <a href={`${base}/entertainment`} class="link meme-back">← Venture</a>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .meme-story {
+    position: relative;
+    background: #0e2230; /* entertainment chapter 03 (MEME) ground — same room */
+    min-height: 100svh;
+    overflow: clip;
+  }
+  .meme-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: 7rem 2rem 6rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .meme-back {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .meme-slate {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+  }
+  .meme-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    line-height: 1.12;
+    color: #f2f4f8;
+  }
+  .meme-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+  }
+  .meme-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    padding-top: 1.4rem;
+    margin-top: 0.6rem;
+  }
+
+  /* ghost "M E M E" — faint letterforms behind the column (no-JS = at rest) */
+  .meme-ghosts {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .meme-ghost {
+    position: absolute;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: clamp(6rem, 18vw, 16rem);
+    line-height: 1;
+    color: color-mix(in srgb, #ffffff 5%, transparent);
+  }
+  .meme-ghost:nth-child(1) { left: 4%; top: 12%; }
+  .meme-ghost:nth-child(2) { right: 8%; top: 30%; }
+  .meme-ghost:nth-child(3) { left: 10%; bottom: 18%; }
+  .meme-ghost:nth-child(4) { right: 4%; bottom: 8%; }
+
+  @media (max-width: 640px) {
+    .meme-ghost { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .meme-ghost { transform: none !important; }
+  }
+</style>
+
+<script>
+  // enhancement only: decode the slate label, and let the ghost letters drift
+  // in and settle (their resting positions already live in CSS, so no-JS and
+  // reduced-motion see the final, correct layout).
+  const mountDecode = () => import("../../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecode, { timeout: 3000 });
+  else setTimeout(mountDecode, 1500);
+
+  (async () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(max-width: 640px)").matches) return;
+    const { gsap } = await import("gsap");
+    document.querySelectorAll<HTMLElement>("[data-im-ghost]").forEach((g, i) => {
+      const dx = (i % 2 ? 1 : -1) * (36 + (i % 3) * 24);
+      gsap.fromTo(
+        g,
+        { x: dx, y: 48, opacity: 0 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: 1.1,
+          ease: "power3.out",
+          delay: i * 0.08,
+          onComplete: () => {
+            gsap.to(g, {
+              y: (i % 2 ? -1 : 1) * 10,
+              duration: 5 + (i % 3) * 1.5,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          },
+        },
+      );
+    });
+  })();
+</script>
