@@ -341,19 +341,9 @@ export type WorkItem = {
 };
 
 export const WORK: readonly WorkItem[] = [
-  {
-    slug: "pitchboulder",
-    title: "PitchBoulder — coverage, recaps & the commercial",
-    pillar: "entertainment",
-    forOrg: "PitchBoulder",
-    what: "event coverage & recaps, and produced their commercial",
-    // Sourced (COPY.md §3), not guessed: Rothschild's published quote says
-    // "I hired Sindbad Horizon"; the published case copy says "directly
-    // commissioned by founder Peter Rothschild."
-    engagement: "paid engagement",
-    relationshipId: "pitchboulder",
-    href: "/work/pitchboulder",
-  },
+  // P12.7 — order flipped per operator: the Shelby/Pebble Beach piece is his
+  // signature showpiece right now, so it leads the wall; PitchBoulder follows
+  // (now with its own hover-loop cut from the promo he produced).
   {
     slug: "shelby-pebble-beach",
     title: "A restored Shelby at Pebble Beach",
@@ -366,6 +356,19 @@ export const WORK: readonly WorkItem[] = [
     engagement: "[confirm]",
     relationshipId: "pebble-beach",
     href: "/work/shelby-pebble-beach",
+  },
+  {
+    slug: "pitchboulder",
+    title: "PitchBoulder — coverage, recaps & the commercial",
+    pillar: "entertainment",
+    forOrg: "PitchBoulder",
+    what: "event coverage & recaps, and produced their commercial",
+    // Sourced (COPY.md §3), not guessed: Rothschild's published quote says
+    // "I hired Sindbad Horizon"; the published case copy says "directly
+    // commissioned by founder Peter Rothschild."
+    engagement: "paid engagement",
+    relationshipId: "pitchboulder",
+    href: "/work/pitchboulder",
   },
   // ---------------------------------------------------------------------------
   // Adventure gallery — the two [confirm]-titled placeholders (alps-expedition,
