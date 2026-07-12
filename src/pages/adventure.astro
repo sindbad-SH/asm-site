@@ -108,20 +108,35 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
             const orientation = item.orientation ?? "landscape";
             const isVertical = orientation === "vertical";
             return (
-              <Card
-                class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}
-                mediaRatio={isVertical ? "4/5" : "3/2"}
-                mediaSrc={galleryMedia(item.slug, orientation)}
-                mediaAlt={item.title}
-                mediaLabel={`${item.title} — gallery still (§2b/§2e)`}
-                eyebrow={item.engagement}
-                title={item.title}
-                meta={item.what}
-                fieldNote={item.fieldNote}
-                fieldNoteOpen={item.fieldNoteOpen}
-                reveal
-                revealStagger={50}
-              />
+              <div class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}>
+                <Card
+                  mediaRatio={isVertical ? "4/5" : "3/2"}
+                  mediaSrc={galleryMedia(item.slug, orientation)}
+                  mediaAlt={item.title}
+                  mediaLabel={`${item.title} — gallery still (§2b/§2e)`}
+                  eyebrow={item.engagement}
+                  title={item.title}
+                  meta={item.what}
+                  fieldNote={item.fieldNote}
+                  fieldNoteOpen={item.fieldNoteOpen}
+                  reveal
+                  revealStagger={50}
+                />
+                {/* Quiet per-card AA licensing link (P12.4b) — Card has no link
+                    slot, so this rides alongside it at the page level rather
+                    than redesigning Card.astro. Reads as a field-note-style
+                    footer strip flush against the card's own border. Deep
+                    per-image links aren't available from AA, so every card
+                    points at the same operator portfolio URL. */}
+                <a
+                  href={p.aaFunnel.cta.href}
+                  target="_blank"
+                  rel="noopener"
+                  class="gallery-card-aa-link hud-label"
+                >
+                  License via Amazing Aerial <span aria-hidden="true">→</span>
+                </a>
+              </div>
             );
           })
         }
@@ -146,7 +161,7 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
               <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
             </div>
           </div>
-          <a href={p.aaFunnel.cta.href} class="btn shrink-0" rel="noopener">
+          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
             {p.aaFunnel.cta.label}
           </a>
         </div>
