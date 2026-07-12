@@ -18,8 +18,12 @@
  *      relationship's permittedPhrasing, VERBATIM (lockedAttribution).
  *   4. The Pebble tile shows a real photo AT REST (the logo frame), not just on
  *      hover — caseMedia() now prefers a `tile.*` face over `poster.*`.
- *   5. A quiet "from the archive" band (Gigs Go Green, Vybe) rounds out the
- *      bottom — honest one-liners, dated from the source files, links nowhere.
+ *   5. A quiet "from the archive" band rounds out the bottom — honest one-liners
+ *      (each relationship's permittedPhrasing, verbatim), dated from the source
+ *      files. P-work-2 (2026-07-12): Gigs Go Green + Vybe now LINK to their own
+ *      light case pages (with the "Read the story →" affordance); three early-work
+ *      tiles joined the band, display-only (Nordic Daughter & Something for
+ *      Tomorrow, The Art of Brazilian Living, PNUMIX — Paranormal Palace).
  *
  * Honesty: attribution-first — every tile carries its status verbatim from
  * consts (LegendMark-style phrasing for the AA + archive relationships; the
@@ -107,12 +111,15 @@ const filters = [
   })),
 ] as const;
 
-// Archive band — honest one-liners rendered verbatim from consts.
+// Archive band — honest one-liners rendered verbatim from consts. A tile with an
+// `href` (Gigs Go Green, Vybe) links to its own light case page and shows the
+// "Read the story →" affordance; the rest are display-only.
 const archive = WORK_ARCHIVE.map((a) => {
   const rel = RELATIONSHIP_BY_ID[a.relationshipId];
   return {
     item: a,
     media: archiveMedia(a.slug),
+    href: a.href ? `${base}${a.href}` : undefined,
     symbol: rel ? LEGEND[rel.tier].symbol : "",
     tierLabel: rel ? LEGEND[rel.tier].label : "",
     phrasing: rel?.permittedPhrasing ?? "",
@@ -223,31 +230,42 @@ const archive = WORK_ARCHIVE.map((a) => {
         <div class="archive">
           <p class="hud-label archive-kicker">From the archive</p>
           <div class="archive-grid">
-            {archive.map(({ item, media, symbol, tierLabel, phrasing }) => (
-              <div class="atile" data-archive>
-                <figure class="atile-media" aria-hidden="true">
-                  {media ? (
-                    <picture>
-                      <source type="image/avif" srcset={media.avif} />
-                      <img src={media.webp ?? media.avif} alt="" loading="lazy" decoding="async" />
-                    </picture>
-                  ) : (
-                    <div class="wtile-placeholder placeholder" />
-                  )}
-                </figure>
-                <div class="atile-meta">
-                  <span class="atile-head">
-                    <span class="atile-title">{item.title}</span>
-                    <span class="atile-date">{item.date}</span>
-                  </span>
-                  <span class="atile-line">
-                    <span class="atile-sym" aria-hidden="true">{symbol}</span>
-                    <span class="sr-only">{tierLabel}: </span>
-                    {phrasing}
-                  </span>
-                </div>
-              </div>
-            ))}
+            {archive.map(({ item, media, href, symbol, tierLabel, phrasing }) => {
+              const Tag = href ? "a" : "div";
+              return (
+                <Tag class={`atile${href ? " atile--link" : ""}`} href={href} data-archive>
+                  <figure class="atile-media" aria-hidden="true">
+                    {media ? (
+                      <picture>
+                        <source type="image/avif" srcset={media.avif} />
+                        <img src={media.webp ?? media.avif} alt="" loading="lazy" decoding="async" />
+                      </picture>
+                    ) : (
+                      <div class="wtile-placeholder placeholder" />
+                    )}
+                  </figure>
+                  <div class="atile-meta">
+                    <span class="atile-head">
+                      <span class="atile-title">{item.title}</span>
+                      <span class="atile-date">{item.date}</span>
+                    </span>
+                    <span class="atile-line">
+                      <span class="atile-sym" aria-hidden="true">{symbol}</span>
+                      <span class="sr-only">{tierLabel}: </span>
+                      {phrasing}
+                    </span>
+                    {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — "Read the story" CTA label
+                        (staging-only). Shown only on linked tiles; the whole tile is
+                        the link, so the button is an affordance, not the tap target. */}
+                    {href && (
+                      <span class="atile-cta">
+                        Read the story <span class="arrow" aria-hidden="true">→</span>
+                      </span>
+                    )}
+                  </div>
+                </Tag>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -583,12 +601,66 @@ const archive = WORK_ARCHIVE.map((a) => {
     color: var(--color-accent-deep, #1e8f8a);
     margin-right: 0.3rem;
   }
+
+  /* linked archive tiles (Gigs Go Green, Vybe) — the whole tile is the anchor,
+     so reset the link chrome and add the small "Read the story →" affordance in
+     the shared button grammar, a notch quieter than the wall's .wtile-cta. */
+  .atile--link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .atile--link:focus-visible {
+    outline: 2px solid var(--color-accent, #38f8ec);
+    outline-offset: 2px;
+  }
+  .atile-cta {
+    justify-self: start;
+    margin-top: 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, #090c13 55%, transparent);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #eef5fa;
+    text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .atile-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .atile--link:hover .atile-cta,
+    .atile--link:focus-visible .atile-cta {
+      border-color: var(--color-accent, #38f8ec);
+      color: var(--color-accent, #38f8ec);
+      box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+    }
+    .atile--link:hover .atile-cta .arrow,
+    .atile--link:focus-visible .atile-cta .arrow {
+      transform: translateX(5px);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .atile-media img {
       transition: none;
     }
     .atile:hover .atile-media img {
       transform: none;
+    }
+    .atile-cta .arrow {
+      transition: none;
     }
   }
 </style>

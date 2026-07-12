@@ -49,16 +49,23 @@ const pair = (relBase: string) => {
 
 // chapter 01 — PitchBoulder (E3, the primary proof anchor)
 const pbPoster = pair("work/pitchboulder/hook-poster");
-const pbLoop = media("work/pitchboulder/loop.mp4"); // P13c — hover-video on the tall card
+const pbLoop = media("work/pitchboulder/loop.mp4"); // P21b — hover-video on the landscape video card
 // chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room).
 // P13c — real stills replace the frame-grabs: on-set (crew filming the car,
 // the storytelling card) rides the wide card + hover-video; dawn-flare + heritage
 // fill the tall/small cards. All from the width-suffixed photos/ exports.
+// P21b — operator: "pretty good but could use a couple more photos — 3 is too
+// light." TWO complementary frames join from the SAME already-baked photos/ set
+// (no new export — reused, not re-cut): engine (an engine-bay DETAIL, hands at
+// work) + lawn (an elevated CROWD/CONTEXT frame — the Cobra, period-dressed
+// spectators, and the coastline). Five frames now, chosen to not repeat an angle.
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
 const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
 const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-900");
 const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-900");
+const shEngine = pair("work/shelby-pebble-beach/photos/engine-900"); // P21b — engine-bay detail
+const shLawn = pair("work/shelby-pebble-beach/photos/lawn-1600"); // P21b — elevated crowd + coastline
 const shLoop = media("work/shelby-pebble-beach/loop.mp4"); // P13c — hover-video on the wide card
 // mtime cache-bust (same mechanism as PortalHero/Tableaux) so a returning
 // browser pulls fresh crops instead of a cached stale one.
@@ -77,15 +84,36 @@ const bust = (relBase: string, p: ReturnType<typeof pair>) =>
       }
     : undefined;
 
-// P12.6b — chapter 01 collage enriched with real PitchBoulder event photos
-// (operator: "there's a lot of photos please use them, make it visually
-// compelling"). Exported by scripts/make-pitchboulder-collage.mjs from his
-// hand-curated Tier-1 set: a logo-forward presenter frame (the big card), a
-// wide room-energy frame, and a clean podium moment — cache-busted like the
+// P21b — chapter 01 collage, REBUILT for a VENUE MIX (operator: "you're using
+// all the photos from the Boulder Chamber [one room] — I wanted a mix", and
+// "I don't like the large vertical photo above the video"). The hover-video now
+// rides a LANDSCAPE card (hook-poster/loop are native 16:9 — the old tall 9:14
+// crop was the vertical the operator flagged), ringed by three frames spanning
+// two venues + two capture styles: a Boulder Chamber brand moment (presenter at
+// the "Follow Us!" slide, square phone frame) and TWO professionally-edited
+// frames from the Jan-28 co-working room — a wide crowd-energy frame and a
+// presenter mid-talk. The old same-room room-wide/podium picks are retired.
+// Exported by scripts/make-pitchboulder-collage.mjs, cache-busted like the
 // rooms photos so a returning browser pulls fresh crops.
 const pbPresenter = bust("work/pitchboulder/presenter-logo-1600", pair("work/pitchboulder/presenter-logo-1600"));
-const pbRoom = bust("work/pitchboulder/room-wide-900", pair("work/pitchboulder/room-wide-900"));
-const pbPodium = bust("work/pitchboulder/podium-900", pair("work/pitchboulder/podium-900"));
+const pbCrowd = bust("work/pitchboulder/coworking-crowd-1600", pair("work/pitchboulder/coworking-crowd-1600"));
+const pbTalk = bust("work/pitchboulder/coworking-presenter-1600", pair("work/pitchboulder/coworking-presenter-1600"));
+
+// P21b — chapter 03 (MEME) gains the org's own logo animatic as an AMBIENT
+// framed card (operator: "you can use the video I gave you"). It is the SAME
+// processed loop the /venture/meme article carries — reused here, existence-
+// gated + cache-busted. Poster-first (no-JS / reduced-motion / Save-Data land on
+// the still); the video fades in and plays ONLY while on-screen (the ambient-loop
+// script below, mirroring /venture/meme.astro's gating). The static AI brand PNG
+// the operator offered as a fallback is intentionally NOT added: it is the same
+// wordmark art this loop already animates, so a second still card would only
+// duplicate the loop (verdict recorded in the P21b report).
+const memeLoop = media("venture/meme/meme-loop.mp4")
+  ? {
+      mp4: `${base}/media/venture/meme/meme-loop.mp4${mtimeV("venture/meme/meme-loop.mp4")}`,
+      poster: bust("venture/meme/meme-poster", pair("venture/meme/meme-poster")),
+    }
+  : undefined;
 
 // the pebble-beach proof (with its owner-endorsement context) relocates from
 // the rooms list to chapter 02. P12-KO — workshop-coverage (KO Law) ALSO leaves
@@ -193,15 +221,18 @@ const GROUNDS = {
       <span class="im-index im-turn" aria-hidden="true">01</span>
       <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
-        <div class="im-collage" aria-hidden="true">
+        <div class="im-collage im-collage--pb" aria-hidden="true">
           {
             pbPoster && (
-              // P13c — the tall card is a clickable hover-video link to the case page
+              // P21b — the hover-video now rides a LANDSCAPE card (its poster/loop
+              // are native 16:9; the old tall 9:14 crop was the vertical the
+              // operator flagged). Still a clickable hover-video link to the case
+              // page — Boulder Chamber room energy, the collage's anchor.
               <a
-                class="im-card im-card--tall im-card--link"
+                class="im-card im-pb-video im-card--link"
                 href={`${base}/work/pitchboulder`}
                 data-im-card
-                data-depth="1.4"
+                data-depth="1.15"
                 tabindex="-1"
               >
                 <picture>
@@ -213,13 +244,24 @@ const GROUNDS = {
             )
           }
           {
-            /* P12.6b — real event photos ring the tall video card: the
-               logo-forward presenter frame leads (wide), a room-energy frame and
-               a podium moment tuck into the lower corners. */
+            /* P21b — three frames ring the video across TWO venues: a wide
+               co-working crowd-energy frame (Venue B, top-right), a Boulder
+               Chamber brand moment (Venue A, square, lower-left), and a
+               co-working presenter mid-talk (Venue B, lower-right). */
+          }
+          {
+            pbCrowd && (
+              <figure class="im-card im-pb-crowd" data-im-card data-depth="0.65">
+                <picture>
+                  {pbCrowd.avif && <source srcset={pbCrowd.avif} type="image/avif" />}
+                  <img src={pbCrowd.webp ?? pbCrowd.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
           }
           {
             pbPresenter && (
-              <figure class="im-card im-card--wide" data-im-card data-depth="0.7">
+              <figure class="im-card im-pb-brand" data-im-card data-depth="1.7">
                 <picture>
                   {pbPresenter.avif && <source srcset={pbPresenter.avif} type="image/avif" />}
                   <img src={pbPresenter.webp ?? pbPresenter.avif} alt="" loading="lazy" decoding="async" />
@@ -228,21 +270,11 @@ const GROUNDS = {
             )
           }
           {
-            pbRoom && (
-              <figure class="im-card im-card--small" data-im-card data-depth="1.6">
+            pbTalk && (
+              <figure class="im-card im-pb-talk" data-im-card data-depth="1.1">
                 <picture>
-                  {pbRoom.avif && <source srcset={pbRoom.avif} type="image/avif" />}
-                  <img src={pbRoom.webp ?? pbRoom.avif} alt="" loading="lazy" decoding="async" />
-                </picture>
-              </figure>
-            )
-          }
-          {
-            pbPodium && (
-              <figure class="im-card im-card--smallb" data-im-card data-depth="1.1">
-                <picture>
-                  {pbPodium.avif && <source srcset={pbPodium.avif} type="image/avif" />}
-                  <img src={pbPodium.webp ?? pbPodium.avif} alt="" loading="lazy" decoding="async" />
+                  {pbTalk.avif && <source srcset={pbTalk.avif} type="image/avif" />}
+                  <img src={pbTalk.webp ?? pbTalk.avif} alt="" loading="lazy" decoding="async" />
                 </picture>
               </figure>
             )
@@ -276,13 +308,13 @@ const GROUNDS = {
       <span class="im-index im-turn" aria-hidden="true">02</span>
       <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
-        <div class="im-collage" aria-hidden="true">
+        <div class="im-collage im-collage--sh" aria-hidden="true">
           {
             shOnSet && (
               // P13c — real on-set still (crew filming the car); wide card is the
               // clickable hover-video link to the case page
               <a
-                class="im-card im-card--wide im-card--link"
+                class="im-card im-sh-onset im-card--link"
                 href={`${base}${shHref}`}
                 data-im-card
                 data-depth="1.2"
@@ -297,18 +329,34 @@ const GROUNDS = {
             )
           }
           {shDawn && (
-            <figure class="im-card im-card--tall" data-im-card data-depth="0.6">
+            <figure class="im-card im-sh-dawn" data-im-card data-depth="0.6">
               <picture>
                 {shDawn.avif && <source srcset={shDawn.avif} type="image/avif" />}
                 <img src={shDawn.webp ?? shDawn.avif} alt="" loading="lazy" decoding="async" />
               </picture>
             </figure>
           )}
+          {shLawn && (
+            <figure class="im-card im-sh-lawn" data-im-card data-depth="1.5">
+              <picture>
+                {shLawn.avif && <source srcset={shLawn.avif} type="image/avif" />}
+                <img src={shLawn.webp ?? shLawn.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
+            </figure>
+          )}
           {shHeritage && (
-            <figure class="im-card im-card--small" data-im-card data-depth="1.8">
+            <figure class="im-card im-sh-heritage" data-im-card data-depth="1.8">
               <picture>
                 {shHeritage.avif && <source srcset={shHeritage.avif} type="image/avif" />}
                 <img src={shHeritage.webp ?? shHeritage.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
+            </figure>
+          )}
+          {shEngine && (
+            <figure class="im-card im-sh-engine" data-im-card data-depth="1.0">
+              <picture>
+                {shEngine.avif && <source srcset={shEngine.avif} type="image/avif" />}
+                <img src={shEngine.webp ?? shEngine.avif} alt="" loading="lazy" decoding="async" />
               </picture>
             </figure>
           )}
@@ -351,6 +399,41 @@ const GROUNDS = {
           <!-- meme.body verbatim: "The role I hold most formally in this world." -->
           <p class="im-turn im-tag" data-reveal>{p.meme.body}</p>
         </div>
+        {
+          /* P21b — the org's own logo animatic joins this typographic chapter as
+             an AMBIENT framed card (operator: "you can use the video I gave you").
+             Poster-first (the still is the permanent base layer — no-JS / reduced-
+             motion / Save-Data all land here); the muted loop fades in over it and
+             plays ONLY while on-screen (the ambient-loop script below, gated like
+             /venture/meme.astro). No caption — it sits as the mark, in motion,
+             inside the composition; the typography above/below is untouched. */
+        }
+        {
+          memeLoop && (
+            <figure class="im-meme-loop" data-reveal>
+              <picture>
+                {memeLoop.poster?.avif && <source type="image/avif" srcset={memeLoop.poster.avif} />}
+                <img
+                  class="im-meme-loop-poster"
+                  src={memeLoop.poster?.webp ?? memeLoop.poster?.avif}
+                  alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground."
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <video
+                class="im-loop im-meme-loop-vid"
+                data-im-amb
+                data-loop-src={memeLoop.mp4}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+              ></video>
+            </figure>
+          )
+        }
         <div class="im-chapter-meta" data-reveal>
           <LegendMark proof={p.meme.proof} />
           {/* P12.6b — MEME gets the primary story CTA (→ its venture story) plus
@@ -605,12 +688,26 @@ const GROUNDS = {
   .im-card--link.is-looping .im-loop {
     opacity: 1;
   }
-  .im-card--tall { width: clamp(160px, 22vw, 320px); aspect-ratio: 9 / 14; left: 4%; top: 6%; }
-  .im-card--wide { width: clamp(240px, 34vw, 520px); aspect-ratio: 16 / 10; right: 2%; top: 14%; }
-  .im-card--small { width: clamp(130px, 16vw, 240px); aspect-ratio: 4 / 3; left: 18%; bottom: 4%; }
-  /* P12.6b — fourth collage slot (ch01), tucked into the lower-right corner so
-     the four photos ring the centered title without crowding it. */
-  .im-card--smallb { width: clamp(120px, 15vw, 220px); aspect-ratio: 4 / 3; right: 5%; bottom: 6%; }
+
+  /* ── P21b · chapter-01 (PitchBoulder) collage geometry — a venue MIX ringing
+     the LANDSCAPE hover-video (no tall 9:14 vertical anymore). Varied aspect
+     ratios that still fit the .im-card grammar: 16:10 video, 3:2 crowd, 1:1
+     brand, 4:3 talk. ── */
+  .im-pb-video { width: clamp(240px, 33vw, 500px); aspect-ratio: 16 / 10; left: 1%; top: 5%; }
+  .im-pb-crowd { width: clamp(210px, 28vw, 430px); aspect-ratio: 3 / 2; right: 1%; top: 8%; }
+  .im-pb-brand { width: clamp(140px, 17vw, 260px); aspect-ratio: 1 / 1; left: 5%; bottom: 5%; }
+  .im-pb-talk  { width: clamp(180px, 22vw, 350px); aspect-ratio: 4 / 3; right: 4%; bottom: 6%; }
+
+  /* ── P21b · chapter-02 (Shelby) collage geometry — FIVE frames scattered so
+     they ring the centered title without crowding it: the on-set hover-video
+     (16:10) top-right, a dawn tall (9:14) at the left edge, an elevated lawn/
+     coast frame (16:10) bottom-left, a heritage frame (4:3) bottom-right, and a
+     small engine-detail accent (4:3) tucked into the upper-center gap. ── */
+  .im-sh-onset    { width: clamp(240px, 31vw, 460px); aspect-ratio: 16 / 10; right: 1%; top: 6%; }
+  .im-sh-dawn     { width: clamp(150px, 18vw, 280px); aspect-ratio: 9 / 14; left: 1%; top: 4%; }
+  .im-sh-lawn     { width: clamp(210px, 26vw, 400px); aspect-ratio: 16 / 10; left: 3%; bottom: 5%; }
+  .im-sh-heritage { width: clamp(150px, 17vw, 260px); aspect-ratio: 4 / 3; right: 4%; bottom: 6%; }
+  .im-sh-engine   { width: clamp(120px, 14vw, 210px); aspect-ratio: 4 / 3; left: 30%; top: 3%; }
   .im-chapter-type {
     position: relative;
     z-index: 2;
@@ -639,6 +736,32 @@ const GROUNDS = {
   }
   .im-quote {
     font-style: italic;
+  }
+
+  /* ── P21b · chapter-03 (MEME) ambient logo loop — a framed 16:9 moment set
+     into the typographic chapter (title + tag above, proof + CTAs below). The
+     poster is the permanent base layer; the muted video reuses .im-loop and
+     fades in over it while on-screen. Mirrors /venture/meme.astro's framing so
+     the two pages read as one room. ── */
+  .im-meme-loop {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 30rem);
+    margin: 2.4rem auto 0.4rem;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    border-radius: 10px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
+  }
+  .im-meme-loop-poster {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .im-meme-loop.is-playing .im-loop {
+    opacity: 1;
   }
 
   /* ── P12.6b · the shared "story CTA" — one bold, unmissable treatment used
@@ -984,10 +1107,10 @@ const GROUNDS = {
   }
   void init();
 
-  // P13c hover-life: the two case-chapter cards (PB tall, Shelby wide) play
-  // their loop on hover — the video mounts on FIRST pointerenter (preload="none"
-  // keeps the initial load still-only), fades in over its poster, pauses on
-  // leave. Fine pointers only; never under reduced motion or Save-Data.
+  // P13c hover-life: the two case-chapter cards (PB video card, Shelby on-set)
+  // play their loop on hover — the video mounts on FIRST pointerenter
+  // (preload="none" keeps the initial load still-only), fades in over its poster,
+  // pauses on leave. Fine pointers only; never under reduced motion or Save-Data.
   (() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -1006,6 +1129,36 @@ const GROUNDS = {
         if (!video.paused) video.pause();
       });
     });
+  })();
+
+  // P21b MEME ambient loop: the chapter-03 logo animatic plays only when motion
+  // is allowed and the framed card is actually on-screen; the poster underneath
+  // is the permanent base layer (reduced-motion / no-JS / autoplay-refused all
+  // show the still). Mirrors /venture/meme.astro. Distinct hook (data-im-amb) so
+  // the collage hover-life script never grabs it; lazy src (preload="none") like
+  // the collage loops — the video mounts on first intersection.
+  (() => {
+    const fig = document.querySelector<HTMLElement>(".im-meme-loop");
+    const video = fig?.querySelector<HTMLVideoElement>("[data-im-amb]");
+    if (!fig || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => fig.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {}); // refusal → poster stands
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(fig);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
   })();
 
   // P12.6b story-rail: pointer-drag-to-scroll on fine pointers (desktop). Touch

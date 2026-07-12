@@ -6,15 +6,32 @@
  * CRITICAL — these are phone photos carrying an orientation flag), written into
  * public/media/work/pitchboulder/.
  *
- * PICKS come from the operator's hand-curated Tier-1 set
- * (E:\Pitch Boulder\Top photos for web build — see _ABOUT.md + _photo-tiers.csv).
- * Chosen for variety + PitchBoulder brand visibility (the operator "loves the
- * logo being visible"):
- *   - presenter-logo: a presenter mid-gesture at the "Follow Us!" slide, the
- *     PITCH BOULDER logo prominent + a lit snowy-window backdrop (the big card).
- *   - room-wide: a wide venue/room-energy frame — flags, tall windows, the
- *     screening in progress (the establishing "energy in the room" shot).
- *   - podium: a clean single-presenter moment at the Boulder Chamber lectern.
+ * P21b — REBUILT for a VENUE MIX (operator: "you're using all the photos from
+ * the Boulder Chamber [one room] — I wanted a mix"). The original set was three
+ * frames from the single May-6 Boulder Chamber session (snowy windows, flags).
+ * This set now spans TWO venues + two capture styles, so the collage reads as a
+ * body of coverage instead of one room:
+ *
+ *   Venue A — Boulder Chamber (May 6): the hand-phone session.
+ *     - presenter-logo: a presenter mid-gesture at the "Follow Us!" QR slide,
+ *       the PITCH BOULDER brand prominent + a lit snowy-window backdrop (the
+ *       operator "loves the logo being visible"). Kept from the original set.
+ *       [the hover-video card (hook-poster + loop.mp4) is ALSO this room — the
+ *        audience-view room energy — so Venue A carries the brand + the motion.]
+ *
+ *   Venue B — the industrial co-working room (Jan 28): the PROFESSIONALLY
+ *     EDITED Sony set (E:\Pitch Boulder\2026 Recordings\1-28-2026\Photos\Edited),
+ *     a warmer, exposed-ceiling space — a genuinely different room, and the
+ *     highest-quality frames in the archive:
+ *     - coworking-presenter: a presenter working a "Five Ways We Transform Your
+ *       Business" slide with the seated room behind (the presenter moment).
+ *     - coworking-crowd: a wide full-room frame — long tables, a full audience,
+ *       the speaker entering (the crowd-energy establishing shot).
+ *
+ * The old room-wide / podium picks (both also Boulder Chamber) are retired — they
+ * doubled the single venue the operator asked to move away from. The collage now
+ * mixes venue, moment, and capture style. Aspect ratios stay native (the .im-card
+ * grid crops each frame), so a square phone frame and a 3:2 Sony frame both fit.
  *
  * To re-export: `node scripts/make-pitchboulder-collage.mjs` from the repo root.
  */
@@ -27,14 +44,22 @@ const WIDTHS = [900, 1600];
 const AVIF = { quality: 50, effort: 5 };
 const WEBP = { quality: 72, effort: 5 };
 
-const SOURCE_DIR = "E:/Pitch Boulder/Top photos for web build/_TIER 1 - TOP (make stories)";
+const CHAMBER_DIR = "E:/Pitch Boulder/Top photos for web build/_TIER 1 - TOP (make stories)";
+const COWORK_DIR = "E:/Pitch Boulder/2026 Recordings/1-28-2026/Photos/Edited";
 const OUT_REL = ["public", "media", "work", "pitchboulder"];
 
-// slug → source filename (all Tier 1).
+// slug → { dir, file }. Venue A = the May-6 Boulder Chamber phone session;
+// Venue B = the Jan-28 professionally-edited Sony set (a different room).
 const PICKS = {
-  "presenter-logo": "20260506_091404.jpg", // presenter gesturing at the "Follow Us!" PITCH BOULDER slide
-  "room-wide": "20260506_091805.jpg", // wide venue: flags, tall windows, screening in progress
-  podium: "20260506_091738.jpg", // single presenter at the Boulder Chamber lectern
+  // Venue A — Boulder Chamber: presenter gesturing at the "Follow Us!" PITCH
+  // BOULDER slide (square phone frame, 3056². the collage gives it a square card).
+  "presenter-logo": { dir: CHAMBER_DIR, file: "20260506_091404.jpg" },
+  // Venue B — co-working room: presenter + "Five Ways We Transform Your Business"
+  // slide, seated room behind (edited Sony, 6272×4168 3:2).
+  "coworking-presenter": { dir: COWORK_DIR, file: "_TIER 1 - TOP (make stories)/DSC08258.jpg" },
+  // Venue B — co-working room: wide full-room crowd energy, speaker entering
+  // (edited Sony, 6272×4168 3:2).
+  "coworking-crowd": { dir: COWORK_DIR, file: "_TIER 2 - GOOD/DSC08301.jpg" },
 };
 
 const repoRoot = process.cwd();
@@ -43,8 +68,8 @@ await mkdir(outDir, { recursive: true });
 
 console.log(`\n▸ pitchboulder collage → ${OUT_REL.join("/")}/`);
 let total = 0;
-for (const [slug, file] of Object.entries(PICKS)) {
-  const srcPath = join(SOURCE_DIR, file);
+for (const [slug, { dir, file }] of Object.entries(PICKS)) {
+  const srcPath = join(dir, file);
   if (!existsSync(srcPath)) {
     console.error(`  ✖ missing source: ${file}`);
     process.exitCode = 1;
@@ -61,6 +86,6 @@ for (const [slug, file] of Object.entries(PICKS)) {
     bytes += statSync(avifOut).size + statSync(webpOut).size;
   }
   total += bytes;
-  console.log(`  ✓ ${slug.padEnd(16)} ${meta.width}×${meta.height}  ${(bytes / 1024).toFixed(0)}KB`);
+  console.log(`  ✓ ${slug.padEnd(20)} ${meta.width}×${meta.height}  ${(bytes / 1024).toFixed(0)}KB`);
 }
 console.log(`  ── total: ${(total / 1024 / 1024).toFixed(2)}MB added\n`);

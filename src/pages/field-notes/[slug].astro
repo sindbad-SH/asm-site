@@ -84,9 +84,31 @@ const fmtDate = (d: Date) =>
 const photos = note.data.photos ?? [];
 const lead = photos[0];
 const leadMedia = lead ? galleryMedia(lead.slug, lead.orientation) : undefined;
-const bandPhotos = photos.slice(1); // the best-of band; the lead already headlines
+
+// Supporting frames (the lead already headlines) → resolved to their export
+// sets once, dropping any whose files aren't on disk. They FLOAT around the
+// prose (P22): the first two bracket the story left/right, any beyond stagger
+// in a row beneath it. Same gallery-frame treatment as the paintings wall.
+const supporting = photos
+  .slice(1)
+  .map((ph) => ({ ph, m: galleryMedia(ph.slug, ph.orientation) }))
+  .filter((x): x is { ph: (typeof photos)[number]; m: NonNullable<ReturnType<typeof galleryMedia>> } => !!x.m);
+const bracketFloats = supporting.slice(0, 2);
+const restFloats = supporting.slice(2);
+
+// Funnel filmstrip: up to three tiny frames from THIS place (lead first) — a
+// "more of the collection" cue that reuses already-baked frames, no new assets.
+const filmstrip = [lead, ...photos.slice(1)]
+  .filter((ph): ph is NonNullable<typeof ph> => !!ph)
+  .map((ph) => ({ ph, m: galleryMedia(ph.slug, ph.orientation) }))
+  .filter((x): x is { ph: (typeof photos)[number]; m: NonNullable<ReturnType<typeof galleryMedia>> } => !!x.m)
+  .slice(0, 3);
+
 const heroSizes = "(min-width: 1100px) 1000px, (min-width: 768px) 88vw, 100vw";
-const bandSizes = "(min-width: 768px) 30vw, 90vw";
+const floatSizes = "(min-width: 880px) 17rem, (min-width: 560px) 42vw, 80vw";
+
+// LOCKED — reused verbatim from consts/this template; NOT new copy.
+const AA_LICENSED_LINE = "Licensed through Amazing Aerial Agency";
 
 const meta = {
   title: `${note.data.title} — Field Notes`,
@@ -161,20 +183,49 @@ const meta = {
         }
       </header>
 
-      <div class="spotlight-prose" data-reveal>
-        <Content />
+      {/* THE STORY — the operator's prose with the supporting frames FLOATING
+          around it (P22). The first two bracket the reading column (one ragged
+          right, one ragged left) and the prose flows between and past them; any
+          further frames stagger in a loose row beneath. Each frame is a hung
+          gallery print — slim mat, hairline, drop shadow, desynced ambient float
+          — and carries the LOCKED Amazing Aerial caption chip. */}
+      <div class={`spotlight-story ${bracketFloats.length ? "has-floats" : ""}`}>
+        {bracketFloats.map(({ ph, m }, i) => (
+          <figure
+            class={`spotlight-float ${i % 2 === 0 ? "is-right" : "is-left"} ${ph.orientation === "vertical" ? "is-tall" : ""}`}
+            data-reveal
+          >
+            <div class="spotlight-float-frame">
+              <picture>
+                <source type="image/avif" srcset={m.avif} sizes={floatSizes} />
+                <source type="image/webp" srcset={m.webp} sizes={floatSizes} />
+                <img
+                  src={m.src}
+                  alt={ph.alt}
+                  loading="lazy"
+                  decoding="async"
+                  style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
+                />
+              </picture>
+            </div>
+            <figcaption class="spotlight-float-chip hud-label">{AA_LICENSED_LINE}</figcaption>
+          </figure>
+        ))}
+
+        <div class="spotlight-prose" data-reveal>
+          <Content />
+        </div>
       </div>
 
       {
-        bandPhotos.length > 0 && (
-          <section class="spotlight-band" data-reveal aria-label="More frames from this place">
-            {bandPhotos.map((ph) => {
-              const m = galleryMedia(ph.slug, ph.orientation);
-              return m ? (
-                <figure class={`spotlight-band-frame ${ph.orientation === "vertical" ? "is-tall" : ""}`}>
+        restFloats.length > 0 && (
+          <section class="spotlight-float-row" data-reveal aria-label="More frames from this place">
+            {restFloats.map(({ ph, m }) => (
+              <figure class={`spotlight-float is-loose ${ph.orientation === "vertical" ? "is-tall" : ""}`}>
+                <div class="spotlight-float-frame">
                   <picture>
-                    <source type="image/avif" srcset={m.avif} sizes={bandSizes} />
-                    <source type="image/webp" srcset={m.webp} sizes={bandSizes} />
+                    <source type="image/avif" srcset={m.avif} sizes={floatSizes} />
+                    <source type="image/webp" srcset={m.webp} sizes={floatSizes} />
                     <img
                       src={m.src}
                       alt={ph.alt}
@@ -183,9 +234,10 @@ const meta = {
                       style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
                     />
                   </picture>
-                </figure>
-              ) : null;
-            })}
+                </div>
+                <figcaption class="spotlight-float-chip hud-label">{AA_LICENSED_LINE}</figcaption>
+              </figure>
+            ))}
           </section>
         )
       }
@@ -199,21 +251,66 @@ const meta = {
         note.data.license && (
           <aside class="spotlight-funnel">
             <div class="panel aa-band spotlight-funnel-panel" data-reveal>
-              <img
-                src={`${base}/media/adventure/aa-logo.png`}
-                alt="Amazing Aerial Agency"
-                class="aa-funnel-logo"
-                width="480"
-                height="158"
-                loading="lazy"
-                decoding="async"
-              />
-              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
-              <h2 class="spotlight-funnel-heading">{p.aaFunnel.heading}</h2>
-              <p class="spotlight-funnel-body">{p.aaFunnel.body}</p>
-              <a href={p.aaFunnel.cta.href} class="btn" target="_blank" rel="noopener">
-                {p.aaFunnel.cta.label}
-              </a>
+              {/* Decorative survey ground: a faint graticule + a slow ambient
+                  shimmer, so the funnel reads as part of the page's map/atmosphere
+                  grammar rather than a plain box. Both are aria-hidden and killed
+                  under reduced motion. */}
+              <span class="spotlight-funnel-grid" aria-hidden="true" />
+              <span class="spotlight-funnel-shimmer" aria-hidden="true" />
+
+              <div class="spotlight-funnel-inner">
+                {/* AA lockup — the mark as a unit with the LOCKED phrasing on a
+                    hairline rule (verbatim; not new copy). */}
+                <div class="spotlight-funnel-lockup">
+                  <img
+                    src={`${base}/media/adventure/aa-logo.png`}
+                    alt="Amazing Aerial Agency"
+                    class="aa-funnel-logo"
+                    width="480"
+                    height="158"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="spotlight-funnel-rule" aria-hidden="true" />
+                  <p class="hud-label spotlight-funnel-kicker">Licensed through Amazing Aerial Agency</p>
+                </div>
+
+                <h2 class="spotlight-funnel-heading">{p.aaFunnel.heading}</h2>
+                <p class="spotlight-funnel-body">{p.aaFunnel.body}</p>
+
+                {/* Mini filmstrip — three tiny frames from THIS place, a "more of
+                    the collection" cue. Decorative (the frames are described
+                    above); reuses already-baked exports, no new assets. */}
+                {filmstrip.length > 1 && (
+                  <div class="spotlight-filmstrip" aria-hidden="true">
+                    {filmstrip.map(({ ph, m }) => (
+                      <span class="spotlight-filmstrip-cell">
+                        <picture>
+                          <source type="image/avif" srcset={m.avif} sizes="140px" />
+                          <source type="image/webp" srcset={m.webp} sizes="140px" />
+                          <img
+                            src={m.src}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
+                          />
+                        </picture>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <a
+                  href={p.aaFunnel.cta.href}
+                  class="btn spotlight-funnel-cta"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span>{p.aaFunnel.cta.label}</span>
+                  <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
             </div>
           </aside>
         )
@@ -346,7 +443,6 @@ const meta = {
 
   /* ── prose: the operator's words, verbatim, in the reading type ── */
   .spotlight-prose {
-    margin-top: 2.5rem;
     max-width: 42rem;
     font-size: clamp(1.08rem, 1.5vw, 1.24rem);
     line-height: 1.72;
@@ -376,39 +472,275 @@ const meta = {
     font-style: italic;
   }
 
-  /* ── the best-of band: the extra frames (only if they exist) ── */
-  .spotlight-band {
-    margin-top: 3rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-    gap: clamp(0.75rem, 2vw, 1.25rem);
+  /* ── the story: prose with supporting frames floating around it ──
+        The story is a block-formatting context (clearfix) wider than the reading
+        column; the first two frames float to its right/left edges and the prose
+        text flows between and past them. Beyond desktop, everything stacks. */
+  .spotlight-story {
+    margin-top: 2.5rem;
+    max-width: 58rem;
+    margin-inline: auto;
   }
-  .spotlight-band-frame {
-    margin: 0;
-    overflow: clip;
-    border-radius: 3px;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
-    box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.6);
-  }
-  .spotlight-band-frame img {
+  .spotlight-story::after {
+    content: "";
     display: block;
-    width: 100%;
+    clear: both;
+  }
+  .spotlight-prose {
+    margin-inline: auto; /* centered when no floats bracket it */
+  }
+  /* Mobile: the bracket frames sit BEFORE the prose in source order (needed so
+     the desktop text wraps around them). Under ~880px, flex-column + order pulls
+     the prose back above them, so a phone reads story-then-frames, one column. */
+  @media (max-width: 879px) {
+    .spotlight-story.has-floats {
+      display: flex;
+      flex-direction: column;
+    }
+    .spotlight-story.has-floats .spotlight-prose {
+      order: -1;
+    }
   }
 
-  /* ── the funnel panel ── */
+  /* Each supporting frame — a hung gallery print: slim mat, hairline, drop
+     shadow (matches the paintings wall + the hero frame), a tiny mono caption
+     chip, and a desynced ambient float on the inner frame. */
+  .spotlight-float {
+    margin: 1.75rem auto 0;
+    width: min(21rem, 82%);
+  }
+  .spotlight-float-frame {
+    position: relative;
+    padding: clamp(0.4rem, 0.9vw, 0.62rem);
+    border-radius: 3px;
+    background: linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--color-peak) 9%, var(--color-elevated)) 0%,
+      var(--color-elevated) 48%,
+      color-mix(in srgb, var(--color-base) 45%, var(--color-elevated)) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-peak) 15%, transparent);
+    box-shadow:
+      0 20px 44px -22px rgba(0, 0, 0, 0.62),
+      0 4px 12px -8px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 color-mix(in srgb, var(--color-peak) 12%, transparent);
+    animation: spot-float var(--sf-dur, 13s) ease-in-out var(--sf-delay, 0s) infinite alternate;
+    will-change: transform;
+  }
+  .spotlight-float-frame img {
+    display: block;
+    width: 100%;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 18%, transparent);
+    border-radius: 1px;
+  }
+  .spotlight-float-chip {
+    display: block;
+    margin: 0.55rem 0 0;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    color: color-mix(in srgb, var(--color-peak) 52%, transparent);
+  }
+  @keyframes spot-float {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(var(--sf-rot, -0.4deg));
+    }
+    50% {
+      transform: translate3d(3px, -6px, 0) rotate(calc(var(--sf-rot, -0.4deg) + 0.5deg));
+    }
+    100% {
+      transform: translate3d(-2px, 4px, 0) rotate(var(--sf-rot, -0.4deg));
+    }
+  }
+  .spotlight-float.is-right .spotlight-float-frame {
+    --sf-rot: 0.6deg;
+    --sf-dur: 14s;
+    --sf-delay: -3s;
+  }
+  .spotlight-float.is-left .spotlight-float-frame {
+    --sf-rot: -0.7deg;
+    --sf-dur: 12.5s;
+    --sf-delay: -7s;
+  }
+  .spotlight-float.is-loose:nth-child(odd) .spotlight-float-frame {
+    --sf-rot: -0.5deg;
+    --sf-dur: 15s;
+    --sf-delay: -2s;
+  }
+  .spotlight-float.is-loose:nth-child(even) .spotlight-float-frame {
+    --sf-rot: 0.5deg;
+    --sf-dur: 13.5s;
+    --sf-delay: -9s;
+  }
+
+  /* Desktop: bracket the prose. The story is 58rem, floats ~16rem each edge,
+     leaving a comfortable ~24rem reading channel between them. */
+  @media (min-width: 880px) {
+    .spotlight-story.has-floats .spotlight-prose {
+      max-width: none;
+      margin-inline: 0;
+    }
+    .spotlight-float {
+      width: clamp(12rem, 24vw, 16.5rem);
+      margin: 0.35rem 0 1.4rem;
+    }
+    .spotlight-float.is-tall {
+      width: clamp(10rem, 20vw, 14rem);
+    }
+    .spotlight-float.is-right {
+      float: right;
+      margin-left: 2.2rem;
+    }
+    .spotlight-float.is-left {
+      float: left;
+      margin-right: 2.2rem;
+    }
+  }
+
+  /* Any frames beyond the first two: a loose, centered, staggered row below the
+     story (salon hang). Wraps to a single column on narrow screens. */
+  .spotlight-float-row {
+    margin: 2.75rem auto 0;
+    max-width: 58rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: clamp(1rem, 3vw, 2.4rem);
+  }
+  .spotlight-float-row .spotlight-float {
+    margin: 0;
+    width: min(21rem, 82%);
+  }
+  @media (min-width: 880px) {
+    .spotlight-float-row .spotlight-float {
+      width: clamp(13rem, 30vw, 18.5rem);
+    }
+    .spotlight-float-row .spotlight-float.is-loose:nth-child(even) {
+      margin-top: clamp(0.8rem, 3vw, 2.6rem);
+    }
+  }
+
+  /* ── the funnel panel — the licensable-collection block, rebuilt as a piece of
+        the page's survey/atmosphere grammar: a deep slate ground under a faint
+        graticule, an AA lockup, a mini filmstrip of THIS place's frames, the
+        accent hairline (from .aa-band), a slow shimmer, and an arrow-slide CTA.
+        All copy inside is the LOCKED/flagged strings, verbatim. ── */
   .spotlight-funnel {
-    margin-top: 3.25rem;
+    margin-top: 3.5rem;
   }
   .spotlight-funnel-panel {
+    position: relative;
+    padding: clamp(1.6rem, 3.4vw, 2.6rem);
+    border-radius: 4px;
+    background:
+      radial-gradient(
+        125% 140% at 12% 0%,
+        color-mix(in srgb, var(--color-accent-deep) 14%, transparent) 0%,
+        transparent 55%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--color-adventure-slate) 55%, var(--color-elevated)) 0%,
+        var(--color-elevated) 58%,
+        color-mix(in srgb, var(--color-base) 55%, var(--color-elevated)) 100%
+      );
+    border: 1px solid color-mix(in srgb, var(--color-peak) 16%, transparent);
+  }
+  /* faint lat/lon graticule, fading out toward the far corners (survey motif) */
+  .spotlight-funnel-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 4px;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-peak) 7%, transparent) 0 1px,
+        transparent 1px 64px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-peak) 7%, transparent) 0 1px,
+        transparent 1px 64px
+      );
+    -webkit-mask-image: radial-gradient(125% 120% at 82% 18%, #000 0%, transparent 80%);
+    mask-image: radial-gradient(125% 120% at 82% 18%, #000 0%, transparent 80%);
+    opacity: 0.6;
+  }
+  /* slow ambient light-sweep (reduced-motion safe) */
+  .spotlight-funnel-shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .spotlight-funnel-shimmer::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: 0;
+    width: 34%;
+    height: 200%;
+    background: linear-gradient(
+      105deg,
+      transparent,
+      color-mix(in srgb, var(--color-accent) 9%, transparent),
+      transparent
+    );
+    transform: translateX(-140%) rotate(8deg);
+    animation: funnel-shimmer 9s ease-in-out infinite;
+  }
+  @keyframes funnel-shimmer {
+    0%,
+    100% {
+      transform: translateX(-140%) rotate(8deg);
+      opacity: 0;
+    }
+    14% {
+      opacity: 1;
+    }
+    52% {
+      transform: translateX(420%) rotate(8deg);
+      opacity: 0.55;
+    }
+    64% {
+      opacity: 0;
+    }
+  }
+  .spotlight-funnel-inner {
+    position: relative;
+    z-index: 1;
     display: grid;
     justify-items: start;
-    gap: 0.7rem;
-    padding: clamp(1.5rem, 3vw, 2.25rem);
+    gap: 0.8rem;
+  }
+  /* AA lockup — mark + hairline rule + the LOCKED phrasing, as one unit */
+  .spotlight-funnel-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
   }
   .aa-funnel-logo {
     height: auto;
-    max-width: 168px;
+    max-width: 150px;
+  }
+  .spotlight-funnel-rule {
+    align-self: stretch;
+    width: 1px;
+    min-height: 1.7rem;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--color-peak) 42%, transparent),
+      transparent
+    );
+  }
+  .spotlight-funnel-kicker {
+    margin: 0;
+    max-width: 16ch;
   }
   .spotlight-funnel-heading {
     font-family: var(--font-display);
@@ -418,11 +750,52 @@ const meta = {
     color: var(--color-peak);
   }
   .spotlight-funnel-body {
-    max-width: 44ch;
+    max-width: 46ch;
     color: var(--color-ink);
   }
-  .spotlight-funnel-panel .btn {
-    margin-top: 0.4rem;
+  /* mini filmstrip — three tiny frames from this place, in a dark holder */
+  .spotlight-filmstrip {
+    display: flex;
+    gap: 0.45rem;
+    margin: 0.35rem 0 0.15rem;
+    padding: 0.4rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-base) 45%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-peak) 10%, transparent);
+  }
+  .spotlight-filmstrip-cell {
+    display: block;
+    width: clamp(3.4rem, 9vw, 4.7rem);
+    border-radius: 2px;
+    overflow: clip;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 16%, transparent);
+  }
+  .spotlight-filmstrip-cell img {
+    display: block;
+    width: 100%;
+  }
+  .spotlight-funnel-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .spotlight-funnel-cta .arrow {
+    transition: transform var(--dur-hover) var(--ease-swift);
+  }
+  .spotlight-funnel-cta:hover .arrow,
+  .spotlight-funnel-cta:focus-visible .arrow {
+    transform: translateX(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spotlight-float-frame {
+      animation: none;
+    }
+    .spotlight-funnel-shimmer::before {
+      animation: none;
+      opacity: 0;
+    }
   }
 
   /* ── footer: prev/next through the gallery + back to /adventure ── */

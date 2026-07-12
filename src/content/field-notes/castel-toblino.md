@@ -1,5 +1,5 @@
 ---
-# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body), staging-only until read.
+# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body + photo alt text), staging-only until read.
 title: Castel Toblino, Trentino
 date: 2023-08-26
 location: Madruzzo, Trentino, Italy
@@ -13,6 +13,12 @@ photos:
   - slug: castel-toblino-01
     orientation: vertical
     alt: Castel Toblino on a narrow spit reaching into the green water of Lake Toblino
+  - slug: castel-toblino-02
+    orientation: landscape
+    alt: Lake Toblino under a steep wooded mountain, the peak mirrored in the still green water
+  - slug: castel-toblino-03
+    orientation: landscape
+    alt: Aerial of Castel Toblino on its wooded spit, vineyards and cypresses behind it above the green lake
 license: true
 ---
 

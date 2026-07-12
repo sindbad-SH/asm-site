@@ -1,5 +1,5 @@
 ---
-# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body), staging-only until read.
+# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body + photo alt text), staging-only until read.
 title: The Matterhorn, from Zermatt
 date: 2023-08-14
 location: Zermatt, Switzerland
@@ -13,6 +13,15 @@ photos:
   - slug: matterhorn-zermatt-01
     orientation: vertical
     alt: The Matterhorn above the larch slopes and valley floor at Zermatt
+  - slug: matterhorn-zermatt-02
+    orientation: landscape
+    alt: Aerial above the Zermatt valley with the Matterhorn rising beyond the green slopes and scattered hamlets
+  - slug: matterhorn-zermatt-03
+    orientation: landscape
+    alt: The pyramid of the Matterhorn from a green hillside above Zermatt under a clear sky
+  - slug: matterhorn-zermatt-04
+    orientation: landscape
+    alt: The Matterhorn beyond an alpine meadow trail, cloud drifting past the summit
 license: true
 ---
 

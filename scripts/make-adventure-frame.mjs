@@ -36,6 +36,8 @@ import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 
 const SRC_ROOT = "E:/Amazing Ariel/Old adventure photos and footage from 2022 to 2023";
 const REPO = process.cwd();
@@ -119,6 +121,156 @@ const PICKS = {
     extract: { left: 0, top: 500, width: 2750, height: 1833 },
     position: "centre",
   },
+
+  // ── SUPPORTING FRAMES (P22) ────────────────────────────────────────────────
+  // 2–4 more per spotlight, complementary angles to each lead, so a place reads
+  // as a small collection funnelling to Amazing Aerial. Every source is a real
+  // frame from the same 2022–2023 archive (or, for Castel Toblino, a still pulled
+  // from the outing's own drone video). Sharp/varied picks, near-duplicates of
+  // the lead avoided. See the P22 report for per-pick reasoning.
+
+  // MATTERHORN (lead = vertical aerial). Add a wide aerial + two ground frames.
+  "matterhorn-zermatt-02": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier2_Alternates/DJI_0065.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "matterhorn-zermatt-03": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier2_Alternates/20230814_090502.jpg",
+    orientation: "landscape",
+    position: "top",
+  },
+  "matterhorn-zermatt-04": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier2_Alternates/20230814_110334.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // GORNERGRAT (lead = vertical, station over the glacier). Add an aerial glacier
+  // panorama + the Gorner Glacier S-curve + a moraine sweep.
+  "gornergrat-glacier-02": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier1_Best/aerial/DJI_0080.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "gornergrat-glacier-03": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier2_Alternates/20230815_142853.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "gornergrat-glacier-04": {
+    src: "2023-08-14 - Switzerland - Zermatt/Photos/AA_Tier2_Alternates/20230815_132619.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // LAC DE TSEUZIER (already lead + dam). Add a dramatic aerial (lake at the foot
+  // of the rock wall) + a ground-level lake view from the Icogne trail.
+  "lac-de-tseuzier-03": {
+    src: "2023-08-11 - Switzerland - Ayent/Photos/Drone/DJI_0039.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "lac-de-tseuzier-04": {
+    src: "2023-08-11 - Switzerland - Icogne/Photos/AA_Tier2_Alternates/20230811_123838.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // CRANS-MONTANA (lead = pine + summit). Add two Rhône-valley panoramas from the
+  // same shelf (raws here are thin on variety — both are down-valley vistas).
+  "crans-montana-02": {
+    src: "2023-08-11 - Switzerland - Lens/Photos/AA_Tier2_Alternates/20230811_105859.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "crans-montana-03": {
+    src: "2023-08-11 - Switzerland - Lens/Photos/AA_Tier2_Alternates/20230811_105910.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // CASTEL TOBLINO (lead = vertical castle). Add a ground lake+mountain view + a
+  // bright aerial of the castle pulled from the outing's own drone video.
+  "castel-toblino-02": {
+    src: "2023-08-26 - Italy - Madruzzo/Photos/AA_Tier2_Alternates/20230826_103128.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "castel-toblino-03": {
+    video: "2023-08-26 - Italy - Madruzzo/Videos/DJI_0187.MP4",
+    videoTime: 4,
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // FLATIRONS / CHAUTAUQUA (lead = aerial over the meadow). Add a ground Flatirons
+  // view through a pine, a dramatic rock spire, and a plains vista from a ledge.
+  "flatirons-chautauqua-04": {
+    src: "2023-04-24 - Colorado - Boulder/Photos/AA_Tier2_Alternates/IMG_20230420_083820_386.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "flatirons-chautauqua-05": {
+    src: "2023-04-24 - Colorado - Boulder/Photos/AA_Tier2_Alternates/IMG_20230430_080530_251.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "flatirons-chautauqua-06": {
+    src: "2023-04-24 - Colorado - Boulder/Photos/AA_Tier2_Alternates/IMG_20230427_060309_287.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // BELLAGIO (lead = pastel village). Add the flowered promenade + a shoreline
+  // village + the ferry-quay pilings.
+  "bellagio-02": {
+    src: "2023-08-20 - Italy - Bellagio/Photos/AA_Tier2_Alternates/20230820_131251.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "bellagio-03": {
+    src: "2023-08-20 - Italy - Bellagio/Photos/AA_Tier2_Alternates/20230820_141503.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "bellagio-04": {
+    src: "2023-08-20 - Italy - Bellagio/Photos/AA_Tier2_Alternates/20230820_134846.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // LUGANO (lead = dusk + white flowerbeds). Add the promenade with the cathedral
+  // tower + the red flowerbeds along the lake.
+  "lugano-02": {
+    src: "2023-08-16 - Switzerland - Lugano/Photos/AA_Tier2_Alternates/20230816_203152.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "lugano-03": {
+    src: "2023-08-16 - Switzerland - Lugano/Photos/AA_Tier2_Alternates/20230816_203405.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+
+  // VARENNA / LAKE COMO (lead = the village promontory). Add three frames from the
+  // adjacent Perledo shoulder of the SAME eastern shore (operator asked for "more
+  // from that region"): a cypress-framed lake, an open-lake vista, a rocky shore.
+  "varenna-lake-como-02": {
+    src: "2023-08-20 - Italy - Perledo/Photos/AA_Tier2_Alternates/20230820_103732.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "varenna-lake-como-03": {
+    src: "2023-08-20 - Italy - Perledo/Photos/AA_Tier2_Alternates/20230820_104419.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
+  "varenna-lake-como-04": {
+    src: "2023-08-20 - Italy - Perledo/Photos/AA_Tier2_Alternates/20230820_102232.jpg",
+    orientation: "landscape",
+    position: "centre",
+  },
 };
 
 /** Build a faded (optionally recoloured-white) mark PNG at a target pixel width. */
@@ -161,17 +313,38 @@ async function watermark(baseBuffer, W, H) {
   ]);
 }
 
+/** Pull a single frame out of an archive video (ffmpeg) → a temp PNG path.
+ * Used for places whose only strong extra angle lives in the outing's drone
+ * clips (e.g. Castel Toblino). The archive stays read-only; the frame lands in
+ * the OS temp dir and is fed to sharp exactly like a still source. */
+function extractVideoFrame(videoPath, timeSec) {
+  const out = join(tmpdir(), `adv-frame-${Date.now()}-${Math.round(Math.random() * 1e6)}.png`);
+  execFileSync("ffmpeg", ["-y", "-ss", String(timeSec ?? 0), "-i", videoPath, "-frames:v", "1", out], {
+    stdio: "ignore",
+  });
+  return out;
+}
+
+/** Resolve a pick to its on-disk source path (still or, for video picks, the
+ * clip that a frame is extracted from — used for the existence check). */
+function pickSrcPath(pick) {
+  return join(SRC_ROOT, pick.video ?? pick.src);
+}
+
 /** EXIF-orient + optional pre-crop → a source buffer to resize from per width. */
 async function preparedSource(pick) {
-  let img = sharp(join(SRC_ROOT, pick.src)).rotate();
+  const input = pick.video
+    ? extractVideoFrame(join(SRC_ROOT, pick.video), pick.videoTime)
+    : join(SRC_ROOT, pick.src);
+  let img = sharp(input).rotate();
   if (pick.extract) img = img.extract(pick.extract);
   return img.toBuffer();
 }
 
 async function bakeOne(slug, pick) {
-  const srcPath = join(SRC_ROOT, pick.src);
+  const srcPath = pickSrcPath(pick);
   if (!existsSync(srcPath)) {
-    console.error(`  ✖ missing source: ${pick.src}`);
+    console.error(`  ✖ missing source: ${pick.video ?? pick.src}`);
     process.exitCode = 1;
     return;
   }

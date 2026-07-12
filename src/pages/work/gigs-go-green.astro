@@ -1,0 +1,408 @@
+---
+/**
+ * /work/gigs-go-green — a LIGHT case page for the Gigs Go Green production work
+ * (P-work-2, 2026-07-12). Linked from the work-wall's archive band. Same
+ * venture-article family grammar as /venture/ko-law-workshops + the Amazing
+ * Aerial reel: dark ground, mono slate, italic title, LegendMark proof, a few
+ * short paragraphs, a media band (muted web-loop clips + stills), prominent
+ * CTAs, ← back to /work.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every heading / caption / paragraph / CTA
+ * label below is NEW copy, staging-only until read. The ONLY relationship
+ * statement is the LOCKED permittedPhrasing, rendered verbatim via <LegendMark>
+ * ("gigs-go-green" → "production work for Gigs Go Green"). Prose states plainly
+ * what the two projects were — competition / pitch films — in the past tense,
+ * with NO claim about either venture today and NO payment talk (per operator
+ * direction the one-liner was softened off "two paid production engagements").
+ *
+ * Media (scripts/make-archive-media.mjs, existence-gated): frames + short muted
+ * web loops cut from the two finished films. The We Own Cash clip is the brand
+ * beat (vault → the "WeOwnCash" logo over a skyline), never the stock B-roll.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { existsSync, statSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// ── media (existence-gated, cache-busted like the rest of the site) ──
+const MDIR = join(process.cwd(), "public", "media", "work", "gigs-go-green");
+const CDIR = join(MDIR, "clips");
+const bust = (rel: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(MDIR, rel)).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
+function still(name: string) {
+  if (!existsSync(join(MDIR, `${name}.avif`))) return undefined;
+  return {
+    avif: `${base}/media/work/gigs-go-green/${name}.avif${bust(`${name}.avif`)}`,
+    webp: existsSync(join(MDIR, `${name}.webp`))
+      ? `${base}/media/work/gigs-go-green/${name}.webp${bust(`${name}.webp`)}`
+      : undefined,
+  };
+}
+function clip(slug: string, caption: string, alt: string) {
+  if (!existsSync(join(CDIR, `${slug}.mp4`))) return undefined;
+  return {
+    mp4: `${base}/media/work/gigs-go-green/clips/${slug}.mp4${bust(`clips/${slug}.mp4`)}`,
+    posterAvif: `${base}/media/work/gigs-go-green/clips/${slug}-poster.avif`,
+    posterWebp: `${base}/media/work/gigs-go-green/clips/${slug}-poster.webp`,
+    caption,
+    alt,
+  };
+}
+
+const hero = still("hero");
+const stills = [
+  { s: still("still-graphic"), alt: "Motion-graphic frame from the solar-prize film — a cooperative clean-energy scene." },
+  { s: still("still-endcard"), alt: "The Onchain Energy Network end card from the solar-prize film." },
+].filter((x): x is { s: NonNullable<ReturnType<typeof still>>; alt: string } => !!x.s);
+
+const clips = [
+  clip("hero-x-solar", "Hero X Solar · the solar-prize film", "Aerial and ground footage of working solar arrays from the Hero X Solar film."),
+  clip("we-own-cash", "We Own Cash · the pitchfest film", "Brand animation from the We Own Cash pitchfest film, resolving on the logo over a city skyline."),
+].filter((x): x is NonNullable<typeof x> => !!x);
+
+// ── THE ARTICLE (all new sentences — see the approval note above) ──
+const ARTICLE = {
+  slate: "GIGS GO GREEN · COMPETITION & PITCH FILMS",
+  title: "Two films, two competitions.",
+  paragraphs: [
+    "I produced two short films for Gigs Go Green — each one built to carry a venture into a competition and make its case in the room.",
+    "The first was a solar-energy piece for the Hero X Solar team's run at an on-chain energy prize (Sept 2024): interviews, motion graphics, and aerials of working solar arrays, cut into one clear pitch.",
+    "The second was a tighter, brand-forward pitch film for We Own Cash, made for a CoinDesk pitchfest (Apr 2025) — a single idea, animated and delivered.",
+  ],
+};
+
+const CTAS = [
+  { label: "Back to the work", href: `${base}/work`, primary: true },
+  { label: "The Vybe story", href: `${base}/work/vybe`, primary: false },
+];
+---
+
+<Base
+  title="Gigs Go Green — competition & pitch films"
+  description="Two short films produced for Gigs Go Green — a solar-energy competition piece and a fintech pitchfest film — with frames and short clips from each."
+>
+  <main class="case">
+    <article class="case-inner">
+      <a href={`${base}/work`} class="link case-back">← Work</a>
+
+      <p class="hud-label case-slate" data-reveal>
+        <span data-decode>{ARTICLE.slate}</span>
+      </p>
+      <h1 class="case-title" data-reveal>{ARTICLE.title}</h1>
+      <div class="case-proof" data-reveal>
+        <LegendMark proof={{ relationshipId: "gigs-go-green" }} showName={false} />
+      </div>
+
+      {
+        hero && (
+          <figure class="case-hero" data-reveal>
+            <picture>
+              <source type="image/avif" srcset={hero.avif} />
+              <img
+                src={hero.webp ?? hero.avif}
+                alt="Aerial of a large solar array in a green landscape, from the Hero X Solar film."
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
+          </figure>
+        )
+      }
+
+      {ARTICLE.paragraphs.map((para) => <p class="case-para" data-reveal>{para}</p>)}
+
+      {
+        clips.length > 0 && (
+          <section class="case-section" data-reveal>
+            <h2 class="hud-label case-h2">In motion</h2>
+            <div class="case-clips">
+              {clips.map((cl) => (
+                <figure class="case-clip" data-clip>
+                  <picture>
+                    <source type="image/avif" srcset={cl.posterAvif} />
+                    <img class="case-clip-poster" src={cl.posterWebp} alt={cl.alt} loading="lazy" decoding="async" />
+                  </picture>
+                  <video class="case-clip-vid" data-clip-loop data-src={cl.mp4} muted loop playsinline preload="none" />
+                  <figcaption class="hud-label case-clip-cap">{cl.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      {
+        stills.length > 0 && (
+          <section class="case-section" data-reveal>
+            <h2 class="hud-label case-h2">Frames</h2>
+            <div class="case-stills">
+              {stills.map(({ s, alt }) => (
+                <figure class="case-still">
+                  <picture>
+                    <source type="image/avif" srcset={s.avif} />
+                    <img src={s.webp ?? s.avif} alt={alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      <nav class="case-ctas" data-reveal>
+        {
+          CTAS.map((c) => (
+            <a href={c.href} class={`case-cta${c.primary ? " case-cta--primary" : ""}`}>
+              <span>{c.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </nav>
+      <a href={`${base}/work`} class="link case-back">← Work</a>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .case {
+    background: #0e131c; /* the venture-article family — a dark, quiet ground */
+    min-height: 100svh;
+  }
+  .case-inner {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: 7rem 2rem 6rem;
+    display: grid;
+    gap: 1.4rem;
+  }
+  .case-back {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .case-slate {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+    margin: 0;
+  }
+  .case-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    line-height: 1.12;
+    color: #f2f4f8;
+  }
+
+  .case-hero {
+    margin: 0.4rem 0 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .case-hero img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .case-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+    max-width: 44rem;
+  }
+
+  .case-section {
+    margin-top: 1.2rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .case-h2 {
+    margin: 0;
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 70%, transparent);
+  }
+
+  /* clips — muted autoplay-in-view loops; the poster is the permanent base
+     layer, so reduced-motion / no-JS / Save-Data / autoplay-refused all show the
+     still (gating pattern shared with the Amazing Aerial reel). */
+  .case-clips {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  .case-clip {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .case-clip-poster,
+  .case-clip-vid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .case-clip-vid {
+    opacity: 0;
+    transition: opacity 600ms var(--ease-survey, ease);
+  }
+  .case-clip.is-playing .case-clip-vid {
+    opacity: 1;
+  }
+  .case-clip-cap {
+    position: absolute;
+    left: 0.8rem;
+    bottom: 0.7rem;
+    margin: 0;
+    z-index: 2;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, #f4fbfa 92%, transparent);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+  }
+
+  /* stills — a tidy responsive grid, native aspect, lazy avif/webp */
+  .case-stills {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  .case-still {
+    margin: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .case-still img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* CTA row — shared button grammar: 1px border, Space Mono caps, arrow slides
+     6px on hover, accent hover, visible at rest, ≥44px tall */
+  .case-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    padding-top: 1.4rem;
+    margin-top: 0.6rem;
+  }
+  .case-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.7rem 1.15rem;
+    border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #eef2f5 88%, transparent);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .case-cta--primary {
+    border-color: var(--color-accent-deep, #1e8f8a);
+    color: #f2f4f8;
+  }
+  .case-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .case-cta:hover,
+  .case-cta:focus-visible {
+    border-color: var(--color-accent, #38f8ec);
+    color: var(--color-accent, #38f8ec);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .case-cta:hover .arrow,
+  .case-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 640px) {
+    .case-clips,
+    .case-stills {
+      grid-template-columns: 1fr;
+    }
+    .case-cta {
+      flex: 1 1 100%;
+      justify-content: space-between;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case-clip-vid {
+      transition: none;
+    }
+    .case-cta .arrow {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // enhancement only: decode the slate label (matches the sibling article pages)
+  const mountDecode = () => import("../../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecode, { timeout: 3000 });
+  else setTimeout(mountDecode, 1500);
+
+  // Muted loops — play ONLY when motion is allowed and the clip is on screen;
+  // the poster underneath is the permanent base layer, so reduced-motion / no-JS
+  // / Save-Data / autoplay-refused all just show the still. Lazy: src mounts on
+  // first intersection (preload="none" keeps initial load light). Copied from
+  // /work/amazing-aerial.
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+
+    const clips = [...document.querySelectorAll<HTMLElement>("[data-clip]")];
+    if (!clips.length || !("IntersectionObserver" in window)) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const wrap = entry.target as HTMLElement;
+          const video = wrap.querySelector<HTMLVideoElement>("[data-clip-loop]");
+          if (!video) continue;
+          if (entry.isIntersecting) {
+            if (!video.src) video.src = video.dataset.src!; // lazy mount
+            video.addEventListener("playing", () => wrap.classList.add("is-playing"), { once: true });
+            video.play().catch(() => {}); // refusal → poster stands
+          } else if (!video.paused) {
+            video.pause();
+          }
+        }
+      },
+      { threshold: 0.25 },
+    );
+    clips.forEach((cl) => io.observe(cl));
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+</script>

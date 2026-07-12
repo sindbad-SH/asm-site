@@ -1,5 +1,5 @@
 ---
-# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body), staging-only until read.
+# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body + photo alt text), staging-only until read.
 title: Lac de Tseuzier, Valais
 date: 2023-08-11
 location: Ayent, Valais, Switzerland
@@ -16,6 +16,12 @@ photos:
   - slug: lac-de-tseuzier-01
     orientation: landscape
     alt: The curved concrete dam that holds Lac de Tseuzier, at the lower edge of the turquoise reservoir
+  - slug: lac-de-tseuzier-03
+    orientation: landscape
+    alt: Aerial of the turquoise Lac de Tseuzier at the foot of a towering grey rock wall
+  - slug: lac-de-tseuzier-04
+    orientation: landscape
+    alt: The turquoise Lac de Tseuzier from the trail, green pines in the foreground and jagged peaks beyond
 license: true
 ---
 

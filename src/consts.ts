@@ -408,26 +408,68 @@ export const RELATIONSHIPS: readonly Relationship[] = [
   // work-wall "from the archive" band (staging-only until read). P-work
   // (2026-07-12). Dates come from the source files, never invented.
   //
-  // Gigs Go Green — the operator's own statement: a high-end paying customer,
-  // TWO projects, four-figure engagements (Hero X Solar / OEN solar-prize film,
-  // Sept 2024; "We Own Cash" CoinDesk pitchfest film, Apr 2025). Tier "delivered"
-  // (paid delivered work — same tier as PitchBoulder). The phrasing does NOT
-  // claim the company currently exists: past-tense engagements only.
+  // Gigs Go Green — production work on two competition / pitch films (Hero X
+  // Solar / OEN solar-prize film, Sept 2024; "We Own Cash" CoinDesk pitchfest
+  // film, Apr 2025). Tier "delivered" (delivered work — same tier as
+  // PitchBoulder). The phrasing does NOT claim the company currently exists
+  // (past-tense only) and, per operator direction (P-work-2, 2026-07-12), was
+  // SOFTENED off the specific "two paid production engagements" — no count,
+  // no pay claim. Renders on the archive tile AND the /work/gigs-go-green case page.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — softened permittedPhrasing (staging-only).
   {
     id: "gigs-go-green",
     name: "Gigs Go Green",
     tier: "delivered",
-    permittedPhrasing: "two paid production engagements for Gigs Go Green",
+    permittedPhrasing: "production work for Gigs Go Green",
   },
-  // Vybe — unpaid festival coverage made for a friend who is no longer affiliated
-  // with the brand. The phrasing leaves NO client implication and asserts NO
-  // current affiliation for anyone (the spirit of the Knights "made on a
-  // handshake" line). Tier "informal". Coverage spanned 2023–2024.
+  // Vybe — event coverage of a few of the Vybe events (Vybe = a Denver arts /
+  // music / dance collective, "Vibrate Your Best Energy"; brand meaning verified
+  // from the collective's own public channels). Coverage spanned 2023–2024 (an
+  // outdoor festival + the 2024 Boogie Lights show). Tier "informal". The
+  // phrasing asserts NO client relationship and NO current affiliation for
+  // anyone; per operator direction (P-work-2, 2026-07-12) the "made for a friend"
+  // note was DROPPED — just "coverage of…". Renders on the archive tile AND the
+  // /work/vybe case page.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — softened permittedPhrasing (staging-only).
   {
     id: "vybe",
     name: "Vybe",
     tier: "informal",
-    permittedPhrasing: "festival coverage, made for a friend",
+    permittedPhrasing: "event coverage for Vybe",
+  },
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — three new relationship entries for the
+  // additional "from the archive" tiles (staging-only until read). P-work-2
+  // (2026-07-12). Early gig work; dates read from the source files, never
+  // invented. NO payment is asserted for any of these (operator direction:
+  // "little gig-work things … do NOT mention pay").
+  //
+  // Nordic Daughter & Something for Tomorrow — live-music coverage of two bands
+  // that share a member (Nordic Daughter: Nordic / folk, a Scandinavian-festival
+  // set, Jun 2024; Something for Tomorrow: punk rock, a "Rickhouse" show, Jul
+  // 2024). Tier "informal" (early gig work, no pay claim). One combined tile.
+  {
+    id: "nordic-daughter",
+    name: "Nordic Daughter & Something for Tomorrow",
+    tier: "informal",
+    permittedPhrasing: "live-music coverage for two bands with a shared member",
+  },
+  // The Art of Brazilian Living — event coverage of a Brazilian music showcase
+  // (a singer + samba dancers, outdoor stage; footage dated Jun 2025). Tier
+  // "informal" (early gig work, no pay claim).
+  {
+    id: "brazilian-living",
+    name: "The Art of Brazilian Living",
+    tier: "informal",
+    permittedPhrasing: "event coverage of a Brazilian music showcase",
+  },
+  // PNUMIX — a delivered event video (the "Paranormal Palace" event, Oct 2024).
+  // Tier "delivered" (a finished, delivered piece — the operator's own word).
+  // "delivered" is about delivery, not payment, so no pay is implied.
+  {
+    id: "pnumix",
+    name: "PNUMIX",
+    tier: "delivered",
+    permittedPhrasing: "a delivered event video for PNUMIX",
   },
 ] as const;
 
@@ -561,20 +603,51 @@ export type ArchiveItem = {
   title: string;
   date: string;
   relationshipId: string;
+  /** When set, the archive tile links to its own light case page and shows the
+   *  "Read the story →" affordance; unset tiles are display-only (no page). */
+  href?: string;
 };
 
 export const WORK_ARCHIVE: readonly ArchiveItem[] = [
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — GGG + Vybe now LINK to their own light
+  // case pages (P-work-2, 2026-07-12). Their one-liners render verbatim from the
+  // softened RELATIONSHIPS above; the `href` adds the "Read the story →"
+  // affordance and makes the tile a link.
   {
     slug: "gigs-go-green",
     title: "Gigs Go Green",
     date: "2024–2025",
     relationshipId: "gigs-go-green",
+    href: "/work/gigs-go-green",
   },
   {
     slug: "vybe",
     title: "Vybe",
     date: "2023–2024",
     relationshipId: "vybe",
+    href: "/work/vybe",
+  },
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — three new archive tiles (the `title` +
+  // `date` strings are new visible copy, staging-only). Tiles-only (no case
+  // pages), per operator. One-liners render verbatim from the RELATIONSHIPS
+  // above; dates read from the source files, never invented.
+  {
+    slug: "nordic-daughter",
+    title: "Nordic Daughter & Something for Tomorrow",
+    date: "2024",
+    relationshipId: "nordic-daughter",
+  },
+  {
+    slug: "brazilian-living",
+    title: "The Art of Brazilian Living",
+    date: "2025",
+    relationshipId: "brazilian-living",
+  },
+  {
+    slug: "pnumix",
+    title: "PNUMIX — Paranormal Palace",
+    date: "2024",
+    relationshipId: "pnumix",
   },
 ] as const;
 

@@ -83,10 +83,34 @@ const ARTICLE = {
 
 // Session index — FACTUAL titles (see the approval note). Jan/Feb from the
 // operator's edit filenames; Apr/Jun read off the on-screen KO title slide.
+//
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — the one-line `note` on each session is
+// NEW copy (light touch, per operator), staging-only until read. Each is drawn
+// from his own LinkedIn post recapping that session:
+//   · Modeling the Exit — his "Modeling the Exit: Understanding M&A Economics"
+//     post (~Feb 2026: the tax reality where founders are "wealthy on paper but
+//     cash-poor on closing day"; "starting where most founders hope to finish").
+//   · Mapping Your Business's Lifecycle — his session-2 post (~Mar 2026: from
+//     incorporation to liquidity; entity choice + vesting keeping a team aligned).
+//   · Formation: Building the Foundation — his "Building the Foundation" post
+//     (~May 2026: his own opening line, quoted as his words).
+//   · Building Your Team — NO post exists in the dossier, so no note (honest gap).
 const SESSIONS = [
-  { date: "Jan 29, 2026", title: "Modeling the Exit" },
-  { date: "Feb 26, 2026", title: "Mapping Your Business's Lifecycle" },
-  { date: "Apr 30, 2026", title: "Formation: Building the Foundation" },
+  {
+    date: "Jan 29, 2026",
+    title: "Modeling the Exit",
+    note: "The exit, modeled — where the tax math can leave a founder wealthy on paper but cash-poor on closing day.",
+  },
+  {
+    date: "Feb 26, 2026",
+    title: "Mapping Your Business's Lifecycle",
+    note: "From incorporation to liquidity — how entity choice and vesting schedules keep a team aligned for the long haul.",
+  },
+  {
+    date: "Apr 30, 2026",
+    title: "Formation: Building the Foundation",
+    note: "“You don't form a company. You answer questions, and what falls out of them is a company.”",
+  },
   { date: "Jun 25, 2026", title: "Building Your Team" },
 ];
 
@@ -131,7 +155,10 @@ const CTAS = [
           SESSIONS.map((s) => (
             <li class="ko-session">
               <span class="ko-session-date">{s.date}</span>
-              <span class="ko-session-title">{s.title}</span>
+              <span class="ko-session-body">
+                <span class="ko-session-title">{s.title}</span>
+                {s.note && <span class="ko-session-note">{s.note}</span>}
+              </span>
             </li>
           ))
         }
@@ -257,10 +284,21 @@ const CTAS = [
     text-transform: uppercase;
     color: color-mix(in srgb, #d9f2ec 72%, transparent);
   }
+  .ko-session-body {
+    display: grid;
+    gap: 0.3rem;
+  }
   .ko-session-title {
     font-family: var(--font-sans);
     font-size: clamp(1rem, 1.3vw, 1.12rem);
     color: color-mix(in srgb, #eef2f5 90%, transparent);
+  }
+  /* one-line session note — quieter, smaller, sits under the title */
+  .ko-session-note {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #eef2f5 60%, transparent);
   }
 
   /* photo collage — native 1:1 tiles (the frames are square as shot), a tidy

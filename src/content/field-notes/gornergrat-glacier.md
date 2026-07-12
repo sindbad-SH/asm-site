@@ -1,5 +1,5 @@
 ---
-# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body), staging-only until read.
+# ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (title + body + photo alt text), staging-only until read.
 title: Gornergrat glacier panorama
 date: 2023-08-14
 location: Gornergrat, Zermatt, Switzerland
@@ -13,6 +13,15 @@ photos:
   - slug: gornergrat-glacier-01
     orientation: vertical
     alt: The Gornergrat summit station with observatory domes above the Gorner Glacier
+  - slug: gornergrat-glacier-02
+    orientation: landscape
+    alt: Aerial over a broad alpine glacier and snow-capped peaks in the Zermatt high country
+  - slug: gornergrat-glacier-03
+    orientation: landscape
+    alt: The Gorner Glacier curving down its valley from the Monte Rosa snowfields under heavy cloud
+  - slug: gornergrat-glacier-04
+    orientation: landscape
+    alt: The Gorner Glacier and its dark moraine ridges below high snow peaks
 license: true
 ---
 
