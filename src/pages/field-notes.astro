@@ -1,0 +1,236 @@
+---
+/**
+ * /field-notes — P12.4d · "FIELD NOTES": the operator's blog-that-isn't-a-blog.
+ *
+ * This is the LIST surface — an editorial "field log", not a generic post feed.
+ * Each entry reads like a survey record: a mono date/location coordinate line
+ * (Space Mono, the site's hud-label voice), the title in the display serif
+ * (Fraunces), a short excerpt, and the cover image at its NATIVE aspect if one
+ * was supplied. Chrome stays quiet; the words and the photograph carry it —
+ * the same restraint as /work and /adventure.
+ *
+ * SELF-SERVICE: every card here is one markdown file the operator dropped into
+ * `src/content/field-notes/`. Newest first. Drafts (`draft: true`) are filtered
+ * out at build, so an unfinished note is never listed and never routable.
+ *
+ * EMPTY STATE (the launch reality — zero real notes yet): rather than emit a
+ * noindex meta (which would need a new Base.astro prop — out of P12.4d scope,
+ * see the report), the page renders a single honest mono line in the site's
+ * existing quiet-placeholder voice ("Nothing in this lane yet.", "Real stills
+ * replace these slots as footage arrives"). It claims nothing; it just states
+ * the absence. The first published note replaces it automatically.
+ *
+ * HONESTY (P12.4d): all page chrome below is LABEL text only ("Field Notes",
+ * "The log", "Read the note") — it asserts nothing about the operator. Every
+ * substantive claim is the operator's own words, from his own file.
+ *
+ * Fallbacks: no-JS / reduced-motion → cards visible at rest (the reveal engine
+ * only hides under html.js and force-shows under reduced motion).
+ */
+import Base from "../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Non-draft notes only, newest first. `date` is a real Date (schema coerces it),
+// so this sort is a straight numeric compare.
+const notes = (await getCollection("fieldNotes", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+// Survey-slate date: mono, coordinate-like (YYYY.MM.DD). Built from UTC parts so
+// the printed day matches the authored `YYYY-MM-DD` regardless of build TZ.
+const fmtDate = (d: Date) =>
+  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
+
+// A short excerpt from the note body — strip the lightest markdown so the card
+// preview reads as prose, not source. First ~180 chars, cut on a word.
+function excerpt(body: string | undefined, max = 180): string {
+  if (!body) return "";
+  const plain = body
+    .replace(/^---[\s\S]*?---/, "") // any stray frontmatter fence (defensive)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "") // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links → their text
+    .replace(/[#>*_`~-]/g, "") // md punctuation
+    .replace(/\s+/g, " ")
+    .trim();
+  if (plain.length <= max) return plain;
+  const cut = plain.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ")).trimEnd() + "…";
+}
+
+const meta = {
+  title: "Field Notes — the log",
+  description:
+    "Field Notes — a running log of stories from the field, newest first.",
+};
+---
+
+<Base title={meta.title} description={meta.description}>
+  <section class="fn-head">
+    <p class="hud-label fn-kicker" data-reveal>The log</p>
+    <h1 class="fn-title" data-reveal>Field Notes</h1>
+  </section>
+
+  {
+    notes.length === 0 ? (
+      <section class="fn-empty">
+        <p class="hud-label" data-reveal>No field notes logged yet.</p>
+      </section>
+    ) : (
+      <section class="fn-list">
+        {notes.map((note) => (
+          <a class="fn-entry" href={`${base}/field-notes/${note.id}`} data-reveal data-reveal-stagger="70">
+            {note.data.cover && (
+              <figure class="fn-cover" aria-hidden="true">
+                <img src={`${base}${note.data.cover}`} alt="" loading="lazy" decoding="async" />
+              </figure>
+            )}
+            <div class="fn-body">
+              <p class="hud-label fn-slate">
+                <span class="fn-date">{fmtDate(note.data.date)}</span>
+                {note.data.location && (
+                  <>
+                    <span class="fn-slate-sep" aria-hidden="true">·</span>
+                    <span class="fn-loc">{note.data.location}</span>
+                  </>
+                )}
+              </p>
+              <h2 class="fn-entry-title">{note.data.title}</h2>
+              {excerpt(note.body) && <p class="fn-excerpt">{excerpt(note.body)}</p>}
+              <span class="fn-cta hud-label">Read the note →</span>
+            </div>
+          </a>
+        ))}
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  /* ── header: mono kicker over a serif display title (site voice) ── */
+  .fn-head {
+    max-width: 82rem;
+    margin-inline: auto;
+    padding: 8rem clamp(1.5rem, 6vw, 7rem) 2rem;
+  }
+  .fn-kicker {
+    letter-spacing: 0.26em;
+  }
+  .fn-title {
+    margin-top: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    line-height: 1.02;
+    color: var(--color-peak);
+  }
+
+  /* ── empty state: one quiet honest line, roomy ── */
+  .fn-empty {
+    max-width: 82rem;
+    margin-inline: auto;
+    padding: 2rem clamp(1.5rem, 6vw, 7rem) 10rem;
+  }
+
+  /* ── the log: a stacked column of survey records, hairline-separated ── */
+  .fn-list {
+    max-width: 82rem;
+    margin-inline: auto;
+    padding: 1rem clamp(1.5rem, 6vw, 7rem) 8rem;
+    display: grid;
+    gap: 0;
+  }
+  .fn-entry {
+    display: grid;
+    grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.75rem);
+    align-items: start;
+    padding: clamp(2rem, 4vw, 3.25rem) 0;
+    border-top: 1px solid var(--color-hairline);
+    text-decoration: none;
+    color: inherit;
+  }
+  .fn-entry:last-child {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  /* cover at NATIVE aspect — never cropped to a fixed card shape */
+  .fn-cover {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-elevated) 70%, transparent);
+  }
+  .fn-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 900ms var(--ease-survey);
+  }
+
+  .fn-body {
+    display: grid;
+    gap: 0.7rem;
+    /* nudge the text column down to align with the cover's top edge */
+    padding-top: 0.1rem;
+  }
+  .fn-slate {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.55rem;
+    letter-spacing: 0.18em;
+  }
+  .fn-slate-sep {
+    opacity: 0.5;
+  }
+  .fn-loc {
+    color: color-mix(in srgb, var(--color-peak) 62%, transparent);
+  }
+  .fn-entry-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.12;
+    color: var(--color-peak);
+  }
+  .fn-excerpt {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+    max-width: 62ch;
+  }
+  .fn-cta {
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+
+  /* hover-life on fine pointers only — quiet media lift + accent CTA */
+  @media (hover: hover) and (pointer: fine) {
+    .fn-entry:hover .fn-cover img,
+    .fn-entry:focus-visible .fn-cover img {
+      transform: scale(1.035);
+    }
+    .fn-entry:hover .fn-cta,
+    .fn-entry:focus-visible .fn-cta,
+    .fn-entry:hover .fn-entry-title,
+    .fn-entry:focus-visible .fn-entry-title {
+      color: var(--color-accent);
+    }
+  }
+
+  /* ── stack the record on narrow screens: cover over text ── */
+  @media (max-width: 720px) {
+    .fn-entry {
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fn-cover img {
+      transition: none;
+    }
+  }
+</style>

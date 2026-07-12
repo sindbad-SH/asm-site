@@ -1,0 +1,219 @@
+---
+/**
+ * /field-notes/[slug] — P12.4d · a single Field Note.
+ *
+ * The reading surface: cover (if supplied) at native aspect, a mono
+ * date/location survey slate, the title in the display serif, then the note's
+ * markdown body styled to the site's type — Fraunces would fight the reading,
+ * so body copy stays in the sans (DM Sans) with a comfortable measure, and
+ * sub-headings pick up the serif. A quiet mono "Back to the log" wayfinder
+ * closes it.
+ *
+ * STATIC PATHS: one page per NON-DRAFT note. Drafts are excluded here too, so a
+ * `draft: true` file is never routable — not just unlisted. With zero real
+ * notes at launch, getStaticPaths returns [] and no pages are emitted; the only
+ * live surface is /field-notes with its empty state.
+ *
+ * HONESTY (P12.4d): the only authored strings on this page are labels ("Field
+ * Notes", "Back to the log"). Everything else is the operator's own markdown.
+ *
+ * Fallbacks: no-JS / reduced-motion → everything visible at rest.
+ */
+import Base from "../../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("fieldNotes", ({ data }) => !data.draft);
+  return notes.map((note) => ({
+    params: { slug: note.id },
+    props: { note },
+  }));
+}
+
+type Props = { note: CollectionEntry<"fieldNotes"> };
+const { note } = Astro.props;
+const { Content } = await render(note);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const fmtDate = (d: Date) =>
+  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
+
+const meta = {
+  title: `${note.data.title} — Field Notes`,
+  description: note.data.location
+    ? `Field note — ${note.data.title}, ${note.data.location}.`
+    : `Field note — ${note.data.title}.`,
+};
+---
+
+<Base title={meta.title} description={meta.description}>
+  <article class="fn-note">
+    {
+      note.data.cover && (
+        <figure class="fn-note-cover" data-reveal aria-hidden="true">
+          <img src={`${base}${note.data.cover}`} alt="" loading="eager" decoding="async" />
+        </figure>
+      )
+    }
+
+    <header class="fn-note-head">
+      <p class="hud-label fn-note-slate" data-reveal>
+        <span>{fmtDate(note.data.date)}</span>
+        {
+          note.data.location && (
+            <>
+              <span class="fn-note-sep" aria-hidden="true">·</span>
+              <span class="fn-note-loc">{note.data.location}</span>
+            </>
+          )
+        }
+      </p>
+      <h1 class="fn-note-title" data-reveal>{note.data.title}</h1>
+      {
+        note.data.tags && note.data.tags.length > 0 && (
+          <ul class="fn-note-tags" data-reveal>
+            {note.data.tags.map((tag) => (
+              <li class="hud-label fn-note-tag">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="fn-prose" data-reveal>
+      <Content />
+    </div>
+
+    <footer class="fn-note-foot">
+      <a class="link" href={`${base}/field-notes`}>← Back to the log</a>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  .fn-note {
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: 7rem clamp(1.5rem, 6vw, 3rem) 6rem;
+  }
+
+  /* cover at native aspect — the note leads with its image if it has one */
+  .fn-note-cover {
+    margin: 0 0 2.5rem;
+    overflow: hidden;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-elevated) 70%, transparent);
+  }
+  .fn-note-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ── survey slate + serif title ── */
+  .fn-note-slate {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.55rem;
+    letter-spacing: 0.2em;
+  }
+  .fn-note-sep {
+    opacity: 0.5;
+  }
+  .fn-note-loc {
+    color: color-mix(in srgb, var(--color-peak) 62%, transparent);
+  }
+  .fn-note-title {
+    margin-top: 0.7rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.08;
+    color: var(--color-peak);
+  }
+  .fn-note-tags {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+  .fn-note-tag {
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── prose: the note body, styled to the site's reading type ──
+        Body stays in the sans at a comfortable measure; headings pick up the
+        serif; links use the sanctioned accent. Scoped :global so it reaches
+        the markdown Astro renders inside <Content/>. ── */
+  .fn-prose {
+    margin-top: 2.75rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--color-ink) 92%, transparent);
+  }
+  .fn-prose :global(p) {
+    margin: 0 0 1.35em;
+  }
+  .fn-prose :global(h2) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.2;
+    color: var(--color-peak);
+    margin: 2.4rem 0 0.9rem;
+  }
+  .fn-prose :global(h3) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    color: var(--color-peak);
+    margin: 2rem 0 0.7rem;
+  }
+  .fn-prose :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .fn-prose :global(ul),
+  .fn-prose :global(ol) {
+    margin: 0 0 1.35em;
+    padding-left: 1.4em;
+  }
+  .fn-prose :global(li) {
+    margin: 0.35em 0;
+  }
+  .fn-prose :global(blockquote) {
+    margin: 1.6em 0;
+    padding-left: 1.1em;
+    border-left: 2px solid var(--color-accent-deep);
+    color: color-mix(in srgb, var(--color-ink) 80%, transparent);
+    font-style: italic;
+  }
+  .fn-prose :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.6em 0;
+  }
+  .fn-prose :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+    margin: 2.4rem 0;
+  }
+  .fn-prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  .fn-note-foot {
+    margin-top: 3.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--color-hairline);
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+# ─────────────────────────────────────────────────────────────────────────
+#  FIELD NOTE TEMPLATE  ·  (P12.4d)
+#
+#  TO PUBLISH A STORY:
+#    1. COPY this file.
+#    2. RENAME the copy to something like  my-story.md
+#         → the file name becomes the web address:
+#           my-story.md  →  /field-notes/my-story
+#         → use lowercase letters, numbers and hyphens; no spaces.
+#         → IMPORTANT: end it in ".md" (this template ends in ".md.txt" on
+#           purpose so it never appears on the live site).
+#    3. FILL IN the fields between the two "---" lines below.
+#    4. WRITE your story under the second "---" line.
+#    5. SAVE. Done — the site builds the page for you.
+#
+#  You can leave this template right where it is. Anything whose name starts
+#  with "_" is ignored, so it will never show up on the site.
+# ─────────────────────────────────────────────────────────────────────────
+
+# REQUIRED — the headline of the note (shown big, in the serif face).
+title: The title of your story goes here
+
+# REQUIRED — the date, as year-month-day. Newest notes list first.
+date: 2026-07-11
+
+# OPTIONAL — a place name. Shown on the small monospace line, like a coordinate.
+#   Delete this line if you don't want one.
+location: Boulder, Colorado
+
+# OPTIONAL — a few short labels. Delete this line if you don't want any.
+tags:
+  - example
+  - how-to
+
+# OPTIONAL — a cover image. Put the file in  public/media/field-notes/  and
+#   write the path starting with a slash, like below. Delete this line for no
+#   cover. (The site adds the rest of the address automatically.)
+# cover: /media/field-notes/my-story-cover.jpg
+
+# OPTIONAL — set this to true to keep a note hidden while you're still writing.
+#   Leave it false (or delete the line) to publish.
+draft: true
+---
+
+Write your story here, in plain text.
+
+Leave a blank line between paragraphs, and they'll render as separate
+paragraphs. That's the whole trick — no formatting knowledge required.
+
+## You can add a section heading like this
+
+Start a line with "## " for a sub-heading. Start a line with "- " for a
+bullet point:
+
+- one thing
+- another thing
+
+To make a word **bold**, wrap it in two asterisks. To make it *italic*, use
+one. To add a link, write it like [this](https://example.com).
+
+When you're happy with it, save the file. If you set `draft` to `true` above,
+switch it to `false` when you're ready for the world to see it.
