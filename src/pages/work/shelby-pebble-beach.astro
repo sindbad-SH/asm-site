@@ -29,13 +29,30 @@ const hookSources = existsSync(join(mediaDir, "loop.mp4"))
   : [];
 const contextImage = `${base}/media/work/shelby-pebble-beach/context.avif`;
 
-// BTS scrub — the site's single scrub moment (§1.1 P4), genuine BTS of this
-// shoot (16:9 center-crop of the vertical source; see HANDOFF.md). Rendered
-// only when the frame sequence exists on disk.
-const btsDir = join(mediaDir, "bts");
-const btsCount = existsSync(join(btsDir, "f-096.webp")) ? 96 : 0;
-const btsFramesBase = btsCount > 0 ? `${base}/media/work/shelby-pebble-beach/bts/f-` : undefined;
-const btsPoster = btsCount > 0 ? `${base}/media/work/shelby-pebble-beach/bts/poster.webp` : undefined;
+// Real-photo gallery (P13f) — the operator's own photographs of the restored
+// 1967 Shelby Cobra 427 at the 2025 Pebble Beach Concours (car beauty, crew at
+// work, engine detail, event context), baked by scripts/make-shelby-photos.mjs
+// into photos/. These REPLACE the old video frame-grab scrub as the chapter's
+// visual proof; the scrub props are no longer wired. Rendered only when the
+// exports exist on disk (same optional-media contract). Order = gallery order.
+const photosDir = join(mediaDir, "photos");
+const photosBase = existsSync(join(photosDir, "beauty-front-1600.webp"))
+  ? `${base}/media/work/shelby-pebble-beach/photos/`
+  : undefined;
+const photos = photosBase
+  ? [
+      { slug: "beauty-front", alt: "The restored blue 1967 Shelby Cobra 427, hood raised, on the show lawn at sunrise with the coastline behind" },
+      { slug: "dawn-flare", alt: "Low front three-quarter view of the blue Cobra catching sun flare at dawn" },
+      { slug: "on-set", alt: "The crew filming the Cobra at first light on the fairway" },
+      { slug: "paddock", alt: "The Cobra in the pre-dawn staging paddock among other classic cars" },
+      { slug: "crew", alt: "The three-person crew beside the blue Cobra, a silver Cobra and the bay behind" },
+      { slug: "engine", alt: "The Cobra's engine bay open, hands at work, spectators looking on" },
+      { slug: "lawn", alt: "Elevated view of the Cobra on the lawn ringed by the Concours crowd and the coastline" },
+      { slug: "morning-crowd", alt: "The Cobra on the lawn under a dramatic morning sky with attendees nearby" },
+      { slug: "heritage", alt: "The blue Cobra beside the white competition Cobras on the show field" },
+      { slug: "signage", alt: "The Pebble Beach Concours d'Elegance lettering and clock at the entrance" },
+    ]
+  : [];
 
 // Full film — already public-embedded on the live site (DIRECTION §2.6).
 const fullFilmVideoId = "SvIIXnM2R70";
@@ -48,9 +65,8 @@ const fullFilmVideoId = "SvIIXnM2R70";
     hookPoster={hookPoster}
     hookSources={hookSources}
     contextImage={contextImage}
-    btsFramesBase={btsFramesBase}
-    btsCount={btsCount}
-    btsPoster={btsPoster}
+    photos={photos}
+    photosBase={photosBase}
     fullFilmVideoId={fullFilmVideoId}
   />
 </Base>

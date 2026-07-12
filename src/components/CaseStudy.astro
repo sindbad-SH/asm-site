@@ -45,6 +45,13 @@ interface Props {
   btsFramesBase?: string;
   btsCount?: number;
   btsPoster?: string;
+  /** Real-photo gallery (P13f). An optional mixed-aspect still set rendered in
+   *  "The Work" chapter — supplied only when real exports exist on disk. Each
+   *  entry is a semantic slug + alt; the component builds the avif/webp srcset
+   *  from photosBase. Absent → nothing renders (same optional-media contract as
+   *  the BTS scrub). */
+  photos?: readonly { slug: string; alt: string }[];
+  photosBase?: string;
 }
 const {
   study,
@@ -59,6 +66,8 @@ const {
   btsFramesBase,
   btsCount = 0,
   btsPoster,
+  photos = [],
+  photosBase,
 } = Astro.props;
 
 // The "Words" chapter only exists when the case supplies a testimonialId — a
@@ -177,6 +186,42 @@ const isPending = (body: string) => body.trim() === "[confirm]";
           poster={btsPoster}
           placeholderLabel="BTS SCRUB (§2c/§4) — behind-the-scenes of the commercial as a scroll-scrubbed sequence."
         />
+      )
+    }
+
+    {/* Real-photo gallery (P13f) — mixed-aspect masonry (.gallery-wall), each
+        still in a peak-hairline .map-inset frame (site photography voice, §3.1).
+        Native aspects, lazy, no claim copy. Renders only when photos supplied. */}
+    {
+      photos.length > 0 && photosBase && (
+        <div class="case-chapter__inner space-y-3">
+          <p class="hud-label">The stills</p>
+          <div class="gallery-wall">
+            {photos.map((p) => (
+              <figure class="map-inset gallery-card">
+                <picture>
+                  <source
+                    type="image/avif"
+                    srcset={`${photosBase}${p.slug}-900.avif 900w, ${photosBase}${p.slug}-1600.avif 1600w`}
+                    sizes="(min-width: 768px) 33vw, 50vw"
+                  />
+                  <source
+                    type="image/webp"
+                    srcset={`${photosBase}${p.slug}-900.webp 900w, ${photosBase}${p.slug}-1600.webp 1600w`}
+                    sizes="(min-width: 768px) 33vw, 50vw"
+                  />
+                  <img
+                    src={`${photosBase}${p.slug}-1600.webp`}
+                    alt={p.alt}
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+              </figure>
+            ))}
+          </div>
+        </div>
       )
     }
 
