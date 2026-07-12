@@ -228,6 +228,12 @@ const GROUNDS = {
             otherRooms.map((room) => (
               <li class="im-room" data-reveal data-reveal-stagger="80">
                 <LegendMark proof={room.proof} />
+                {/* the SeriesFest room now has a pilot venture story behind it */}
+                {room.proof.relationshipId === "seriesfest" && (
+                  <a href={`${base}/venture/seriesfest-2026`} class="link im-room-story">
+                    Read the story <span class="arrow" aria-hidden="true">→</span>
+                  </a>
+                )}
               </li>
             ))
           }
@@ -507,6 +513,10 @@ const GROUNDS = {
   .im-room {
     border-top: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
     padding-top: 1.1rem;
+  }
+  .im-room-story {
+    display: inline-block;
+    margin-top: 0.5rem;
   }
   .im-rooms-photos {
     position: relative;
