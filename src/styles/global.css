@@ -1190,12 +1190,16 @@
     font-family: var(--font-display-condensed);
     font-weight: 400;
     text-transform: uppercase;
-    /* vw-clamped so the name always holds ONE line — a split "THE /
-       STORYSMITH." reads as an accident, not a lockup */
-    font-size: clamp(2.9rem, 7.2vw, 7rem);
-    white-space: nowrap;
-    line-height: 0.92;
-    letter-spacing: 0.014em;
+    /* P14a — now carries the COMPANY name ("ADVENTURE STORYTELLING MEDIA",
+       28 chars) rather than the short "THE STORYSMITH." (14). A smaller clamp
+       holds it on ONE line on wide desktop; where it can't (mobile), it wraps
+       to two BALANCED lines — text-wrap:balance renders "ADVENTURE" /
+       "STORYTELLING MEDIA" (the intended split) instead of a ragged break, so
+       the lockup never looks accidental. nowrap dropped for exactly this. */
+    font-size: clamp(2rem, 5.4vw, 4.6rem);
+    text-wrap: balance;
+    line-height: 0.94;
+    letter-spacing: 0.012em;
     color: #f4f8fb;
   }
   .portal-headline-turn {

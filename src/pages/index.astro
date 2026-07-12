@@ -6,17 +6,23 @@ import Testimonial from "../components/Testimonial.astro";
 import PortalHero from "../components/PortalHero.astro";
 import Tableaux from "../components/Tableaux.astro";
 import TrailJourney from "../components/TrailJourney.astro";
-import { COPY, PAGES, SAGA_STAGES } from "../consts";
+import { COPY, PAGES, SAGA_STAGES, SITE } from "../consts";
 
 const p = PAGES.home;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// P1.1 — the hero lockup: split the LOCKED headline at its first sentence
-// break for presentation only (condensed-caps lead + engraved serif turn).
-// The copy itself stays verbatim from consts; only the styling differs.
+// P14a — the hero lockup now leads with the COMPANY (operator direction
+// 2026-07-08). The giant condensed-caps line is SITE.name verbatim (the caps are
+// presentational, applied by text-transform in CSS — the string is unchanged).
+// The italic turn is the promise: the remainder of the LOCKED hero headline
+// after its "The StorySmith." lead sentence.
+//
+// OPERATOR-DIRECTED (2026-07-08): hero leads with the company; The StorySmith
+// stays in About/copy — dropping the lead sentence here is presentational per
+// his call, flag for read-approval.
+const heroLead = SITE.name; // "Adventure Storytelling Media" → CSS uppercases it
 const splitAt = COPY.hero.headline.indexOf(". ");
-const heroLead = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(0, splitAt + 1);
-const heroTurn = splitAt === -1 ? "" : COPY.hero.headline.slice(splitAt + 2);
+const heroTurn = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(splitAt + 2);
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>

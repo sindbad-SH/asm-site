@@ -196,13 +196,49 @@ export function initDistortion(grids: HTMLElement[]): void {
     rectsDirty = false;
   };
 
-  // NON-SCROLL layout shifts (P12 bug fix): a field-note expanding or a
-  // filter FLIP changes the grid's height with zero scroll, and the old
-  // "self-heals on the next scroll" policy left the WebGL image copies
-  // parked at stale coordinates until the visitor happened to scroll —
-  // the operator saw the Varenna tile lag seconds behind its card. A
-  // ResizeObserver on each grid fires on every frame of such a transition
-  // (the 320ms note-expand included), keeping rects live while it happens.
+  /* ── P14a — field-note photo-lag ROOT FIX ─────────────────────────────────
+     The P12.1 ResizeObserver fix (below) missed the true cause. The gallery is
+     CSS multi-column masonry (`.gallery-wall { column-count }`, global.css) and
+     the RO was attached to that COLUMN CONTAINER, but:
+       (1) a ResizeObserver reports SIZE changes of the observed box only, never
+           POSITION changes of its descendants; and
+       (2) with `column-fill: balance` (the default) the container's height is
+           the TALLEST balanced column — expanding one card's field note is
+           absorbed by column rebalancing, so the container's box height does
+           NOT change and the RO never fires.
+     Reproduced live (?fx=force): toggling a field note left `.gallery-wall`
+     height fixed at 1240px and fired the RO 0 times, while the card below moved
+     to a new POSITION. So the cached rects stayed stale for the whole 320ms
+     expansion and the WebGL copies stayed parked until the next scroll
+     (dy≠0 → measure) — exactly the "scrolling snaps it right" symptom. (Even
+     when the container HAD resized, a single RO callback marks dirty once, which
+     re-measures for one frame, not across the ~19-frame animation.)
+
+     FIX: this gallery is small (6 tiles today; the media guide caps ~20–40).
+     For small grids, re-measure EVERY frame — getBoundingClientRect on ≤20
+     tiles is the same reflow the scroll path already forces per scroll frame, so
+     ANY layout shift (note expand, filter FLIP, late image, font swap) tracks
+     frame-by-frame with zero heuristics. Above LIVE_MEASURE_MAX, keep the cached
+     path but open a "dirty window" on any click inside a distort grid: such a
+     transition is always user-initiated, so ~620ms of live re-measurement
+     (covering the 320ms transition + settle) tracks it smoothly without paying
+     the per-frame cost on a large gallery forever. */
+  const LIVE_MEASURE_MAX = 20;
+  const liveMeasure = tiles.length <= LIVE_MEASURE_MAX;
+
+  let dirtyUntil = 0;
+  if (!liveMeasure) {
+    // Engine-agnostic (P14a): not coupled to `.field-note-toggle` — ANY click
+    // inside a distort grid may start a layout transition that shifts tile
+    // POSITIONS without resizing the observed container. Keep rects live across
+    // it. performance.now() shares the rAF timestamp clock (compared in step()).
+    const openWindow = () => (dirtyUntil = performance.now() + 620);
+    grids.forEach((g) => g.addEventListener("click", openWindow));
+  }
+
+  // Genuine container-SIZE changes (real width reflow) still mark dirty — a cheap
+  // backstop, but NOT sufficient alone for the masonry position shifts above
+  // (P14a). Kept because it is correct for the cases it does catch.
   const gridRo = new ResizeObserver(() => {
     rectsDirty = true;
   });
@@ -215,7 +251,10 @@ export function initDistortion(grids: HTMLElement[]): void {
     lastY = y;
     vel += (Math.max(-1, Math.min(1, dy * 0.05)) - vel) * 0.12;
 
-    if (rectsDirty || dy !== 0) measure();
+    // P14a: liveMeasure re-measures every frame on small grids (bulletproof for
+    // masonry position shifts); large grids fall back to the cached path plus
+    // the scroll / dirty-flag / click-window triggers.
+    if (liveMeasure || rectsDirty || dy !== 0 || now < dirtyUntil) measure();
 
     for (let k = 0; k < tiles.length; k++) {
       const tile = tiles[k]!;
@@ -280,5 +319,12 @@ export function initDistortion(grids: HTMLElement[]): void {
     step: () => step(performance.now()),
     strengths: () => tiles.map((t) => Number(t.uniforms.uStrength.value.toFixed(3))),
     targets: () => tiles.map((t) => t.target),
+    // P14a QA: cached draw rect top vs live DOM top per tile — the staleness the
+    // field-note lag was made of. After a layout shift these should converge to
+    // ~0 within one step() on a small (liveMeasure) grid.
+    stale: () =>
+      tiles.map((t, k) =>
+        rects[k] ? Math.round(rects[k]!.top - t.media.getBoundingClientRect().top) : null,
+      ),
   };
 }
