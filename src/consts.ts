@@ -53,14 +53,19 @@ export const SITE = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// NAV — 6 items, capped (BUILD-PLAN §1.0). Forge the Saga owns the only CTA.
+// NAV — 6 items, capped (BUILD-PLAN §1.0). Single source of truth for the top
+// nav, the mobile menu, and the footer (all three map this array), so ordering
+// lives here alone. Order (P12.6): the credibility lanes and the proof come
+// first, THEN the sales page — Forge the Saga follows Work so the pitch lands
+// after the proof. The header's separate PRIMARY_CTA button still owns the only
+// call-to-action; nav position doesn't change that.
 // ---------------------------------------------------------------------------
 
 export const NAV = [
-  { label: "Forge the Saga", href: "/forge-the-saga" },
   { label: "Adventure", href: "/adventure" },
   { label: "Film & TV", href: "/entertainment" },
   { label: "Work", href: "/work" },
+  { label: "Forge the Saga", href: "/forge-the-saga" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
@@ -807,15 +812,15 @@ export const PAGES = {
     },
     // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
     // are watermarked previews; the gallery is a referral to the agency that
-    // licenses the full collection. Link verified: the /shorizon short form
-    // redirects to the AA homepage, so this points at the resolvable contributor
-    // URL. Copy invites licensing THROUGH Amazing Aerial.
+    // licenses the full collection. Points directly at the operator's AA
+    // portfolio search URL (P12.4b) — his contributor listing, not the AA
+    // homepage. Copy invites licensing THROUGH Amazing Aerial.
     aaFunnel: {
       heading: "License the full collection",
       body: "The aerial work is represented by Amazing Aerial Agency. The watermarked frames here are previews — see the full, licensable collection on my Amazing Aerial portfolio.",
       cta: {
         label: "See the full collection at Amazing Aerial",
-        href: "https://www.amazingaerial.com/controller/portfolio/shorizon",
+        href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
       },
     },
     // A5 — soft handoff toward consulting.

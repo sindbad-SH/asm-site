@@ -21,37 +21,67 @@ import ContourDivider from "./ContourDivider.astro";
 import { PAGES, PILLARS } from "../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const chapters = PAGES.home.tableaux;
+
+// P12.6 — read a shot's TRUE pixel ratio at BUILD TIME so its cluster card can
+// take the IMAGE's native aspect, not force the image into a hardcoded box.
+// sharp ships with astro (the image pipeline uses it); we read the webp (always
+// present alongside the avif) since both encode the same frame. Returned as a
+// CSS `W / H` string for `aspect-ratio: var(--ar)`; a read failure returns
+// undefined so the card falls back to its authored default ratio in CSS.
+async function aspectOf(file: string): Promise<string | undefined> {
+  try {
+    const { width, height } = await sharp(file).metadata();
+    return width && height ? `${width} / ${height}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 // R5/R3.6b — a chapter renders as a FLOATING SHOT CLUSTER (TableauCluster) when
 // its cluster assets exist on disk, replacing the old full-bleed layered scene.
 // Generalized in R3.6b from wild-only to any chapter dir (wild|market|industry):
 // a chapter clusters when its public/media/home/<slug>/cluster/ has >=2 shots.
 // Build-time check (frontmatter runs server-side), anchored to cwd.
-function clusterShot(slug: string, id: string) {
+async function clusterShot(slug: string, id: string) {
   const dir = join(process.cwd(), "public", "media", "home", slug, "cluster");
-  const has = existsSync(join(dir, `${id}.avif`)) && existsSync(join(dir, `${id}.webp`));
+  const webpPath = join(dir, `${id}.webp`);
+  const has = existsSync(join(dir, `${id}.avif`)) && existsSync(webpPath);
   return has
-    ? { avif: `${base}/media/home/${slug}/cluster/${id}.avif`, webp: `${base}/media/home/${slug}/cluster/${id}.webp` }
+    ? {
+        avif: `${base}/media/home/${slug}/cluster/${id}.avif`,
+        webp: `${base}/media/home/${slug}/cluster/${id}.webp`,
+        // P12.6 — native ratio so the card matches the photo (crop-free).
+        ar: await aspectOf(webpPath),
+      }
     : undefined;
 }
-function clusterShotsFor(slug: string) {
+async function clusterShotsFor(slug: string) {
   const wildDir = join(process.cwd(), "public", "media", "home", "wild");
+  const posterPath = join(wildDir, "matterhorn-loop-poster.avif");
   const hasLoop =
-    slug === "wild" &&
-    existsSync(join(wildDir, "matterhorn-loop.mp4")) &&
-    existsSync(join(wildDir, "matterhorn-loop-poster.avif"));
+    slug === "wild" && existsSync(join(wildDir, "matterhorn-loop.mp4")) && existsSync(posterPath);
+  const [peak, valley, lake, ridge] = await Promise.all([
+    clusterShot(slug, "peak"),
+    clusterShot(slug, "valley"),
+    clusterShot(slug, "lake"),
+    clusterShot(slug, "ridge"),
+  ]);
   return {
-    peak: clusterShot(slug, "peak"),
-    valley: clusterShot(slug, "valley"),
-    lake: clusterShot(slug, "lake"),
-    ridge: clusterShot(slug, "ridge"),
+    peak,
+    valley,
+    lake,
+    ridge,
     loop: hasLoop
       ? {
           mp4: `${base}/media/home/wild/matterhorn-loop.mp4`,
           poster: `${base}/media/home/wild/matterhorn-loop-poster.avif`,
+          // P12.6 — the loop's true frame ratio (poster == mp4 dimensions), so
+          // the 16/9 Matterhorn loop is no longer cropped into a 3/2 box.
+          ar: await aspectOf(posterPath),
         }
       : undefined,
   };
@@ -94,6 +124,14 @@ function findLayerImages(terrain: string): (TableauImage | null)[] {
 // can anchor a portal node to the real pillar section.
 const pillarByTerrain = Object.fromEntries(PILLARS.map((p) => [p.terrain.toLowerCase(), p.id]));
 
+// P12.6 — resolve each chapter's cluster shots (with native ratios) up front:
+// clusterShotsFor is now async (it reads pixel dimensions at build time), and
+// Astro's JSX map callback can't await, so the per-chapter data is precomputed
+// here in parallel and indexed by chapter position below.
+const clusterData = await Promise.all(
+  chapters.map((chapter) => clusterShotsFor(terrainSlug(chapter.terrain))),
+);
+
 // ── LAYER_SETS — art-direction layer descriptors, keyed by chapter terrain.
 // All three chapters are now fully built, mirroring "the wild" exemplar's
 // structure exactly (3 layers: background 0.15 → midground 0.45 →
@@ -125,7 +163,7 @@ const LAYER_SETS: Record<string, readonly TableauLayer[] | null> = {
   {
     chapters.map((chapter, i) => {
       const slug = terrainSlug(chapter.terrain);
-      const shots = clusterShotsFor(slug);
+      const shots = clusterData[i];
       const clusterLive = clusterLiveFor(shots);
       // Drift amp per the R3.5 wire-up map: wild 1.0, market/industry 0.9.
       const driftAmp = slug === "wild" ? 1.0 : 0.9;

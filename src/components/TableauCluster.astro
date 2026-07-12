@@ -24,13 +24,16 @@ interface Props {
   index: number;
   base: string;
   nodeId?: string;
-  /** Which shots exist on disk (build-time checked in Tableaux.astro). */
+  /** Which shots exist on disk (build-time checked in Tableaux.astro). Each
+   *  carries `ar` — the image's TRUE `W / H` ratio read at build time (P12.6) —
+   *  so the card takes the photo's native aspect instead of a hardcoded box,
+   *  and object-fit:cover no longer crops (the ratios now match). */
   shots: {
-    peak?: { avif: string; webp: string };
-    valley?: { avif: string; webp: string };
-    lake?: { avif: string; webp: string };
-    ridge?: { avif: string; webp: string };
-    loop?: { mp4: string; poster: string };
+    peak?: { avif: string; webp: string; ar?: string };
+    valley?: { avif: string; webp: string; ar?: string };
+    lake?: { avif: string; webp: string; ar?: string };
+    ridge?: { avif: string; webp: string; ar?: string };
+    loop?: { mp4: string; poster: string; ar?: string };
   };
   /** Ambient drift amplitude for this cluster's floats (R3.5 wire-up map:
    *  wild 1.0, market/industry 0.9). */
@@ -57,7 +60,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
          its own data-rate. Order back→front so nearer shots sit above. -->
     {
       shots.valley && (
-        <figure class="float float--valley" data-float data-rate="6" data-drift data-drift-amp={ampAttr}>
+        <figure
+          class="float float--valley"
+          data-float
+          data-rate="6"
+          data-drift
+          data-drift-amp={ampAttr}
+          style={shots.valley.ar ? `--ar:${shots.valley.ar}` : undefined}
+        >
           <picture>
             <source srcset={shots.valley.avif} type="image/avif" />
             <img src={shots.valley.webp} alt="" loading="lazy" decoding="async" />
@@ -67,7 +77,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
     }
     {
       shots.loop ? (
-        <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
+        <figure
+          class="float float--loop"
+          data-float
+          data-rate="9"
+          data-drift
+          data-drift-amp={ampAttr}
+          style={shots.loop.ar ? `--ar:${shots.loop.ar}` : undefined}
+        >
           <video
             class="float-loop"
             data-cluster-loop-video
@@ -84,7 +101,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
         </figure>
       ) : (
         shots.lake && (
-          <figure class="float float--loop" data-float data-rate="9" data-drift data-drift-amp={ampAttr}>
+          <figure
+            class="float float--loop"
+            data-float
+            data-rate="9"
+            data-drift
+            data-drift-amp={ampAttr}
+            style={shots.lake.ar ? `--ar:${shots.lake.ar}` : undefined}
+          >
             <picture>
               <source srcset={shots.lake.avif} type="image/avif" />
               <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />
@@ -95,7 +119,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
     }
     {
       shots.peak && (
-        <figure class="float float--peak" data-float data-rate="13" data-drift data-drift-amp={ampAttr}>
+        <figure
+          class="float float--peak"
+          data-float
+          data-rate="13"
+          data-drift
+          data-drift-amp={ampAttr}
+          style={shots.peak.ar ? `--ar:${shots.peak.ar}` : undefined}
+        >
           <picture>
             <source srcset={shots.peak.avif} type="image/avif" />
             <img src={shots.peak.webp} alt="" loading="lazy" decoding="async" />
@@ -105,7 +136,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
     }
     {
       shots.ridge && (
-        <figure class="float float--ridge" data-float data-rate="16" data-drift data-drift-amp={ampAttr}>
+        <figure
+          class="float float--ridge"
+          data-float
+          data-rate="16"
+          data-drift
+          data-drift-amp={ampAttr}
+          style={shots.ridge.ar ? `--ar:${shots.ridge.ar}` : undefined}
+        >
           <picture>
             <source srcset={shots.ridge.avif} type="image/avif" />
             <img src={shots.ridge.webp} alt="" loading="lazy" decoding="async" />
@@ -116,7 +154,14 @@ const tintDeg = [0, 14, -18][index] ?? 0;
     {
       /* the lake as a small extra near-shot when the loop occupies its slot */
       shots.loop && shots.lake && (
-        <figure class="float float--lake" data-float data-rate="19" data-drift data-drift-amp={ampAttr}>
+        <figure
+          class="float float--lake"
+          data-float
+          data-rate="19"
+          data-drift
+          data-drift-amp={ampAttr}
+          style={shots.lake.ar ? `--ar:${shots.lake.ar}` : undefined}
+        >
           <picture>
             <source srcset={shots.lake.avif} type="image/avif" />
             <img src={shots.lake.webp} alt="" loading="lazy" decoding="async" />

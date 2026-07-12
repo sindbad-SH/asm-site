@@ -1668,34 +1668,39 @@
   }
   /* Slot geometry — % of the stage. Widths use vw-clamped values so the cluster
      scales down gracefully. Positions scatter the shots around the centred copy
-     column and deliberately let them bleed past the text edges. */
+     column and deliberately let them bleed past the text edges. P12.6: each
+     card's aspect-ratio now reads the IMAGE's true ratio (--ar, set inline from
+     the build-time pixel read) so the whole photo shows uncropped — the
+     Matterhorn summit, the PitchBoulder logo, the AFM frame's edges. The literal
+     ratio stays as the fallback if --ar can't be read. The width clamps are the
+     size cap (DIRECTION), so a portrait card can't grow comically tall/wide. */
   .float--valley {
     width: clamp(220px, 30vw, 420px);
-    aspect-ratio: 3/2;
+    aspect-ratio: var(--ar, 3/2);
     top: 6%;
     left: 3%;
   }
   .float--loop {
     width: clamp(240px, 32vw, 460px);
-    aspect-ratio: 3/2;
+    aspect-ratio: var(--ar, 3/2);
     top: 10%;
     right: 2%;
   }
   .float--peak {
     width: clamp(150px, 19vw, 290px);
-    aspect-ratio: 4/5;
+    aspect-ratio: var(--ar, 4/5);
     bottom: 6%;
     left: 8%;
   }
   .float--ridge {
     width: clamp(150px, 19vw, 300px);
-    aspect-ratio: 4/5;
+    aspect-ratio: var(--ar, 4/5);
     bottom: 4%;
     right: 9%;
   }
   .float--lake {
     width: clamp(170px, 21vw, 320px);
-    aspect-ratio: 3/2;
+    aspect-ratio: var(--ar, 3/2);
     top: 46%;
     right: 20%;
     z-index: 1;
