@@ -246,8 +246,13 @@ export type Relationship = {
 //    text-only until the operator obtains one from Peter. (Reserved slot, see R3.2c.)
 //  • SeriesFest / AFM / Pebble Beach — TEXT ONLY, always. Attendance ≠ affiliation; a logo
 //    reads as endorsement. This is a legal posture, not a style choice.
-//  • MEME — text-only at launch (Board Chair is already the strongest phrasing; revisit only
-//    if the operator explicitly asks).
+//  • MEME — text-only at launch. P13e HONESTY CORRECTION (2026-07-08): the
+//    original brief said "Board Chair", but meme.ngo/meet-the-team lists the
+//    Board Chair as Amber MacPherson and Sindbad as "Member At-Large"
+//    (role text: Strategic Liaison and Scout). Corrected to THEIR published
+//    wording — understating beats overstating. Operator to confirm/refine.
+//    Logo use now operator-approved for editorial article pages (nominative
+//    use inside an about-the-org card), still never in hero lockups.
 export const RELATIONSHIPS: readonly Relationship[] = [
   /** Never: a paid staff role (unless confirmed). */
   {
@@ -255,7 +260,7 @@ export const RELATIONSHIPS: readonly Relationship[] = [
     name: "MEME",
     tier: "official",
     permittedPhrasing:
-      "Board Chair, MEME (Makeshift Entertainment Media Education), a Colorado nonprofit",
+      "Member At-Large, MEME (Makeshift Entertainment Media Education), a Colorado nonprofit",
   },
   /** Never: "represented exclusively"; never ownership of the agency. */
   {
@@ -357,20 +362,18 @@ export const WORK: readonly WorkItem[] = [
     relationshipId: "pebble-beach",
     href: "/work/shelby-pebble-beach",
   },
-  // P13d — Knights of Mayhem (operator direction 2026-07-08): the jousting
-  // showcase he cut at the Colorado Medieval Festival (Longmont). Made on a
-  // handshake ("send us the piece and maybe we'll talk"), never commissioned —
-  // he's proud of the piece and wants it shown WITH that truth intact.
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED for the three strings below (title,
-  // what, and the final engagement wording — engagement ships "[confirm]",
-  // which blocks production until he supplies his word).
+  // P13d — Knights of Mayhem: the jousting showcase he cut at the Colorado
+  // Medieval Festival (Longmont). Engagement wording per operator direction
+  // (2026-07-08): open to interpretation — his own phrase, states the deal's
+  // shape without claiming or denying payment. Title/what still in the
+  // read-approval queue with the other new strings.
   {
     slug: "knights-of-mayhem",
     title: "Knights of Mayhem — full-contact jousting at the Colorado Medieval Festival",
     pillar: "entertainment",
     forOrg: "Knights of Mayhem",
     what: "covered the jousting troupe and cut their showcase piece",
-    engagement: "[confirm]",
+    engagement: "made on a handshake",
   },
   {
     slug: "pitchboulder",
