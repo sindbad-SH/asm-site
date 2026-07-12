@@ -31,6 +31,15 @@
  * Fallbacks: no-JS / reduced motion → the temper line renders FULLY
  * FORGED (solid, final state), stations all visible via the reveal
  * engine's watchdog, no canvas, no flares. The page reads perfectly cold.
+ *
+ * P12.5: below 760px the desktop .fg-spine SVG is display:none (the
+ * two-column grid collapses to one), which used to leave mobile with no
+ * temper line at all — the page's whole signature gone on the phone the
+ * operator actually reviews on. Mobile now gets its own rail: a static
+ * heat→aqua gradient painted as a background-image on .fg-stations (spans
+ * the list's real rendered height automatically, no JS measuring needed)
+ * plus a small node tick beside each card in that station's own --heat.
+ * Pure CSS, always fully drawn — nothing to fail open on.
  */
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
@@ -523,6 +532,40 @@ const NODE_Y = [240, 660, 1060, 1470, 1860];
     .fg-s {
       opacity: 0.35;
       right: -12%;
+    }
+
+    /* P12.5 — mobile's own temper spine. A background-gradient rail on
+       the list (heat → mid → aqua, the same stops as #fg-temper) hugs
+       the stations column's left edge; it covers the ul's full box
+       automatically, so it stays correct no matter how tall any one
+       card's copy makes it. Each station gets a node tick — a small
+       dot in its own --heat — laid out in normal flow beside the card
+       so the tick and the rail line up without any absolute-position
+       math. Static, no scrub: fully drawn with no JS and no motion. */
+    .fg-stations {
+      background: linear-gradient(180deg, var(--color-forge-heat, #ff9d45), #c9b26a 55%, var(--color-accent, #38f8ec)) no-repeat 4px 0 /
+        2px 100%;
+    }
+    .fg-station {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+    }
+    .fg-station::before {
+      content: "";
+      flex: none;
+      width: 10px;
+      height: 10px;
+      margin-top: 1.7rem;
+      border-radius: 50%;
+      background: var(--heat);
+      box-shadow:
+        0 0 0 3px var(--fg-ground),
+        0 0 6px color-mix(in srgb, var(--heat) 65%, transparent);
+    }
+    .fg-card {
+      flex: 1 1 auto;
+      min-width: 0;
     }
   }
 </style>
