@@ -14,7 +14,6 @@
  * optional/selective and sits below the gallery, not as the page opener.
  */
 import Base from "../layouts/Base.astro";
-import Card from "../components/Card.astro";
 import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
@@ -335,92 +334,79 @@ const fmtSlate = (d: Date) =>
       </div>
     </section>
 
-    <!-- A4 — the field: micro travel stories (P12.6), the page's MAIN SURFACE
-         (§9.5 photo-first). Data-driven from the fieldNotes collection — one
-         place per markdown file, an ever-expanding set. -->
+    <!-- A4 — THE FLOATING GALLERY WALL (P19), the page's MAIN SURFACE
+         (§9.5 photo-first). Each place is a framed painting hung on the void:
+         a slim gallery frame + mat + drop shadow, drifting gently (CSS float,
+         desynced per painting; static under reduced motion / no-JS). The WHOLE
+         painting is a link into its spotlight — the "Super Mario 64 painting"
+         jump into the world. Data-driven from the fieldNotes collection; the
+         operator grows the wall by adding a markdown file.
+
+         The in-page field-note prose is GONE from /adventure (it now lives on
+         the spotlight pages). The license chip moved to the spotlight too, so
+         the wall reads as a clean salon hang, not a shop shelf — the mid-page
+         AA band + bottom funnel still carry the licensing weave.
+
+         Tile budget: each painting's frame is ONE .map-inset distort tile → 7
+         tiles, under the engine's ≤20 live-measure cap (distort-engine.ts). -->
     <section class="border-t border-hairline p-8">
       <hr class="flight-line mb-6" aria-hidden="true" />
-      <h2 class="mx-auto mb-4 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
-      <!-- Micro-story wall (P12.6): mixed-aspect, native orientation honored.
-           Each card is one place — mono survey slate (date · location), title,
-           an expandable observational field note, its watermarked frame, and a
-           per-story Amazing Aerial license chip. Data-driven from the fieldNotes
-           collection; the operator grows it by adding a markdown file.
-           Tile budget: ONE distort tile per story (the lead photo) → 7 tiles,
-           under the engine's ≤20 live-measure cap that keeps the note expand
-           lag-free. -->
-      <div class="gallery-wall mx-auto max-w-5xl" data-distort-grid>
+      <h2 class="mx-auto mb-6 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
+      <div class="painting-wall mx-auto max-w-5xl" data-distort-grid>
         {
-          stories.map((story, idx) => {
+          stories.map((story) => {
             const photos = story.data.photos ?? [];
             const lead = photos[0]!;
             const isVertical = lead.orientation === "vertical";
+            const media = galleryMedia(lead.slug, lead.orientation);
             const slate = `${fmtSlate(story.data.date)} · ${story.data.location}`;
+            const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw";
             return (
-              <article class={isVertical ? "gallery-card gallery-card--tall" : "gallery-card"}>
-                <Card
-                  mediaRatio={isVertical ? "4/5" : "3/2"}
-                  mediaSrc={galleryMedia(lead.slug, lead.orientation)}
-                  mediaAlt={lead.alt}
-                  mediaLabel={`${story.data.title} — gallery still`}
-                  eyebrow={slate}
-                  title={story.data.title}
-                  fieldNote={story.body?.trim()}
-                  fieldNoteOpen={idx === 0}
-                  reveal
-                  revealStagger={50}
-                />
-                {/* Secondary frames (a story may carry up to 3) render OUTSIDE
-                    any .map-inset, so they never count toward the ≤20 tile cap. */}
-                {photos.length > 1 && (
-                  <div class="story-extra">
-                    {photos.slice(1).map((ph) => {
-                      const m = galleryMedia(ph.slug, ph.orientation);
-                      return m ? (
-                        <picture>
-                          <source type="image/avif" srcset={m.avif} sizes="(min-width: 1024px) 30vw, 45vw" />
-                          <source type="image/webp" srcset={m.webp} sizes="(min-width: 1024px) 30vw, 45vw" />
-                          <img
-                            src={m.src}
-                            alt={ph.alt}
-                            loading="lazy"
-                            decoding="async"
-                            style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
-                          />
-                        </picture>
-                      ) : null;
-                    })}
-                  </div>
-                )}
-                {/* Per-story AA license chip (P12.6) — small logo mark + locked
-                    mono line + portfolio link. A visible-but-quiet purchase path
-                    on every story. Deep per-image links aren't available from AA,
-                    so each points at the operator's portfolio.
-                    ⚠ OPERATOR READ-APPROVAL REQUIRED — "License these frames" is
-                    new label copy (staging-only until read). */}
-                {story.data.license && (
-                  <a
-                    href={p.aaFunnel.cta.href}
-                    target="_blank"
-                    rel="noopener"
-                    class="license-chip"
-                  >
-                    <img
-                      src={`${base}/media/adventure/aa-logo.png`}
-                      alt="Amazing Aerial"
-                      class="license-chip-logo"
-                      width="480"
-                      height="158"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span class="license-chip-text hud-label">Licensed through Amazing Aerial</span>
-                    <span class="license-chip-cta hud-label">
-                      License these frames <span class="arrow" aria-hidden="true">→</span>
+              <a
+                class={isVertical ? "painting painting--tall" : "painting"}
+                href={`${base}/field-notes/${story.id}`}
+                data-painting
+                data-reveal
+                aria-label={`${story.data.title} — ${story.data.location}`}
+              >
+                {/* Inner carries the frame + shadow + ambient float, so the
+                    reveal-entrance transform on the anchor and the float never
+                    fight over `transform`. */}
+                <div class="painting-inner">
+                  <figure class="painting-window map-inset">
+                    {media && (
+                      <picture>
+                        <source type="image/avif" srcset={media.avif} sizes={sizes} />
+                        <source type="image/webp" srcset={media.webp} sizes={sizes} />
+                        <img
+                          src={media.src}
+                          alt={lead.alt}
+                          class="block w-full"
+                          style={`aspect-ratio:${isVertical ? "4/5" : "3/2"};object-fit:cover`}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </picture>
+                    )}
+                    {/* Hover affordance — the "jump into the painting" cue (fine
+                        pointers). ⚠ OPERATOR READ-APPROVAL REQUIRED — "Enter" is
+                        new label copy (staging-only until read). Styled mono
+                        directly (NOT .hud-label) so the distort engine's
+                        is-distorted label-lift can't override its centering. */}
+                    <span class="painting-enter" aria-hidden="true">
+                      Enter <span class="arrow">→</span>
                     </span>
-                  </a>
-                )}
-              </article>
+                  </figure>
+                  <div class="painting-plate">
+                    <span class="painting-slate hud-label">{slate}</span>
+                    <span class="painting-title">{story.data.title}</span>
+                    {/* Persistent affordance for touch (no hover-only cues). */}
+                    <span class="painting-cta hud-label" aria-hidden="true">
+                      Enter <span class="arrow">→</span>
+                    </span>
+                  </div>
+                </div>
+              </a>
             );
           })
         }
@@ -486,18 +472,41 @@ const fmtSlate = (d: Date) =>
 </Base>
 
 <script>
-  // Field-note toggle (R3.4) — one delegated listener; the grid-rows CSS does
-  // the expand/collapse. No-JS renders every note open (CSS), so this is pure
-  // enhancement. The note sits outside .map-inset, so the gallery hover warp is
-  // untouched.
-  document.addEventListener("click", (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLElement>(".field-note-toggle");
-    if (!btn) return;
-    const note = btn.closest<HTMLElement>("[data-field-note]");
-    if (!note) return;
-    const open = note.classList.toggle("is-open");
-    btn.setAttribute("aria-expanded", String(open));
-  });
+  // ── P19 — "jump into the painting" click transition ──────────────────────
+  // Progressive enhancement over a plain link. On a primary click of a painting
+  // we briefly zoom it toward the viewer, then navigate — the Super Mario 64
+  // dive into the world. Hard-degrades to INSTANT navigation: skipped entirely
+  // under reduced motion, on coarse/touch pointers, and for modifier / non-left
+  // clicks (so cmd/ctrl/middle-click still open a new tab). A safety timeout
+  // guarantees navigation even if the transitionend never fires.
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    if (reduce || !fine) return; // instant nav is the baseline everywhere else
+
+    document.addEventListener("click", (e) => {
+      const me = e as MouseEvent;
+      if (me.button !== 0 || me.metaKey || me.ctrlKey || me.shiftKey || me.altKey) return;
+      const painting = (e.target as HTMLElement).closest<HTMLAnchorElement>("a.painting[href]");
+      if (!painting || painting.classList.contains("is-entering")) return;
+      e.preventDefault();
+      const href = painting.href;
+      painting.classList.add("is-entering");
+      let done = false;
+      const go = () => {
+        if (done) return;
+        done = true;
+        window.location.assign(href);
+      };
+      painting.addEventListener("transitionend", go, { once: true });
+      window.setTimeout(go, 420); // fallback ceiling
+    });
+  })();
+
+  // NOTE: the paintings' ambient float is pure CSS (@keyframes painting-float on
+  // .painting-inner, desynced per painting, killed under reduced motion) — no JS
+  // engine, so it also breathes on mobile without a transform tug-of-war with
+  // the reveal-entrance transform on the anchor.
 
   // ── P12.4c — THE TERRITORY constellation interaction ─────────────────────
   // Pure progressive enhancement over the static (all-expanded) base. Under

@@ -2143,11 +2143,9 @@
     }
   }
 
-  /* ── Mixed-aspect gallery wall (R3) ── */
-  /* CSS multi-column masonry: every card keeps its NATIVE aspect (landscape 3:2,
-     vertical 4:5) and flows into balanced columns — portrait stills stand tall
-     beside landscape ones, nothing is squished into a uniform shape. Columns
-     are bulletproof across browsers (no grid row-span math, no JS). */
+  /* ── Mixed-aspect gallery wall (R3) — shared masonry container ─────────────
+     Still used by CaseStudy.astro's "stills" grid. CSS multi-column masonry:
+     every card keeps its native aspect and flows into balanced columns. */
   .gallery-wall {
     column-count: 2;
     column-gap: 1rem;
@@ -2164,95 +2162,271 @@
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
   }
-  /* Quiet per-card AA licensing link (P12.4b) — Card.astro has no link slot,
-     so this rides alongside it as a page-level footer strip flush against
-     the card's own border (same hairline/background), reading as a
-     continuation of the field-note register rather than a new UI element. */
-  .gallery-card-aa-link {
-    display: block;
-    margin-top: -1px;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid var(--color-hairline);
-    border-top: none;
-    background: var(--color-elevated);
-    color: var(--color-ink-muted);
-    text-decoration: none;
-    transition: color var(--dur-hover) var(--ease-swift);
+
+  /* ── The floating gallery wall (P19) ──────────────────────────────────────
+     A "salon hang" of framed paintings on the void — its OWN masonry container
+     (decoupled from .gallery-wall so the /adventure paintings can stack on
+     phones without changing CaseStudy's stills grid). Each painting is a LINK
+     into its spotlight — the Super Mario 64 dive into the world. The whole
+     thing drifts gently on its own phase (CSS float, killed under reduced
+     motion). */
+  .painting-wall {
+    column-count: 1; /* phones: paintings stack full-width (big tap targets) */
+    column-gap: clamp(0.9rem, 2.2vw, 1.9rem);
   }
-  .gallery-card-aa-link:hover,
-  .gallery-card-aa-link:focus-visible {
-    color: var(--color-accent);
+  @media (min-width: 600px) {
+    .painting-wall {
+      column-count: 2;
+    }
+  }
+  @media (min-width: 960px) {
+    .painting-wall {
+      column-count: 3;
+    }
   }
 
-  /* ── P12.6 · per-story Amazing Aerial license chip ──
-     A compact, repeatable purchase path on every micro-story: small AA logo
-     mark + locked mono line + arrow link. Flush against the card's own border
-     (same hairline/elevated ground as the old aa-link), reading as a quiet
-     footer strip, not a shouting CTA. break-inside:avoid keeps it welded to its
-     card in the masonry columns. */
-  .license-chip {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.3rem 0.6rem;
-    margin-top: -1px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-hairline);
-    border-top: none;
-    background: var(--color-elevated);
-    text-decoration: none;
-    color: var(--color-ink-muted);
-    transition:
-      color var(--dur-hover) var(--ease-swift),
-      border-color var(--dur-hover) var(--ease-swift);
+  /* Each painting: a link that carries the reveal-entrance transform on the
+     OUTER anchor, and the frame + shadow + ambient float on the INNER wrapper,
+     so the two never fight over `transform`. */
+  .painting {
+    display: block;
+    width: 100%;
+    margin: 0 0 clamp(1.4rem, 3vw, 2.6rem);
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
   }
-  .license-chip-logo {
-    height: 15px;
-    width: auto;
-    flex-shrink: 0;
-    opacity: 0.72;
-    transition: opacity var(--dur-hover) var(--ease-swift);
-  }
-  .license-chip-text {
-    color: var(--color-ink-muted);
-  }
-  .license-chip-cta {
-    margin-left: auto;
-    color: var(--color-peak);
-    transition: color var(--dur-hover) var(--ease-swift);
-  }
-  .license-chip:hover,
-  .license-chip:focus-visible {
-    color: var(--color-accent);
-    border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-hairline));
-  }
-  .license-chip:hover .license-chip-cta,
-  .license-chip:focus-visible .license-chip-cta {
-    color: var(--color-accent);
-  }
-  .license-chip:hover .license-chip-logo,
-  .license-chip:focus-visible .license-chip-logo {
-    opacity: 1;
+  /* Salon asymmetry — nudge alternating paintings so the hang reads hand-placed,
+     not gridded. Only in the 3-column hang (≥960px); the stacked/2-col layouts
+     need no vertical offset. */
+  @media (min-width: 960px) {
+    .painting:nth-child(3n + 2) {
+      margin-top: clamp(0.8rem, 2.6vw, 2rem);
+    }
+    .painting:nth-child(3n + 3) {
+      margin-top: clamp(0.3rem, 1.4vw, 1.1rem);
+    }
   }
 
-  /* Secondary story frames (a story may carry up to 3). Plain pictures OUTSIDE
-     any .map-inset — they never count toward the distort engine's ≤20 tile cap. */
-  .story-extra {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
-    margin-top: 0.4rem;
+  .painting-inner {
+    display: block;
+    position: relative;
+    border-radius: 3px;
+    padding: clamp(0.5rem, 1.1vw, 0.85rem); /* the mat */
+    background: linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--color-peak) 9%, var(--color-elevated)) 0%,
+      var(--color-elevated) 48%,
+      color-mix(in srgb, var(--color-base) 45%, var(--color-elevated)) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-peak) 15%, transparent);
+    box-shadow:
+      0 22px 48px -22px rgba(0, 0, 0, 0.66),
+      0 4px 12px -7px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 color-mix(in srgb, var(--color-peak) 12%, transparent);
+    transition:
+      transform 300ms var(--ease-swift),
+      box-shadow 300ms var(--ease-swift);
+    animation: painting-float var(--float-dur, 13s) ease-in-out var(--float-delay, 0s)
+      infinite alternate;
+    will-change: transform;
   }
-  .story-extra picture,
-  .story-extra img {
+  /* Desync the field: each painting drifts on its own period + phase so no two
+     ever synchronize (the golden-angle idea, hand-tuned for 7 paintings). */
+  .painting:nth-child(1) .painting-inner {
+    --float-dur: 12.5s;
+    --float-delay: -1.1s;
+  }
+  .painting:nth-child(2) .painting-inner {
+    --float-dur: 15.5s;
+    --float-delay: -6.4s;
+  }
+  .painting:nth-child(3) .painting-inner {
+    --float-dur: 11s;
+    --float-delay: -3.7s;
+  }
+  .painting:nth-child(4) .painting-inner {
+    --float-dur: 14s;
+    --float-delay: -9.2s;
+  }
+  .painting:nth-child(5) .painting-inner {
+    --float-dur: 16.5s;
+    --float-delay: -2.3s;
+  }
+  .painting:nth-child(6) .painting-inner {
+    --float-dur: 12s;
+    --float-delay: -7.8s;
+  }
+  .painting:nth-child(7) .painting-inner {
+    --float-dur: 13.7s;
+    --float-delay: -4.9s;
+  }
+  @keyframes painting-float {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(-0.4deg);
+    }
+    50% {
+      transform: translate3d(6px, -7px, 0) rotate(0.5deg);
+    }
+    100% {
+      transform: translate3d(-3px, 5px, 0) rotate(-0.2deg);
+    }
+  }
+
+  /* The image window — .map-inset already supplies the 1px bevel + elevated
+     ground + the distort tile hook. */
+  .painting-window {
+    position: relative;
+    margin: 0;
+    overflow: clip;
+    border-radius: 1px;
+  }
+  .painting-window img {
     display: block;
     width: 100%;
   }
-  .story-extra img {
+
+  /* Hover "Enter" cue — centered over the image, the jump-in prompt (fine
+     pointers). Hidden by default; fades in on hover/focus. */
+  .painting-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 34%,
+      color-mix(in srgb, var(--color-base) 58%, transparent) 100%
+    );
+    transition: opacity var(--dur-hover) var(--ease-swift);
+  }
+  .painting-enter {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    transform: translate(-50%, -50%) scale(0.94);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.42rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-peak);
+    border: 1px solid color-mix(in srgb, var(--color-peak) 42%, transparent);
+    background: color-mix(in srgb, var(--color-base) 60%, transparent);
     border-radius: 2px;
-    border: 1px solid var(--color-hairline);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--dur-hover) var(--ease-swift),
+      transform var(--dur-hover) var(--ease-swift);
+  }
+  .painting-enter .arrow {
+    transition: transform var(--dur-hover) var(--ease-swift);
+  }
+
+  /* The placard on the mat, beneath the image — mono slate + serif title + a
+     persistent "Enter" affordance (visible on touch, no hover-only cue). */
+  .painting-plate {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.7rem 0.35rem 0.25rem;
+  }
+  .painting-slate {
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted);
+    font-size: 0.66rem;
+  }
+  .painting-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.16;
+    color: var(--color-peak);
+  }
+  .painting-cta {
+    margin-top: 0.15rem;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+    transition: color var(--dur-hover) var(--ease-swift);
+  }
+  .painting-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover) var(--ease-swift);
+  }
+
+  /* Hover / focus life — fine pointers only (no hover-only affordance leaks to
+     touch, where the persistent plate CTA carries the cue). */
+  @media (hover: hover) and (pointer: fine) {
+    .painting:hover .painting-inner,
+    .painting:focus-visible .painting-inner {
+      box-shadow:
+        0 30px 60px -24px rgba(0, 0, 0, 0.72),
+        0 6px 16px -8px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 color-mix(in srgb, var(--color-peak) 18%, transparent);
+      border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    }
+    .painting:hover .painting-window::after,
+    .painting:focus-visible .painting-window::after {
+      opacity: 1;
+    }
+    .painting:hover .painting-enter,
+    .painting:focus-visible .painting-enter {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .painting:hover .painting-enter .arrow,
+    .painting:focus-visible .painting-enter .arrow {
+      transform: translateX(3px);
+    }
+    .painting:hover .painting-cta,
+    .painting:focus-visible .painting-cta {
+      color: var(--color-accent);
+    }
+    .painting:hover .painting-cta .arrow,
+    .painting:focus-visible .painting-cta .arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  /* Focus-visible ring on the whole painting (keyboard) — the anchor has no
+     default outline, so paint one on the frame. */
+  .painting:focus-visible .painting-inner {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* "Jump into the painting" click transition (P19) — the page script adds
+     .is-entering, we zoom the inner toward the viewer, then navigate on
+     transitionend. Only ever added on fine-pointer + motion-allowed (the script
+     bails otherwise), so this never runs under reduced motion. Pausing the
+     float animation lets the scale transition read cleanly. */
+  .painting.is-entering .painting-inner {
+    animation: none;
+    transform: scale(1.09);
+    box-shadow:
+      0 40px 80px -28px rgba(0, 0, 0, 0.78),
+      0 10px 24px -10px rgba(0, 0, 0, 0.6);
+    z-index: 3;
+  }
+  .painting.is-entering {
+    position: relative;
+    z-index: 3;
+  }
+
+  /* Reduced motion: no float, no hover scale — paintings hang perfectly still.
+     (The click transition is already script-gated off here.) */
+  @media (prefers-reduced-motion: reduce) {
+    .painting-inner {
+      animation: none;
+    }
   }
 
   /* AA mid-band (P12.6) — mirrors the funnel panel; its own accent hairline on
