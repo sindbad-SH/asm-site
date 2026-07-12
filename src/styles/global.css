@@ -2368,3 +2368,393 @@ html.js .portal-forced .portal-scrim {
   opacity: 1;
   transition: opacity 600ms var(--ease-survey);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * P12.4c — "THE TERRITORY" constellation
+ *
+ * A surveyor's constellation (NOT a geographic map) that illustrates the A2
+ * territory copy: country nodes on the void ground, each with a HUD-dot glow +
+ * mono label, and a sunflower spray of location dots. Hairline contour arcs
+ * connect the clusters. Voice + tokens match the Contour Survey system
+ * (--font-mono labels, --color-accent scarce/only-on-active, --color-accent-deep
+ * resting linework, --color-adventure-warm reserved to this lane's imagery/chip).
+ *
+ * Progressive enhancement:
+ *   • Base (no-JS / reduced motion): every location is rendered and visible.
+ *     Info chips (with the license link) reveal on hover / focus, so the link is
+ *     reachable without JS. The <ul> is the plain accessible list.
+ *   • Enhanced (JS + motion): the page script adds `.terr--live`, which collapses
+ *     each country's locations until its node is clicked (see adventure.astro).
+ * Unlayered on purpose (like the portal-forced rules above) so it wins over the
+ * layered component defaults without a specificity fight.
+ * ══════════════════════════════════════════════════════════════════════════ */
+.terr {
+  margin-top: 1.75rem;
+}
+.terr-kicker {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* The framed panel on the void ground — hairline border + faint contour wash. */
+.terr-field {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-hairline);
+  border-radius: 2px;
+  background:
+    radial-gradient(
+      circle at 22% 30%,
+      color-mix(in srgb, var(--color-adventure-slate) 40%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 80% 66%,
+      color-mix(in srgb, var(--color-adventure-slate) 32%, transparent),
+      transparent 58%
+    ),
+    var(--color-base);
+  overflow: visible; /* chips open toward the interior, so they never need clipping */
+}
+
+/* Decorative connective arcs — low-alpha dashed survey linework, aria-hidden. */
+.terr-arcs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.terr-arc {
+  fill: none;
+  stroke: var(--color-accent-deep);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 2 5;
+  opacity: 0.24;
+}
+
+.terr-clusters,
+.terr-locations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Cluster <li> is a zero-box anchor: both its country node and its location
+   dots are absolutely positioned against the field, so it adds no layout. */
+.terr-cluster {
+  position: static;
+}
+
+/* ── Country node — the glowing anchor + mono caption ── */
+.terr-country {
+  position: absolute;
+  left: calc(var(--cx) * 1%);
+  top: calc(var(--cy) * 1%);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  z-index: 4;
+  -webkit-tap-highlight-color: transparent;
+}
+.terr-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, var(--color-accent), var(--color-accent-deep) 78%);
+  box-shadow: 0 0 13px -2px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  /* Subtle life: one-notch-above-minimal breathing glow, never a light show. */
+  animation: terr-pulse 5.5s var(--ease-survey) infinite;
+}
+@keyframes terr-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 11px -3px color-mix(in srgb, var(--color-accent) 42%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 21px -2px color-mix(in srgb, var(--color-accent) 72%, transparent);
+  }
+}
+.terr-country-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-peak);
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--color-base) 78%, transparent);
+  padding: 0.12rem 0.4rem;
+  border-radius: 2px;
+  transition: color var(--dur-hover) var(--ease-swift);
+}
+.terr-country:hover .terr-country-label,
+.terr-country:focus-visible .terr-country-label,
+.terr-cluster.is-open .terr-country-label {
+  color: var(--color-accent);
+}
+
+/* ── Location dot — small node + reveal-on-hover mono label + info chip ── */
+.terr-loc {
+  position: absolute;
+  left: calc(var(--lx) * 1%);
+  top: calc(var(--ly) * 1%);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.terr-loc:hover,
+.terr-loc:focus-within {
+  z-index: 7; /* lift the hovered dot (and its chip/label) above its neighbours */
+}
+.terr-loc-node {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.terr-loc-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-deep) 16%, transparent);
+  transition:
+    background var(--dur-hover) var(--ease-swift),
+    box-shadow var(--dur-hover) var(--ease-swift),
+    transform var(--dur-hover) var(--ease-swift);
+}
+.terr-loc-node:hover .terr-loc-dot,
+.terr-loc-node:focus-visible .terr-loc-dot,
+.terr-loc-node[aria-expanded="true"] .terr-loc-dot {
+  background: var(--color-accent);
+  box-shadow: 0 0 12px -1px color-mix(in srgb, var(--color-accent) 62%, transparent);
+  transform: scale(1.28);
+}
+.terr-loc-label {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%) translateY(3px);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  background: color-mix(in srgb, var(--color-base) 82%, transparent);
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-hover) var(--ease-swift),
+    transform var(--dur-hover) var(--ease-swift);
+}
+.terr-loc-node:hover .terr-loc-label,
+.terr-loc-node:focus-visible .terr-loc-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Info chip — name, outing count, license link. Kept in the a11y tree (opacity,
+   not display:none) so the link stays focusable; :focus-within holds it open
+   while the link is focused. Opens below the dot, anchored toward the interior. */
+.terr-chip {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  width: 9.5rem;
+  max-width: 62vw;
+  padding: 0.55rem 0.6rem;
+  background: var(--color-elevated);
+  border: 1px solid color-mix(in srgb, var(--color-adventure-warm) 30%, var(--color-hairline));
+  border-radius: 2px;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-hover) var(--ease-swift),
+    transform var(--dur-hover) var(--ease-swift),
+    visibility 0s linear var(--dur-hover);
+}
+[data-side="left"] .terr-chip {
+  left: auto;
+  right: 50%;
+  transform: translateX(-6px) translateY(4px);
+}
+[data-side="right"] .terr-chip {
+  left: 50%;
+  right: auto;
+  transform: translateX(6px) translateY(4px);
+}
+.terr-loc:hover > .terr-chip,
+.terr-loc:focus-within > .terr-chip,
+.terr-loc-node[aria-expanded="true"] + .terr-chip {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition:
+    opacity var(--dur-hover) var(--ease-swift),
+    transform var(--dur-hover) var(--ease-swift),
+    visibility 0s;
+}
+[data-side="left"] .terr-loc:hover > .terr-chip,
+[data-side="left"] .terr-loc:focus-within > .terr-chip,
+[data-side="left"] .terr-loc-node[aria-expanded="true"] + .terr-chip {
+  transform: translateX(-6px) translateY(0);
+}
+[data-side="right"] .terr-loc:hover > .terr-chip,
+[data-side="right"] .terr-loc:focus-within > .terr-chip,
+[data-side="right"] .terr-loc-node[aria-expanded="true"] + .terr-chip {
+  transform: translateX(6px) translateY(0);
+}
+.terr-chip-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--color-peak);
+  line-height: 1.1;
+}
+.terr-chip-count {
+  font-size: 0.58rem;
+}
+.terr-chip-link {
+  font-size: 0.72rem;
+}
+
+/* ── Enhanced (live) mode: collapse each country's dots until it is opened.
+   Only added by JS when motion is allowed; no-JS keeps everything shown. ── */
+.terr--live .terr-loc {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.35);
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity 0.45s var(--ease-survey),
+    transform 0.45s var(--ease-survey),
+    visibility 0s linear 0.45s;
+}
+.terr--live .terr-cluster.is-open .terr-loc {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  /* soft radial stagger as the dots spray out */
+  transition:
+    opacity 0.45s var(--ease-survey) calc(var(--i) * 32ms),
+    transform 0.45s var(--ease-survey) calc(var(--i) * 32ms),
+    visibility 0s;
+}
+
+/* ── Reduced motion: no pulse, no transitions, everything shown (belt-and-
+   suspenders — the script also never enters live mode under reduced motion). ── */
+@media (prefers-reduced-motion: reduce) {
+  .terr-dot {
+    animation: none;
+  }
+  .terr-loc,
+  .terr-chip,
+  .terr-loc-label,
+  .terr-loc-dot,
+  .terr-country-label {
+    transition: none;
+  }
+  .terr--live .terr-loc {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    visibility: visible;
+  }
+}
+
+/* ── Mobile: clusters stack vertically, positions go static, names show inline;
+   the same interaction (expand a country, open a chip) still works. ── */
+@media (max-width: 719px) {
+  .terr-arcs {
+    display: none;
+  }
+  .terr-field {
+    aspect-ratio: auto;
+    padding: 1rem 0.75rem;
+  }
+  .terr-clusters {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  .terr-cluster,
+  .terr-country,
+  .terr-loc {
+    position: static;
+    transform: none;
+  }
+  .terr-country {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    width: 100%;
+  }
+  .terr-country-label {
+    background: none;
+    padding: 0;
+  }
+  .terr-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0.7rem 0 0 1.5rem;
+  }
+  .terr-loc-node {
+    gap: 0.4rem;
+  }
+  /* names always visible on mobile (no hover) */
+  .terr-loc-label {
+    position: static;
+    transform: none;
+    opacity: 1;
+    background: none;
+    padding: 0;
+    font-size: 0.6rem;
+  }
+  .terr-chip {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin-top: 0.4rem;
+    box-shadow: none;
+  }
+  .terr-loc:hover > .terr-chip,
+  .terr-loc:focus-within > .terr-chip,
+  .terr-loc-node[aria-expanded="true"] + .terr-chip {
+    transform: none;
+  }
+  /* accordion collapse via display so stacked rows reflow cleanly */
+  .terr--live .terr-loc {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+  }
+  .terr--live .terr-cluster:not(.is-open) .terr-locations {
+    display: none;
+  }
+}

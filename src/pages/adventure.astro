@@ -20,6 +20,7 @@ import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import { PAGES, WORK } from "../consts";
+import { TERRITORY, TERRITORY_TOTALS } from "../data/territory";
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -27,6 +28,69 @@ import { join } from "node:path";
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const adventureWork = WORK.filter((item) => item.pillar === "adventure");
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * P12.4c — "THE TERRITORY" constellation geometry.
+ *
+ * The map that illustrates the A2 territory copy is NOT a geographic map — it's
+ * a surveyor's constellation. Each country is a glowing node; its locations
+ * spray around it on a golden-angle (sunflower) spiral so they distribute
+ * evenly and organically. Positions are computed here (presentation) so the
+ * data file (src/data/territory.ts) stays a clean, typed inventory.
+ *
+ * Coordinates are percentages of the field box. The USA groups (Colorado, New
+ * Mexico) sit in the left column; the Alps groups (Switzerland, Italy) sit to
+ * the right — echoing the real world without pretending to be a map.
+ * ───────────────────────────────────────────────────────────────────────── */
+const TERRITORY_CLUSTERS: Record<string, { cx: number; cy: number; r: number }> = {
+  Colorado: { cx: 20, cy: 33, r: 15 },
+  "New Mexico": { cx: 20, cy: 79, r: 5 },
+  Switzerland: { cx: 55, cy: 30, r: 15 },
+  Italy: { cx: 82, cy: 63, r: 14 },
+};
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ≈137.5°, the sunflower angle
+const TERRITORY_YSQUASH = 0.72; // field is wider than tall — squash y so the spiral reads round
+
+function terrSlug(s: string) {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const territory = TERRITORY.map((c) => {
+  const cfg = TERRITORY_CLUSTERS[c.country];
+  const n = c.locations.length;
+  const locations = c.locations.map((loc, i) => {
+    const frac = (i + 0.5) / n;
+    const rad = cfg.r * Math.sqrt(frac);
+    const theta = i * GOLDEN_ANGLE;
+    const x = cfg.cx + rad * Math.cos(theta);
+    const y = cfg.cy + rad * Math.sin(theta) * TERRITORY_YSQUASH;
+    // Info chip opens toward the field interior so it never runs off an edge.
+    const side = x > 62 ? "left" : x < 30 ? "right" : "up";
+    return {
+      ...loc,
+      slug: terrSlug(`${c.country}-${loc.name}`),
+      x: Math.round(x * 100) / 100,
+      y: Math.round(y * 100) / 100,
+      side,
+    };
+  });
+  return { ...c, slug: terrSlug(c.country), cx: cfg.cx, cy: cfg.cy, locations };
+});
+
+// Decorative hairline contour arcs between the cluster centers (quadratic
+// béziers in the same 0–100 percentage space; the SVG uses
+// preserveAspectRatio="none" so they map straight onto the field). Low-alpha,
+// aria-hidden — pure connective linework, no data.
+const TERRITORY_ARCS = [
+  "M20,33 Q37,12 55,30", // Colorado → Switzerland (the transatlantic bridge)
+  "M55,30 Q76,43 82,63", // Switzerland → Italy (the Alps hop)
+  "M20,33 Q9,56 20,79", // Colorado → New Mexico (the home column)
+];
+const AA_HREF = p.aaFunnel.cta.href; // same operator portfolio URL as the gallery (P12.4b)
+const outingWord = (n: number) => (n === 1 ? "OUTING" : "OUTINGS");
 
 // Ambient reel: SKIPPED by default (DIRECTION §2.3) — the on-disk loop
 // candidates were unverified content. The section renders only if a real reel
@@ -77,6 +141,105 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
       <hr class="flight-line mb-6" aria-hidden="true" />
       <h2 class="text-2xl font-bold" data-reveal>{p.territory.heading}</h2>
       <p class="text-ink" data-reveal>{p.territory.body}</p>
+
+      {/* ── P12.4c — THE TERRITORY constellation ──────────────────────────────
+          A clickable location-dots map that ILLUSTRATES the copy above: where
+          the operator has actually shot, in outings. No new claim sentences —
+          every string here is functional data/labels (country + location names,
+          outing counts, "License this work →").
+
+          Progressive enhancement model:
+            • Base (no-JS / reduced motion): every location is rendered and
+              visible — the constellation reads as a static star map, nothing
+              needs a click to be seen. Chips (with the license link) reveal on
+              hover / focus so keyboard + no-JS users can still reach the link.
+            • Enhanced (html.js, motion allowed): the interaction script adds
+              `.terr--live`, which collapses each country's locations. Clicking a
+              country node sprays its dots out (staggered); clicking another
+              country collapses the previous. Clicking a location dot opens its
+              info chip. All controls are real <button>s with aria-expanded.
+
+          The <ul> structure IS the plain accessible list the spec asks for:
+          country → its locations, each a labelled control with a real license
+          link. Under no-JS it renders fully expanded, so it doubles as the
+          screen-reader / no-JS fallback list. The decorative SVG arcs are
+          aria-hidden. */}
+      <figure class="terr" data-reveal aria-labelledby="terr-kicker">
+        <figcaption id="terr-kicker" class="terr-kicker hud-label">
+          {TERRITORY_TOTALS.outings} OUTINGS · 3 COUNTRIES
+        </figcaption>
+        <p class="sr-only">
+          Where this work was shot, by number of outings. Expand a country to
+          list its locations; each links out to the licensing portfolio.
+        </p>
+        <div class="terr-field">
+          <svg
+            class="terr-arcs"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            {TERRITORY_ARCS.map((d) => <path class="terr-arc" d={d} />)}
+          </svg>
+          <ul class="terr-clusters">
+            {
+              territory.map((c) => (
+                <li class="terr-cluster" style={`--cx:${c.cx};--cy:${c.cy}`} data-country={c.country}>
+                  <button
+                    type="button"
+                    class="terr-country"
+                    aria-expanded="true"
+                    aria-controls={`terr-locs-${c.slug}`}
+                    aria-label={`${c.country}, ${c.outings} outings across ${c.locations.length} locations`}
+                  >
+                    <span class="terr-dot" aria-hidden="true" />
+                    <span class="terr-country-label">
+                      {c.label} · {c.outings} {outingWord(c.outings)}
+                    </span>
+                  </button>
+                  <ul class="terr-locations" id={`terr-locs-${c.slug}`}>
+                    {c.locations.map((loc, i) => (
+                      <li
+                        class="terr-loc"
+                        style={`--lx:${loc.x};--ly:${loc.y};--i:${i}`}
+                        data-side={loc.side}
+                      >
+                        <button
+                          type="button"
+                          class="terr-loc-node"
+                          aria-expanded="false"
+                          aria-controls={`terr-chip-${loc.slug}`}
+                          aria-label={`${loc.name}, ${loc.outings} ${loc.outings === 1 ? "outing" : "outings"}`}
+                        >
+                          <span class="terr-loc-dot" aria-hidden="true" />
+                          <span class="terr-loc-label" aria-hidden="true">
+                            {loc.name} · {loc.outings}
+                          </span>
+                        </button>
+                        <span class="terr-chip" id={`terr-chip-${loc.slug}`} role="group">
+                          <span class="terr-chip-name">{loc.name}</span>
+                          <span class="terr-chip-count hud-label">
+                            {loc.outings} {outingWord(loc.outings)}
+                          </span>
+                          <a
+                            class="terr-chip-link link"
+                            href={AA_HREF}
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            License this work <span class="arrow" aria-hidden="true">→</span>
+                          </a>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </figure>
     </section>
 
     <!-- A3 — Licensed vs Personal nesting -->
@@ -214,4 +377,60 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
     const open = note.classList.toggle("is-open");
     btn.setAttribute("aria-expanded", String(open));
   });
+
+  // ── P12.4c — THE TERRITORY constellation interaction ─────────────────────
+  // Pure progressive enhancement over the static (all-expanded) base. Under
+  // reduced motion we do NOTHING: every location stays rendered so nothing
+  // needs a click to be seen (the country nodes keep aria-expanded="true" from
+  // the markup, matching the visible state). With motion allowed we add
+  // `.terr--live`, which lets the CSS collapse each country's locations; the
+  // handlers below spray one country's dots at a time and toggle info chips.
+  (() => {
+    const terr = document.querySelector<HTMLElement>(".terr");
+    if (!terr) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const clusters = Array.from(terr.querySelectorAll<HTMLElement>(".terr-cluster"));
+
+    // Enter the live (collapsible) mode and start every country collapsed.
+    terr.classList.add("terr--live");
+    clusters.forEach((cl) => {
+      cl.classList.remove("is-open");
+      cl.querySelector<HTMLElement>(".terr-country")?.setAttribute("aria-expanded", "false");
+    });
+
+    const closeChips = (keep?: Element | null) =>
+      terr.querySelectorAll<HTMLElement>('.terr-loc-node[aria-expanded="true"]').forEach((n) => {
+        if (n !== keep) n.setAttribute("aria-expanded", "false");
+      });
+
+    terr.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+
+      // Country node → expand its locations, collapse every other country.
+      const country = target.closest<HTMLElement>(".terr-country");
+      if (country) {
+        const cluster = country.closest<HTMLElement>(".terr-cluster");
+        const willOpen = country.getAttribute("aria-expanded") !== "true";
+        clusters.forEach((cl) => {
+          const open = cl === cluster && willOpen;
+          cl.classList.toggle("is-open", open);
+          cl.querySelector<HTMLElement>(".terr-country")?.setAttribute(
+            "aria-expanded",
+            String(open),
+          );
+        });
+        closeChips(); // any open chip belonged to a country we may have just collapsed
+        return;
+      }
+
+      // Location dot → toggle its info chip (only one chip open at a time).
+      const loc = target.closest<HTMLElement>(".terr-loc-node");
+      if (loc) {
+        const open = loc.getAttribute("aria-expanded") !== "true";
+        closeChips(open ? loc : null);
+        loc.setAttribute("aria-expanded", String(open));
+      }
+    });
+  })();
 </script>
