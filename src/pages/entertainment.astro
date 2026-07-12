@@ -49,7 +49,6 @@ const pair = (relBase: string) => {
 
 // chapter 01 — PitchBoulder (E3, the primary proof anchor)
 const pbPoster = pair("work/pitchboulder/hook-poster");
-const pbContext = pair("work/pitchboulder/context");
 const pbLoop = media("work/pitchboulder/loop.mp4"); // P13c — hover-video on the tall card
 // chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room).
 // P13c — real stills replace the frame-grabs: on-set (crew filming the car,
@@ -61,11 +60,8 @@ const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
 const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-900");
 const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-900");
 const shLoop = media("work/shelby-pebble-beach/loop.mp4"); // P13c — hover-video on the wide card
-// the rooms — honest published event frames (SeriesFest panel, AFM panel).
-// P14b — these two industry frames were re-shot to wider, crop-tolerant Tier-1
-// stage shots (the AFM logo + SeriesFest branding now survive the card crops).
 // mtime cache-bust (same mechanism as PortalHero/Tableaux) so a returning
-// browser pulls the new frames instead of a cached stale crop.
+// browser pulls fresh crops instead of a cached stale one.
 const mtimeV = (rel: string) => {
   try {
     return `?v=${Math.round(statSync(join(mediaRoot, ...rel.split("/"))).mtimeMs).toString(36)}`;
@@ -80,8 +76,16 @@ const bust = (relBase: string, p: ReturnType<typeof pair>) =>
         webp: p.webp ? p.webp + mtimeV(`${relBase}.webp`) : undefined,
       }
     : undefined;
-const roomSeries = bust("home/industry/background", pair("home/industry/background"));
-const roomAfm = bust("home/industry/midground", pair("home/industry/midground"));
+
+// P12.6b — chapter 01 collage enriched with real PitchBoulder event photos
+// (operator: "there's a lot of photos please use them, make it visually
+// compelling"). Exported by scripts/make-pitchboulder-collage.mjs from his
+// hand-curated Tier-1 set: a logo-forward presenter frame (the big card), a
+// wide room-energy frame, and a clean podium moment — cache-busted like the
+// rooms photos so a returning browser pulls fresh crops.
+const pbPresenter = bust("work/pitchboulder/presenter-logo-1600", pair("work/pitchboulder/presenter-logo-1600"));
+const pbRoom = bust("work/pitchboulder/room-wide-900", pair("work/pitchboulder/room-wide-900"));
+const pbPodium = bust("work/pitchboulder/podium-900", pair("work/pitchboulder/podium-900"));
 
 // the pebble-beach proof (with its owner-endorsement context) relocates from
 // the rooms list to chapter 02; the remaining rooms keep the list.
@@ -89,9 +93,8 @@ const pebbleRoom = p.rooms.items.find((r) => r.proof.relationshipId === "pebble-
 const otherRooms = p.rooms.items.filter((r) => r.proof.relationshipId !== "pebble-beach");
 
 // scattered ghost letters are drawn FROM the page's own words (presentational
-// letterforms, not new copy): the hero scatters PULSE, the rooms scatter ROOMS.
+// letterforms, not new copy): the hero scatters STORY.
 const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories"
-const roomsGhost = ["R", "O", "O", "M", "S"];
 
 // P13c — the coverage index: editorial tiles to the published venture stories.
 // slate + title strings are COPIED VERBATIM from each article page's own
@@ -107,6 +110,37 @@ const coverage = [
   // article page's own frontmatter; reuse adds no new copy here).
   { href: "/venture/meme", slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION", title: "The most formal role I hold in this world." },
 ];
+
+// P12.6b — the STORY RAIL cards: the coverage stories PLUS the emerging film
+// venture, as one user-driven horizontal carousel (operator's idea — no
+// auto-rotate). Each card resolves its own hero frame; the conceptual cards
+// (amazing-aerial, MEME, and the film venture) have no event export, so they
+// render as ghost-letter cards in the chapter-03 typographic style.
+const railGhosts: Record<string, string> = {
+  "amazing-aerial": "AERIAL",
+  meme: "MEME",
+  "makeshift-film-group": "MAKESHIFT",
+};
+// The film-venture card mirrors its page's HELD-FROM-PUBLISH interlock (see
+// /venture/makeshift-film-group.astro): that page builds as a redirect until
+// the operator (1) updates the honesty ledger and (2) builds with
+// PUBLISH_MFG=true — so the card only renders under the SAME condition, else
+// its "Read the story" button would bounce visitors back to this page.
+const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
+const mfgCard = PUBLISH_MFG
+  ? [
+      // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only until read.
+      // HONESTY NOTE: the entity's full name is a hard-excluded audit term
+      // (scripts/audit-lib.mjs FORBIDDEN_TERMS), so the visible slate + title
+      // deliberately avoid it; only the hyphenated href (audit-safe) carries
+      // the route. Operator to confirm the naming and whether that exclusion lifts.
+      { href: "/venture/makeshift-film-group", slate: "MAKESHIFT", title: "A film venture, taking shape." },
+    ]
+  : [];
+const railCards = [...coverage, ...mfgCard].map((c) => {
+  const slug = c.href.replace(/^\/venture\//, "");
+  return { ...c, slug, img: bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`)), ghost: railGhosts[slug] };
+});
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.
 // P13c — meme ground removed (the S2 statement is now chapter 03); ch03 added.
@@ -171,11 +205,36 @@ const GROUNDS = {
             )
           }
           {
-            pbContext && (
+            /* P12.6b — real event photos ring the tall video card: the
+               logo-forward presenter frame leads (wide), a room-energy frame and
+               a podium moment tuck into the lower corners. */
+          }
+          {
+            pbPresenter && (
               <figure class="im-card im-card--wide" data-im-card data-depth="0.7">
                 <picture>
-                  {pbContext.avif && <source srcset={pbContext.avif} type="image/avif" />}
-                  <img src={pbContext.webp ?? pbContext.avif} alt="" loading="lazy" decoding="async" />
+                  {pbPresenter.avif && <source srcset={pbPresenter.avif} type="image/avif" />}
+                  <img src={pbPresenter.webp ?? pbPresenter.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            pbRoom && (
+              <figure class="im-card im-card--small" data-im-card data-depth="1.6">
+                <picture>
+                  {pbRoom.avif && <source srcset={pbRoom.avif} type="image/avif" />}
+                  <img src={pbRoom.webp ?? pbRoom.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            pbPodium && (
+              <figure class="im-card im-card--smallb" data-im-card data-depth="1.1">
+                <picture>
+                  {pbPodium.avif && <source srcset={pbPodium.avif} type="image/avif" />}
+                  <img src={pbPodium.webp ?? pbPodium.avif} alt="" loading="lazy" decoding="async" />
                 </picture>
               </figure>
             )
@@ -194,8 +253,12 @@ const GROUNDS = {
           <div class="im-quote">
             <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
           </div>
-          <a href={`${base}${p.pitchboulder.link.href}`} class="link">
-            {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
+          {/* P12.6b — the unmissable story CTA (operator: the old links were
+              "so buried people just scroll past"). ⚠ OPERATOR READ-APPROVAL
+              REQUIRED — new copy "Read the full story", staging-only until read. */}
+          <a href={`${base}/work/pitchboulder`} class="im-cta">
+            <span class="im-cta-label">Read the full story</span>
+            <span class="im-cta-arrow" aria-hidden="true">→</span>
           </a>
         </div>
       </div>
@@ -255,8 +318,11 @@ const GROUNDS = {
           {pebbleRoom && <LegendMark proof={pebbleRoom.proof} />}
           {
             shelby?.href && (
-              <a href={`${base}${shelby.href}`} class="link">
-                {p.pitchboulder.link.label} <span class="arrow" aria-hidden="true">→</span>
+              /* P12.6b — same unmissable story CTA. ⚠ OPERATOR READ-APPROVAL
+                 REQUIRED — new copy "Read the full story", staging-only. */
+              <a href={`${base}${shelby.href}`} class="im-cta">
+                <span class="im-cta-label">Read the full story</span>
+                <span class="im-cta-arrow" aria-hidden="true">→</span>
               </a>
             )
           }
@@ -279,70 +345,84 @@ const GROUNDS = {
         </div>
         <div class="im-chapter-meta" data-reveal>
           <LegendMark proof={p.meme.proof} />
-          <a href="https://www.meme.ngo" rel="noopener" target="_blank" class="link">
+          {/* P12.6b — MEME gets the primary story CTA (→ its venture story) plus
+              a secondary text link out to the org. ⚠ OPERATOR READ-APPROVAL
+              REQUIRED — new copy "Read the full story", staging-only until read. */}
+          <a href={`${base}/venture/meme`} class="im-cta">
+            <span class="im-cta-label">Read the full story</span>
+            <span class="im-cta-arrow" aria-hidden="true">→</span>
+          </a>
+          <a href="https://www.meme.ngo" rel="noopener" target="_blank" class="link im-cta-secondary">
             About the organization <span class="arrow" aria-hidden="true">→</span>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- ═══ S4 · THE ROOMS — her playground, his honest list ═══ -->
-    <section class="im-sec im-rooms" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
+    <!-- ═══ S4 · THE STORY RAIL — the venture stories as a user-driven carousel
+         (operator's idea; no auto-rotate). Native overflow-x + scroll-snap works
+         with ZERO JS (native swipe on touch); a pointer-drag enhancement and a
+         "drag →" affordance layer on top for fine pointers. Replaces the retired
+         "rooms" list + coverage grid — the same stories, one honest rail. ═══ -->
+    <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
       <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
-        {roomsGhost.map((ch, i) => <span class="im-ghost im-ghost--room" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
         <span class="im-confetti" data-im-confetti style="--ci:0"></span>
         <span class="im-confetti" data-im-confetti style="--ci:1"></span>
         <span class="im-confetti" data-im-confetti style="--ci:2"></span>
         <span class="im-confetti" data-im-confetti style="--ci:3"></span>
       </div>
-      <p class="hud-label im-kicker" data-reveal>{p.rooms.heading}</p>
-      <p class="im-turn im-rooms-intro" data-reveal>{p.rooms.intro}</p>
-      <div class="im-rooms-stage">
-        <ul class="im-rooms-list">
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (kicker + intro),
+          staging-only until read. */}
+      <p class="hud-label im-kicker" data-reveal>More venture stories</p>
+      <p class="im-turn im-rail-intro" data-reveal>
+        More of the industry I stay close to — each one marked at exactly what it is.
+      </p>
+
+      <div class="im-rail-wrap">
+        <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
+        <ul class="im-rail" data-im-rail>
           {
-            otherRooms.map((room) => (
-              <li class="im-room" data-reveal data-reveal-stagger="80">
-                <LegendMark proof={room.proof} />
+            railCards.map((c) => (
+              <li class="im-rail-card">
+                <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
+                  <span class="im-rail-media">
+                    {c.img ? (
+                      <picture>
+                        {c.img.avif && <source srcset={c.img.avif} type="image/avif" />}
+                        <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" />
+                      </picture>
+                    ) : (
+                      <span class="im-rail-ghost">{c.ghost ?? ""}</span>
+                    )}
+                  </span>
+                  <span class="im-rail-slate hud-label">{c.slate}</span>
+                  <span class="im-rail-title im-turn">{c.title}</span>
+                  {/* decorative — the WHOLE card is the link. ⚠ OPERATOR
+                      READ-APPROVAL REQUIRED — new copy "Read the story". */}
+                  <span class="im-cta im-cta--sm im-rail-cta">
+                    <span class="im-cta-label">Read the story</span>
+                    <span class="im-cta-arrow" aria-hidden="true">→</span>
+                  </span>
+                </a>
               </li>
             ))
           }
         </ul>
-        <div class="im-rooms-photos" aria-hidden="true">
-          {
-            roomSeries && (
-              <figure class="im-card im-card--wide" data-im-card data-depth="0.8">
-                <picture>
-                  {roomSeries.avif && <source srcset={roomSeries.avif} type="image/avif" />}
-                  <img src={roomSeries.webp ?? roomSeries.avif} alt="" loading="lazy" decoding="async" />
-                </picture>
-              </figure>
-            )
-          }
-          {
-            roomAfm && (
-              <figure class="im-card im-card--small" data-im-card data-depth="1.5">
-                <picture>
-                  {roomAfm.avif && <source srcset={roomAfm.avif} type="image/avif" />}
-                  <img src={roomAfm.webp ?? roomAfm.avif} alt="" loading="lazy" decoding="async" />
-                </picture>
-              </figure>
-            )
-          }
-        </div>
       </div>
-      <!-- P13c — the coverage index: editorial tiles to the published venture
-           stories, replacing the P12.8 one-off seriesfest link. -->
-      <nav class="im-coverage" aria-label="Venture coverage">
+
+      <!-- the honesty proofs that lived in the rooms list: seriesfest + afm
+           folded here as a compact list; workshop-coverage stays an UNLINKED
+           line (no article behind it, its subject excluded). Verbatim
+           permittedPhrasing via LegendMark — no new wording. -->
+      <ul class="im-rail-proofs" aria-label="How close each relationship is">
         {
-          coverage.map((c) => (
-            <a class="im-cov" href={`${base}${c.href}`} data-reveal data-reveal-stagger="60">
-              <span class="im-cov-slate hud-label">{c.slate}</span>
-              <span class="im-cov-title im-turn">{c.title}</span>
-              <span class="im-cov-arrow arrow" aria-hidden="true">→</span>
-            </a>
+          otherRooms.map((room) => (
+            <li data-reveal data-reveal-stagger="70">
+              <LegendMark proof={room.proof} />
+            </li>
           ))
         }
-      </nav>
+      </ul>
       <div class="im-key" data-reveal><LegendKey /></div>
     </section>
 
@@ -519,6 +599,9 @@ const GROUNDS = {
   .im-card--tall { width: clamp(160px, 22vw, 320px); aspect-ratio: 9 / 14; left: 4%; top: 6%; }
   .im-card--wide { width: clamp(240px, 34vw, 520px); aspect-ratio: 16 / 10; right: 2%; top: 14%; }
   .im-card--small { width: clamp(130px, 16vw, 240px); aspect-ratio: 4 / 3; left: 18%; bottom: 4%; }
+  /* P12.6b — fourth collage slot (ch01), tucked into the lower-right corner so
+     the four photos ring the centered title without crowding it. */
+  .im-card--smallb { width: clamp(120px, 15vw, 220px); aspect-ratio: 4 / 3; right: 5%; bottom: 6%; }
   .im-chapter-type {
     position: relative;
     z-index: 2;
@@ -549,23 +632,191 @@ const GROUNDS = {
     font-style: italic;
   }
 
-  /* ── S4 rooms ── */
-  .im-rooms {
+  /* ── P12.6b · the shared "story CTA" — one bold, unmissable treatment used
+     below every chapter's text block and (smaller) on every rail card. Space
+     Mono caps, ≥44px tall, arrow slides 6px + subtle accent fill on hover. ── */
+  .im-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    width: fit-content;
+    padding: 0.85rem 1.5rem;
+    border: 1px solid color-mix(in srgb, #ffffff 32%, transparent);
+    border-radius: 4px;
+    background: color-mix(in srgb, #ffffff 3%, transparent);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #f2f4f8;
+    text-decoration: none;
+    transition:
+      background 320ms var(--ease-survey, ease),
+      border-color 320ms ease;
+  }
+  .im-cta:hover,
+  .im-cta:focus-visible {
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 16%, transparent);
+    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 62%, transparent);
+  }
+  .im-cta-arrow {
+    color: var(--color-accent, #38f8ec);
+    font-size: 1.05em;
+    transition: transform 320ms var(--ease-survey, ease);
+  }
+  .im-cta:hover .im-cta-arrow,
+  .im-cta:focus-visible .im-cta-arrow {
+    transform: translateX(6px);
+  }
+  /* the MEME secondary link sits quiet under its primary button */
+  .im-cta-secondary {
+    font-size: 0.9rem;
+    justify-self: start;
+  }
+  /* smaller scale for the story-rail cards */
+  .im-cta--sm {
+    min-height: 40px;
+    padding: 0.55rem 1rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    gap: 0.7rem;
+  }
+
+  /* ── P12.6b · S4 THE STORY RAIL — the coverage stories as a user-driven
+     horizontal carousel. Native overflow-x + scroll-snap (no-JS baseline);
+     pointer-drag + "drag →" hint enhance on top. ── */
+  .im-rail-sec {
     min-height: 100svh;
-    padding: 9rem clamp(2rem, 7vw, 8rem);
+    padding: 9rem clamp(1.5rem, 6vw, 8rem);
     display: grid;
+    /* minmax(0, 1fr) is load-bearing: without the 0 min-track, the flex rail's
+       content width (all cards) would blow the column — and the page — wide.
+       This pins the column to the section width so the rail scrolls instead. */
+    grid-template-columns: minmax(0, 1fr);
     align-content: center;
-    gap: 1.6rem;
+    gap: 1.4rem;
   }
-  .im-ghost--room {
-    font-size: clamp(4.5rem, 11vw, 10rem);
-    color: color-mix(in srgb, #ffffff 6%, transparent);
+  .im-rail-intro {
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    max-width: 44rem;
   }
-  .im-ghosts--rooms .im-ghost:nth-child(1) { left: 8%; top: 10%; }
-  .im-ghosts--rooms .im-ghost:nth-child(2) { left: 30%; top: 20%; }
-  .im-ghosts--rooms .im-ghost:nth-child(3) { left: 52%; top: 8%; }
-  .im-ghosts--rooms .im-ghost:nth-child(4) { left: 70%; top: 18%; }
-  .im-ghosts--rooms .im-ghost:nth-child(5) { left: 86%; top: 10%; }
+  .im-rail-wrap {
+    position: relative;
+    margin-top: 0.6rem;
+    min-width: 0; /* let the wrap shrink to the column, so overflow-x can scroll */
+  }
+  .im-rail-hint {
+    position: absolute;
+    right: 0.2rem;
+    top: -1.7rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #e8f6f3 55%, transparent);
+  }
+  .im-rail {
+    display: flex;
+    gap: 1.1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 1.4rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, #ffffff 22%, transparent) transparent;
+  }
+  /* JS marks the rail draggable on fine pointers (grab cursor); dragging kills
+     snap so the throw feels direct. */
+  .im-rail.is-draggable { cursor: grab; }
+  .im-rail.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+  .im-rail-card {
+    flex: 0 0 clamp(240px, 78vw, 336px); /* one card + a peek on ~390px screens */
+    scroll-snap-align: start;
+  }
+  .im-rail-link {
+    display: grid;
+    gap: 0.7rem;
+    height: 100%;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, #ffffff 13%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, #ffffff 2.5%, transparent);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 380ms var(--ease-survey, ease),
+      border-color 380ms ease,
+      background 380ms ease;
+  }
+  .im-rail-link:hover,
+  .im-rail-link:focus-visible {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, #ffffff 30%, transparent);
+    background: color-mix(in srgb, #ffffff 5%, transparent);
+  }
+  .im-rail-media {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border-radius: 6px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 6%, transparent);
+  }
+  .im-rail-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* typographic (ghost-letter) card — chapter-03 style for the conceptual
+     stories that have no event photo (AERIAL / MEME / the film venture). */
+  .im-rail-ghost {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 5.5vw, 2.9rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: color-mix(in srgb, #ffffff 16%, transparent);
+  }
+  .im-rail-slate {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: color-mix(in srgb, #e8f6f3 72%, transparent);
+  }
+  .im-rail-title {
+    font-size: clamp(1.1rem, 1.5vw, 1.32rem);
+    line-height: 1.24;
+  }
+  .im-rail-cta {
+    margin-top: 0.2rem;
+    pointer-events: none; /* decorative; the card <a> owns the click */
+  }
+  /* the card-link hover drives its decorative CTA (fill + 6px arrow slide) */
+  .im-rail-link:hover .im-cta,
+  .im-rail-link:focus-visible .im-cta {
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 16%, transparent);
+    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 62%, transparent);
+  }
+  .im-rail-link:hover .im-cta-arrow,
+  .im-rail-link:focus-visible .im-cta-arrow {
+    transform: translateX(6px);
+  }
+  .im-rail-proofs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 2.2rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.6rem 0 0;
+  }
+
+  /* ── S4 story-rail ambient: confetti drift (abstract shapes, kept quiet —
+     the retired "rooms" ghost letters + list/coverage styles are gone). ── */
   .im-confetti {
     position: absolute;
     width: clamp(34px, 4vw, 64px);
@@ -578,80 +829,8 @@ const GROUNDS = {
   .im-confetti:nth-of-type(2) { left: 44%; top: 34%; background: #0da79b; }
   .im-confetti:nth-of-type(3) { left: 66%; top: 44%; background: #8fb7d8; }
   .im-confetti:nth-of-type(4) { left: 88%; top: 36%; }
-  .im-rooms-intro {
-    font-size: clamp(1.3rem, 2vw, 1.7rem);
-  }
-  .im-rooms-stage {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 3rem;
-    align-items: start;
-    margin-top: 1.5rem;
-  }
-  .im-rooms-list {
-    display: grid;
-    gap: 1.4rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .im-room {
-    border-top: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    padding-top: 1.1rem;
-  }
-  .im-room-story {
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
-  .im-rooms-photos {
-    position: relative;
-    min-height: 380px;
-  }
-  .im-rooms-photos .im-card--wide { width: 100%; right: 0; top: 0; position: absolute; }
-  .im-rooms-photos .im-card--small { left: -6%; bottom: -8%; }
   .im-key {
     margin-top: 2rem;
-  }
-
-  /* ── P13c coverage index — editorial tiles, im- voice, hover lift ── */
-  .im-coverage {
-    margin-top: 3rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    gap: 1rem;
-  }
-  .im-cov {
-    position: relative;
-    display: grid;
-    gap: 0.5rem;
-    padding: 1.3rem 1.4rem;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition:
-      transform 380ms var(--ease-survey, ease),
-      border-color 380ms ease,
-      background 380ms ease;
-  }
-  .im-cov:hover,
-  .im-cov:focus-visible {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, #ffffff 30%, transparent);
-    background: color-mix(in srgb, #ffffff 4%, transparent);
-  }
-  .im-cov-slate {
-    font-size: 0.62rem;
-    letter-spacing: 0.22em;
-    color: color-mix(in srgb, #e8f6f3 72%, transparent);
-  }
-  .im-cov-title {
-    font-size: clamp(1.15rem, 1.7vw, 1.45rem);
-    line-height: 1.22;
-  }
-  .im-cov-arrow {
-    color: var(--color-accent, #38f8ec);
-    font-size: 0.9rem;
   }
 
   /* ── S5 handoff ── */
@@ -673,12 +852,14 @@ const GROUNDS = {
     .im-line--push { transform: none; }
     .im-intro-sub { justify-self: center; text-align: center; }
     .im-collage { position: relative; inset: auto; display: grid; gap: 0.8rem; grid-template-columns: 1fr 1fr; margin-bottom: 2rem; pointer-events: auto; }
-    .im-card, .im-rooms-photos .im-card--wide { position: relative; inset: auto; width: 100%; }
+    .im-card { position: relative; inset: auto; width: 100%; }
     .im-chapter { min-height: 0; padding-top: 6rem; }
     .im-chapter-stage { min-height: 0; }
-    .im-rooms-stage { grid-template-columns: 1fr; }
-    .im-rooms-photos { min-height: 0; display: grid; gap: 0.8rem; }
     .im-ghost { display: none; }
+  }
+  /* mobile: the rail cards give a touch more peek on the smallest screens */
+  @media (max-width: 480px) {
+    .im-rail-card { flex-basis: 82vw; }
   }
   @media (prefers-reduced-motion: reduce) {
     .im-ghost,
@@ -687,8 +868,14 @@ const GROUNDS = {
       transform: none !important;
     }
     .im-loop,
-    .im-cov {
+    .im-cta,
+    .im-cta-arrow,
+    .im-rail-link {
       transition: none;
+    }
+    .im-cta:hover .im-cta-arrow,
+    .im-rail-link:hover .im-cta-arrow {
+      transform: none;
     }
   }
 </style>
@@ -810,5 +997,54 @@ const GROUNDS = {
         if (!video.paused) video.pause();
       });
     });
+  })();
+
+  // P12.6b story-rail: pointer-drag-to-scroll on fine pointers (desktop). Touch
+  // devices use the browser's native swipe — this only enhances mouse/trackpad,
+  // where there's otherwise no drag. Fully optional: no-JS keeps native overflow
+  // scroll + snap. A drag past ~4px suppresses the ending click so a throw never
+  // navigates. User-driven, so it runs under reduced motion too (no auto-motion).
+  (() => {
+    const rail = document.querySelector<HTMLElement>("[data-im-rail]");
+    if (!rail) return;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!fine) return; // touch = native swipe
+    rail.classList.add("is-draggable");
+    let down = false;
+    let moved = false;
+    let startX = 0;
+    let startScroll = 0;
+    rail.addEventListener("pointerdown", (e) => {
+      down = true;
+      moved = false;
+      startX = e.clientX;
+      startScroll = rail.scrollLeft;
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) moved = true;
+      rail.scrollLeft = startScroll - dx;
+      if (moved) rail.classList.add("is-dragging");
+    });
+    const end = () => {
+      if (!down) return;
+      down = false;
+      rail.classList.remove("is-dragging");
+    };
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
+    // swallow the click that terminates a real drag (capture phase, before the
+    // card link navigates) — a plain click still passes through untouched.
+    rail.addEventListener(
+      "click",
+      (e) => {
+        if (moved) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      },
+      true,
+    );
   })();
 </script>

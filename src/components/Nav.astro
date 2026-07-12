@@ -22,7 +22,7 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
     without JS it stays visible and wraps, imperfect but fully functional.
   -->
   <nav aria-label="Primary" data-nav-links>
-    <ul class="flex flex-wrap gap-5">
+    <ul class="nav-links flex flex-wrap gap-x-4 gap-y-2 xl:gap-5">
       {
         NAV.map((item) => {
           const isCurrent = path === item.href || path.startsWith(`${item.href}/`);
@@ -55,3 +55,36 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
     <span class="bar" aria-hidden="true"></span>
   </button>
 </header>
+
+<style>
+  /* P12.6b — the appended "Stories" nav labels lengthen the inline desktop row.
+     The inline list goes live at ≥1024px (MobileMenu collapses it below that),
+     so in the tight 1024–1279 band we compress the whole header — nav tracking +
+     size, the wordmark, and the header's own gap/padding — enough that logo +
+     the six full labels + the CTA all hold ONE row instead of wrapping. Labels
+     stay full per operator; only spacing shrinks. Everything eases back to the
+     system voice once there's room at ≥1280px. */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    header {
+      padding-inline: 0.9rem;
+      column-gap: 0.7rem;
+    }
+    /* the wordmark next to the logo mark */
+    header > a > span {
+      font-size: 1rem;
+    }
+    .nav-links {
+      column-gap: 0.7rem;
+    }
+    .nav-links .hud-label {
+      letter-spacing: 0.04em;
+      font-size: 0.62rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .nav-links .hud-label {
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+    }
+  }
+</style>

@@ -125,7 +125,7 @@ const filters = [
           const Tag = item.href ? "a" : "div";
           return (
             <Tag
-              class={`wtile wtile--${shape}`}
+              class={`wtile wtile--${shape}${item.href ? " wtile--link" : ""}`}
               href={item.href ? `${base}${item.href}` : undefined}
               data-pillar={item.pillar}
               data-reveal
@@ -157,8 +157,15 @@ const filters = [
                 <span class="wtile-line">
                   For {item.forOrg} · {item.what} — {item.engagement}
                 </span>
-                {item.href && <span class="wtile-cta">See the work →</span>}
               </figcaption>
+              {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible CTA label "Read the story",
+                  staging-only. Pulled OUT of the hover-hidden meta strip so the click-through
+                  is always visible (mobile has no hover), as a bordered mono button. */}
+              {item.href && (
+                <span class="wtile-cta">
+                  Read the story <span class="arrow" aria-hidden="true">→</span>
+                </span>
+              )}
             </Tag>
           );
         })
@@ -340,13 +347,65 @@ const filters = [
     color: rgba(238, 245, 250, 0.72);
     line-height: 1.35;
   }
+  /* the click-through: a bordered mono button, ALWAYS visible (not a hover
+     state — mobile has no hover), pinned bottom-right with its own backdrop so
+     it stays legible over any frame. Shared button grammar: 1px border, Space
+     Mono caps, arrow slides 6px on hover, accent hover. */
   .wtile-cta {
-    margin-top: 4px;
+    position: absolute;
+    z-index: 3;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, #090c13 74%, transparent);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     font-family: var(--font-mono);
     font-size: 0.62rem;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-accent, #38f8ec);
+    color: #eef5fa;
+    text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .wtile-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  /* reserve the button's corner so the attribution line never runs under it */
+  .wtile--link .wtile-meta {
+    padding-right: 10.5rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wtile:hover .wtile-cta,
+    .wtile:focus-visible .wtile-cta {
+      border-color: var(--color-accent, #38f8ec);
+      color: var(--color-accent, #38f8ec);
+      box-shadow: 0 0 20px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
+    }
+    .wtile:hover .wtile-cta .arrow,
+    .wtile:focus-visible .wtile-cta .arrow {
+      transform: translateX(6px);
+    }
+  }
+  @media (max-width: 640px) {
+    .wtile--link .wtile-meta {
+      padding-right: 9rem; /* reserve the pinned button's corner on narrow tiles */
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wtile-cta .arrow {
+      transition: none;
+    }
   }
   @media (hover: hover) and (pointer: fine) {
     .wtile-meta {

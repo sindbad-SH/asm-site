@@ -1,24 +1,27 @@
 ---
 /**
- * /venture/amazing-aerial — P13g: the agency story. UNLIKE the coverage
- * articles (whose prose is assembled from the operator's _ABOUT.md files),
- * this one was WRITTEN BY THE ORCHESTRATOR in the operator's voice at his
- * explicit direction ("feel free to just kind of use my voice that you kind
- * of have identified over us building stuff and just go ahead with it").
+ * /venture/amazing-aerial — P13g → company-page treatment. UNLIKE the coverage
+ * articles (whose prose is assembled from the operator's _ABOUT.md files), this
+ * one was WRITTEN BY THE ORCHESTRATOR in the operator's voice at his explicit
+ * direction ("feel free to just kind of use my voice… and just go ahead").
  *
- * ⚠ OPERATOR READ-APPROVAL REQUIRED — every sentence in ARTICLE below is
- * new copy. Staging-only until he reads it. Fact base he supplied
- * (2026-07-08): first conversation with founder Paul came through LinkedIn
- * in June 2024; about a month of talking; an official agent by mid-2024
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — the three ARTICLE paragraphs below are new
+ * copy (staging-only until read). They are KEPT VERBATIM from the P13g approval
+ * queue — the company-page expansion does NOT rewrite them. Fact base he
+ * supplied (2026-07-08): first conversation with founder Paul came through
+ * LinkedIn in June 2024; about a month of talking; an official agent by mid-2024
  * ("they're my agency"). Everything else stays inside the LOCKED permitted
- * phrasing: contributor/licensed-through — never "represented exclusively",
- * never ownership.
+ * phrasing: contributor / licensed-through / "an official agent with the
+ * collection" — never "represented exclusively", never ownership.
  *
- * Media: the article reuses the EXISTING licensed adventure-gallery exports
- * (the dual-brand AA+ASM watermarked teasers) — the watermarks aren't a
- * compromise here, they ARE the story: this is what agency licensing looks
- * like. The funnel runs both directions: their site, his portfolio, and
- * back into /adventure.
+ * P-company additions (also read-approval-gated, but labels/facts ONLY — no new
+ * sentences): a logo lockup (the real AA mark, nominative editorial use the
+ * operator authorized), a facts row whose chips are each a fact already present
+ * verbatim in the article/slate, and a fuller photo COLLAGE. The photos reuse
+ * the EXISTING licensed adventure-gallery exports (dual-brand AA+ASM watermarked
+ * teasers) — the watermarks aren't a compromise, they ARE the story: this is
+ * what agency licensing looks like. The band caption is the LOCKED permitted
+ * phrasing from consts, verbatim.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
@@ -30,28 +33,51 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const aa = PAGES.adventure.licensed; // the locked licensed-relationship block
 const AA_PORTFOLIO = PAGES.adventure.aaFunnel.cta.href;
 
-// three licensed teaser frames from the existing gallery exports (gated)
+// the real AA mark (nominative editorial use, operator-authorized). Existence-
+// gated so a missing asset just drops the lockup rather than 404-ing.
+const logoAbs = join(process.cwd(), "public", "media", "adventure", "aa-logo.png");
+const hasLogo = existsSync(logoAbs);
+const LOGO = `${base}/media/adventure/aa-logo.png`;
+
+// A fuller COLLAGE from the existing gallery exports — every frame + width
+// existence-gated at build so nothing can 404. avif+webp, responsive, lazy.
 const g = join(process.cwd(), "public", "media", "adventure", "gallery");
-const shots = ["matterhorn-zermatt-01", "flatirons-chautauqua-03", "castel-toblino-01"]
-  .filter((s) => existsSync(join(g, `${s}-800.avif`)))
-  .map((s) => ({
-    avif: `${base}/media/adventure/gallery/${s}-800.avif`,
-    webp: `${base}/media/adventure/gallery/${s}-800.webp`,
-  }));
+const GALLERY_WIDTHS = [800, 1120, 1400, 1600, 2200];
+function frame(slug: string) {
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  const widths = GALLERY_WIDTHS.filter((w) => existsSync(join(g, `${slug}-${w}.avif`)));
+  const set = (ext: string) =>
+    widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.${ext} ${w}w`).join(", ");
+  return { avif: set("avif"), webp: set("webp"), src: `${base}/media/adventure/gallery/${slug}-800.webp` };
+}
+const shots = [
+  "matterhorn-zermatt-01",
+  "flatirons-chautauqua-03",
+  "lac-de-tseuzier-01",
+  "castel-toblino-01",
+  "eldorado-springs-01",
+  "gornergrat-glacier-01",
+  "varenna-lake-como-01",
+]
+  .map((slug) => frame(slug))
+  .filter((f): f is NonNullable<typeof f> => !!f);
 
 // ── THE ARTICLE (all new sentences — see the approval note above) ──
 const ARTICLE = {
   slate: "AMAZING AERIAL AGENCY · SINCE MID-2024",
   title: "The agency that takes my aerials to market.",
+  // Facts row — labels ONLY, each already present verbatim in the copy below /
+  // the slate above. ⚠ OPERATOR READ-APPROVAL REQUIRED (new visible labels).
+  facts: ["SINCE MID-2024", "OFFICIAL AGENT", "FRONT RANGE · THE ALPS"],
   paragraphs: [
     "In June 2024, a LinkedIn conversation with Amazing Aerial's founder, Paul, turned into a month of talking — and by mid-2024 I was an official agent with the collection.",
     "The arrangement is simple and honest: I chase the frames, from the Front Range to the Alps, and Amazing Aerial licenses them to the people who need them. The aerial work you see across my adventure pages lives with them.",
     "It's the quiet engine behind the adventure lane — every expedition feeds the collection, and the collection funds the next one.",
   ],
   ctas: [
-    { label: "License my work →", href: AA_PORTFOLIO, external: true },
-    { label: "About the agency →", href: "https://www.amazingaerial.com/", external: true },
-    { label: "See the adventure lane →", href: `${base}/adventure`, external: false },
+    { label: "License my work", href: AA_PORTFOLIO, external: true, primary: true },
+    { label: "About the agency", href: "https://www.amazingaerial.com/", external: true },
+    { label: "See the adventure lane", href: `${base}/adventure`, external: false },
   ],
 };
 ---
@@ -60,34 +86,65 @@ const ARTICLE = {
   <main class="aa-story">
     <article class="aa-inner">
       <a href={`${base}/entertainment`} class="link aa-back">← Venture</a>
-      <p class="hud-label aa-slate" data-reveal data-tableau-content>
-        <span data-decode>{ARTICLE.slate}</span>
-      </p>
+
+      <div class="aa-lockup" data-reveal>
+        {hasLogo && (
+          <img class="aa-logo" src={LOGO} alt="Amazing Aerial Agency" width="480" height="158" loading="eager" decoding="async" />
+        )}
+        <p class="hud-label aa-slate">
+          <span data-decode>{ARTICLE.slate}</span>
+        </p>
+      </div>
+
       <h1 class="aa-title" data-reveal>{ARTICLE.title}</h1>
       <div class="aa-proof" data-reveal>
         <LegendMark proof={aa.proof} />
       </div>
+
+      <ul class="aa-facts" data-reveal aria-label="At a glance">
+        {ARTICLE.facts.map((f) => <li class="aa-chip">{f}</li>)}
+      </ul>
+
       {ARTICLE.paragraphs.map((para) => <p class="aa-para" data-reveal>{para}</p>)}
 
       {
         shots.length > 0 && (
-          <div class="aa-shots" data-reveal>
-            {shots.map((s) => (
-              <figure class="aa-shot">
-                <picture>
-                  <source srcset={s.avif} type="image/avif" />
-                  <img src={s.webp} alt="" loading="lazy" decoding="async" />
-                </picture>
-              </figure>
-            ))}
-          </div>
+          <figure class="aa-collage-wrap" data-reveal>
+            <div class="aa-collage">
+              {shots.map((s) => (
+                <div class="aa-shot">
+                  <picture>
+                    <source
+                      type="image/avif"
+                      srcset={s.avif}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <source
+                      type="image/webp"
+                      srcset={s.webp}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <img src={s.src} alt="" loading="lazy" decoding="async" />
+                  </picture>
+                </div>
+              ))}
+            </div>
+            <figcaption class="hud-label aa-collage-cap">Aerial work licensed through Amazing Aerial Agency</figcaption>
+          </figure>
         )
       }
+
       <nav class="aa-ctas" data-reveal>
         {
           ARTICLE.ctas.map((c) => (
-            <a href={c.href} class="link" rel={c.external ? "noopener" : undefined} target={c.external ? "_blank" : undefined}>
-              {c.label}
+            <a
+              href={c.href}
+              class={`aa-cta${c.primary ? " aa-cta--primary" : ""}`}
+              rel={c.external ? "noopener" : undefined}
+              target={c.external ? "_blank" : undefined}
+            >
+              <span>{c.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
             </a>
           ))
         }
@@ -103,7 +160,7 @@ const ARTICLE = {
     min-height: 100svh;
   }
   .aa-inner {
-    max-width: 46rem;
+    max-width: 52rem;
     margin-inline: auto;
     padding: 7rem 2rem 6rem;
     display: grid;
@@ -116,9 +173,23 @@ const ARTICLE = {
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
+
+  /* logo lockup — the real AA mark above the slate */
+  .aa-lockup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .aa-logo {
+    height: 2.4rem;
+    width: auto;
+    opacity: 0.95;
+  }
   .aa-slate {
     letter-spacing: 0.26em;
     color: color-mix(in srgb, #d9f2ec 75%, transparent);
+    margin: 0;
   }
   .aa-title {
     font-family: var(--font-display);
@@ -133,38 +204,112 @@ const ARTICLE = {
     font-size: clamp(1.05rem, 1.4vw, 1.2rem);
     line-height: 1.65;
     color: color-mix(in srgb, #eef2f5 86%, transparent);
+    max-width: 46rem;
   }
-  .aa-shots {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.8rem;
-    margin-top: 0.6rem;
+
+  /* facts row — mono chips, hairline bordered, facts only */
+  .aa-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .aa-chip {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #d9f2ec 78%, transparent);
+    border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
+    border-radius: 2px;
+    padding: 0.4rem 0.7rem;
+  }
+
+  /* photo collage — CSS columns masonry, native aspects, licensed watermarks
+     are the story. Fast: lazy + avif/webp responsive sources. */
+  .aa-collage-wrap {
+    margin: 0.6rem 0 0;
+  }
+  .aa-collage {
+    columns: 3;
+    column-gap: 0.7rem;
   }
   .aa-shot {
-    margin: 0;
+    break-inside: avoid;
+    margin-bottom: 0.7rem;
     border-radius: 6px;
     overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
   }
   .aa-shot img {
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    aspect-ratio: 3 / 2;
+    height: auto;
   }
+  .aa-collage-cap {
+    margin-top: 0.8rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #d9f2ec 60%, transparent);
+  }
+
+  /* CTA row — shared button grammar: 1px border, Space Mono caps, generous
+     padding, arrow slides 6px on hover, accent hover, visible at rest, ≥44px. */
   .aa-ctas {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.6rem;
+    gap: 1rem;
     border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
     padding-top: 1.4rem;
+    margin-top: 0.4rem;
+  }
+  .aa-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.7rem 1.15rem;
+    border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #eef2f5 88%, transparent);
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .aa-cta--primary {
+    border-color: var(--color-accent-deep, #1e8f8a);
+    color: #f2f4f8;
+  }
+  .aa-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .aa-cta:hover,
+  .aa-cta:focus-visible {
+    border-color: var(--color-accent, #38f8ec);
+    color: var(--color-accent, #38f8ec);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .aa-cta:hover .arrow,
+  .aa-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 1024px) {
+    .aa-collage { columns: 2; }
   }
   @media (max-width: 640px) {
-    .aa-shots {
-      grid-template-columns: 1fr;
-    }
-    .aa-shot img {
-      aspect-ratio: 16 / 10;
-    }
+    .aa-collage { columns: 1; }
+    .aa-cta { flex: 1 1 100%; justify-content: space-between; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aa-cta .arrow { transition: none; }
   }
 </style>
 

@@ -184,8 +184,37 @@ const tintDeg = [0, 14, -18][index] ?? 0;
       <div class="tableau-reveal">
         <p class="mx-auto max-w-md text-lg text-ink">{chapter.body}</p>
         <LegendMark proof={chapter.proof} class="justify-center" />
-        <a href={`${base}${chapter.link.href}`} class="btn">{chapter.link.label}</a>
+        <a href={`${base}${chapter.link.href}`} class="btn tableau-cta">
+          <span>{chapter.link.label}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
       </div>
     </div>
   </div>
 </article>
+
+<style>
+  /* Chapter CTA — the shared prominent-button grammar layered onto the global
+     .btn base: keeps the 1px border / Space Mono caps / accent hover / glow, and
+     adds a 6px arrow slide + a guaranteed ≥44px tap target. */
+  .tableau-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.7rem 1.2rem;
+  }
+  .tableau-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .tableau-cta:hover .arrow,
+  .tableau-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tableau-cta .arrow {
+      transition: none;
+    }
+  }
+</style>

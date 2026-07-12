@@ -1,0 +1,345 @@
+---
+/**
+ * /venture/makeshift-film-group — SCAFFOLD. A held-open frame for the for-profit
+ * film company affiliated with MEME. Same venture-article grammar as
+ * /venture/meme (slate, italic title, short paragraphs, CTA row, ← Venture
+ * backlinks) with a ghost "M F G" letter motif in place of a media collage —
+ * because no real media for this relationship exists yet. The media band below
+ * is a labelled SCAFFOLD: elegant empty frames that real photos/videos drop
+ * into later with NO layout rework (same slot contract as the AA/MEME pages).
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every ARTICLE sentence below is new copy,
+ * staging-only until read. Fact base (all externally verifiable, 2026-07-12):
+ *   • MFG = Makeshift Film Group LLC, "an independent production, production
+ *     services, and Consulting company" (makeshiftfilmgroup.com), Colorado-based.
+ *   • It shares its leadership with MEME (Makeshift Entertainment Media
+ *     Education), the Colorado nonprofit — the same founder/president and VP hold
+ *     positions in both (makeshiftfilmgroup.com/company + meme.ngo/meet-the-team).
+ *   • Operator's own role stays the LOCKED phrasing: Member At-Large, MEME.
+ * No claim is made that the operator holds any MFG role — this page only states
+ * the MFG↔MEME affiliation and that it is scaffolding awaiting real material.
+ *
+ * ── MEDIA THE OPERATOR SHOULD SUPPLY (drops into the SCAFFOLD band below) ──
+ *   1. A poster still or short loop from an MFG production (drop as a still now,
+ *      a loop later — the frames below are aspect-flexible).
+ *   2. A behind-the-scenes / on-set photo (crew, camera, or location).
+ *   3. Any MFG lockup/logo cleared for use, OR a third production frame.
+ *   Export convention (scripts/make-venture-story.mjs): sharp, avif+webp,
+ *   EXIF auto-orient. Suggested drop path: public/media/venture/makeshift-film-group/.
+ *   When real files land, swap each .mfg-slot's placeholder for a <picture> — the
+ *   grid geometry and captions stay; nothing else changes.
+ */
+import Base from "../../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// ── HELD FROM PUBLISH — honesty-ledger interlock ─────────────────────────────
+// ⚠ IMPORTANT: scripts/audit-lib.mjs HARD-EXCLUDES the literal phrase "Makeshift
+// Film Group" (research-brief §4 "POSSIBLE FUTURE"; verified in QA-P6-REPORT.md):
+// it must NOT ship in dist/. The operator greenlit SCAFFOLDING this page, but the
+// honesty ledger has not been updated to permit the phrase — so this scaffold is
+// held out of the built site: it renders under `astro dev` (operator preview) and
+// any `astro build` emits a redirect instead (no forbidden phrase → audit green).
+// TO PUBLISH: (1) reclassify the film group in the ledger and remove
+// "makeshift film group" from FORBIDDEN_TERMS in scripts/audit-lib.mjs, THEN
+// (2) build with PUBLISH_MFG=true. The env flag is a deliberate interlock so the
+// page can never ship without a conscious ledger update. NOT auto-decided here.
+const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
+if (!PUBLISH_MFG) return Astro.redirect(`${base}/entertainment`);
+
+// ghost letterforms — the page's own subject, scattered as a faint backdrop
+// (presentational; assembles under the engine, sits still with no-JS).
+const ghost = ["M", "F", "G"];
+
+// ── THE ARTICLE (all new sentences — see the approval note above) ──
+const ARTICLE = {
+  slate: "MAKESHIFT FILM GROUP · SCAFFOLD",
+  title: "The film company alongside the network.",
+  paragraphs: [
+    "Makeshift Film Group is the for-profit film company affiliated with the nonprofit where I hold my most formal title: Member At-Large, MEME (Makeshift Entertainment Media Education), a Colorado nonprofit.",
+    "It's an independent production, production-services, and consulting company based in Colorado, and it shares its leadership with the nonprofit's.",
+    "This page is scaffolding — a frame held open while I gather the documents, photos, and film work to tell that story in full.",
+  ],
+  // SCAFFOLD media slots — styled empty frames, mono captions, drop-in ready.
+  slots: [
+    { caption: "MEDIA INCOMING · PRODUCTION FRAME" },
+    { caption: "MEDIA INCOMING · ON SET" },
+    { caption: "MEDIA INCOMING · LOCKUP / FRAME" },
+  ],
+  ctas: [
+    { label: "About the company", href: "https://www.makeshiftfilmgroup.com/", external: true },
+    { label: "The MEME story", href: `${base}/venture/meme`, external: false },
+  ],
+};
+---
+
+<Base
+  title="Makeshift Film Group — a venture story"
+  description="Makeshift Film Group, the for-profit film company affiliated with MEME (Makeshift Entertainment Media Education), a Colorado nonprofit. A scaffold page while the material is gathered."
+>
+  <main class="mfg-story">
+    <div class="mfg-ghosts" aria-hidden="true">
+      {ghost.map((ch, i) => <span class="mfg-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
+    </div>
+    <article class="mfg-inner">
+      <a href={`${base}/entertainment`} class="link mfg-back">← Venture</a>
+      <p class="hud-label mfg-slate" data-reveal data-tableau-content>
+        <span data-decode>{ARTICLE.slate}</span>
+      </p>
+      <h1 class="mfg-title" data-reveal>{ARTICLE.title}</h1>
+      {ARTICLE.paragraphs.map((para) => <p class="mfg-para" data-reveal>{para}</p>)}
+
+      <!-- SCAFFOLD media band — empty frames, drop-in ready (see header note) -->
+      <p class="hud-label mfg-band-label" data-reveal>Media scaffold — frames reserved</p>
+      <div class="mfg-band" data-reveal>
+        {
+          ARTICLE.slots.map((s) => (
+            <figure class="mfg-slot">
+              <span class="mfg-slot-cross" aria-hidden="true"></span>
+              <figcaption class="mfg-slot-cap">{s.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      <nav class="mfg-ctas" data-reveal>
+        {
+          ARTICLE.ctas.map((c) => (
+            <a
+              href={c.href}
+              class="mfg-cta"
+              rel={c.external ? "noopener" : undefined}
+              target={c.external ? "_blank" : undefined}
+            >
+              <span>{c.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </nav>
+      <a href={`${base}/entertainment`} class="link mfg-back">← Venture</a>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .mfg-story {
+    position: relative;
+    background: #12100e; /* the venture rooms ground, warmed a touch for film */
+    min-height: 100svh;
+    overflow: clip;
+  }
+  .mfg-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: 7rem 2rem 6rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .mfg-back {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .mfg-slate {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #f0e6d9 75%, transparent);
+  }
+  .mfg-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    line-height: 1.12;
+    color: #f5f2ee;
+  }
+  .mfg-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, #f2eee8 86%, transparent);
+  }
+
+  /* SCAFFOLD media band — three reserved frames (see header). Aspect-flexible so
+     a still or a loop of any orientation drops in without layout rework. */
+  .mfg-band-label {
+    margin-top: 0.6rem;
+    letter-spacing: 0.2em;
+    color: color-mix(in srgb, #f0e6d9 55%, transparent);
+  }
+  .mfg-band {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+  .mfg-slot {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 3 / 2;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, #ffffff 3%, transparent) 0 10px,
+        transparent 10px 20px
+      );
+    display: grid;
+    place-items: end start;
+    overflow: hidden;
+  }
+  /* a faint register cross — reads as "reserved frame", not broken image */
+  .mfg-slot-cross {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .mfg-slot-cross::before,
+  .mfg-slot-cross::after {
+    content: "";
+    position: absolute;
+    background: color-mix(in srgb, #ffffff 10%, transparent);
+  }
+  .mfg-slot-cross::before {
+    left: 50%;
+    top: 22%;
+    bottom: 22%;
+    width: 1px;
+    transform: translateX(-0.5px);
+  }
+  .mfg-slot-cross::after {
+    top: 50%;
+    left: 22%;
+    right: 22%;
+    height: 1px;
+    transform: translateY(-0.5px);
+  }
+  .mfg-slot-cap {
+    position: relative;
+    z-index: 1;
+    margin: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #f0e6d9 60%, transparent);
+  }
+
+  /* CTA row — prominent bordered buttons (shared button grammar: 1px border,
+     Space Mono caps, generous padding, arrow slides 6px on hover, accent hover,
+     visible at rest, ≥44px tap target). */
+  .mfg-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    padding-top: 1.4rem;
+    margin-top: 0.6rem;
+  }
+  .mfg-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.7rem 1.15rem;
+    border: 1px solid var(--color-accent-deep, #1e8f8a);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #f2eee8 88%, transparent);
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .mfg-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .mfg-cta:hover,
+  .mfg-cta:focus-visible {
+    border-color: var(--color-accent, #38f8ec);
+    color: var(--color-accent, #38f8ec);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .mfg-cta:hover .arrow,
+  .mfg-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+
+  /* ghost "M F G" — faint letterforms behind the column (no-JS = at rest) */
+  .mfg-ghosts {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .mfg-ghost {
+    position: absolute;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: clamp(6rem, 18vw, 16rem);
+    line-height: 1;
+    color: color-mix(in srgb, #ffffff 5%, transparent);
+  }
+  .mfg-ghost:nth-child(1) { left: 5%; top: 14%; }
+  .mfg-ghost:nth-child(2) { right: 7%; top: 34%; }
+  .mfg-ghost:nth-child(3) { left: 12%; bottom: 12%; }
+
+  @media (max-width: 640px) {
+    .mfg-band { grid-template-columns: 1fr; }
+    .mfg-slot { aspect-ratio: 16 / 10; }
+    .mfg-ghost { display: none; }
+    .mfg-cta { flex: 1 1 100%; justify-content: space-between; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mfg-ghost { transform: none !important; }
+    .mfg-cta .arrow { transition: none; }
+  }
+</style>
+
+<script>
+  // enhancement only: decode the slate label, and let the ghost letters drift in
+  // and settle (their resting positions already live in CSS, so no-JS and
+  // reduced-motion see the final, correct layout).
+  const mountDecode = () => import("../../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecode, { timeout: 3000 });
+  else setTimeout(mountDecode, 1500);
+
+  (async () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(max-width: 640px)").matches) return;
+    const { gsap } = await import("gsap");
+    document.querySelectorAll<HTMLElement>("[data-im-ghost]").forEach((g, i) => {
+      const dx = (i % 2 ? 1 : -1) * (36 + (i % 3) * 24);
+      gsap.fromTo(
+        g,
+        { x: dx, y: 48, opacity: 0 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: 1.1,
+          ease: "power3.out",
+          delay: i * 0.08,
+          onComplete: () => {
+            gsap.to(g, {
+              y: (i % 2 ? -1 : 1) * 10,
+              duration: 5 + (i % 3) * 1.5,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          },
+        },
+      );
+    });
+  })();
+</script>

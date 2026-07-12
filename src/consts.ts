@@ -61,10 +61,14 @@ export const SITE = {
 // call-to-action; nav position doesn't change that.
 // ---------------------------------------------------------------------------
 
+// P12.6b — operator direction (2026-07-12): the three credibility lanes read
+// as investment terms on their own ("Venture" especially). Appending "Stories"
+// disambiguates them as the storytelling lanes they are. Labels ONLY changed;
+// hrefs unchanged. (Forge the Saga / About / Contact keep their labels.)
 export const NAV = [
-  { label: "Adventure", href: "/adventure" },
-  { label: "Venture", href: "/entertainment" },
-  { label: "Work", href: "/work" },
+  { label: "Adventure Stories", href: "/adventure" },
+  { label: "Venture Stories", href: "/entertainment" },
+  { label: "Work Stories", href: "/work" },
   { label: "Forge the Saga", href: "/forge-the-saga" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },

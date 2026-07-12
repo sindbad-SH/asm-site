@@ -286,10 +286,39 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   <!-- Single CTA -->
   <section class="case-chapter">
     <div class="case-chapter__inner space-y-4 text-center">
-      <a href={`${base}${study.cta.href}`} class="btn">{study.cta.label}</a>
+      <a href={`${base}${study.cta.href}`} class="btn case-cta">
+        <span>{study.cta.label}</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
 </article>
+
+<style>
+  /* Case CTA — the shared prominent-button grammar on the global .btn base: keeps
+     the border / mono caps / accent hover / glow, adds the 6px arrow slide and a
+     guaranteed ≥44px tap target, consistent with the work-wall + tableaux CTAs. */
+  .case-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.7rem 1.3rem;
+  }
+  .case-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .case-cta:hover .arrow,
+  .case-cta:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case-cta .arrow {
+      transition: none;
+    }
+  }
+</style>
 
 <script>
   // Rail scroll-spy — light the chapter crossing the viewport's middle band.
