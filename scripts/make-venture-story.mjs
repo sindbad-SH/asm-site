@@ -58,6 +58,93 @@ const STORIES = [
       "soiree-mic": "20260508_200630.jpg", // SOIRÉE speaker w/ mic over the crowd
     },
   },
+
+  // ── P13b venture-coverage set ────────────────────────────────────────────
+  // Same pipeline as the pilot. These blocks point sourceDir at the EVENT ROOT
+  // (parent of the tier folders) so picks can draw from `_TIER 1` first and
+  // widen into `_TIER 2` only where a scene type is genuinely missing from
+  // tier 1 (screenings, garments, venue detail) — the pick value carries the
+  // tier subfolder. Selection + reasons trace to each event's _photo-tiers.csv;
+  // prose on each page is that event's _ABOUT.md in the operator's own words.
+
+  {
+    slug: "seriesfest-2025",
+    sourceDir: "E:/Old Projects/Series Fest/2025 Photos/Series Fest 2025 - Festival",
+    // Panels · podium speakers · the branded step-and-repeat wall — the scenes
+    // tier 1 actually holds. Two screening title-card frames widen in from
+    // tier 2 (that scene is absent from tier 1) per _ABOUT's lead guidance.
+    picks: {
+      hero: "_TIER 1 - TOP (make stories)/20250502_194715.jpg", // SeriesFest branded step-and-repeat wall (clean, non-identifying)
+      "screening-card": "_TIER 2 - GOOD/20250430_201225.jpg", // official-selection title card on the big screen
+      "panel-stage": "_TIER 1 - TOP (make stories)/20250430_201234.jpg", // panel seated on stage w/ mics
+      "podium-speaker": "_TIER 1 - TOP (make stories)/20250502_194803.jpg", // speaker at the podium
+      "screening-title": "_TIER 2 - GOOD/20250430_172103.jpg", // a film playing on the screening-room screen
+      "panel-mics": "_TIER 1 - TOP (make stories)/20250501_151912.jpg", // panel discussion w/ mics
+      "podium-lectern": "_TIER 1 - TOP (make stories)/20250504_183715.jpg", // speaker at the lectern (sharp)
+      "step-and-repeat": "_TIER 1 - TOP (make stories)/20250502_194707.jpg", // the branded backdrop again, different moment
+      "podium-address": "_TIER 1 - TOP (make stories)/20250504_180458.jpg", // speaker addressing the room
+      "panel-seated": "_TIER 1 - TOP (make stories)/20250502_130848.jpg", // seated panel on stage
+    },
+  },
+
+  {
+    slug: "seriesfest-2026-fashion-in-focus",
+    sourceDir:
+      "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Fashion in Focus",
+    // A fashion/style panel: the branded stage, podium hosts, and seated panel.
+    // Garment-on-display + a venue-detail frame widen in from tier 2 for the
+    // editorial variety _ABOUT calls for (those scenes aren't in tier 1).
+    picks: {
+      hero: "_TIER 1 - TOP (make stories)/20260307_173948.jpg", // SeriesFest-branded step-and-repeat wall
+      "panel-stage": "_TIER 1 - TOP (make stories)/20260307_182116.jpg", // panel seated on stage w/ mics
+      "podium-host": "_TIER 1 - TOP (make stories)/20260307_181525.jpg", // host at the branded podium
+      "garment-display": "_TIER 2 - GOOD/20260307_185400.jpg", // a garment on display (fashion detail)
+      "garment-rack": "_TIER 2 - GOOD/20260307_180306.jpg", // a second garment on display
+      "step-and-repeat": "_TIER 1 - TOP (make stories)/20260307_182101.jpg", // the branded backdrop
+      "podium-speaker": "_TIER 1 - TOP (make stories)/20260307_181618.jpg", // speaker at the podium (sharpest frame)
+      "panel-mics": "_TIER 1 - TOP (make stories)/20260307_185718.jpg", // seated panel w/ mics
+      "podium-address": "_TIER 1 - TOP (make stories)/20260307_181715.jpg", // host addressing the room
+      "venue-detail": "_TIER 2 - GOOD/20260307_184947.jpg", // event venue interior / lit staging
+    },
+  },
+
+  {
+    slug: "seriesfest-2026-soul-power",
+    sourceDir:
+      "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Soul Power ABA Premiere",
+    // A small, candid premiere-night set (per _ABOUT). Its whole tier 1–2 is the
+    // premiere step-and-repeat/signage wall plus two screening-room frames — so
+    // this is an honestly small recap: arrivals at the premiere wall + the house.
+    picks: {
+      hero: "_TIER 2 - GOOD/20260218_175218.jpg", // premiere step-and-repeat / signage wall (sharpest, best-lit)
+      "backdrop-arrivals": "_TIER 1 - TOP (make stories)/20260218_174608.jpg", // the premiere wall, arrivals
+      "backdrop-wall": "_TIER 2 - GOOD/20260218_175207.jpg", // the branded premiere wall
+      screening: "_TIER 2 - GOOD/20260218_194924.jpg", // a film on the screening-room screen
+      "backdrop-signage": "_TIER 1 - TOP (make stories)/20260218_181647.jpg", // premiere signage wall
+      "backdrop-lobby": "_TIER 1 - TOP (make stories)/20260218_174548.jpg", // the wall by the theater lobby
+      "screening-house": "_TIER 2 - GOOD/20260218_183237.jpg", // the screening-room house
+    },
+  },
+
+  {
+    slug: "afm-2025",
+    sourceDir: "E:/Old Projects/American Film Market/Photos/American Film Market 2025",
+    // "The AFM Sessions": the blue AFM-branded stage — panels and podium
+    // speakers — plus the market venue signage and the branded step-and-repeat.
+    // Rich enough in tier 1 that only the picks below are needed (all tier 1).
+    picks: {
+      hero: "_TIER 1 - TOP (make stories)/20251115_160916.jpg", // AFM-branded stage panel (clean, well-lit)
+      "venue-signage": "_TIER 1 - TOP (make stories)/20251111_080341.jpg", // the market venue interior / lit AFM signage
+      "panel-stage": "_TIER 1 - TOP (make stories)/20251112_113729.jpg", // panel on stools w/ mics
+      "podium-speaker": "_TIER 1 - TOP (make stories)/20251115_101950.jpg", // speaker at the podium
+      "step-and-repeat": "_TIER 1 - TOP (make stories)/20251112_213413.jpg", // the AFM branded step-and-repeat (sharpest)
+      "panel-mics": "_TIER 1 - TOP (make stories)/20251112_093746.jpg", // a second session panel
+      "podium-lectern": "_TIER 1 - TOP (make stories)/20251115_101957.jpg", // speaker at the lectern
+      "step-and-repeat-2": "_TIER 1 - TOP (make stories)/20251112_213406.jpg", // the branded backdrop again
+      "panel-seated": "_TIER 1 - TOP (make stories)/20251113_110725.jpg", // seated panel on the AFM stage
+      "podium-address": "_TIER 1 - TOP (make stories)/20251115_095745.jpg", // speaker addressing the session
+    },
+  },
 ];
 
 const repoRoot = process.cwd();

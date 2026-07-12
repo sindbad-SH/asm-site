@@ -1,0 +1,259 @@
+---
+/**
+ * Venture story · SeriesFest 2026 "Soul Power ABA Premiere" — built on the P12.8
+ * pilot pattern (seriesfest-2026.astro). Mono slate, mixed-face headline, native-
+ * aspect collage, SeriesFest LegendMark near the top.
+ *
+ * Honestly small: per the operator's _ABOUT.md this is a small, candid premiere-
+ * night set, so this recap runs short — the premiere wall and the screening room.
+ * HONESTY: the only status claim is the SeriesFest LegendMark (tier `attended`),
+ * rendered near the top from consts — verbatim. Attendance ≠ affiliation.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import sharp from "sharp";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const STORY = "seriesfest-2026-soul-power";
+const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
+
+async function aspectOf(file: string): Promise<string | undefined> {
+  try {
+    const { width, height } = await sharp(file).metadata();
+    return width && height ? `${width} / ${height}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+async function shot(slug: string, alt: string) {
+  const webp900 = join(mediaDir, `${slug}-900.webp`);
+  if (!existsSync(webp900)) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/venture/${STORY}/${slug}-${w}.${ext}`;
+  return {
+    alt,
+    ar: await aspectOf(webp900),
+    avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
+    webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
+    fallback: url(900, "webp"),
+  };
+}
+
+const [hero, ...gallery] = await Promise.all([
+  shot("hero", "The premiere step-and-repeat and signage wall at the Soul Power ABA premiere."),
+  shot("backdrop-arrivals", "The branded premiere wall as attendees arrive."),
+  shot("backdrop-wall", "The branded SeriesFest premiere backdrop."),
+  shot("screening", "A film playing on the screen in the theater."),
+  shot("backdrop-signage", "The premiere signage wall at the theater."),
+  shot("backdrop-lobby", "The premiere backdrop by the theater lobby."),
+  shot("screening-house", "The screening-room house at the premiere."),
+].map((p) => p));
+
+const spans = [3, 3, 2, 2, 3, 3];
+
+const seriesRoom = PAGES.entertainment.rooms.items.find(
+  (r) => r.proof.relationshipId === "seriesfest",
+);
+
+const meta = {
+  title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story",
+  description:
+    "SeriesFest 2026 Soul Power ABA premiere night in Denver, Colorado — the premiere wall and the screening room, from a weekend of relationship-building attendance.",
+};
+---
+
+<Base title={meta.title} description={meta.description}>
+  <main class="vs" data-lane="venture" style="--ground:#10141f">
+    <section class="vs-head">
+      <a href={`${base}/entertainment`} class="link vs-back"><span class="arrow" aria-hidden="true">←</span> Venture</a>
+
+      <p class="hud-label vs-slate" data-reveal>SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO</p>
+
+      <h1 class="vs-headline" data-reveal>
+        <span class="vs-line">SOUL POWER</span>
+        <span class="vs-line vs-line--push"><span class="vs-turn">Premiere,</span> 2026</span>
+      </h1>
+
+      {seriesRoom && (
+        <div class="vs-proof" data-reveal>
+          <LegendMark proof={seriesRoom.proof} />
+        </div>
+      )}
+    </section>
+
+    {hero && (
+      <figure class="vs-hero" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
+          <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
+          <img src={hero.fallback} alt={hero.alt} style={`--ar:${hero.ar}`} loading="eager" decoding="async" />
+        </picture>
+      </figure>
+    )}
+
+    <!--
+      OPERATOR READ-APPROVAL REQUIRED — assembled from his _ABOUT.md; staging-only
+      until read. The two paragraphs below are his own words (verbatim / near-
+      verbatim light stitching) from the SeriesFest 2026 "Soul Power ABA Premiere"
+      _ABOUT.md, plus the event's own date/location metadata. No invented claims.
+    -->
+    <section class="vs-prose" data-reveal>
+      <p>
+        Premiere-night coverage: the theater lobby, attendees mingling and
+        networking, concessions, and general premiere atmosphere for the Soul
+        Power ABA premiere. Smaller, candid, ambient set — lower light.
+      </p>
+      <p>
+        A film and series premiere night. SeriesFest, Denver, Colorado,
+        February 18, 2026.
+      </p>
+    </section>
+
+    <section class="vs-gallery" aria-label="SeriesFest 2026 Soul Power premiere — frames">
+      {gallery.map((g, i) =>
+        g ? (
+          <figure class="vs-card" style={`--span:${spans[i] ?? 2}`} data-reveal data-reveal-stagger="70">
+            <picture>
+              <source type="image/avif" srcset={g.avif} sizes="(max-width: 760px) 100vw, 40rem" />
+              <source type="image/webp" srcset={g.webp} sizes="(max-width: 760px) 100vw, 40rem" />
+              <img src={g.fallback} alt={g.alt} style={`--ar:${g.ar}`} loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        ) : null,
+      )}
+    </section>
+
+    <section class="vs-foot">
+      <a href={`${base}/entertainment`} class="link"><span class="arrow" aria-hidden="true">←</span> Venture</a>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .vs {
+    background: var(--ground);
+    min-height: 100svh;
+    padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    max-width: 90rem;
+    margin-inline: auto;
+  }
+
+  .vs-head {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+  }
+  .vs-back {
+    margin-bottom: 0.4rem;
+  }
+  .vs-slate {
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-peak) 72%, transparent);
+  }
+
+  .vs-headline {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.94;
+    letter-spacing: 0.006em;
+    color: #f2f4f8;
+    font-size: clamp(2.8rem, 9vw, 8.5rem);
+    display: grid;
+    gap: 0.03em;
+  }
+  .vs-turn {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #eef1f6;
+    font-size: 0.44em;
+    vertical-align: 0.2em;
+    margin-inline: 0.1em;
+  }
+  .vs-line {
+    display: block;
+  }
+  .vs-line--push {
+    transform: translateX(5vw);
+  }
+  .vs-proof {
+    margin-top: 0.4rem;
+    max-width: 42rem;
+  }
+
+  .vs-hero {
+    margin: 0;
+    max-width: 78rem;
+    width: 100%;
+    justify-self: center;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 16%, transparent);
+    padding: 0.4rem;
+    background: var(--color-elevated);
+  }
+  .vs-hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ar, 1 / 1);
+    object-fit: cover;
+  }
+
+  .vs-prose {
+    max-width: 44rem;
+    display: grid;
+    gap: 1.1rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--color-ink) 92%, transparent);
+    justify-self: center;
+  }
+
+  .vs-gallery {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: clamp(0.6rem, 1.4vw, 1.1rem);
+    align-items: start;
+  }
+  .vs-card {
+    grid-column: span var(--span, 2);
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
+    background: var(--color-elevated);
+  }
+  .vs-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ar, 1 / 1);
+    object-fit: cover;
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .vs-card:hover img {
+    transform: scale(1.03);
+  }
+
+  .vs-foot {
+    justify-self: start;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-hairline);
+    width: 100%;
+  }
+
+  @media (max-width: 760px) {
+    .vs-line--push { transform: none; }
+    .vs-gallery { grid-template-columns: repeat(2, 1fr); }
+    .vs-card { grid-column: span 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vs-card img { transition: none; }
+    .vs-card:hover img { transform: none; }
+  }
+</style>
