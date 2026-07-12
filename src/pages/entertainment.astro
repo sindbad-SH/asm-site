@@ -66,7 +66,7 @@ const otherRooms = p.rooms.items.filter((r) => r.proof.relationshipId !== "pebbl
 
 // scattered ghost letters are drawn FROM the page's own words (presentational
 // letterforms, not new copy): the hero scatters PULSE, the rooms scatter ROOMS.
-const heroGhost = ["P", "U", "L", "S", "E"];
+const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories"
 const roomsGhost = ["R", "O", "O", "M", "S"];
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family
@@ -93,12 +93,13 @@ const GROUNDS = {
         {heroGhost.map((ch, i) => <span class="im-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
       </div>
       <p class="hud-label im-kicker" data-reveal>{p.hero.eyebrow}</p>
-      <!-- the LOCKED headline, composed in the reference's two voices:
-           "I keep a pulse on the industry." — caps carry the nouns, the
-           serif italic carries the connective words. Verbatim, re-dressed. -->
+      <!-- P12.3 — the VENTURE headline, composed in the reference's two
+           voices: "The venture in adventure." — the pun carried by the caps,
+           the connectives by the serif italic. Copy from consts (pending
+           operator read-approval; see the review block there). -->
       <h1 class="im-headline" data-reveal>
-        <span class="im-line">I <span class="im-turn">keep a</span> PULSE</span>
-        <span class="im-line im-line--push"><span class="im-turn">on the</span> INDUSTRY.</span>
+        <span class="im-line"><span class="im-turn">The</span> VENTURE</span>
+        <span class="im-line im-line--push"><span class="im-turn">in</span> ADVENTURE.</span>
       </h1>
       <p class="im-turn im-intro-sub" data-reveal>{p.hero.subline}</p>
     </section>

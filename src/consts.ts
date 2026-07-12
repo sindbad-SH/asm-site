@@ -63,7 +63,7 @@ export const SITE = {
 
 export const NAV = [
   { label: "Adventure", href: "/adventure" },
-  { label: "Film & TV", href: "/entertainment" },
+  { label: "Venture", href: "/entertainment" },
   { label: "Work", href: "/work" },
   { label: "Forge the Saga", href: "/forge-the-saga" },
   { label: "About", href: "/about" },
@@ -108,7 +108,7 @@ export const PILLARS: readonly Pillar[] = [
   },
   {
     id: "entertainment",
-    name: "Film & TV",
+    name: "Venture",
     terrain: "the industry",
     role: "credibility",
     href: "/entertainment",
@@ -830,20 +830,25 @@ export const PAGES = {
     },
   },
 
-  // ---- ENTERTAINMENT (§1.4) — credibility lane, the industry. --------------
+  // ---- ENTERTAINMENT (§1.4) — credibility lane, now "VENTURE" (P12.3). ------
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED (staging-only until then): the lane was
+  // renamed Film & TV → Venture per his 2026-07-08 direction ("the venture in
+  // adventure" — business stories). NEW SENTENCES in this block, listed for his
+  // verbatim review:
+  //   1. meta.title  2. meta.description  3. hero.headline  4. hero.subline
+  // Every relationship claim below (MEME/PitchBoulder/rooms) is UNCHANGED.
   entertainment: {
     meta: {
-      title: "Film & TV — the industry",
+      title: "Venture — business stories",
       description:
-        "Film & TV: a pulse on the industry — board work, real coverage, and the festivals and markets I attend, each stated at exactly what it is.",
+        "The venture in adventure: business stories — board work, real coverage, and the rooms of the industry, each stated at exactly what it is.",
     },
-    // E1 — restrained hero; no "at the table where the industry decides" claim.
-    // Eyebrow names the lane (Film & TV) per R8; headline stays honest.
+    // E1 — the pun IS the headline; the subline makes it land honestly.
     hero: {
-      eyebrow: "Film & TV",
-      headline: "I keep a pulse on the industry.",
+      eyebrow: "Venture",
+      headline: "The venture in adventure.",
       subline:
-        "Board work, real coverage, and the festivals and markets I attend — here's exactly what each one is.",
+        "I tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where the industry does business. Board work, real coverage, and the festivals I attend — each stated at exactly what it is.",
     },
     // E2 — MEME (the most formal role).
     meme: {
