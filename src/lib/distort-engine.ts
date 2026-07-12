@@ -189,13 +189,24 @@ export function initDistortion(grids: HTMLElement[]): void {
   // Tile DOM rects only move on scroll, resize, or a layout shift — measuring
   // every tile every frame forces a reflow per tile and scales with the gallery
   // (the media guide points toward 20–40 photos). Cache them and re-measure only
-  // when one of those fires; a rare non-scroll shift self-heals on the next
-  // scroll/frame, and the effect is ambient (text is lifted above via CSS).
+  // when one of those fires.
   const rects: DOMRect[] = [];
   const measure = () => {
     for (let k = 0; k < tiles.length; k++) rects[k] = tiles[k]!.media.getBoundingClientRect();
     rectsDirty = false;
   };
+
+  // NON-SCROLL layout shifts (P12 bug fix): a field-note expanding or a
+  // filter FLIP changes the grid's height with zero scroll, and the old
+  // "self-heals on the next scroll" policy left the WebGL image copies
+  // parked at stale coordinates until the visitor happened to scroll —
+  // the operator saw the Varenna tile lag seconds behind its card. A
+  // ResizeObserver on each grid fires on every frame of such a transition
+  // (the 320ms note-expand included), keeping rects live while it happens.
+  const gridRo = new ResizeObserver(() => {
+    rectsDirty = true;
+  });
+  grids.forEach((g) => gridRo.observe(g));
 
   const step = (now: number) => {
     const t = now * 0.001;
