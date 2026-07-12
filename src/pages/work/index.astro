@@ -1,40 +1,43 @@
 ---
 /**
- * /work — P4 (V1-UPGRADE-PLAN): THE WALL. Resn's dark work-wall grammar
- * (media-first tiles, hover-life, lane filters) with Sindbad's spin: instead
- * of Resn's uniform near-vertical tiles, the wall LEANS INTO the library's
- * mixed form factors — wide aerials get wide tiles, true verticals get tall
- * tiles, the two case studies get cinematic feature tiles — composed as an
- * art-directed asymmetric mosaic (deterministic spans by shape, dense-packed,
- * never random).
+ * /work — "Work Stories" (name still being chosen; DO NOT rename). The wall,
+ * simplified to the real engagements after the P-work (2026-07-12) edit.
  *
- * Kept from R3.9 unchanged in spirit:
- *   - filters are pure enhancement: every tile visible by default (the no-JS
- *     baseline), buttons inert without JS
- *   - FLIP animates survivors between mosaic positions on filter
- *   - attribution-first honesty: forOrg · what · engagement all verbatim from
- *     consts on every tile; the AA band stays
+ * What changed this round (operator direction):
+ *   1. FILTER BUG FIXED. The lane buttons toggled Tailwind's `.hidden` utility,
+ *      but Tailwind v4 emits utilities inside `@layer utilities`, and Astro's
+ *      scoped `.wtile { display:block }` is UNLAYERED — an unlayered rule beats
+ *      ANY layered one regardless of specificity, so `.hidden` never took and
+ *      every tile stayed visible. Fix: a scoped `.wtile.hidden { display:none }`
+ *      (also unlayered, higher specificity) actually hides. The JS is unchanged.
+ *   2. Knights of Mayhem RE-LANED venture → adventure (it's an adventure story).
+ *      The only two VENTURE tiles are now Shelby/Pebble Beach + PitchBoulder.
+ *   3. The watermarked Amazing Aerial gallery stills were REMOVED from the wall
+ *      (they belong on /adventure). One AA FLAGSHIP tile replaces them, linking
+ *      to the new highlights reel at /work/amazing-aerial. Its line is the AA
+ *      relationship's permittedPhrasing, VERBATIM (lockedAttribution).
+ *   4. The Pebble tile shows a real photo AT REST (the logo frame), not just on
+ *      hover — caseMedia() now prefers a `tile.*` face over `poster.*`.
+ *   5. A quiet "from the archive" band (Gigs Go Green, Vybe) rounds out the
+ *      bottom — honest one-liners, dated from the source files, links nowhere.
  *
- * Hover-life ladder (fine pointers only, never under reduced motion or
- *   Save-Data): case tiles with a loop export play it on hover (mounted on
- *   first pointerenter, paused on leave); all tiles get the slow media lift.
- *   Touch: meta strips are simply always on.
- *
- * Styles live in this page's scoped block ON PURPOSE (P3/P4 land in parallel;
- * global.css is P3's to extend this round).
+ * Honesty: attribution-first — every tile carries its status verbatim from
+ * consts (LegendMark-style phrasing for the AA + archive relationships; the
+ * composed "For [org] · [what] — [engagement]" line for the rest). Filters are
+ * pure enhancement: every tile visible by default (no-JS baseline).
  */
 import Base from "../../layouts/Base.astro";
 import DistortionLayer from "../../components/DistortionLayer.astro";
-import { PAGES, WORK, PILLARS } from "../../consts";
+import { PAGES, WORK, WORK_ARCHIVE, PILLARS, RELATIONSHIP_BY_ID, LEGEND } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.work;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Slug → grid media (unchanged from R3.9/Task 5): responsive exports from the
-// shared gallery folder, orientation-aware widths, every file existence-gated
-// at build so nothing can 404.
+// Slug → grid media: responsive exports from the shared gallery folder,
+// orientation-aware widths, every file existence-gated at build so nothing 404s.
+// (Kept for any future non-case gallery item; the current wall is all cases.)
 function gridMedia(slug: string, orientation: "landscape" | "vertical" = "landscape") {
   const g = join(process.cwd(), "public", "media", "adventure", "gallery");
   if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
@@ -48,11 +51,16 @@ function gridMedia(slug: string, orientation: "landscape" | "vertical" = "landsc
   };
 }
 
-// Case-study feature media: poster still (+ optional hover loop). Existence-
+// Case-study feature media: an always-visible face (+ optional hover loop).
+// Preference order: a purpose-made `tile.*` beats the case-page `poster.*`, so
+// the index tile can show a different frame than the case hero (the Pebble tile
+// uses its logo photo; its case page keeps the clean beauty poster). Existence-
 // gated per file — a tile only ever references media that shipped.
 function caseMedia(slug: string) {
   const dir = join(process.cwd(), "public", "media", "work", slug);
-  const posterName = ["poster", "hook-poster", "context"].find((n) => existsSync(join(dir, `${n}.avif`)));
+  const posterName = ["tile", "poster", "hook-poster", "context"].find((n) =>
+    existsSync(join(dir, `${n}.avif`)),
+  );
   if (!posterName) return undefined;
   return {
     avif: `${base}/media/work/${slug}/${posterName}.avif`,
@@ -61,25 +69,31 @@ function caseMedia(slug: string) {
   };
 }
 
-// The mosaic's shape grammar (the P4 spin): every tile declares the form that
-// MAXIMIZES its media — case studies read cinematic, true verticals stay
-// tall, aerial landscapes stay wide. Deterministic, art-directed, no random.
-type Shape = "feature" | "wide" | "tall";
+// Archive-band still: a single frame per older project (public/media/work/archive/).
+function archiveMedia(slug: string) {
+  const dir = join(process.cwd(), "public", "media", "work", "archive");
+  if (!existsSync(join(dir, `${slug}.avif`))) return undefined;
+  return {
+    avif: `${base}/media/work/archive/${slug}.avif`,
+    webp: existsSync(join(dir, `${slug}.webp`)) ? `${base}/media/work/archive/${slug}.webp` : undefined,
+  };
+}
+
 const tiles = WORK.map((item, i) => {
-  // P13d — feature treatment follows the MEDIA, not the link: an item with
-  // case-grade exports (work/<slug>/ poster + loop) reads as a cinematic
-  // feature tile even before its case page exists (Knights of Mayhem ships
-  // tile-first; its page can come later). caseMedia is existence-gated, so
-  // gallery items without a work/ folder are untouched.
   const caseArt = caseMedia(item.slug);
   const isCase = !!item.href || !!caseArt;
-  const shape: Shape = isCase ? "feature" : item.orientation === "vertical" ? "tall" : "wide";
+  // A licensed relationship (Amazing Aerial) may ONLY be stated in its verbatim
+  // permittedPhrasing — never a composed "For … · … — …" line.
+  const attribution =
+    item.lockedAttribution && item.relationshipId
+      ? RELATIONSHIP_BY_ID[item.relationshipId]?.permittedPhrasing
+      : undefined;
   return {
     item,
     index: String(i + 1).padStart(3, "0"),
-    shape,
     media: isCase ? undefined : gridMedia(item.slug, item.orientation ?? "landscape"),
     caseArt: isCase ? caseArt : undefined,
+    attribution,
     pillarName: PILLARS.find((pl) => pl.id === item.pillar)?.name ?? item.pillar,
   };
 });
@@ -92,6 +106,18 @@ const filters = [
     label: pillar.name,
   })),
 ] as const;
+
+// Archive band — honest one-liners rendered verbatim from consts.
+const archive = WORK_ARCHIVE.map((a) => {
+  const rel = RELATIONSHIP_BY_ID[a.relationshipId];
+  return {
+    item: a,
+    media: archiveMedia(a.slug),
+    symbol: rel ? LEGEND[rel.tier].symbol : "",
+    tierLabel: rel ? LEGEND[rel.tier].label : "",
+    phrasing: rel?.permittedPhrasing ?? "",
+  };
+});
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -121,11 +147,11 @@ const filters = [
   <section class="wall-rail py-8">
     <div class="wall" data-distort-grid data-work-grid>
       {
-        tiles.map(({ item, index, shape, media, caseArt, pillarName }) => {
+        tiles.map(({ item, index, media, caseArt, attribution, pillarName }) => {
           const Tag = item.href ? "a" : "div";
           return (
             <Tag
-              class={`wtile wtile--${shape}${item.href ? " wtile--link" : ""}`}
+              class={`wtile${item.href ? " wtile--link" : ""}`}
               href={item.href ? `${base}${item.href}` : undefined}
               data-pillar={item.pillar}
               data-reveal
@@ -134,15 +160,21 @@ const filters = [
               <figure class="wtile-media" aria-hidden="true">
                 {media && (
                   <picture>
-                    <source type="image/avif" srcset={media.avif} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 34vw" />
-                    <source type="image/webp" srcset={media.webp} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 34vw" />
+                    <source type="image/avif" srcset={media.avif} sizes="(max-width: 640px) 100vw, 48vw" />
+                    <source type="image/webp" srcset={media.webp} sizes="(max-width: 640px) 100vw, 48vw" />
                     <img src={media.src} alt="" loading="lazy" decoding="async" />
                   </picture>
                 )}
                 {caseArt && (
                   <picture>
                     <source type="image/avif" srcset={caseArt.avif} />
-                    <img src={caseArt.webp ?? caseArt.avif} alt="" loading="lazy" decoding="async" />
+                    <img
+                      src={caseArt.webp ?? caseArt.avif}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      style={item.objectPosition ? `object-position:${item.objectPosition}` : undefined}
+                    />
                   </picture>
                 )}
                 {!media && !caseArt && <div class="wtile-placeholder placeholder" />}
@@ -154,16 +186,21 @@ const filters = [
               <span class="wtile-tag">{pillarName}</span>
               <figcaption class="wtile-meta">
                 <span class="wtile-title">{item.title}</span>
-                <span class="wtile-line">
-                  For {item.forOrg} · {item.what} — {item.engagement}
-                </span>
+                {attribution ? (
+                  <span class="wtile-line wtile-line--locked">{attribution}</span>
+                ) : (
+                  <span class="wtile-line">
+                    For {item.forOrg} · {item.what} — {item.engagement}
+                  </span>
+                )}
               </figcaption>
-              {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible CTA label "Read the story",
-                  staging-only. Pulled OUT of the hover-hidden meta strip so the click-through
-                  is always visible (mobile has no hover), as a bordered mono button. */}
+              {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — visible CTA labels ("Read the story",
+                  and "See the highlights" for the Amazing Aerial flagship), staging-only.
+                  Pulled OUT of the hover-hidden meta strip so the click-through is always
+                  visible (mobile has no hover), as a bordered mono button. */}
               {item.href && (
                 <span class="wtile-cta">
-                  Read the story <span class="arrow" aria-hidden="true">→</span>
+                  {item.cta ?? "Read the story"} <span class="arrow" aria-hidden="true">→</span>
                 </span>
               )}
             </Tag>
@@ -174,22 +211,48 @@ const filters = [
     <p class="mx-auto mt-4 max-w-3xl text-sm text-ink-muted" data-work-empty hidden>
       Nothing in this lane yet.
     </p>
-    <!-- AA-attribution band (R3.2b) — unchanged: the honest frame around the
-         licensed adventure work, shown regardless of filter. -->
-    <div class="mx-auto mt-8 max-w-3xl">
-      <div class="panel aa-work-band p-4">
-        <img
-          src={`${base}/media/adventure/aa-logo.png`}
-          alt="Amazing Aerial Agency"
-          width="480"
-          height="158"
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="hud-label">Aerial work licensed through Amazing Aerial Agency</p>
-      </div>
-    </div>
   </section>
+
+  <!-- ═══ FROM THE ARCHIVE — quieter band of older projects (unfiltered) ═══
+       ⚠ OPERATOR READ-APPROVAL REQUIRED — the "From the archive" kicker and each
+       tile's title + date are new visible copy (staging-only). The honest
+       one-liner under each is its relationship's permittedPhrasing, VERBATIM. -->
+  {
+    archive.length > 0 && (
+      <section class="wall-rail archive-rail">
+        <div class="archive">
+          <p class="hud-label archive-kicker">From the archive</p>
+          <div class="archive-grid">
+            {archive.map(({ item, media, symbol, tierLabel, phrasing }) => (
+              <div class="atile" data-archive>
+                <figure class="atile-media" aria-hidden="true">
+                  {media ? (
+                    <picture>
+                      <source type="image/avif" srcset={media.avif} />
+                      <img src={media.webp ?? media.avif} alt="" loading="lazy" decoding="async" />
+                    </picture>
+                  ) : (
+                    <div class="wtile-placeholder placeholder" />
+                  )}
+                </figure>
+                <div class="atile-meta">
+                  <span class="atile-head">
+                    <span class="atile-title">{item.title}</span>
+                    <span class="atile-date">{item.date}</span>
+                  </span>
+                  <span class="atile-line">
+                    <span class="atile-sym" aria-hidden="true">{symbol}</span>
+                    <span class="sr-only">{tierLabel}: </span>
+                    {phrasing}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
   <DistortionLayer />
@@ -202,67 +265,21 @@ const filters = [
     width: min(100%, 1440px);
     padding-inline: 2rem;
   }
-  section.wall-rail {
-    container-type: inline-size;
-  }
 
-  /* ── the mosaic. 6 columns desktop / 4 tablet / stacked mobile; row unit is
-        derived from the column width (container query units) so every span
-        keeps its intended shape at any viewport. dense flow packs the
-        asymmetry into a solid wall — the composition IS the spans below. ── */
+  /* ── the wall. Simplified to a clean two-up card grid (the mosaic's mixed
+        form factors were for the many-tile gallery; the wall is now the real
+        engagements). Uniform 16:9 cinematic cards; one column on phones. The
+        logo/branded tile faces (Pebble, Amazing Aerial) are native 16:9, so a
+        16:9 card shows them WHOLE — no crop, every logo stays in frame. ── */
   .wall {
-    --wall-gap: 10px;
+    --wall-gap: 14px;
     display: grid;
     gap: var(--wall-gap);
-    grid-template-columns: repeat(6, 1fr);
-    grid-auto-rows: calc((100cqw - 2 * 2rem - 5 * var(--wall-gap)) / 6 * 0.66);
-    grid-auto-flow: dense;
-  }
-  /* shape grammar: the tile fits the media, never the other way round */
-  .wtile--feature {
-    grid-column: span 4;
-    grid-row: span 3;
-  } /* ≈ 2:1 cinematic */
-  .wtile--wide {
-    grid-column: span 3;
-    grid-row: span 3;
-  } /* ≈ 3:2 aerial */
-  .wtile--tall {
-    grid-column: span 2;
-    grid-row: span 5;
-  } /* ≈ 3:5 portrait */
-
-  @media (max-width: 1024px) {
-    .wall {
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: calc((100cqw - 2 * 2rem - 3 * var(--wall-gap)) / 4 * 0.66);
-    }
-    .wtile--feature {
-      grid-column: span 4;
-      grid-row: span 3;
-    }
-    .wtile--wide {
-      grid-column: span 2;
-      grid-row: span 2;
-    }
-    .wtile--tall {
-      grid-column: span 2;
-      grid-row: span 4;
-    }
+    grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 640px) {
     .wall {
-      display: flex;
-      flex-direction: column;
-    }
-    .wtile--feature {
-      aspect-ratio: 16 / 9;
-    }
-    .wtile--wide {
-      aspect-ratio: 3 / 2;
-    }
-    .wtile--tall {
-      aspect-ratio: 3 / 4;
+      grid-template-columns: 1fr;
     }
   }
 
@@ -270,10 +287,35 @@ const filters = [
   .wtile {
     position: relative;
     display: block;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: 10px;
     background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
     isolation: isolate;
+  }
+  /* FILTER HIDE — must be unlayered + higher specificity than `.wtile`
+     (Tailwind's `.hidden` is layered and loses to any unlayered scoped rule). */
+  .wtile.hidden {
+    display: none;
+  }
+  /* a newly-revealed tile fades + lifts in (JS adds .is-entering on show) */
+  @keyframes wtile-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .wtile.is-entering {
+    animation: wtile-enter 320ms var(--ease-survey, ease) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wtile.is-entering {
+      animation: none;
+    }
   }
   .wtile-media,
   .wtile-media picture,
@@ -346,6 +388,10 @@ const filters = [
     font-size: 0.74rem;
     color: rgba(238, 245, 250, 0.72);
     line-height: 1.35;
+  }
+  .wtile-line--locked {
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
   }
   /* the click-through: a bordered mono button, ALWAYS visible (not a hover
      state — mobile has no hover), pinned bottom-right with its own backdrop so
@@ -436,12 +482,125 @@ const filters = [
       transform: none;
     }
   }
+
+  /* ── FROM THE ARCHIVE — a quieter, smaller band. Narrower rail than the wall,
+        muted media at rest (restored on hover), mono kicker. Older projects,
+        honestly labeled — not competing with the live work above. ── */
+  .archive-rail {
+    width: min(100%, 880px);
+    margin-top: 2.5rem;
+  }
+  .archive {
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    padding-top: 1.4rem;
+  }
+  .archive-kicker {
+    margin: 0 0 1rem;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-ink-muted, #8a9a96) 90%, transparent);
+  }
+  .archive-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 640px) {
+    .archive-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .atile {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    background: color-mix(in srgb, var(--color-surface, #171b22) 60%, transparent);
+    isolation: isolate;
+  }
+  .atile-media,
+  .atile-media picture,
+  .atile-media img,
+  .atile .wtile-placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  .atile-media img {
+    object-fit: cover;
+    /* muted at rest — the archive is quieter than the live wall */
+    filter: saturate(0.82) brightness(0.82);
+    opacity: 0.92;
+    transition:
+      filter 400ms var(--ease-survey),
+      opacity 400ms var(--ease-survey),
+      transform 900ms var(--ease-survey);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .atile:hover .atile-media img {
+      filter: saturate(1) brightness(0.95);
+      opacity: 1;
+      transform: scale(1.03);
+    }
+  }
+  .atile-meta {
+    position: absolute;
+    z-index: 2;
+    inset-inline: 0;
+    bottom: 0;
+    display: grid;
+    gap: 3px;
+    padding: 1.6rem 12px 10px;
+    background: linear-gradient(to top, rgba(9, 12, 19, 0.9), rgba(9, 12, 19, 0.45) 62%, transparent);
+  }
+  .atile-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .atile-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #eef5fa;
+    line-height: 1.2;
+  }
+  .atile-date {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: rgba(238, 245, 250, 0.6);
+  }
+  .atile-line {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: rgba(238, 245, 250, 0.72);
+  }
+  .atile-sym {
+    color: var(--color-accent-deep, #1e8f8a);
+    margin-right: 0.3rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .atile-media img {
+      transition: none;
+    }
+    .atile:hover .atile-media img {
+      transform: none;
+    }
+  }
 </style>
 
 <script>
   // Filter enhancement only — every tile starts visible (see file header).
-  import { gsap } from "gsap";
-
+  // The toggle is a plain class flip: `.wtile.hidden { display:none }` is
+  // scoped + unlayered, so it actually removes the tile from the grid (Tailwind
+  // v4's layered `.hidden` alone could not). Survivors that stay get a quick
+  // fade-in for polish; no GSAP Flip reflow (its absolute-mode leave handling
+  // left hidden tiles stuck visible — correctness of the filter beats the
+  // animation, which added little for a handful of tiles).
   const grid = document.querySelector<HTMLElement>("[data-work-grid]");
   const bar = document.querySelector<HTMLElement>("[data-work-filters]");
   const empty = document.querySelector<HTMLElement>("[data-work-empty]");
@@ -453,50 +612,29 @@ const filters = [
     function applyFilter(filter: string) {
       let visibleCount = 0;
       cards.forEach((card) => {
+        const wasHidden = card.classList.contains("hidden");
         const show = filter === "all" || card.dataset.pillar === filter;
         card.classList.toggle("hidden", !show);
+        // fade a newly-revealed tile in (fine pointers, motion allowed only)
+        if (show && wasHidden && !reduce) {
+          card.classList.remove("is-entering");
+          void card.offsetWidth; // restart the animation
+          card.classList.add("is-entering");
+        }
         if (show) visibleCount++;
       });
       if (empty) empty.hidden = visibleCount > 0;
     }
 
-    // R3.9 filter FLIP, unchanged: survivors animate between mosaic positions;
-    // if the plugin import fails, the instant toggle is already correct.
-    let FlipMod: typeof import("gsap/Flip") | null = null;
-    let flipFailed = false;
-
-    bar.addEventListener("click", async (e) => {
+    bar.addEventListener("click", (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
       if (!btn) return;
-      const filter = btn.dataset.filter!;
       buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-
-      if (!FlipMod && !flipFailed && !reduce) {
-        try {
-          FlipMod = await import("gsap/Flip");
-          gsap.registerPlugin(FlipMod.Flip);
-        } catch {
-          flipFailed = true;
-        }
-      }
-
-      if (FlipMod && !reduce) {
-        const state = FlipMod.Flip.getState(cards);
-        applyFilter(filter);
-        FlipMod.Flip.from(state, {
-          duration: 0.45,
-          ease: "power2.out", // = --ease-swift
-          absolute: true,
-          onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.25 }),
-          onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.96, duration: 0.2 }),
-        });
-      } else {
-        applyFilter(filter);
-      }
+      applyFilter(btn.dataset.filter!);
     });
   }
 
-  // P4 hover-life: case tiles with a loop export play it on hover. The video
+  // Hover-life: case tiles with a loop export play it on hover. The video
   // mounts on FIRST pointerenter (preload="none" keeps the wall's initial
   // load still-only), fades in over its poster, pauses on leave. Fine
   // pointers only; never under reduced motion or Save-Data.

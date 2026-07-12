@@ -49,6 +49,17 @@ const total = FORGE_SERVICES.length;
 const temper = (i: number) =>
   `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (total - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
 const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.indexOf(svc));
+
+// PRICE TYPOGRAPHY split (operator: "make the pricing bigger + a nicer font").
+// This is a purely TYPOGRAPHIC split — NOT a copy edit. The three captured
+// parts concatenate back to the exact source string (pre + amt + unit ===
+// svc.price, byte-for-byte), so the operator's read-approved price strings are
+// untouched; we only let Fraunces carry the dollar numerals while "Starts at"
+// and "/ mo" · "/ day" stay as small Space Mono labels around them.
+const priceParts = (price: string) => {
+  const m = price.match(/^(Starts at\s+)?(\$[\d,]+)(\s*\/\s*\S+)?$/);
+  return m ? { pre: m[1] ?? "", amt: m[2], unit: m[3] ?? "" } : { pre: "", amt: price, unit: "" };
+};
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -98,21 +109,26 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
           <header class="fg-class-head" data-reveal>
             <span class="hud-label fg-class-label">{p.classes.engagements.label}</span>
             <p class="fg-class-tag">{p.classes.engagements.tagline}</p>
+            <span class="fg-class-rule" aria-hidden="true"></span>
           </header>
           <ol class="fg-cards">
             {
-              engagements.map((svc) => (
+              engagements.map((svc) => {
+                const pp = priceParts(svc.price);
+                return (
                 <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
                   <article class="fg-card" data-reveal data-reveal-stagger="80">
                     <header class="fg-card-head">
-                      <span class="fg-no" aria-hidden="true">{svc.no}</span>
                       <h3 class="fg-name">{svc.name}</h3>
-                      <p class="fg-price">{svc.price}</p>
+                      {/* one line, tags adjacent — no whitespace text nodes, so
+                          the rendered text stays byte-identical to svc.price */}
+                      <p class="fg-price">{pp.pre && <span class="fg-price-lead">{pp.pre}</span>}<span class="fg-price-amt">{pp.amt}</span>{pp.unit && <span class="fg-price-unit">{pp.unit}</span>}</p>
                     </header>
                     <p class="fg-blurb">{svc.blurb}</p>
                     {svc.flagship && (
                       <div class="fg-strip">
                         <p class="hud-label fg-strip-label">{p.flagshipStrip.label}</p>
+                        <span class="fg-strip-line" aria-hidden="true"></span>
                         <ol class="fg-strip-stages">
                           {SAGA_STAGES.map((s) => (
                             <li class="fg-strip-stage">{s.name}</li>
@@ -123,7 +139,8 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
                     )}
                   </article>
                 </li>
-              ))
+                );
+              })
             }
           </ol>
         </div>
@@ -133,22 +150,27 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
           <header class="fg-class-head" data-reveal>
             <span class="hud-label fg-class-label">{p.classes.deliverables.label}</span>
             <p class="fg-class-tag">{p.classes.deliverables.tagline}</p>
+            <span class="fg-class-rule" aria-hidden="true"></span>
           </header>
           <ol class="fg-cards fg-cards--grid">
             {
-              deliverables.map((svc) => (
+              deliverables.map((svc) => {
+                const pp = priceParts(svc.price);
+                return (
                 <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
                   <article class="fg-card" data-reveal data-reveal-stagger="80">
                     <header class="fg-card-head">
-                      <span class="fg-no" aria-hidden="true">{svc.no}</span>
                       <h3 class="fg-name">{svc.name}</h3>
-                      <p class="fg-price">{svc.price}</p>
+                      {/* one line, tags adjacent — no whitespace text nodes, so
+                          the rendered text stays byte-identical to svc.price */}
+                      <p class="fg-price">{pp.pre && <span class="fg-price-lead">{pp.pre}</span>}<span class="fg-price-amt">{pp.amt}</span>{pp.unit && <span class="fg-price-unit">{pp.unit}</span>}</p>
                     </header>
                     <p class="fg-blurb">{svc.blurb}</p>
                     {svc.note && <p class="fg-ledger">{svc.note}</p>}
                   </article>
                 </li>
-              ))
+                );
+              })
             }
           </ol>
         </div>
@@ -420,6 +442,13 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
       var(--color-accent, #38f8ec)
     );
     opacity: 0.9;
+    /* the rail DRAWS with scroll: JS scrubs --rail-progress (0→1) as the
+       services column passes through the viewport, and this clip reveals the
+       gutter line from the top down. Default 1 = fully drawn — no-JS and
+       reduced motion (the script bails before it ever sets the var) both get
+       the complete rail, so it can never fail invisible. */
+    clip-path: inset(0 0 calc((1 - var(--rail-progress, 1)) * 100%) 0);
+    will-change: clip-path;
   }
   .fg-class {
     display: grid;
@@ -440,6 +469,31 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
     line-height: 1.35;
     color: color-mix(in srgb, #f0ece6 88%, transparent);
     max-width: 44ch;
+  }
+  /* class-header temper hairline — a heat→aqua rule that DRAWS in (scaleX) as
+     the header reveals, echoing the gutter rail. Fail-open convention: fully
+     drawn by default; hidden only while JS is live AND the header hasn't
+     revealed yet (the reveal engine's 4s watchdog guarantees .is-revealed
+     lands, so it can't stay collapsed). */
+  .fg-class-rule {
+    display: block;
+    height: 2px;
+    margin-top: 0.5rem;
+    width: min(52%, 15rem);
+    border-radius: 2px;
+    transform-origin: left;
+    background: linear-gradient(
+      to right,
+      var(--color-forge-heat, #ff9d45),
+      var(--color-accent, #38f8ec)
+    );
+  }
+  html.js .fg-class-head[data-reveal]:not(.is-revealed) .fg-class-rule {
+    transform: scaleX(0);
+  }
+  html.js .fg-class-head.is-revealed .fg-class-rule {
+    transform: scaleX(1);
+    transition: transform 900ms var(--ease-survey, ease-out);
   }
   .fg-cards {
     list-style: none;
@@ -472,6 +526,32 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
       0 0 0 3px var(--fg-ground),
       0 0 7px color-mix(in srgb, var(--heat) 65%, transparent);
   }
+  /* each node tick IGNITES once as the drawing rail reaches it — JS adds
+     .is-lit on scroll (enhancement only; the tick's resting dot above is always
+     rendered, so nothing depends on this firing). */
+  @keyframes fg-tick-ignite {
+    0% {
+      transform: scale(1);
+      box-shadow:
+        0 0 0 3px var(--fg-ground),
+        0 0 7px color-mix(in srgb, var(--heat) 65%, transparent);
+    }
+    34% {
+      transform: scale(1.85);
+      box-shadow:
+        0 0 0 3px var(--fg-ground),
+        0 0 20px color-mix(in srgb, var(--heat) 95%, transparent);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow:
+        0 0 0 3px var(--fg-ground),
+        0 0 7px color-mix(in srgb, var(--heat) 65%, transparent);
+    }
+  }
+  .fg-svc.is-lit::before {
+    animation: fg-tick-ignite 640ms var(--ease-swift, ease-out) 1;
+  }
   .fg-card {
     height: 100%;
     background: var(--fg-glass);
@@ -484,20 +564,11 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
     /* each card sits in its own heat: a faint inset edge in station color */
     box-shadow: inset 3px 0 0 var(--heat);
   }
+  /* index numbers dropped (operator) — the head is now just name over price,
+     stacked, so nothing looks amputated where 01–06 used to sit. */
   .fg-card-head {
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    gap: 0.4rem 0.9rem;
-  }
-  .fg-no {
-    grid-row: span 2;
-    align-self: start;
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    color: var(--heat);
-    padding-top: 0.15rem;
+    gap: 0.55rem;
   }
   .fg-name {
     font-family: var(--font-sans);
@@ -506,12 +577,38 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
     line-height: 1.2;
     color: #f4f0ea;
   }
+  /* PRICE — the strongest thing on the card after the name (operator: bigger,
+     nicer face). The dollar amount is set in the display serif (Fraunces) at
+     large size with its handsome lining numerals; "Starts at" rides above as a
+     small mono kicker and "/ mo" · "/ day" trails inline as a small mono unit. */
   .fg-price {
-    grid-column: 2;
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
+    display: block;
     color: var(--heat);
+  }
+  .fg-price-lead {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #f0ece6 52%, transparent);
+    margin-bottom: 0.2rem;
+  }
+  .fg-price-amt {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(2rem, 3.4vw, 2.55rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--heat);
+  }
+  .fg-price-unit {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, #f0ece6 62%, transparent);
+    white-space: nowrap;
   }
   .fg-blurb {
     font-size: 0.97rem;
@@ -534,6 +631,27 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
     border-top: 1px solid var(--fg-hair);
     display: grid;
     gap: 0.5rem;
+  }
+  /* the five-stage strip's connecting line — the same subtle scaleX draw-in,
+     keyed to the flagship card's reveal (fail-open by the same rule). */
+  .fg-strip-line {
+    display: block;
+    height: 1px;
+    width: 100%;
+    transform-origin: left;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-forge-heat, #ff9d45) 60%, transparent),
+      color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent),
+      transparent
+    );
+  }
+  html.js .fg-card[data-reveal]:not(.is-revealed) .fg-strip-line {
+    transform: scaleX(0);
+  }
+  html.js .fg-card.is-revealed .fg-strip-line {
+    transform: scaleX(1);
+    transition: transform 1100ms var(--ease-survey, ease-out) 120ms;
   }
   .fg-strip-label {
     letter-spacing: 0.18em;
@@ -625,16 +743,29 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
       opacity: 0.35;
       right: -12%;
     }
-    .fg-card-head {
-      grid-template-columns: auto 1fr;
+  }
+
+  /* ── reduced motion: the scroll animatics are enhancement only. The rail JS
+     bails before it ever sets --rail-progress (rail stays fully drawn), ticks
+     never get .is-lit. The two CSS draw-in lines are force-revealed by the
+     engine, so pin them to their final state with no transition/animation. ── */
+  @media (prefers-reduced-motion: reduce) {
+    html.js .fg-class-head.is-revealed .fg-class-rule,
+    html.js .fg-card.is-revealed .fg-strip-line {
+      transform: scaleX(1);
+      transition: none;
+    }
+    .fg-svc.is-lit::before {
+      animation: none;
     }
   }
 </style>
 
 <script>
   // P12.x enhancement — everything below rides over a page that is already
-  // fully forged (and fully readable) without JS. The temper rail is CSS-only;
-  // the two enhancements here are the hero ember field and the S-finale draw.
+  // fully forged (and fully readable) without JS. The temper rail renders fully
+  // drawn in CSS by default; the enhancements here are the hero ember field, the
+  // S-finale draw, and the scroll-scrubbed rail draw + node-tick ignition.
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { ensureSmoothScroll } from "../lib/smooth-scroll";
@@ -668,6 +799,40 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
           scrollTrigger: { trigger: saga, start: "top 85%", end: "center 45%", scrub: 0.5 },
         },
       );
+    }
+
+    // ── the temper rail DRAWS with scroll (operator: "I still like the lines
+    // that move"). One scrubbed --rail-progress (0→1) grows the gutter gradient
+    // down the services column as it passes the viewport; each card's node tick
+    // ignites once as the drawing tip reaches it. Fail-open: on any error the
+    // rail is restored to fully drawn — it can never be left half-painted. ──
+    const services = document.querySelector<HTMLElement>("[data-fg-services]");
+    const railBox = services?.querySelector<HTMLElement>(".fg-services-inner");
+    if (services && railBox) {
+      try {
+        // scrub over the rail's OWN box (not the section, which trails a pricing
+        // footer below the rail) so progress maps tightly to the drawn line
+        gsap.fromTo(
+          railBox,
+          { "--rail-progress": 0 },
+          {
+            "--rail-progress": 1,
+            ease: "none",
+            scrollTrigger: { trigger: railBox, start: "top 78%", end: "bottom 62%", scrub: 0.6 },
+          },
+        );
+        // each tick fires once, ~when the drawing rail tip passes its card
+        services.querySelectorAll<HTMLElement>(".fg-svc").forEach((svc) => {
+          ScrollTrigger.create({
+            trigger: svc,
+            start: "top 72%",
+            once: true,
+            onEnter: () => svc.classList.add("is-lit"),
+          });
+        });
+      } catch {
+        railBox.style.setProperty("--rail-progress", "1"); // never fail invisible
+      }
     }
 
     // ── the embers: a featherweight 2D canvas field in the hero. Rises,

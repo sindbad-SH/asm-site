@@ -8,12 +8,15 @@ tags:
   - switzerland
   - valais
   - aerial
-cover: /media/adventure/gallery/lac-de-tseuzier-01-1400.webp
+cover: /media/adventure/gallery/lac-de-tseuzier-02-1400.webp
 photos:
+  - slug: lac-de-tseuzier-02
+    orientation: landscape
+    alt: The turquoise reservoir of Lac de Tseuzier deep in its valley, with the Valais Alps ranged along the horizon
   - slug: lac-de-tseuzier-01
     orientation: landscape
-    alt: The turquoise reservoir of Lac de Tseuzier with the curve of its dam at the lower edge
+    alt: The curved concrete dam that holds Lac de Tseuzier, at the lower edge of the turquoise reservoir
 license: true
 ---
 
-Lac de Tseuzier, a reservoir in the Valais Alps above Ayent, Switzerland, August 2023. The curved concrete arc at the lower edge of the frame is the dam that holds it; rock and pasture rise straight out of the turquoise water. The colour is glacial melt, the lake's main source.
+Lac de Tseuzier, a reservoir in the Valais Alps above Ayent, Switzerland, August 2023. From above the ridge the turquoise water sits deep in the valley, the snow line of the Valais Alps ranged along the horizon. The second frame drops close to the curved concrete dam that holds it, rock and pasture rising straight out of the water. The colour is glacial melt, the lake's main source.

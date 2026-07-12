@@ -33,11 +33,12 @@ const DROP_LAT = -56; // drop rings that live entirely below this (Antarctica)
 const SIMPLIFY_EPS = 0.28; // Douglas–Peucker tolerance in degrees (faint backdrop)
 const MIN_RING_AREA = 4; // deg² — drop islands smaller than this (noise at low opacity)
 
-// The four honest territories, at true lat/lon. These MUST land on the right
-// landmass once baked — the self-check below enforces it.
+// The pinged territories, at true lat/lon. These MUST land on the right
+// landmass once baked — the self-check below enforces it. Kept in sync with the
+// PINGS array in WorldMapBackdrop.astro. New Mexico is intentionally NOT pinged
+// (operator direction: too small a trip to flag on the world map).
 const PINGS = [
   { label: "Colorado (Boulder)", lat: 40.0, lon: -105.3 },
-  { label: "New Mexico", lat: 34.5, lon: -106.1 },
   { label: "Switzerland (Valais)", lat: 46.0, lon: 7.75 },
   { label: "Italy (Como/Trentino)", lat: 45.85, lon: 9.5 },
 ];

@@ -2699,13 +2699,33 @@ html.js .portal-forced .portal-scrim {
   overflow: visible; /* chips open toward the interior, so they never need clipping */
 }
 
+/* ── The shared coordinate frame ──────────────────────────────────────────
+   A 2:1 box centered in the 16:9 field. Because the world SVG is also 2:1,
+   `preserveAspectRatio:meet` fills this frame with NO internal letterbox — so
+   this frame IS the rendered map rectangle at every viewport. Both the map and
+   the constellation are positioned against it, so a node's left/top percentage
+   is pure projection math and always lands on the true coastline. The subtle
+   scroll parallax rides here (--wm-shift), moving map + nodes locked together.
+   `width:100%` is width-bound in a 16:9 field (2:1 is wider), so the frame is
+   full-width and vertically centered — exactly reproducing the old `meet` fit. */
+.terr-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  max-height: 100%;
+  transform: translate(-50%, -50%) translateY(var(--wm-shift, 0px));
+  will-change: transform;
+}
+
 /* Decorative connective arcs — low-alpha dashed survey linework, aria-hidden. */
 .terr-arcs {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 1; /* above the world map, below the dots */
   pointer-events: none;
 }
 .terr-arc {
@@ -2729,16 +2749,16 @@ html.js .portal-forced .portal-scrim {
   position: static;
 }
 
-/* ── Country node — the glowing anchor + mono caption ── */
+/* ── Country node — a zero-size anchor seated on the TRUE (lon,lat) point.
+   The dot sits exactly on the point; the label is thrown off on a hairline
+   leader in the per-cluster --label-dir so near-coincident clusters
+   (Switzerland↔Italy, Colorado↔New Mexico) never collide. ── */
 .terr-country {
   position: absolute;
   left: calc(var(--cx) * 1%);
   top: calc(var(--cy) * 1%);
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
+  width: 0;
+  height: 0;
   padding: 0;
   border: 0;
   background: none;
@@ -2747,13 +2767,32 @@ html.js .portal-forced .portal-scrim {
   -webkit-tap-highlight-color: transparent;
 }
 .terr-dot {
-  width: 13px;
-  height: 13px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%); /* centered on the true point */
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, var(--color-accent), var(--color-accent-deep) 78%);
   box-shadow: 0 0 13px -2px color-mix(in srgb, var(--color-accent) 55%, transparent);
   /* Subtle life: one-notch-above-minimal breathing glow, never a light show. */
   animation: terr-pulse 5.5s var(--ease-survey) infinite;
+}
+
+/* Hairline leader from the dot to its offset label — classic cartographic
+   labeling. A 22px line rotated to the cluster's --label-dir; the label's near
+   corner meets its far end (see the per-direction rules below). */
+.terr-leader {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-accent-deep) 60%, transparent);
+  transform-origin: 0 50%;
+  opacity: 0.75;
+  pointer-events: none;
 }
 @keyframes terr-pulse {
   0%,
@@ -2765,13 +2804,16 @@ html.js .portal-forced .portal-scrim {
   }
 }
 .terr-country-label {
+  position: absolute;
+  left: 0;
+  top: 0;
   font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-peak);
   white-space: nowrap;
-  background: color-mix(in srgb, var(--color-base) 78%, transparent);
+  background: color-mix(in srgb, var(--color-base) 82%, transparent);
   padding: 0.12rem 0.4rem;
   border-radius: 2px;
   transition: color var(--dur-hover) var(--ease-swift);
@@ -2780,6 +2822,44 @@ html.js .portal-forced .portal-scrim {
 .terr-country:focus-visible .terr-country-label,
 .terr-cluster.is-open .terr-country-label {
   color: var(--color-accent);
+}
+/* The button anchor is zero-size, so the visible focus indicator rides its
+   label (keyboard users still get a clear ring). */
+.terr-country:focus-visible .terr-country-label {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.terr-country:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Per-cluster label offset: the leader points in --label-dir and the label's
+   near corner sits at its far end (~16px ≈ 22px/√2 on each axis). Directions
+   are chosen so the four callouts fan apart — Switzerland up-left vs Italy
+   down-right; Colorado up-left vs New Mexico down-left. */
+.terr-cluster[data-label-dir="up-left"] .terr-leader {
+  transform: rotate(225deg);
+}
+.terr-cluster[data-label-dir="up-left"] .terr-country-label {
+  transform: translate(calc(-100% - 16px), calc(-100% - 16px));
+}
+.terr-cluster[data-label-dir="up-right"] .terr-leader {
+  transform: rotate(315deg);
+}
+.terr-cluster[data-label-dir="up-right"] .terr-country-label {
+  transform: translate(16px, calc(-100% - 16px));
+}
+.terr-cluster[data-label-dir="down-left"] .terr-leader {
+  transform: rotate(135deg);
+}
+.terr-cluster[data-label-dir="down-left"] .terr-country-label {
+  transform: translate(calc(-100% - 16px), 16px);
+}
+.terr-cluster[data-label-dir="down-right"] .terr-leader {
+  transform: rotate(45deg);
+}
+.terr-cluster[data-label-dir="down-right"] .terr-country-label {
+  transform: translate(16px, 16px);
 }
 
 /* ── Location dot — small node + reveal-on-hover mono label + info chip ── */
@@ -2969,8 +3049,25 @@ html.js .portal-forced .portal-scrim {
 /* ── Mobile: clusters stack vertically, positions go static, names show inline;
    the same interaction (expand a country, open a chip) still works. ── */
 @media (max-width: 719px) {
-  .terr-arcs {
+  /* Chosen mobile strategy: a 2:1 world at ~350px is only ~175px tall — too
+     tight to seat labels on. So we collapse to the accessible list (the same
+     <ul> the spec asks for): the world map, arcs and leaders are hidden, the
+     frame drops its 2:1 box, and clusters stack as tappable rows. No horizontal
+     overflow; tap targets ≥44px. */
+  .terr-arcs,
+  .terr-leader {
     display: none;
+  }
+  .terr-frame {
+    position: static;
+    transform: none;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+  .terr-field .wm {
+    display: none; /* hide the world backdrop — the list is the mobile surface */
   }
   .terr-field {
     aspect-ratio: auto;
@@ -2982,18 +3079,28 @@ html.js .portal-forced .portal-scrim {
     gap: 1.1rem;
   }
   .terr-cluster,
-  .terr-country,
   .terr-loc {
     position: static;
     transform: none;
   }
   .terr-country {
+    position: static;
+    display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
     gap: 0.6rem;
     width: 100%;
+    height: auto;
+    min-height: 44px; /* tap target */
+  }
+  .terr-dot {
+    position: static;
+    transform: none;
   }
   .terr-country-label {
+    position: static;
+    transform: none;
     background: none;
     padding: 0;
   }
@@ -3005,6 +3112,8 @@ html.js .portal-forced .portal-scrim {
   }
   .terr-loc-node {
     gap: 0.4rem;
+    min-height: 44px; /* tap target */
+    padding: 0.3rem 0;
   }
   /* names always visible on mobile (no hover) */
   .terr-loc-label {

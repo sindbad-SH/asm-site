@@ -1,55 +1,42 @@
 ---
 /**
- * WorldMapBackdrop — P19 · the faint world behind THE TERRITORY constellation.
+ * WorldMapBackdrop — the faint world behind THE TERRITORY constellation.
  *
- * ATMOSPHERE, NOT A RE-PROJECTION of the nodes. The constellation
- * (adventure.astro) is a surveyor's sunflower spray, not a geographic map; this
- * layer sits BEHIND it as a hairline equirectangular world outline in the
- * page's cartography grammar — real coastlines + a 30° graticule, all at very
- * low opacity in the resting contour color (--color-accent-deep). It does NOT
- * re-layout the nodes.
+ * ATMOSPHERE, NOT A RE-PROJECTION. This layer is a hairline equirectangular
+ * world outline (real coastlines + a 30° graticule) in the page's cartography
+ * grammar, at very low opacity in the resting contour color. It is now seated
+ * inside `.terr-frame` (adventure.astro) — a 2:1 wrapper — so with the SVG's own
+ * 2:1 viewBox and `preserveAspectRatio="xMidYMid meet"` it fills that frame
+ * with NO internal letterbox. The interactive constellation lives in the SAME
+ * frame, so the country dots seat on their true coastline by pure projection
+ * math (left% = (lon+180)/360*100, top% = (90−lat)/180*100).
  *
- * ACCURATE COASTLINES (P19 fix): the old outline was hand-authored and coarse,
- * so honest lon/lat pings landed on the wrong pixels (Italy read as ocean, a US
- * ping near Africa). The land path is now BAKED from a real dataset — Natural
+ * ACCURATE COASTLINES: the land path is BAKED from a real dataset — Natural
  * Earth 1:110m land (world-atlas TopoJSON) — by scripts/make-world-map.mjs,
- * which converts it to this exact equirectangular projection and self-checks
- * that every territory coordinate is point-in-land before writing. Vite inlines
- * the baked string at build via `?raw`, so there is NO runtime/network fetch;
+ * which converts it to this exact equirectangular projection. Vite inlines the
+ * baked string at build via `?raw`, so there is NO runtime/network fetch;
  * re-bake with `node scripts/make-world-map.mjs` if the geometry ever changes.
  *
  * PROJECTION: equirectangular, viewBox "0 0 360 180", x = lon + 180 and
  * y = 90 − lat (1 SVG unit = 1°). Antarctica dropped; ~22 KB inline, no raster.
  *
- * FIT: the field is 16:9 and the world is 2:1, so preserveAspectRatio
- * "xMidYMid meet" (contain) shows the WHOLE world — the operator wants it zoomed
- * out for regions still to come — softly faded at the field edges by a mask.
- * Because the pings live in the SAME viewBox as the land, they stay seated on
- * the coastline under any fit.
+ * NO "you-are-here" PINGS: the old in-SVG pings (Colorado / Switzerland / Italy)
+ * were removed — the interactive country dots now sit at the exact same
+ * projected pixels (verified to within ~0.08%), so the pings were duplicate
+ * markers. If a distinct static "you-are-here" halo is ever wanted again, add it
+ * as a ring on the constellation dot in adventure.astro, not here.
  *
- * The four real territories get a brighter "you-are-here" ping at their true
- * lon/lat. Decorative/aria-hidden — the accessible territory list is the <ul>
- * in adventure.astro.
- *
- * MOTION: a subtle vertical parallax (≤ the site's other drift amplitudes),
- * absorbed by the contain letterbox so it never reveals a hard edge. Static
- * under no-JS (var defaults to 0) and under reduced motion (the script bails).
+ * MOTION: the section's subtle vertical parallax is owned by `.terr-frame`
+ * (adventure.astro), which drifts the whole frame — map + nodes locked
+ * together. This component is now static (no self-transform, no script), which
+ * keeps map and dots from ever separating during scroll. The edge-fade mask
+ * still softens the coastlines into the frame borders.
  */
 import LAND from "../../scripts/world-map-path.txt?raw"; // baked by make-world-map.mjs
 
 // 30° graticule.
 const MERIDIANS = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 const PARALLELS = [30, 60, 120, 150]; // 90 (equator) is drawn separately, brighter
-
-// The four real territories, at true lon/lat → x = lon + 180, y = 90 − lat.
-// These coordinates are the ones scripts/make-world-map.mjs point-in-land tests
-// on every run — keep the two files in sync if they ever change.
-const PINGS = [
-  { label: "Colorado", x: 74.7, y: 50.0 }, // 40.0N, 105.3W (Boulder)
-  { label: "New Mexico", x: 73.9, y: 55.5 }, // 34.5N, 106.1W
-  { label: "Switzerland", x: 187.8, y: 44.0 }, // 46.0N, 7.75E (Valais)
-  { label: "Italy", x: 189.5, y: 44.1 }, // 45.85N, 9.5E (Como / Trentino)
-];
 ---
 
 <div class="wm" aria-hidden="true">
@@ -65,25 +52,13 @@ const PINGS = [
     </g>
     <line class="wm-equator" x1="0" y1="90" x2="360" y2="90" />
     <path class="wm-land" d={LAND} fill-rule="evenodd" />
-    <g class="wm-pings">
-      {
-        PINGS.map((p) => (
-          <>
-            <circle class="wm-ping-ring" cx={p.x} cy={p.y} r="2.6" />
-            <circle class="wm-ping" cx={p.x} cy={p.y} r="1.1" />
-          </>
-        ))
-      }
-    </g>
   </svg>
 </div>
 
 <style>
-  /* Clip wrapper: the field itself keeps overflow:visible (chips escape it), so
-     the map gets its OWN clip box. Sits behind the arcs (z-index 0, earlier in
-     DOM) and well behind the nodes (z-index 4). A soft edge mask fades the
-     coastlines into the field borders so the contained world never ends on a
-     hard line. */
+  /* Fills the shared 2:1 frame (adventure.astro's .terr-frame). Sits behind the
+     arcs (z-index 1) and the nodes (z-index 4). A soft edge mask fades the
+     coastlines into the frame borders so the world never ends on a hard line. */
   .wm {
     position: absolute;
     inset: 0;
@@ -103,9 +78,6 @@ const PINGS = [
     inset: 0;
     width: 100%;
     height: 100%;
-    /* parallax rides inside the contain letterbox — never reveals a hard edge */
-    transform: translateY(var(--wm-shift, 0px));
-    will-change: transform;
   }
 
   .wm-graticule line {
@@ -128,77 +100,4 @@ const PINGS = [
     vector-effect: non-scaling-stroke;
     opacity: 0.5;
   }
-
-  /* The four real-footprint pings — brighter, in the scarce accent. */
-  .wm-ping {
-    fill: var(--color-adventure-warm);
-    opacity: 0.85;
-  }
-  .wm-ping-ring {
-    fill: none;
-    stroke: var(--color-adventure-warm);
-    stroke-width: 0.6;
-    vector-effect: non-scaling-stroke;
-    opacity: 0.4;
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: wm-ping-pulse 4.5s var(--ease-survey) infinite;
-  }
-  @keyframes wm-ping-pulse {
-    0%,
-    100% {
-      opacity: 0.42;
-      transform: scale(0.7);
-    }
-    50% {
-      opacity: 0.12;
-      transform: scale(1.35);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .wm-svg {
-      transform: none;
-    }
-    .wm-ping-ring {
-      animation: none;
-    }
-  }
 </style>
-
-<script>
-  // Subtle parallax: write --wm-shift as the field scrolls through the viewport.
-  // rAF-throttled; bails entirely under reduced motion (leaving the CSS default
-  // of 0px → static). No-JS never runs this at all.
-  (() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const wraps = Array.from(document.querySelectorAll<HTMLElement>(".wm"));
-    if (!wraps.length) return;
-    const AMP = 12; // px — at/under the site's other drift amplitudes
-    let ticking = false;
-
-    const update = () => {
-      ticking = false;
-      const vh = window.innerHeight || 1;
-      for (const wrap of wraps) {
-        const svg = wrap.querySelector<HTMLElement>(".wm-svg");
-        if (!svg) continue;
-        const r = wrap.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) continue; // offscreen — skip
-        // progress: -1 (below fold) → +1 (above fold), 0 at viewport center
-        const progress = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
-        svg.style.setProperty("--wm-shift", `${(-progress * AMP).toFixed(1)}px`);
-      }
-    };
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
-  })();
-</script>

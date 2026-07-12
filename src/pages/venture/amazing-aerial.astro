@@ -77,6 +77,10 @@ const ARTICLE = {
   ctas: [
     { label: "License my work", href: AA_PORTFOLIO, external: true, primary: true },
     { label: "About the agency", href: "https://www.amazingaerial.com/", external: true },
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new CTA label (staging-only). Cross-link
+    // to the work-side highlights reel (/work/amazing-aerial) — the two AA pages
+    // point at each other: this is the agency STORY, that is the REEL.
+    { label: "The highlights reel", href: `${base}/work/amazing-aerial`, external: false },
     { label: "See the adventure lane", href: `${base}/adventure`, external: false },
   ],
 };

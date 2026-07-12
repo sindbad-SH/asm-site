@@ -404,6 +404,31 @@ export const RELATIONSHIPS: readonly Relationship[] = [
     tier: "attended",
     permittedPhrasing: "relationship-building attendance — keeping a pulse on the industry",
   },
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — two new relationship entries for the
+  // work-wall "from the archive" band (staging-only until read). P-work
+  // (2026-07-12). Dates come from the source files, never invented.
+  //
+  // Gigs Go Green — the operator's own statement: a high-end paying customer,
+  // TWO projects, four-figure engagements (Hero X Solar / OEN solar-prize film,
+  // Sept 2024; "We Own Cash" CoinDesk pitchfest film, Apr 2025). Tier "delivered"
+  // (paid delivered work — same tier as PitchBoulder). The phrasing does NOT
+  // claim the company currently exists: past-tense engagements only.
+  {
+    id: "gigs-go-green",
+    name: "Gigs Go Green",
+    tier: "delivered",
+    permittedPhrasing: "two paid production engagements for Gigs Go Green",
+  },
+  // Vybe — unpaid festival coverage made for a friend who is no longer affiliated
+  // with the brand. The phrasing leaves NO client implication and asserts NO
+  // current affiliation for anyone (the spirit of the Knights "made on a
+  // handshake" line). Tier "informal". Coverage spanned 2023–2024.
+  {
+    id: "vybe",
+    name: "Vybe",
+    tier: "informal",
+    permittedPhrasing: "festival coverage, made for a friend",
+  },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -416,12 +441,23 @@ export type WorkItem = {
   slug: string;
   title: string;
   pillar: PillarId;
-  /** "For [org]" — the attribution that keeps every card honest. */
-  forOrg: string;
-  what: string;
-  engagement: "paid engagement" | "unpaid coverage" | "personal / editorial" | "[confirm]";
+  /** "For [org]" — the attribution that keeps every card honest. Omitted only
+   *  when `lockedAttribution` renders the relationship's permittedPhrasing as
+   *  the WHOLE line (e.g. the Amazing Aerial flagship — a licensed relationship
+   *  may only ever be stated in its verbatim phrasing). */
+  forOrg?: string;
+  what?: string;
+  engagement?: "paid engagement" | "unpaid coverage" | "personal / editorial" | "made on a handshake" | "[confirm]";
   relationshipId?: string;
   href?: string;
+  /** When true, the tile prints RELATIONSHIP_BY_ID[relationshipId].permittedPhrasing
+   *  VERBATIM as its attribution line instead of the composed "For … · … — …"
+   *  line — the only honest way to carry a licensed relationship on a tile. */
+  lockedAttribution?: boolean;
+  /** Overrides the tile's default "Read the story" click-through label. */
+  cta?: string;
+  /** CSS object-position for the tile face, to keep key elements in the crop. */
+  objectPosition?: string;
   /** AA-bound teaser still: its exported media carries a baked-in dual-brand
    *  (Amazing Aerial + ASM) watermark (exclusivity handling — see the gallery
    *  comment). Purely descriptive; the gallery uses it for an optional caption. */
@@ -457,19 +493,6 @@ export const WORK: readonly WorkItem[] = [
     relationshipId: "pebble-beach",
     href: "/work/shelby-pebble-beach",
   },
-  // P13d — Knights of Mayhem: the jousting showcase he cut at the Colorado
-  // Medieval Festival (Longmont). Engagement wording per operator direction
-  // (2026-07-08): open to interpretation — his own phrase, states the deal's
-  // shape without claiming or denying payment. Title/what still in the
-  // read-approval queue with the other new strings.
-  {
-    slug: "knights-of-mayhem",
-    title: "Knights of Mayhem — full-contact jousting at the Colorado Medieval Festival",
-    pillar: "entertainment",
-    forOrg: "Knights of Mayhem",
-    what: "covered the jousting troupe and cut their showcase piece",
-    engagement: "made on a handshake",
-  },
   {
     slug: "pitchboulder",
     title: "PitchBoulder — coverage, recaps & the commercial",
@@ -483,121 +506,75 @@ export const WORK: readonly WorkItem[] = [
     relationshipId: "pitchboulder",
     href: "/work/pitchboulder",
   },
-  // ---------------------------------------------------------------------------
-  // Adventure gallery — the two [confirm]-titled placeholders (alps-expedition,
-  // swiss-expedition) are REPLACED by the real selects below (COPY.md §5.2;
-  // MEDIA-GUIDE Worked Example 2 sanctions replacement). All pillar "adventure",
-  // forOrg "Personal / Editorial", engagement "personal / editorial", NO
-  // relationshipId (personal/editorial work is not a licensed Amazing Aerial
-  // credit — attaching that relationship here would overstate the licensing
-  // claim; the Adventure page's Licensed section carries that proof on its own).
-  // Titles are place-names only — no time-of-day or story claims.
-  //
-  // EXCLUSIVITY (operator decision): the Colorado 7-3-2026 batch is AA-bound
-  // (premium-exclusive). Per the operator, only the BEST Colorado picks ship,
-  // WATERMARKED (dual-brand AA+ASM baked into the exports), as an Amazing Aerial
-  // teaser/funnel; the clean Valais set fills the rest unwatermarked.
-  //
-  // ROUND 2 (REVISION-ORDERS R3/R4): re-selected for "awesome, hire me" impact
-  // — 7 knockout cards, mixed aspect (never letterbox-squished). The two Valais
-  // verticals (Matterhorn 5, Gornergrat 6 — genuinely portrait 3060x5440 stills)
-  // get vertical cards; the rest are 3:2 landscape. Dropped the mid-tier
-  // `zermatt-panorama-01` (a trail-bench frame). `lac-de-tseuzier-01` re-sourced
-  // to the actual turquoise lake (Tseuzier 10) — the prior export was a rapids
-  // frame that didn't match its title. Order interleaves verticals with
-  // landscapes so the grid reads as a mixed-aspect wall, not a uniform strip.
-  // Watermarks are now OBVIOUS (R4): AA mark large + centered, ASM corner clear.
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ROUND 3 (R3.3): Walker Ranch + Crescent Meadows CUT (weak slots). Replaced
-  // by two Italy picks (Castel Toblino, Varenna/Lake Como — the first Italian
-  // frames on the site). EVERY gallery still is now watermarked (dual-brand
-  // AA+ASM, baked from the REAL AA logo) — the gallery is dual-brand advertising
-  // for AA + ASM, not a portfolio of clean files (operator framing). Field notes
-  // (R3.4) are VERBATIM from FIELD-NOTES-COPY.md; STAGING-ONLY until operator
-  // read-approval. Order interleaves verticals/landscapes for the mixed-aspect
-  // wall (no two verticals adjacent in DOM/source order).
-  // ---------------------------------------------------------------------------
+  // P-work (2026-07-12) — KNIGHTS RE-LANED venture → ADVENTURE per operator:
+  // "Knights of Mayhem is an adventure story, not a venture — I just was at a
+  // cool place and covered a story." So the only two VENTURE tiles are the
+  // Shelby/Pebble Beach story and PitchBoulder (both above); everything else on
+  // the wall files under adventure. Engagement wording ("made on a handshake")
+  // is the operator's own phrase — states the deal's shape without claiming or
+  // denying payment. Title/what still in the read-approval queue.
   {
-    slug: "matterhorn-zermatt-01",
-    title: "The Matterhorn, from Zermatt",
+    slug: "knights-of-mayhem",
+    title: "Knights of Mayhem — full-contact jousting at the Colorado Medieval Festival",
     pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "vertical",
-    fieldNoteOpen: true,
-    fieldNote:
-      "Zermatt doesn't let cars in, so the town is quiet enough to hear the river. The Matterhorn doesn't care either way. In 1865, Edward Whymper's party reached the summit first — and four men died on the rope coming down. The mountain has been charging that kind of respect ever since. I stood below it with a camera and did the only sensible thing: waited for the light and got out of its way.",
+    forOrg: "Knights of Mayhem",
+    what: "covered the jousting troupe and cut their showcase piece",
+    engagement: "made on a handshake",
+  },
+  // P-work (2026-07-12) — AA FLAGSHIP. The watermarked AA+ASM adventure stills
+  // that used to fill the wall were REMOVED at the operator's direction ("all
+  // these Amazing Aerial cards defeat the purpose — those belong in Adventure").
+  // They still live on /adventure. In their place: ONE flagship tile → the AA
+  // highlights reel at /work/amazing-aerial. Its face is E:/Amazing Ariel/
+  // Snapshot_2.JPG (the AA mark is baked into the frame), exported to
+  // work/amazing-aerial/tile.{avif,webp}. `lockedAttribution` makes the tile
+  // print the AA relationship's permittedPhrasing VERBATIM — the only honest way
+  // to state a licensed relationship on a tile (never a composed line).
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — the `title` and `cta` are new copy
+  // (staging-only until read).
+  {
+    slug: "amazing-aerial",
+    title: "My top shots with Amazing Aerial",
+    pillar: "adventure",
+    relationshipId: "amazing-aerial",
+    lockedAttribution: true,
+    href: "/work/amazing-aerial",
+    cta: "See the highlights",
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// WORK_ARCHIVE — the quiet "from the archive" band at the bottom of the work
+// wall: older projects surfaced to round out the record (operator direction,
+// 2026-07-12). NOT part of the filterable wall — these render in their own
+// muted, smaller-tile band. Each states its relationship ONLY through its
+// consts permittedPhrasing (rendered VERBATIM via <LegendMark>), plus a factual
+// date read from the source files. Media lives in
+// public/media/work/archive/<slug>.{avif,webp}. Tiles link nowhere (no case
+// pages) — tiles-only, per operator.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — the `title` + `date` strings and the band
+// kicker are new visible copy (staging-only until read); the honest one-liners
+// come verbatim from RELATIONSHIPS above.
+// ---------------------------------------------------------------------------
+export type ArchiveItem = {
+  slug: string;
+  title: string;
+  date: string;
+  relationshipId: string;
+};
+
+export const WORK_ARCHIVE: readonly ArchiveItem[] = [
+  {
+    slug: "gigs-go-green",
+    title: "Gigs Go Green",
+    date: "2024–2025",
+    relationshipId: "gigs-go-green",
   },
   {
-    slug: "flatirons-chautauqua-03",
-    title: "The Flatirons over Chautauqua",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "aerial photo, Boulder, Colorado",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "landscape",
-    fieldNote:
-      "The story goes that pioneer women named the Flatirons for the irons they pressed laundry with. From the air you see what they meant — great slabs leaned against the mountain like tools set down mid-job. Chautauqua's meadow below has been Boulder's front porch since 1898. I've walked under these rocks more times than I can count; flying over them was the first time they looked brand new.",
-  },
-  {
-    slug: "gornergrat-glacier-01",
-    title: "Gornergrat glacier panorama",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Switzerland",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "vertical",
-    fieldNote:
-      "From the Gornergrat ridge you look across at Monte Rosa and down onto the Gorner Glacier — one of the largest ice streams left in the Alps. “Left” is the operative word. Photographs from a century ago show ice where there is now bare rock. I shot this panorama knowing the frame is a record as much as a picture: this exact view is leaving, one summer at a time.",
-  },
-  {
-    slug: "eldorado-springs-01",
-    title: "Eldorado Springs canyon",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "aerial photo, Colorado",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "landscape",
-    fieldNote:
-      "A century ago this canyon was a resort they called the Coney Island of the West, and a man named Ivy Baldwin walked a wire strung across it — hundreds of feet up, no net. He made his last crossing at 82. The resort faded; the nerve stayed. Most mornings the sandstone is dotted with climbers picking their way up. I flew the drone through the quiet above them and tried to earn the view Baldwin got for free.",
-  },
-  {
-    slug: "castel-toblino-01",
-    title: "Castel Toblino, Trentino",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Italy",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "vertical",
-    // DRAFT (R3.4) — awaiting operator read-approval. Legend beats web-verified:
-    // 12th-c. castle on a near-island in Lago di Toblino; long tied to the
-    // prince-bishops of Trento; the folk-legend of Claudia Particella (the
-    // bishop's love) is widely documented local lore (hedged as legend).
-    fieldNote:
-      "They say a prince-bishop of Trento kept his forbidden love, Claudia Particella, out here where the lake could hide her — the kind of story a castle on its own little island seems built to attract. Toblino has stood on this water since medieval times, half fortress, half fairy tale. I came for the reflection and got the whole legend thrown in. Some places you photograph; this one photographs back.",
-  },
-  {
-    slug: "varenna-lake-como-01",
-    title: "Lake Como, from Varenna",
-    pillar: "adventure",
-    forOrg: "Personal / Editorial",
-    what: "expedition photo, Italy",
-    engagement: "personal / editorial",
-    watermarked: true,
-    orientation: "landscape",
-    // DRAFT (R3.4) — awaiting operator read-approval. Legend beats web-verified:
-    // Castello di Vezio above Varenna is traditionally linked to the Lombard
-    // queen Theodelinda (c. 600 AD) in local history (hedged as tradition); Lake
-    // Como's glacial depth (~400m, one of Europe's deepest lakes) is documented.
-    fieldNote:
-      "Local tradition puts the tower above Varenna at the order of Theodelinda, a Lombard queen from around the year 600 — a watchpost over a lake that drops more than a thousand feet straight down, one of the deepest in Europe. From up here Como looks calm enough to walk on. It isn't. I held the frame wide and let the water do the talking; on Como the water usually wins.",
+    slug: "vybe",
+    title: "Vybe",
+    date: "2023–2024",
+    relationshipId: "vybe",
   },
 ] as const;
 
@@ -1043,9 +1020,13 @@ export const PAGES = {
       description:
         "Everything I've actually done — each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
     },
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — strengthened intro copy (staging-only
+    // until read). Same honesty backbone (attribution-first, no borrowed
+    // credit), sharper voice. Operator note: "the copy of the work field can be
+    // a little stronger."
     intro: {
-      heading: "The field",
-      body: "Everything I've actually done, each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+      heading: "The work, on the record.",
+      body: "Every piece here I actually shot, cut, or led — credited to exactly who it was for and marked at its true status. No logo walls, no borrowed credit, nothing I can't stand behind.",
     },
     // Case-study copy (Immersive-Garden walkthrough). PitchBoulder ships first
     // and sets the template. Facts I can't verify are [confirm] (asset S3);

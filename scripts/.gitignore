@@ -1,0 +1,3 @@
+# Local-only bake previews from make-adventure-frame.mjs --test
+_preview-*.png
+_wm-calibration.png
