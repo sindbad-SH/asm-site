@@ -37,8 +37,8 @@ const p = PAGES.entertainment;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // build-time media gating (cwd-anchored, per repo convention): a card only
-// renders when its file shipped. avif+webp pairs preferred; lone files ride
-// as-is (hook-poster has no webp export; bts frames are webp-only).
+// renders when its file shipped. avif+webp pairs preferred; lone files
+// (e.g. the .mp4 loops) ride as-is via media().
 const mediaRoot = join(process.cwd(), "public", "media");
 const media = (rel: string) => (existsSync(join(mediaRoot, ...rel.split("/"))) ? `${base}/media/${rel}` : undefined);
 const pair = (relBase: string) => {
@@ -50,11 +50,17 @@ const pair = (relBase: string) => {
 // chapter 01 — PitchBoulder (E3, the primary proof anchor)
 const pbPoster = pair("work/pitchboulder/hook-poster");
 const pbContext = pair("work/pitchboulder/context");
-// chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room)
+const pbLoop = media("work/pitchboulder/loop.mp4"); // P13c — hover-video on the tall card
+// chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room).
+// P13c — real stills replace the frame-grabs: on-set (crew filming the car,
+// the storytelling card) rides the wide card + hover-video; dawn-flare + heritage
+// fill the tall/small cards. All from the width-suffixed photos/ exports.
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
-const shPoster = pair("work/shelby-pebble-beach/poster");
-const shBts1 = media("work/shelby-pebble-beach/bts/f-002.webp");
-const shBts2 = media("work/shelby-pebble-beach/bts/f-007.webp");
+const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
+const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
+const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-900");
+const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-900");
+const shLoop = media("work/shelby-pebble-beach/loop.mp4"); // P13c — hover-video on the wide card
 // the rooms — honest published event frames (SeriesFest carpet, AFM panel)
 const roomSeries = pair("home/industry/background");
 const roomAfm = pair("home/industry/midground");
@@ -69,12 +75,25 @@ const otherRooms = p.rooms.items.filter((r) => r.proof.relationshipId !== "pebbl
 const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories"
 const roomsGhost = ["R", "O", "O", "M", "S"];
 
-// chapter ground colors — the reference's jewel-tone ride, our dark family
+// P13c — the coverage index: editorial tiles to the published venture stories.
+// slate + title strings are COPIED VERBATIM from each article page's own
+// frontmatter/markup (already operator-flagged there) — reuse adds no new copy.
+const coverage = [
+  { href: "/venture/seriesfest-2026", slate: "SeriesFest · May 7–8, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story" },
+  { href: "/venture/seriesfest-2025", slate: "SeriesFest · Apr 30 – May 4, 2025 · Denver, CO", title: "SeriesFest 2025 — a venture story" },
+  { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story" },
+  { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story" },
+  { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story" },
+  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes my aerials to market." },
+];
+
+// chapter ground colors — the reference's jewel-tone ride, our dark family.
+// P13c — meme ground removed (the S2 statement is now chapter 03); ch03 added.
 const GROUNDS = {
   intro: "#101020",
-  meme: "#0c2723",
   ch01: "#191031",
   ch02: "#261118",
+  ch03: "#0e2230",
   rooms: "#10141f",
   handoff: "#0f1118",
 };
@@ -104,32 +123,30 @@ const GROUNDS = {
       <p class="im-turn im-intro-sub" data-reveal>{p.hero.subline}</p>
     </section>
 
-    <!-- ═══ S2 · MEME — the focus statement (her BOLD & THOUGHTFUL slot) ═══ -->
-    <section class="im-sec im-meme" data-im-section data-ground={GROUNDS.meme} style={`--sec-ground:${GROUNDS.meme}`}>
-      <p class="hud-label im-kicker" data-reveal>{p.meme.heading}</p>
-      <!-- meme.body verbatim: "The role I hold most formally in this world." -->
-      <h2 class="im-statement" data-reveal>
-        THE ROLE I HOLD <span class="im-turn">most formally</span> IN THIS WORLD.
-      </h2>
-      <div class="im-proof" data-reveal>
-        <LegendMark proof={p.meme.proof} />
-      </div>
-    </section>
+    <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══
+         P13c — the old S2 MEME statement moved into chapter 03 below (no dup). -->
 
-    <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══ -->
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch01} style={`--sec-ground:${GROUNDS.ch01}`}>
       <span class="im-index im-turn" aria-hidden="true">01</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
         <div class="im-collage" aria-hidden="true">
           {
             pbPoster && (
-              <figure class="im-card im-card--tall" data-im-card data-depth="1.4">
+              // P13c — the tall card is a clickable hover-video link to the case page
+              <a
+                class="im-card im-card--tall im-card--link"
+                href={`${base}/work/pitchboulder`}
+                data-im-card
+                data-depth="1.4"
+                tabindex="-1"
+              >
                 <picture>
                   {pbPoster.avif && <source srcset={pbPoster.avif} type="image/avif" />}
                   <img src={pbPoster.webp ?? pbPoster.avif} alt="" loading="lazy" decoding="async" />
                 </picture>
-              </figure>
+                {pbLoop && <video class="im-loop" data-im-loop data-loop-src={pbLoop} muted loop playsinline preload="none" />}
+              </a>
             )
           }
           {
@@ -165,27 +182,42 @@ const GROUNDS = {
 
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch02} style={`--sec-ground:${GROUNDS.ch02}`}>
       <span class="im-index im-turn" aria-hidden="true">02</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
         <div class="im-collage" aria-hidden="true">
           {
-            shPoster && (
-              <figure class="im-card im-card--wide" data-im-card data-depth="1.2">
+            shOnSet && (
+              // P13c — real on-set still (crew filming the car); wide card is the
+              // clickable hover-video link to the case page
+              <a
+                class="im-card im-card--wide im-card--link"
+                href={`${base}${shHref}`}
+                data-im-card
+                data-depth="1.2"
+                tabindex="-1"
+              >
                 <picture>
-                  {shPoster.avif && <source srcset={shPoster.avif} type="image/avif" />}
-                  <img src={shPoster.webp ?? shPoster.avif} alt="" loading="lazy" decoding="async" />
+                  {shOnSet.avif && <source srcset={shOnSet.avif} type="image/avif" />}
+                  <img src={shOnSet.webp ?? shOnSet.avif} alt="" loading="lazy" decoding="async" />
                 </picture>
-              </figure>
+                {shLoop && <video class="im-loop" data-im-loop data-loop-src={shLoop} muted loop playsinline preload="none" />}
+              </a>
             )
           }
-          {shBts1 && (
+          {shDawn && (
             <figure class="im-card im-card--tall" data-im-card data-depth="0.6">
-              <img src={shBts1} alt="" loading="lazy" decoding="async" />
+              <picture>
+                {shDawn.avif && <source srcset={shDawn.avif} type="image/avif" />}
+                <img src={shDawn.webp ?? shDawn.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
             </figure>
           )}
-          {shBts2 && (
+          {shHeritage && (
             <figure class="im-card im-card--small" data-im-card data-depth="1.8">
-              <img src={shBts2} alt="" loading="lazy" decoding="async" />
+              <picture>
+                {shHeritage.avif && <source srcset={shHeritage.avif} type="image/avif" />}
+                <img src={shHeritage.webp ?? shHeritage.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
             </figure>
           )}
         </div>
@@ -211,6 +243,28 @@ const GROUNDS = {
       </div>
     </section>
 
+    <!-- ═══ CHAPTER 03 · MEME — typographic (no collage); the S2 statement,
+         now numbered into the chapter sequence. Title lockup + tag + proof. ═══ -->
+    <section class="im-sec im-chapter im-chapter--type" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
+      <span class="im-index im-turn" aria-hidden="true">03</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
+      <div class="im-chapter-stage">
+        <div class="im-chapter-type">
+          <h2 class="im-title" data-reveal>
+            <span class="im-line">MEME</span>
+          </h2>
+          <!-- meme.body verbatim: "The role I hold most formally in this world." -->
+          <p class="im-turn im-tag" data-reveal>{p.meme.body}</p>
+        </div>
+        <div class="im-chapter-meta" data-reveal>
+          <LegendMark proof={p.meme.proof} />
+          <a href="https://www.meme.ngo" rel="noopener" target="_blank" class="link">
+            About the organization <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══ S4 · THE ROOMS — her playground, his honest list ═══ -->
     <section class="im-sec im-rooms" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
       <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
@@ -228,12 +282,6 @@ const GROUNDS = {
             otherRooms.map((room) => (
               <li class="im-room" data-reveal data-reveal-stagger="80">
                 <LegendMark proof={room.proof} />
-                {/* the SeriesFest room now has a pilot venture story behind it */}
-                {room.proof.relationshipId === "seriesfest" && (
-                  <a href={`${base}/venture/seriesfest-2026`} class="link im-room-story">
-                    Read the story <span class="arrow" aria-hidden="true">→</span>
-                  </a>
-                )}
               </li>
             ))
           }
@@ -261,6 +309,19 @@ const GROUNDS = {
           }
         </div>
       </div>
+      <!-- P13c — the coverage index: editorial tiles to the published venture
+           stories, replacing the P12.8 one-off seriesfest link. -->
+      <nav class="im-coverage" aria-label="Venture coverage">
+        {
+          coverage.map((c) => (
+            <a class="im-cov" href={`${base}${c.href}`} data-reveal data-reveal-stagger="60">
+              <span class="im-cov-slate hud-label">{c.slate}</span>
+              <span class="im-cov-title im-turn">{c.title}</span>
+              <span class="im-cov-arrow arrow" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </nav>
       <div class="im-key" data-reveal><LegendKey /></div>
     </section>
 
@@ -371,25 +432,6 @@ const GROUNDS = {
   .im-ghost:nth-child(4) { left: 68%; top: 58%; }
   .im-ghost:nth-child(5) { left: 86%; top: 22%; }
 
-  /* ── S2 meme ── */
-  .im-meme {
-    min-height: 70svh;
-    display: grid;
-    align-content: center;
-    gap: 1.6rem;
-    padding: 7rem clamp(2rem, 8vw, 9rem);
-  }
-  .im-statement {
-    font-size: clamp(2.2rem, 6vw, 5.4rem);
-    max-width: 18ch;
-  }
-  .im-statement .im-turn {
-    font-size: 0.62em;
-  }
-  .im-proof {
-    max-width: 40rem;
-  }
-
   /* ── S3 chapters ── */
   .im-chapter {
     min-height: 130svh;
@@ -430,6 +472,28 @@ const GROUNDS = {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* P13c — the two case cards are clickable hover-video links: pointer-events
+     back on (the collage is otherwise none), and a muted loop fades over the
+     still on hover. Mounts on first pointerenter (see the hover-life script). */
+  .im-card--link {
+    display: block;
+    pointer-events: auto;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .im-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 500ms var(--ease-survey, ease);
+    pointer-events: none;
+  }
+  .im-card--link.is-looping .im-loop {
+    opacity: 1;
   }
   .im-card--tall { width: clamp(160px, 22vw, 320px); aspect-ratio: 9 / 14; left: 4%; top: 6%; }
   .im-card--wide { width: clamp(240px, 34vw, 520px); aspect-ratio: 16 / 10; right: 2%; top: 14%; }
@@ -528,6 +592,47 @@ const GROUNDS = {
     margin-top: 2rem;
   }
 
+  /* ── P13c coverage index — editorial tiles, im- voice, hover lift ── */
+  .im-coverage {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+  }
+  .im-cov {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.3rem 1.4rem;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 380ms var(--ease-survey, ease),
+      border-color 380ms ease,
+      background 380ms ease;
+  }
+  .im-cov:hover,
+  .im-cov:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, #ffffff 30%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .im-cov-slate {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, #e8f6f3 72%, transparent);
+  }
+  .im-cov-title {
+    font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+    line-height: 1.22;
+  }
+  .im-cov-arrow {
+    color: var(--color-accent, #38f8ec);
+    font-size: 0.9rem;
+  }
+
   /* ── S5 handoff ── */
   .im-handoff {
     min-height: 60svh;
@@ -559,6 +664,10 @@ const GROUNDS = {
     .im-confetti,
     .im-card {
       transform: none !important;
+    }
+    .im-loop,
+    .im-cov {
+      transition: none;
     }
   }
 </style>
@@ -657,4 +766,28 @@ const GROUNDS = {
     }
   }
   void init();
+
+  // P13c hover-life: the two case-chapter cards (PB tall, Shelby wide) play
+  // their loop on hover — the video mounts on FIRST pointerenter (preload="none"
+  // keeps the initial load still-only), fades in over its poster, pauses on
+  // leave. Fine pointers only; never under reduced motion or Save-Data.
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (reduce || !fine || conn?.saveData) return;
+    document.querySelectorAll<HTMLVideoElement>("[data-im-loop]").forEach((video) => {
+      const card = video.closest<HTMLElement>(".im-card--link");
+      if (!card) return;
+      card.addEventListener("pointerenter", () => {
+        if (!video.src) video.src = video.dataset.loopSrc!;
+        video.play().catch(() => {}); // autoplay refusal → the poster stands
+        card.classList.add("is-looping");
+      });
+      card.addEventListener("pointerleave", () => {
+        card.classList.remove("is-looping");
+        if (!video.paused) video.pause();
+      });
+    });
+  })();
 </script>
