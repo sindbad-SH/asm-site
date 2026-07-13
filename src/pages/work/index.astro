@@ -230,7 +230,7 @@ const archive = WORK_ARCHIVE.map((a) => {
         <div class="archive">
           <p class="hud-label archive-kicker">From the archive</p>
           <div class="archive-grid">
-            {archive.map(({ item, media, href, symbol, tierLabel, phrasing }) => {
+            {archive.map(({ item, media, href, tierLabel, phrasing }) => {
               const Tag = href ? "a" : "div";
               return (
                 <Tag class={`atile${href ? " atile--link" : ""}`} href={href} data-archive>
@@ -249,8 +249,10 @@ const archive = WORK_ARCHIVE.map((a) => {
                       <span class="atile-title">{item.title}</span>
                       <span class="atile-date">{item.date}</span>
                     </span>
+                    {/* P23 — the visible tier glyph (●/○) is retired site-wide;
+                        the status now reads in words only. sr-only label kept for
+                        AT (mirrors LegendMark); the phrasing is unchanged. */}
                     <span class="atile-line">
-                      <span class="atile-sym" aria-hidden="true">{symbol}</span>
                       <span class="sr-only">{tierLabel}: </span>
                       {phrasing}
                     </span>

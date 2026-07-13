@@ -161,34 +161,72 @@
     color: var(--color-ink-muted);
   }
 
-  /* Buttons — accent is the border/voice, never a fill. */
+  /* Buttons — accent is the border/voice, never a fill.
+     P23 button kit: the plain 1px box grows a chamfered (notched) bottom-right
+     corner so it reads instantly less boxy, and a soft accent heat-sheen sweeps
+     across ONCE on hover (a moving background layer, so it rides BEHIND the
+     label and never hurts legibility). The resting look, Space Mono caps voice,
+     and AA contrast are unchanged; targets are now ≥44px. The sheen is motion —
+     the reduced-motion block below freezes it (button stays fully usable). */
   .btn {
-    display: inline-block;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
     border: 1px solid var(--color-accent-deep);
     border-radius: 2px;
-    padding: 0.6rem 1.2rem;
+    /* one chamfered corner — the "cut-corner" tell (kcard grammar) */
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    padding: 0.55rem 1.3rem;
     font-family: var(--font-mono);
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
+    /* the sheen lives in the background layer, parked off-screen at rest */
+    background:
+      linear-gradient(
+          100deg,
+          transparent 38%,
+          color-mix(in srgb, var(--color-accent) 20%, transparent) 50%,
+          transparent 62%
+        )
+        no-repeat;
+    background-size: 220% 100%;
+    background-position: 190% 0;
     transition:
       border-color var(--dur-hover) var(--ease-swift),
       color var(--dur-hover) var(--ease-swift),
-      box-shadow var(--dur-hover) var(--ease-swift);
+      filter var(--dur-hover) var(--ease-swift),
+      background-position 0ms;
   }
   .btn:hover,
   .btn:focus-visible {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent) 62%, transparent); /* LP-3: glow up (was 18px/55%) */
+    /* drop-shadow (not box-shadow) so the glow follows the chamfered outline */
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--color-accent) 55%, transparent));
+    background-position: -70% 0;
+    transition:
+      border-color var(--dur-hover) var(--ease-swift),
+      color var(--dur-hover) var(--ease-swift),
+      filter var(--dur-hover) var(--ease-swift),
+      background-position 680ms var(--ease-survey);
   }
   .btn:disabled {
     opacity: 0.4;
     pointer-events: none;
   }
-  /* Low-emphasis button — no border, for a secondary action beside a .btn. */
+  /* Low-emphasis button — no border, for a secondary action beside a .btn.
+     P23: gains an accent hairline that DRAWS in from the left on hover — the
+     lighter member of the same kit for secondary/tag actions. */
   .btn-quiet {
-    display: inline-block;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
     font-family: var(--font-mono);
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -196,9 +234,25 @@
     color: var(--color-ink-muted);
     transition: color var(--dur-hover) var(--ease-swift);
   }
+  .btn-quiet::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    width: 100%;
+    height: 1px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-hover) var(--ease-swift);
+  }
   .btn-quiet:hover,
   .btn-quiet:focus-visible {
     color: var(--color-accent);
+  }
+  .btn-quiet:hover::after,
+  .btn-quiet:focus-visible::after {
+    transform: scaleX(1);
   }
 
   /* Inline wayfinding link (system voice) — replaces bare hover:underline.
@@ -2598,6 +2652,21 @@ html.js .contour-draw.is-revealed path {
   }
   .legend-mark:hover .symbol::after {
     animation: none;
+  }
+  /* P23 button kit: freeze the heat-sheen sweep + the quiet-button underline
+     draw (the buttons keep their resting look, chamfer, and hover color/glow —
+     only the moving parts stop). */
+  .btn,
+  .btn:hover,
+  .btn:focus-visible {
+    background-position: 190% 0;
+    transition:
+      border-color var(--dur-hover) var(--ease-swift),
+      color var(--dur-hover) var(--ease-swift),
+      filter var(--dur-hover) var(--ease-swift);
+  }
+  .btn-quiet::after {
+    transition: none;
   }
   /* R3.10 — the About develop is the one filter animation; force it off + show */
   html.js [data-develop] img {

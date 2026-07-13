@@ -2,10 +2,15 @@
 /**
  * The map-legend honesty device (BUILD-PLAN.md §3.4) — the ONLY channel
  * through which a relationship's status may be stated. Resolves a ProofLine
- * and prints `permittedPhrasing` VERBATIM after the relationship's name,
- * plotted-point style: tier symbol in resting accent-deep, one-shot "survey
- * ping" contour ring on hover (accent — a sanctioned scarce use). Never
- * paraphrase this output; change `context` in consts.ts if framing must vary.
+ * and prints `permittedPhrasing` VERBATIM after the relationship's name.
+ *
+ * P23 (2026-07-12) — the VISIBLE tier symbol (●/○/◆/△) is retired site-wide:
+ * the operator wants each line to state its true status in WORDS without
+ * advertising which tier it is. The tier is still resolved (kept for the
+ * sr-only label + future reversibility) but the marker glyph no longer
+ * renders. The phrasing text is UNCHANGED and still verbatim. Component API
+ * is unchanged so no call site breaks. Never paraphrase this output; change
+ * `context` in consts.ts if framing must vary.
  */
 import { LEGEND, RELATIONSHIP_BY_ID, type ProofLine } from "../consts";
 
@@ -28,7 +33,6 @@ const nameShown = showName && !relationship.permittedPhrasing.startsWith(relatio
 ---
 
 <p class={`legend-mark ${klass}`}>
-  <span class="symbol" aria-hidden="true">{tier.symbol}</span>
   <span>
     <span class="sr-only">{tier.label}: </span>
     {proof.context && <span class="phrasing">{proof.context} </span>}

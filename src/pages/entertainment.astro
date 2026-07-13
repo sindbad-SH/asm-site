@@ -16,10 +16,11 @@
  *
  * HONESTY (unchanged contract): every sentence is verbatim from consts —
  * the mixed-face emphasis inside them is presentational only. Every
- * relationship still renders through LegendMark; LegendKey still decodes
- * the tiers; the Pebble Beach quote stays the car owner's, never the
- * Concours'. The pebble-beach proof line moves from the rooms list into
- * work chapter 02 (same strings, same device, richer stage).
+ * relationship still renders through LegendMark (P23 — its VISIBLE tier
+ * symbol is retired site-wide; the phrasing WORDING is unchanged and each
+ * line still states its true status in words); the Pebble Beach quote stays
+ * the car owner's, never the Concours'. The pebble-beach proof line moves
+ * from the rooms list into work chapter 02 (same strings, richer stage).
  *
  * Fallbacks: no-JS/reduced motion → every section keeps its own static
  * ground color, letters sit in their final positions, collages render as
@@ -27,7 +28,6 @@
  */
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
-import LegendKey from "../components/LegendKey.astro";
 import Testimonial from "../components/Testimonial.astro";
 import { PAGES, WORK } from "../consts";
 import { existsSync, statSync } from "node:fs";
@@ -515,7 +515,6 @@ const GROUNDS = {
           ))
         }
       </ul>
-      <div class="im-key" data-reveal><LegendKey /></div>
     </section>
 
     <!-- ═══ S5 · HANDOFF — one soft exit, back to base ground ═══ -->
@@ -625,10 +624,14 @@ const GROUNDS = {
   .im-ghost:nth-child(4) { left: 68%; top: 58%; }
   .im-ghost:nth-child(5) { left: 86%; top: 22%; }
 
-  /* ── S3 chapters ── */
+  /* ── S3 chapters ──
+     P23 — dead air deliberately compressed: the section was 130svh tall with
+     10rem end-padding and a 90svh stage, which stacked into large empty voids
+     above and below the (already dramatic) titles. The giant title scale is
+     UNTOUCHED — only the surrounding air is removed. */
   .im-chapter {
-    min-height: 130svh;
-    padding: 10rem clamp(1.5rem, 6vw, 7rem);
+    min-height: 96svh;
+    padding: 5.5rem clamp(1.5rem, 6vw, 7rem);
   }
   .im-index {
     position: sticky;
@@ -645,9 +648,10 @@ const GROUNDS = {
     position: relative;
     max-width: 78rem;
     margin-inline: auto;
-    min-height: 90svh;
+    min-height: 72svh;
     display: grid;
     align-content: center;
+    gap: 0.4rem;
   }
   .im-collage {
     position: absolute;
@@ -718,21 +722,40 @@ const GROUNDS = {
     display: grid;
     gap: 0.04em;
   }
+  /* P23 — the short context line (ch01 PitchBoulder summary, ch02 the car
+     owner's endorsement) used to float as small italic directly over the busy
+     collage — the operator flagged it as unreadable. It now sits on a real,
+     near-solid plate in the chapter's own ground color (fully occludes the
+     imagery behind it → AA-safe light-on-dark), a notch larger, right-aligned
+     as a caption block under the title. --sec-ground is the per-section inline
+     var, so the plate keeps the jewel tone even after the ground morphs. */
   .im-tag {
-    margin-top: 0.8rem;
-    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    width: fit-content;
+    max-width: min(92%, 42rem);
+    margin: 1.3rem 0 0 auto;
+    padding: 0.72rem 1.15rem;
+    font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+    line-height: 1.42;
     text-align: right;
-    margin-inline: auto;
-    max-width: 60rem;
-    padding-right: clamp(0rem, 6vw, 5rem);
+    background: color-mix(in srgb, var(--sec-ground, #191031) 90%, #000 10%);
+    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 18px 50px -26px rgba(0, 0, 0, 0.7);
   }
+  /* P23 — the proof line + testimonial + CTA also lifted onto a plate so none
+     of the small type ever fights the collage underneath. */
   .im-chapter-meta {
     position: relative;
     z-index: 2;
-    margin-top: 3.5rem;
-    max-width: 34rem;
+    margin-top: 2.2rem;
+    max-width: 36rem;
     display: grid;
     gap: 1rem;
+    padding: 1.4rem 1.5rem;
+    background: color-mix(in srgb, var(--sec-ground, #191031) 90%, #000 10%);
+    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border-radius: 10px;
+    box-shadow: 0 22px 60px -30px rgba(0, 0, 0, 0.7);
   }
   .im-quote {
     font-style: italic;
@@ -768,6 +791,7 @@ const GROUNDS = {
      below every chapter's text block and (smaller) on every rail card. Space
      Mono caps, ≥44px tall, arrow slides 6px + subtle accent fill on hover. ── */
   .im-cta {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -777,6 +801,9 @@ const GROUNDS = {
     padding: 0.85rem 1.5rem;
     border: 1px solid color-mix(in srgb, #ffffff 32%, transparent);
     border-radius: 4px;
+    /* P23 — the same chamfered corner as the global .btn kit, so the venture
+       story CTAs read as one family with the rest of the site. */
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
     background: color-mix(in srgb, #ffffff 3%, transparent);
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -786,12 +813,15 @@ const GROUNDS = {
     text-decoration: none;
     transition:
       background 320ms var(--ease-survey, ease),
-      border-color 320ms ease;
+      border-color 320ms ease,
+      filter 320ms ease;
   }
   .im-cta:hover,
   .im-cta:focus-visible {
     background: color-mix(in srgb, var(--color-accent, #38f8ec) 16%, transparent);
     border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 62%, transparent);
+    /* glow follows the chamfer (drop-shadow, not box-shadow) */
+    filter: drop-shadow(0 0 16px color-mix(in srgb, var(--color-accent, #38f8ec) 42%, transparent));
   }
   .im-cta-arrow {
     color: var(--color-accent, #38f8ec);
@@ -983,10 +1013,16 @@ const GROUNDS = {
   @media (max-width: 760px) {
     .im-line--push { transform: none; }
     .im-intro-sub { justify-self: center; text-align: center; }
-    .im-collage { position: relative; inset: auto; display: grid; gap: 0.8rem; grid-template-columns: 1fr 1fr; margin-bottom: 2rem; pointer-events: auto; }
+    .im-collage { position: relative; inset: auto; display: grid; gap: 0.7rem; grid-template-columns: 1fr 1fr; margin-bottom: 1.6rem; pointer-events: auto; }
     .im-card { position: relative; inset: auto; width: 100%; }
-    .im-chapter { min-height: 0; padding-top: 6rem; }
-    .im-chapter-stage { min-height: 0; }
+    /* P23 — mobile chapters were min-height:0 with a lone 6rem top pad but the
+       10rem base bottom pad still applied; now the base is tighter and mobile
+       pins both ends so chapters read compressed-but-uncrowded on ~390px. */
+    .im-chapter { min-height: 0; padding: 4.5rem clamp(1.25rem, 6vw, 7rem) 3.5rem; }
+    .im-chapter-stage { min-height: 0; gap: 0; }
+    /* the caption plate reads better centered under a stacked collage on phones */
+    .im-tag { margin-inline: auto; max-width: 100%; text-align: center; }
+    .im-chapter-meta { margin-top: 1.8rem; max-width: 100%; }
     .im-ghost { display: none; }
   }
   /* mobile: the rail cards give a touch more peek on the smallest screens */

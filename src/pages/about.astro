@@ -25,7 +25,6 @@
  * portrait full-color, static ground. Motion is enhancement only.
  */
 import Base from "../layouts/Base.astro";
-import LegendKey from "../components/LegendKey.astro";
 import { PAGES, SITE } from "../consts";
 
 const p = PAGES.about;
@@ -116,12 +115,11 @@ const [opener, ...restNarrative] = p.narrative;
       </div>
     </section>
 
-    <!-- ═══ S3 · her "Recognitions" slot, inverted honestly: the ledger ═══ -->
+    <!-- ═══ S3 · her "Recognitions" slot, inverted honestly: the ledger ═══
+         P23 — the visible tier-key panel is retired site-wide; the trust
+         statement (legendLine) now stands on its own as the recognition. -->
     <section class="ab-sec ab-ledger">
       <p class="ab-ledger-line" data-reveal>{p.legendLine}</p>
-      <div class="ab-key" data-reveal>
-        <LegendKey />
-      </div>
     </section>
 
     <!-- ═══ S4 · the close — home base, scattered ═══ -->
