@@ -1,0 +1,133 @@
+---
+/**
+ * /world — "Fly through the world" scroll-scrubbed landing (STAGING TEST).
+ *
+ * HONESTY NOTE: every scene here is STYLIZED AI-GENERATED BRAND ART (Higgsfield,
+ * Nano Banana Pro stills + Seedance 2.0 image-to-video legs). It is a cinematic
+ * miniature "aurora night" diorama world that EXTENDS the portal-hero aesthetic —
+ * pure presentational world-building. It makes NO factual claims and must NEVER be
+ * presented as the operator's real aerial photography. The real Zermatt drone
+ * photos were used only as terrain-shape reference for the art direction.
+ *
+ * This page is NOT in the nav and NOT the home page — it is a flashy landing that
+ * hands off to the substantive home ({base}/). Built with the scroll-world skill:
+ * Architecture A (continuous forward take) — 5 sequential Seedance legs chained by
+ * frame handoff, no connectors. Engine: src/lib/scroll-world-engine.js (vanilla,
+ * self-contained; injects its own DOM + CSS). Desktop-first; the engine's phone
+ * hardening covers graceful mobile degradation (mobile beta deferred).
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — all section copy below is NEW and
+ * staging-only until the operator reads and approves it.
+ */
+import "../styles/global.css";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const asset = (p: string) => `${base}${p}`;
+---
+
+<!doctype html>
+<html lang="en" class="sw-page">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" href={`${base}/favicon.ico`} sizes="48x48" />
+    <title>Adventure Storytelling Media — fly through the world</title>
+    <meta name="description" content="Scroll to fly through a world under the aurora — the adventure, the market, and the industry, held by one craft." />
+    <!-- Staging test page: keep it out of search. -->
+    <meta name="robots" content="noindex" />
+    <style is:global>
+      /* Dark aurora theme — the visual identity comes from the generated clips,
+         so the chrome stays quiet. Tokens draw on global.css brand vars. */
+      html.sw-page,
+      html.sw-page body { margin: 0; background: #0b0e1a; }
+      .sw-root {
+        --sw-bg: #0b0e1a;            /* deep indigo night */
+        --sw-ink: #eef2f5;           /* snow cream */
+        --sw-ink-soft: #9fb2b8;
+        --sw-accent: #5eead4;        /* aurora teal */
+        --sw-font-display: var(--font-display);  /* Fraunces */
+        --sw-font-body: var(--font-sans);        /* DM Sans */
+      }
+      /* Labels in the surveyor's instrument voice (Space Mono). */
+      .sw-root .sw-copy__eyebrow { font-family: var(--font-mono); letter-spacing: .18em; }
+      .sw-root .sw-copy__num { font-family: var(--font-mono); }
+    </style>
+  </head>
+  <body>
+    <div id="top"></div>
+    <div id="world"></div>
+
+    <script>
+      import { mountScrollWorld } from "../lib/scroll-world-engine.js";
+
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const media = (p) => `${base}/media/world/${p}`;
+
+      mountScrollWorld(document.getElementById("world"), {
+        brand: { name: "Adventure Storytelling Media", href: "#top" },
+        hint: "scroll to fly in",
+        nav: false,               // immersive: no top section nav
+        atmosphere: true,
+        diveScroll: 1.3,
+        crossfade: 0.14,          // architecture A: soft dissolve at each seam
+        sections: [
+          {
+            id: "peak", label: "The Peak",
+            still: media("peak.webp"),
+            clip: media("vid/peak.mp4"),
+            accent: "#5eead4",
+            scroll: 1.7, linger: 0.45,   // hero — long dwell
+            eyebrow: "ADVENTURE STORYTELLING MEDIA",
+            title: "Every story starts in the wild.",
+            body: "A world under the aurora — scroll to fly through it.",
+          },
+          {
+            id: "basecamp", label: "The Wild",
+            still: media("basecamp.webp"),
+            clip: media("vid/basecamp.mp4"),
+            accent: "#7fe0c3",
+            scroll: 1.25,
+            eyebrow: "THE WILD",
+            title: "Where the cameras go that don't get second takes.",
+            body: "Expeditions, glaciers, thin air — the adventure lane.",
+            tags: ["Adventure Stories"],
+          },
+          {
+            id: "valley", label: "The Market",
+            still: media("valley.webp"),
+            clip: media("vid/valley.mp4"),
+            accent: "#38f8ec",
+            scroll: 1.25,
+            eyebrow: "THE MARKET",
+            title: "Down in the valley, founders are telling stories too.",
+            body: "Narrative strategy for the ones building something real.",
+            tags: ["Forge the Saga"],
+          },
+          {
+            id: "cinema", label: "The Industry",
+            still: media("cinema.webp"),
+            clip: media("vid/cinema.mp4"),
+            accent: "#5eead4",
+            scroll: 1.25,
+            eyebrow: "THE INDUSTRY",
+            title: "Under the same sky, the industry gathers.",
+            body: "Festivals, markets, screening rooms — the venture lane.",
+            tags: ["Venture Stories"],
+          },
+          {
+            id: "forge", label: "The StorySmith",
+            still: media("forge.webp"),
+            clip: media("vid/forge.mp4"),
+            accent: "#e8a04c",
+            scroll: 1.7, linger: 0.4,    // finale — long dwell, holds the CTA
+            eyebrow: "THE STORYSMITH",
+            title: "One craft holds it all together.",
+            body: "The full story is inside.",
+            cta: { primary: { label: "Enter the full site", href: base + "/" } },
+          },
+        ],
+        connectors: [],   // architecture A — no connectors; legs crossfade directly
+      });
+    </script>
+  </body>
+</html>
