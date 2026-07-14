@@ -73,7 +73,12 @@ const asset = (p: string) => `${base}${p}`;
         nav: false,               // immersive: no top section nav
         atmosphere: true,
         autoFlight: true,         // the page flies itself; controls let you drive
-        autoFlightSeconds: 105,   // ~1:45 for a full forward flight at 1x
+        // P25b — operator: 105s read as static ("moves a little every 20-30s").
+        // The math: 105s stretched each 10s clip to ~2x slow-mo of already-slow
+        // footage = imperceptible. ~55s makes in-scene video play near REALTIME
+        // at 1x, which is the "very slow crawl" he expected; 0.5x gives the old
+        // meditative pace, 2x/4x the skim.
+        autoFlightSeconds: 55,
         skip: { label: "Enter site", href: base + "/" },  // persistent exit to the real home
         diveScroll: 1.3,
         crossfade: 0.14,          // architecture A: soft dissolve at each seam
