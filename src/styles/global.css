@@ -161,6 +161,22 @@
     color: var(--color-ink-muted);
   }
 
+  /* Nav labels (P-brand) — the header nav voiced to echo the logo wordmark: the
+     engraved display serif (Fraunces), wide uppercase caps, letterspaced. This
+     is a HEADER-ONLY layer — it deliberately does NOT touch .hud-label, whose
+     surveyor's-mono voice is used sitewide. Size/tracking per breakpoint live in
+     Nav.astro's compression band; color stays ink-muted so utilities (text-accent
+     for the you-are-here page, hover:text-ink) still win the cascade. */
+  .nav-label {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 540;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
   /* Buttons — accent is the border/voice, never a fill.
      P23 button kit: the plain 1px box grows a chamfered (notched) bottom-right
      corner so it reads instantly less boxy, and a soft accent heat-sheen sweeps

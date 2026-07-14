@@ -81,6 +81,19 @@ function mountScrollWorld(container, config) {
   const N = SECTIONS.length;
   if (!N) return;
 
+  // --- idempotent (re)mount ---------------------------------------------------
+  // HMR / a double mountScrollWorld() call on the SAME container must not stack a
+  // second rAF loop or a duplicate control cluster: two autopilot loops both
+  // nudging window.scrollTo integrate the flight twice per frame → the visible
+  // "it super-speeds through the whole thing". Tear down any prior instance, wipe
+  // the container, and scope every listener to an AbortController we can abort.
+  if (container.__swDestroy) { try { container.__swDestroy(); } catch (e) {} }
+  while (container.firstChild) container.removeChild(container.firstChild);
+  const _ac = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const _sig = _ac ? _ac.signal : undefined;
+  const _alive = { v: true };
+  container.__swDestroy = () => { _alive.v = false; if (_ac) { try { _ac.abort(); } catch (e) {} } };
+
   injectCSS();
   container.classList.add('sw-root');
 
@@ -190,6 +203,10 @@ function mountScrollWorld(container, config) {
   }
 
   function jumpTo(i) {
+    // A rail/nav jump is a deliberate manual takeover: stop the autopilot so the
+    // smooth-scroll to the target isn't fought (or read as divergence). AUTOFLIGHT
+    // is a const declared above; playing/setPlaying are in scope by click time.
+    if (AUTOFLIGHT && playing) setPlaying(false);
     const seg = SECTIONS[i]._seg;
     window.scrollTo({ top: seg.start + (seg.end - seg.start) * 0.5, behavior: reduce ? 'auto' : 'smooth' });
   }
@@ -284,7 +301,7 @@ function mountScrollWorld(container, config) {
       const t = clamp(s.cur, 0, 0.999) * dur;
       if (Math.abs(s.video.currentTime - t) > eps) { try { s.video.currentTime = t; } catch (e) {} }
     }
-    requestAnimationFrame(raf);
+    if (_alive.v) requestAnimationFrame(raf);
   }
 
   // iOS needs a user gesture before a muted video will decode/paint reliably. On the
@@ -302,12 +319,12 @@ function mountScrollWorld(container, config) {
     userReady = true;
     SEGMENTS.forEach(s => primeVideo(s.video));
   }
-  window.addEventListener('pointerdown', onFirstGesture, { once: true, passive: true });
-  window.addEventListener('touchstart', onFirstGesture, { once: true, passive: true });
+  window.addEventListener('pointerdown', onFirstGesture, { once: true, passive: true, signal: _sig });
+  window.addEventListener('touchstart', onFirstGesture, { once: true, passive: true, signal: _sig });
 
   // Particles are a per-frame cost we can't afford alongside video scrubbing on a phone.
   seedParticles(particles, reduce || coarse);
-  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(read); } }, { passive: true });
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(read); } }, { passive: true, signal: _sig });
   // Mobile browsers fire `resize` every time the URL bar slides in/out. Re-running
   // layout() there rebuilds the track height and yanks the scroll position, so on
   // touch we ignore height-only changes and only relayout when the width actually
@@ -317,11 +334,11 @@ function mountScrollWorld(container, config) {
     if (coarse && window.innerWidth === laidOutW) return;
     layout();
   }
-  window.addEventListener('resize', onResize);
-  window.addEventListener('orientationchange', layout);
-  window.addEventListener('load', layout);
+  window.addEventListener('resize', onResize, { signal: _sig });
+  window.addEventListener('orientationchange', layout, { signal: _sig });
+  window.addEventListener('load', layout, { signal: _sig });
   layout();
-  requestAnimationFrame(raf);
+  if (_alive.v) requestAnimationFrame(raf);
 
   // ---- auto-flight: the page flies itself -----------------------------------
   // Integration: the whole engine already keys off window.scrollY (scroll -> read
@@ -329,11 +346,22 @@ function mountScrollWorld(container, config) {
   // that nudges window.scrollTo. Everything downstream (scene crossfades, copy
   // pinning, route rail, video scrub) keeps working with zero changes. Any REAL
   // user scroll hands the stick back instantly and we never fight it.
-  let playing = false, reversed = false, speedI = 1, autoPos = 0, lastTs = 0, lastSetY = null, autoStarted = false;
+  // armed  — the scrollY-divergence "user took the stick" detector is DISARMED until
+  //          the flight has actually flown one frame, so a load-time scroll write
+  //          (scroll restoration, anchor jump, URL-bar/viewport resize) can't trip it
+  //          and silently pause before the flight ever starts.
+  let playing = false, reversed = false, speedI = 1, autoPos = 0, lastTs = 0, lastSetY = null, autoStarted = false, armed = false;
   const SPEEDS = [0.5, 1, 2, 4];
+  const DT_CLAMP = 0.05;   // s — cap per-frame dt so a tab-away / stall can't lurch (was 0.1)
+  const DIVERGE_PX = 6;    // px — real user scroll past this hands the stick back
   const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
   const perfNow = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
   let flyEls = null;
+  // With the page flying itself, the browser restoring a prior scroll position on
+  // reload/back would fight the autopilot on the first frames — pin it to manual.
+  if (AUTOFLIGHT && typeof history !== 'undefined' && 'scrollRestoration' in history) {
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
+  }
 
   // Persistent "enter the full site" skip control (built regardless of auto-flight).
   if (SKIP) {
@@ -360,8 +388,10 @@ function mountScrollWorld(container, config) {
       const target = (dir === 'forward') ? 0 : maxScroll();
       window.scrollTo(0, target);
       // Keep the autopilot's bookkeeping in lock-step with the jump so it neither
-      // detects "divergence" (see autoTick) nor lurches on the next frame.
-      autoPos = target; lastSetY = Math.round(target); lastTs = 0;
+      // detects "divergence" (see stepAuto) nor lurches on the next frame. Disarm
+      // so the post-jump scroll write can't read as the user grabbing the stick;
+      // stepAuto re-adopts the position and re-arms on its next frame.
+      autoPos = target; lastSetY = null; lastTs = 0; armed = false;
       read();
     };
     if (reduce) {
@@ -386,18 +416,25 @@ function mountScrollWorld(container, config) {
   // Always-on (works with autopilot off, and under reduced-motion).
   window.addEventListener('wheel', (e) => {
     if (e.deltaY > 0) edgeWrap('forward'); else if (e.deltaY < 0) edgeWrap('backward');
-  }, { passive: true });
+  }, { passive: true, signal: _sig });
   let wrapTouchY = null;
-  window.addEventListener('touchstart', (e) => { wrapTouchY = (e.touches && e.touches[0]) ? e.touches[0].clientY : null; }, { passive: true });
+  window.addEventListener('touchstart', (e) => { wrapTouchY = (e.touches && e.touches[0]) ? e.touches[0].clientY : null; }, { passive: true, signal: _sig });
   window.addEventListener('touchmove', (e) => {
     if (wrapTouchY == null || !e.touches || !e.touches[0]) return;
     const cy = e.touches[0].clientY, dy = wrapTouchY - cy; wrapTouchY = cy;
     if (dy > 1) edgeWrap('forward'); else if (dy < -1) edgeWrap('backward');
-  }, { passive: true });
+  }, { passive: true, signal: _sig });
 
   function setPlaying(on) {
     playing = on;
-    if (on) { lastTs = 0; autoPos = window.scrollY || window.pageYOffset; lastSetY = Math.round(autoPos); onFirstGesture(); }
+    if (on) {
+      // Resume cleanly: reset the dt baseline (no huge first-frame dt → no lurch),
+      // hard-sync to the real scroll position, and DISARM divergence until the
+      // first flown frame so a scroll write that lands right after play (restoration,
+      // the click's own focus scroll) can't immediately pause us again.
+      lastTs = 0; autoPos = window.scrollY || window.pageYOffset; lastSetY = null; armed = false;
+      onFirstGesture();
+    }
     if (flyEls) {
       flyEls.play.textContent = on ? 'PAUSE' : 'PLAY';
       flyEls.play.setAttribute('aria-label', on ? 'Pause flight' : 'Play flight');
@@ -413,37 +450,77 @@ function mountScrollWorld(container, config) {
   function handOver() { if (playing) setPlaying(false); }
 
   const flyT0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+  // One integration step of the autopilot. Split out of the rAF loop and made a
+  // pure function of (timestamp, current scroll/state) so it can be driven with
+  // SYNTHETIC timestamps for verification — headless/background panes suspend rAF,
+  // so the only reliable way to prove the flight advances is to pump this directly.
+  // Returns a small telemetry record for tests; also mutates the closure state.
+  function stepAuto(ts) {
+    if (!playing) { lastTs = 0; return { moved: 0, dt: 0, paused: 'idle' }; }
+    // While a wrap fade jumps the scroll position, freeze our bookkeeping so the
+    // divergence check below can't misfire on the jump.
+    if (wrapping) { lastTs = 0; return { moved: 0, dt: 0, paused: 'wrapping' }; }
+
+    const y = window.scrollY || window.pageYOffset;
+    // Divergence = a REAL external scroll (scrollbar drag, PgUp/PgDn, momentum).
+    // Only consult it once armed (after the flight's first frame) so a load-time /
+    // resume-time scroll write can't pause the flight before it starts.
+    if (armed && lastSetY != null && Math.abs(y - lastSetY) > DIVERGE_PX) {
+      setPlaying(false);
+      return { moved: 0, dt: 0, paused: 'diverged' };
+    }
+
+    // First flown frame (or first after a resume/wrap): adopt the real scroll
+    // position and seed the dt baseline so this frame moves nothing (dt 0) — never
+    // a lurch, and the browser-restored position is absorbed rather than fought.
+    if (!armed || lastSetY == null) { autoPos = y; lastTs = ts; }
+    if (!lastTs) lastTs = ts;
+    let dt = (ts - lastTs) / 1000; lastTs = ts;
+    if (!(dt > 0)) dt = 0;                 // guard NaN / non-monotonic clocks
+    if (dt > DT_CLAMP) dt = DT_CLAMP;      // cap a tab-away / stall so we can't lurch
+
+    const max = maxScroll();
+    const before = autoPos;
+    autoPos += (max / AUTOSECONDS) * SPEEDS[speedI] * (reversed ? -1 : 1) * dt;
+    // Loop forever: reaching an end wraps to the opposite end and keeps flying.
+    // Only wrap on a frame that actually integrated (dt > 0) — otherwise the adopt
+    // frame at the summit (y===0) would instantly wrap to the finale.
+    if (dt > 0 && autoPos <= 0) { doWrap('backward'); return { moved: autoPos - before, dt, wrap: 'backward' }; }
+    if (dt > 0 && autoPos >= max) { doWrap('forward'); return { moved: autoPos - before, dt, wrap: 'forward' }; }
+    window.scrollTo(0, autoPos); lastSetY = Math.round(autoPos); armed = true;
+    return { moved: autoPos - before, dt, y: autoPos };
+  }
+
   function autoTick(ts) {
     if (AUTOFLIGHT) {
       // Begin only once the first scene is ready (or a short fallback, so a failed
       // clip still auto-advances the stills).
       if (!autoStarted && (SECTIONS[0]._seg.ready || ts - flyT0 > 2500)) { autoStarted = true; setPlaying(true); }
-      if (playing) {
-        // While a wrap fade is mid-flight the scroll position is being jumped;
-        // pause our own bookkeeping so the divergence check below can't misfire.
-        if (wrapping) { lastTs = 0; }
-        else {
-          const y = window.scrollY || window.pageYOffset;
-          // Divergence = someone else moved the scroll (scrollbar drag, PgUp/PgDn,
-          // momentum, anchor jump). Hand the stick back; don't fight it.
-          if (lastSetY != null && Math.abs(y - lastSetY) > 3) { setPlaying(false); }
-          else {
-            if (!lastTs) lastTs = ts;
-            let dt = (ts - lastTs) / 1000; lastTs = ts;
-            if (dt > 0.1) dt = 0.1;   // clamp after a tab-away so we don't lurch
-            const max = maxScroll();
-            autoPos += (max / AUTOSECONDS) * SPEEDS[speedI] * (reversed ? -1 : 1) * dt;
-            // Loop forever: reaching an end wraps to the opposite end and keeps
-            // flying (forward → back to the summit; reverse → down to the finale).
-            if (autoPos <= 0) { doWrap('backward'); }
-            else if (autoPos >= max) { doWrap('forward'); }
-            else { window.scrollTo(0, autoPos); lastSetY = Math.round(autoPos); }
-          }
-        }
-      } else { lastTs = 0; }
+      stepAuto(ts);
     }
-    requestAnimationFrame(autoTick);
+    if (_alive.v) requestAnimationFrame(autoTick);
   }
+
+  // Returning to a foregrounded tab after it was hidden: the clock jumped, so
+  // reset the dt baseline and disarm — the next frame re-adopts and flies on
+  // smoothly instead of lurching or reading the gap as a user grab.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && playing) { lastTs = 0; armed = false; lastSetY = null; autoPos = window.scrollY || window.pageYOffset; }
+  }, { signal: _sig });
+
+  // Debug/verification handle (headless panes suspend rAF; drive stepAuto by hand).
+  const _api = {
+    get state() { return { playing, reversed, speedI, autoPos, lastTs, lastSetY, armed, autoStarted, wrapping }; },
+    step: (ts) => stepAuto(ts),
+    play: () => setPlaying(true),
+    pause: () => setPlaying(false),
+    maxScroll,
+    seconds: () => AUTOSECONDS,
+    speeds: () => SPEEDS.slice(),
+  };
+  container.__scrollWorld = _api;
+  if (typeof window !== 'undefined') window.__scrollWorld = _api;
 
   if (AUTOFLIGHT) {
     container.classList.add('sw-has-fly');
@@ -467,8 +544,8 @@ function mountScrollWorld(container, config) {
     faster.addEventListener('click', () => { if (!playing) setPlaying(true); setRate(speedI + 1); });
     rev.addEventListener('click', () => { if (!playing) setPlaying(true); setReversed(!reversed); });
 
-    window.addEventListener('wheel', handOver, { passive: true });
-    window.addEventListener('touchmove', handOver, { passive: true });
+    window.addEventListener('wheel', handOver, { passive: true, signal: _sig });
+    window.addEventListener('touchmove', handOver, { passive: true, signal: _sig });
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;   // don't hijack shortcuts
       const t = e.target;
@@ -482,8 +559,8 @@ function mountScrollWorld(container, config) {
         case 'ArrowRight': e.preventDefault(); if (!playing) setPlaying(true); setReversed(false); break;
         case 'ArrowLeft':  e.preventDefault(); if (!playing) setPlaying(true); setReversed(true); break;
       }
-    });
-    requestAnimationFrame(autoTick);
+    }, { signal: _sig });
+    if (_alive.v) requestAnimationFrame(autoTick);
   }
 
   // ---- helpers ----

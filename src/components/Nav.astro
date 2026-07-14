@@ -1,20 +1,36 @@
 ---
 /**
- * Top nav — the capped 6-item nav (BUILD-PLAN.md §1.0) in the system voice:
- * mono hud labels, hairline rule, logo as the map's "title cartouche"
- * (top-left, §3.1). The active page marker uses accent — a sanctioned use
+ * Top nav — the capped 6-item nav (BUILD-PLAN.md §1.0): the full logo lockup
+ * as the map's "title cartouche" (top-left, §3.1), a hairline rule, and nav
+ * labels voiced in the engraved display serif (Fraunces) to echo the logo
+ * wordmark (P-brand). The active page marker uses accent — a sanctioned use
  * (the "you-are-here" signal). Forge the Saga owns the single CTA button.
  */
 import { NAV, SITE, PRIMARY_CTA } from "../consts";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_URL, "/");
+// The you-are-here marker compares this page's route against each NAV href.
+// Two prior-latent bugs fixed here: (1) use Astro.url (Astro.request.url is a
+// constant placeholder in a static build, so it never carried the page path);
+// (2) BASE_URL is "/asm-site" WITHOUT a trailing slash, so the old
+// `.replace(BASE_URL, "/")` yielded "//adventure" — never matching "/adventure".
+// Strip the base prefix by length, then normalize trailing slash. Works for both
+// staging ("/asm-site") and the production base ("/").
+const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
 ---
 
 <header class="flex flex-wrap items-center justify-between gap-4 border-b border-hairline px-5 py-4">
-  <a href={`${base}/`} class="flex items-center gap-3">
-    <img src={`${base}/logo-mark.png`} alt="" class="h-8 w-auto" />
-    <span class="font-display text-lg text-peak">{SITE.name}</span>
+  <a href={`${base}/`} class="brand-lockup flex items-center">
+    <picture>
+      <source srcset={`${base}/logo-lockup-sky.webp`} type="image/webp" />
+      <img
+        src={`${base}/logo-lockup-sky.png`}
+        alt={SITE.name}
+        width="1200"
+        height="317"
+        class="lockup-img"
+      />
+    </picture>
   </a>
   <!--
     Always visible by default — this is the no-JS nav. MobileMenu.astro's
@@ -31,7 +47,7 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
               <a
                 href={`${base}${item.href}`}
                 aria-current={isCurrent ? "page" : undefined}
-                class={`hud-label transition-colors ${isCurrent ? "text-accent" : "hover:text-ink"}`}
+                class={`nav-label transition-colors ${isCurrent ? "text-accent" : "hover:text-ink"}`}
               >
                 {item.label}
               </a>
@@ -62,7 +78,9 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
      drawn as a pseudo-element so it's purely presentational (never read by
      screen readers, never a hit target). Sits between items only — no leading
      or trailing tick. The mobile menu is a different component (unaffected). */
-  .nav-item + .nav-item {
+  /* all items share the same flex box so the serif labels sit on one optical
+     baseline (the first item otherwise rode ~2px high vs. its separated siblings) */
+  .nav-item {
     display: flex;
     align-items: center;
   }
@@ -77,12 +95,12 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
   }
   @media (min-width: 1024px) and (max-width: 1279px) {
     .nav-item + .nav-item::before {
-      margin-right: 0.7rem;
+      margin-right: 0.45rem;
     }
   }
   @media (min-width: 1280px) {
     .nav-item + .nav-item::before {
-      margin-right: 1.25rem;
+      margin-right: 0.75rem;
     }
   }
 
@@ -93,27 +111,50 @@ const path = new URL(Astro.request.url).pathname.replace(import.meta.env.BASE_UR
      the six full labels + the CTA all hold ONE row instead of wrapping. Labels
      stay full per operator; only spacing shrinks. Everything eases back to the
      system voice once there's room at ≥1280px. */
+  /* ── Brand lockup (P-brand) — the full logo lockup replaces the old
+     mark + text-span pair. Slim-bar height per breakpoint; the source art is
+     1200×317 (3.79:1), light-gray/green on transparent → reads on the dark
+     header ground. width/height attrs on the <img> reserve the box (no CLS). */
+  .lockup-img {
+    display: block;
+    height: 44px;
+    width: auto;
+  }
   @media (min-width: 1024px) and (max-width: 1279px) {
     header {
       padding-inline: 0.9rem;
       column-gap: 0.7rem;
     }
-    /* the wordmark next to the logo mark */
-    header > a > span {
-      font-size: 1rem;
+    /* compress the lockup in the tight band so logo + six labels + CTA hold one row */
+    .lockup-img {
+      height: 34px;
     }
     .nav-links {
-      column-gap: 0.7rem;
+      column-gap: 0.5rem;
     }
-    .nav-links .hud-label {
-      letter-spacing: 0.04em;
-      font-size: 0.62rem;
+    .nav-links .nav-label {
+      letter-spacing: 0.03em;
+      font-size: 0.6rem;
+    }
+  }
+  /* below the inline-nav breakpoint the bar is lockup + burger only — give the
+     lockup a touch more room while keeping the bar slim on a phone. */
+  @media (max-width: 640px) {
+    .lockup-img {
+      height: 38px;
     }
   }
   @media (min-width: 1280px) {
-    .nav-links .hud-label {
-      letter-spacing: 0.16em;
-      font-size: 0.7rem;
+    /* override the base xl:gap-5 utility so the wider serif labels + the six
+       long "…Stories" labels + the CTA hold one row from 1280px up (the serif
+       runs wider than the retired mono, so the roomy band needs less inter-item
+       air than the mono voice did). */
+    .nav-links {
+      column-gap: 0.75rem;
+    }
+    .nav-links .nav-label {
+      letter-spacing: 0.09em;
+      font-size: 0.72rem;
     }
   }
 </style>

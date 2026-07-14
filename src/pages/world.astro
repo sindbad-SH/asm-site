@@ -54,51 +54,151 @@ const asset = (p: string) => `${base}${p}`;
       .sw-root .sw-copy__num { font-family: var(--font-mono); }
 
       /* --- Persistent brand chrome, SERVER-RENDERED (survives no-JS) ----------
-         Top-left ASM logo-mark (reuses /logo-mark.png + BASE_URL like Nav.astro)
-         and a prominent top-CENTER "Enter the site" portal button in the site's
-         chamfered button grammar. Both sit above every engine layer (z-index 90)
-         and are safe-area aware so the flight never occludes them. */
-      .sw-logo {
-        position: fixed; z-index: 90;
-        top: calc(env(safe-area-inset-top, 0px) + clamp(12px, 2vw, 22px));
-        left: clamp(14px, 4vw, 40px);
-        display: inline-flex; align-items: center; line-height: 0;
-        filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
-      }
-      .sw-logo img { width: clamp(40px, 6vw, 48px); height: auto; display: block; }
-      .sw-enter {
+         ONE top-CENTER brand block: the full horizontal lockup (S-mark + wordmark)
+         with the chamfered "ENTER THE SITE" portal button directly beneath it, read
+         as a single unit. Both link home. The block sits above every engine layer —
+         crucially above the wrap-fade overlay (z-index 65) — so the flight and its
+         seam-jumps never occlude it, and it is safe-area aware. The old separate
+         top-left logo-mark is intentionally GONE (it doubled the branding). */
+      .sw-brandblock {
         position: fixed; z-index: 90;
         top: calc(env(safe-area-inset-top, 0px) + clamp(12px, 2vw, 22px));
         left: 50%; transform: translateX(-50%);
+        display: flex; flex-direction: column; align-items: center;
+        gap: clamp(8px, 1vw, 12px); pointer-events: none;
+      }
+      .sw-brandblock > * { pointer-events: auto; }
+      /* Soft dark scrim so the light-gray lockup reads over bright snow scenes too. */
+      .sw-brandblock::before {
+        content: ""; position: absolute; left: 50%; top: 42%;
+        transform: translate(-50%, -50%); width: 150%; height: 240%; z-index: -1;
+        pointer-events: none; filter: blur(3px);
+        background: radial-gradient(58% 58% at 50% 42%, rgba(11, 14, 26, 0.6), transparent 72%);
+      }
+      .sw-brand-lockup { display: inline-flex; line-height: 0; text-decoration: none;
+        filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.62)); }
+      .sw-brand-lockup img { height: clamp(52px, 6vw, 66px); width: auto; display: block; }
+      .sw-enter {
+        position: relative; overflow: hidden;
         display: inline-flex; align-items: center; gap: 0.6em;
-        min-height: 44px; padding: 0 22px; text-decoration: none; white-space: nowrap;
-        font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;
+        min-height: 48px; padding: 0 26px; text-decoration: none; white-space: nowrap;
+        font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;
         letter-spacing: 0.18em; text-transform: uppercase; color: #eef2f5;
         border: 1px solid rgba(238, 242, 245, 0.34); border-radius: 2px;
-        background: color-mix(in srgb, #0b0e1a 55%, transparent);
+        background: color-mix(in srgb, #0b0e1a 62%, transparent);
         backdrop-filter: blur(10px) saturate(1.1);
-        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
         clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
         transition: color 0.25s, border-color 0.25s, background 0.25s;
       }
       .sw-enter:hover, .sw-enter:focus-visible {
         color: #5eead4; border-color: color-mix(in srgb, #5eead4 60%, transparent);
-        background: color-mix(in srgb, #0b0e1a 42%, transparent); outline: none;
+        background: color-mix(in srgb, #0b0e1a 46%, transparent); outline: none;
       }
+      .sw-enter:focus-visible { outline: 2px solid #5eead4; outline-offset: 3px; }
       .sw-enter__arw { transition: transform 0.25s; }
       .sw-enter:hover .sw-enter__arw { transform: translateX(3px); }
+      /* Gentle attention cues — this page is a fun detour, and the button is the
+         way to the REAL site, so it must be unmissable: a slow border/glow breath
+         plus a periodic sheen sweep. Both pause on hover/focus (message received)
+         and are fully OFF under prefers-reduced-motion. */
+      .sw-enter::after {
+        content: ""; position: absolute; inset: -2px; pointer-events: none;
+        background: linear-gradient(105deg, transparent 38%,
+          rgba(94, 234, 212, 0.22) 49%, rgba(238, 242, 245, 0.30) 50%,
+          rgba(94, 234, 212, 0.22) 51%, transparent 62%);
+        transform: translateX(-130%);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .sw-enter { animation: sw-enter-breathe 3.6s ease-in-out infinite; }
+        .sw-enter::after { animation: sw-enter-sheen 4.8s ease-in-out infinite; animation-delay: 1.2s; }
+        .sw-enter:hover, .sw-enter:focus-visible { animation: none; }
+        .sw-enter:hover::after, .sw-enter:focus-visible::after { animation: none; }
+      }
+      @keyframes sw-enter-breathe {
+        0%, 100% { border-color: rgba(238, 242, 245, 0.34); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42); }
+        50% { border-color: rgba(94, 234, 212, 0.72);
+              box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42), 0 0 18px rgba(94, 234, 212, 0.32); }
+      }
+      @keyframes sw-enter-sheen {
+        0% { transform: translateX(-130%); }
+        38%, 100% { transform: translateX(130%); }
+      }
       @media (max-width: 860px) {
-        .sw-enter { font-size: 0.7rem; letter-spacing: 0.12em; padding: 0 15px; min-height: 42px; }
-        .sw-logo img { width: 38px; }
+        .sw-brand-lockup img { height: clamp(36px, 9vw, 46px); }
+        .sw-enter { font-size: 0.72rem; letter-spacing: 0.12em; padding: 0 16px; min-height: 44px; }
       }
       @media (max-width: 430px) {
-        /* ~390px: drop the centre button just below the logo row so the two
-           never collide, and trim it so nothing overflows. */
-        .sw-enter {
-          top: calc(env(safe-area-inset-top, 0px) + 62px);
-          font-size: 0.66rem; letter-spacing: 0.1em; padding: 0 13px;
-        }
+        /* ~390px: keep the stacked block tight so neither piece overflows or
+           collides with the route rail / HUD. */
+        .sw-brandblock { gap: 7px; }
+        .sw-brand-lockup img { height: 34px; }
+        .sw-enter { font-size: 0.68rem; letter-spacing: 0.1em; padding: 0 14px; min-height: 42px; }
       }
+
+      /* --- Scene CTA legibility (Task 3) --------------------------------------
+         The engine's default primary button paints white text on --sw-ink, which
+         on THIS dark theme is snow-cream (#eef2f5) → light-on-light, unreadable
+         (worst on the forge scene). Repaint every scene CTA as a near-opaque deep
+         indigo plate with light text, a hairline aurora border and a soft shadow —
+         clearly button-shaped and readable over ANY scene, in the chamfered grammar. */
+      .sw-root .sw-copy__cta .sw-btn {
+        min-height: 48px; display: inline-flex; align-items: center; padding: 0 26px;
+        border-radius: 2px; font-weight: 700; letter-spacing: 0.02em;
+        backdrop-filter: blur(8px) saturate(1.05);
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+        transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+      }
+      .sw-root .sw-btn--primary {
+        color: #eef2f5;
+        background: color-mix(in srgb, #0b0e1a 84%, transparent);
+        border: 1px solid color-mix(in srgb, var(--sw-accent) 55%, transparent);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      }
+      .sw-root .sw-btn--primary:hover, .sw-root .sw-btn--primary:focus-visible {
+        color: #5eead4; transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--sw-accent) 90%, transparent);
+        background: color-mix(in srgb, #0b0e1a 74%, transparent);
+      }
+      .sw-root .sw-btn--ghost {
+        color: #eef2f5; background: color-mix(in srgb, #0b0e1a 60%, transparent);
+        border: 1px solid color-mix(in srgb, #eef2f5 42%, transparent);
+      }
+      .sw-root .sw-btn--ghost:hover, .sw-root .sw-btn--ghost:focus-visible {
+        color: #5eead4; transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--sw-accent) 70%, transparent);
+      }
+      .sw-root .sw-btn:focus-visible { outline: 2px solid var(--sw-accent); outline-offset: 3px; }
+
+      /* --- Route rail: legible AND clickable (Task 3) -------------------------
+         Labels were light text on a light chip (near-invisible) and only appeared on
+         hover. Make them always-legible dark plates with light text, part of the
+         (already <button>) hit target, and give the dots a visible keyboard focus. */
+      .sw-root .sw-route__label {
+        opacity: 0.78; pointer-events: auto; color: #eef2f5;
+        background: color-mix(in srgb, #0b0e1a 78%, transparent);
+        border: 1px solid color-mix(in srgb, var(--sw-accent) 24%, transparent);
+        backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.42);
+        transform: translateY(-50%) translateX(0);
+      }
+      .sw-root .sw-route__dot:hover .sw-route__label,
+      .sw-root .sw-route__dot:focus-visible .sw-route__label,
+      .sw-root .sw-route__dot.is-active .sw-route__label { opacity: 1; }
+      .sw-root .sw-route__dot.is-active .sw-route__label {
+        color: #5eead4; border-color: color-mix(in srgb, var(--sw-accent) 60%, transparent);
+      }
+      .sw-root .sw-route__dot:focus-visible {
+        outline: 2px solid var(--sw-accent); outline-offset: 3px; border-radius: 4px;
+      }
+
+      /* --- HUD flight controls: hold contrast over bright scenes (Task 3) ----- */
+      .sw-root .sw-fly {
+        background: color-mix(in srgb, #0b0e1a 74%, transparent);
+        border: 1px solid color-mix(in srgb, #eef2f5 20%, transparent);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      }
+      .sw-root .sw-fly__btn { color: #eef2f5; }
+      .sw-root .sw-fly__rate { color: #cdd9dd; }
     </style>
   </head>
   <body>
@@ -106,16 +206,26 @@ const asset = (p: string) => `${base}${p}`;
 
     <!--
       ⚠ OPERATOR READ-APPROVAL REQUIRED — persistent brand chrome (staging-only):
-        · top-left logo-mark links home (aria-label "Adventure Storytelling Media — home")
-        · top-center button reads "ENTER THE SITE" (uppercased by CSS) → home ({base}/)
-      Server-rendered on purpose so both survive with JS disabled.
+        · top-CENTER block: the Sky + Persian Green lockup (logo-lockup-sky —
+          gray "adVenture Storytelling" wordmark, Persian-green S-mark and rules,
+          pale "MEDIA") with the "ENTER THE SITE" button (uppercased by CSS)
+          directly beneath — one unit; BOTH link home ({base}/). The button carries
+          a gentle breathing glow + periodic sheen (off under reduced-motion) so
+          visitors get that THIS page is the detour and that button is the site.
+        · lockup <img> alt: "Adventure Storytelling Media"
+      Server-rendered on purpose so the whole block survives with JS disabled.
     -->
-    <a class="sw-logo" href={`${base}/`} aria-label="Adventure Storytelling Media — home">
-      <img src={asset("/logo-mark.png")} alt="" width="48" height="48" />
-    </a>
-    <a class="sw-enter" href={`${base}/`}>
-      Enter the site<span class="sw-enter__arw" aria-hidden="true">→</span>
-    </a>
+    <div class="sw-brandblock">
+      <a class="sw-brand-lockup" href={`${base}/`} aria-label="Adventure Storytelling Media — home">
+        <picture>
+          <source srcset={asset("/logo-lockup-sky.webp")} type="image/webp" />
+          <img src={asset("/logo-lockup-sky.png")} alt="Adventure Storytelling Media" width="1200" height="317" />
+        </picture>
+      </a>
+      <a class="sw-enter" href={`${base}/`}>
+        Enter the site<span class="sw-enter__arw" aria-hidden="true">→</span>
+      </a>
+    </div>
 
     <div id="world"></div>
 
