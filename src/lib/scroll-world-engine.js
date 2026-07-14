@@ -73,6 +73,11 @@ function mountScrollWorld(container, config) {
   const DIVE_W = config.diveScroll || 1.3;
   const CONN_W = config.connScroll || 0.9;
   const CROSSFADE = (config.crossfade != null) ? config.crossfade : 0.12;  // seam dissolve width (vh)
+  // Auto-flight: the page flies itself (rAF-driven scroll) with a control cluster.
+  // Off by default (keeps the engine portable); reduced-motion always disables it.
+  const AUTOFLIGHT = !!config.autoFlight && !reduce;
+  const AUTOSECONDS = config.autoFlightSeconds || 105;   // ~seconds for a full forward flight at 1x
+  const SKIP = (config.skip && config.skip.href) ? config.skip : null;  // persistent "enter the full site"
   const N = SECTIONS.length;
   if (!N) return;
 
@@ -318,6 +323,108 @@ function mountScrollWorld(container, config) {
   layout();
   requestAnimationFrame(raf);
 
+  // ---- auto-flight: the page flies itself -----------------------------------
+  // Integration: the whole engine already keys off window.scrollY (scroll -> read
+  // -> raf scrub). So auto-flight is just "who moves the scrollbar" — a rAF loop
+  // that nudges window.scrollTo. Everything downstream (scene crossfades, copy
+  // pinning, route rail, video scrub) keeps working with zero changes. Any REAL
+  // user scroll hands the stick back instantly and we never fight it.
+  let playing = false, reversed = false, speedI = 1, autoPos = 0, lastTs = 0, lastSetY = null, autoStarted = false;
+  const SPEEDS = [0.5, 1, 2, 4];
+  const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  let flyEls = null;
+
+  // Persistent "enter the full site" skip control (built regardless of auto-flight).
+  if (SKIP) {
+    const sk = el('a', 'sw-skip'); sk.href = SKIP.href;
+    sk.innerHTML = esc(SKIP.label || 'Enter site') + ' <span class="sw-skip__arw" aria-hidden="true">→</span>';
+    container.appendChild(sk);
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    if (on) { lastTs = 0; autoPos = window.scrollY || window.pageYOffset; lastSetY = Math.round(autoPos); onFirstGesture(); }
+    if (flyEls) {
+      flyEls.play.textContent = on ? 'PAUSE' : 'PLAY';
+      flyEls.play.setAttribute('aria-label', on ? 'Pause flight' : 'Play flight');
+      flyEls.play.classList.toggle('is-active', on);
+    }
+  }
+  function setRate(i) { speedI = clamp(i, 0, SPEEDS.length - 1); if (flyEls) flyEls.rate.textContent = SPEEDS[speedI] + '×'; }
+  function setReversed(on) {
+    reversed = on;
+    if (flyEls) { flyEls.rev.classList.toggle('is-active', on); flyEls.rev.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+  }
+  // Instant hand-over: a wheel/touch drag pauses auto-flight the moment it starts.
+  function handOver() { if (playing) setPlaying(false); }
+
+  const flyT0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  function autoTick(ts) {
+    if (AUTOFLIGHT) {
+      // Begin only once the first scene is ready (or a short fallback, so a failed
+      // clip still auto-advances the stills).
+      if (!autoStarted && (SECTIONS[0]._seg.ready || ts - flyT0 > 2500)) { autoStarted = true; setPlaying(true); }
+      if (playing) {
+        const y = window.scrollY || window.pageYOffset;
+        // Divergence = someone else moved the scroll (scrollbar drag, PgUp/PgDn,
+        // momentum, anchor jump). Hand the stick back; don't fight it.
+        if (lastSetY != null && Math.abs(y - lastSetY) > 3) { setPlaying(false); }
+        else {
+          if (!lastTs) lastTs = ts;
+          let dt = (ts - lastTs) / 1000; lastTs = ts;
+          if (dt > 0.1) dt = 0.1;   // clamp after a tab-away so we don't lurch
+          const max = maxScroll();
+          autoPos += (max / AUTOSECONDS) * SPEEDS[speedI] * (reversed ? -1 : 1) * dt;
+          if (autoPos <= 0) { autoPos = 0; window.scrollTo(0, 0); lastSetY = 0; setPlaying(false); }
+          else if (autoPos >= max) { autoPos = max; window.scrollTo(0, max); lastSetY = max; setPlaying(false); }
+          else { window.scrollTo(0, autoPos); lastSetY = Math.round(autoPos); }
+        }
+      } else { lastTs = 0; }
+    }
+    requestAnimationFrame(autoTick);
+  }
+
+  if (AUTOFLIGHT) {
+    container.classList.add('sw-has-fly');
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible control labels (mono HUD voice):
+    // PLAY / PAUSE, SLOWER (−) / FASTER (+) / rate "1×", REVERSE (REV).
+    const fly = el('div', 'sw-fly'); fly.setAttribute('role', 'group'); fly.setAttribute('aria-label', 'Flight controls');
+    const play = el('button', 'sw-fly__btn sw-fly__play'); play.type = 'button'; play.textContent = 'PLAY'; play.setAttribute('aria-label', 'Play flight');
+    const speedWrap = el('div', 'sw-fly__speed');
+    const slower = el('button', 'sw-fly__btn sw-fly__step'); slower.type = 'button'; slower.textContent = '−'; slower.setAttribute('aria-label', 'Slower');
+    const rate = el('span', 'sw-fly__rate'); rate.setAttribute('aria-live', 'polite'); rate.textContent = '1×';
+    const faster = el('button', 'sw-fly__btn sw-fly__step'); faster.type = 'button'; faster.textContent = '+'; faster.setAttribute('aria-label', 'Faster');
+    speedWrap.append(slower, rate, faster);
+    const rev = el('button', 'sw-fly__btn sw-fly__rev'); rev.type = 'button'; rev.textContent = 'REV'; rev.setAttribute('aria-label', 'Reverse flight'); rev.setAttribute('aria-pressed', 'false');
+    fly.append(play, speedWrap, rev);
+    container.appendChild(fly);
+    flyEls = { play, rate, rev };
+    requestAnimationFrame(() => fly.classList.add('is-on'));
+
+    play.addEventListener('click', () => setPlaying(!playing));
+    slower.addEventListener('click', () => setRate(speedI - 1));
+    faster.addEventListener('click', () => { if (!playing) setPlaying(true); setRate(speedI + 1); });
+    rev.addEventListener('click', () => { if (!playing) setPlaying(true); setReversed(!reversed); });
+
+    window.addEventListener('wheel', handOver, { passive: true });
+    window.addEventListener('touchmove', handOver, { passive: true });
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;   // don't hijack shortcuts
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      switch (e.key) {
+        case ' ': case 'Spacebar':
+          if (t && (t.tagName === 'BUTTON' || t.tagName === 'A')) return;   // let the control activate
+          e.preventDefault(); setPlaying(!playing); break;
+        case 'ArrowUp':    e.preventDefault(); if (!playing) setPlaying(true); setRate(speedI + 1); break;
+        case 'ArrowDown':  e.preventDefault(); setRate(speedI - 1); break;
+        case 'ArrowRight': e.preventDefault(); if (!playing) setPlaying(true); setReversed(false); break;
+        case 'ArrowLeft':  e.preventDefault(); if (!playing) setPlaying(true); setReversed(true); break;
+      }
+    });
+    requestAnimationFrame(autoTick);
+  }
+
   // ---- helpers ----
   function el(tag, cls) { const n = document.createElement(tag); if (cls) n.className = cls; return n; }
   function pad(n) { return String(n).padStart(2, '0'); }
@@ -428,6 +535,41 @@ function injectCSS() {
     .sw-btn{padding:15px 26px;}
   }
   @media (prefers-reduced-motion:reduce){ .sw-hint i::after{animation:none;} .sw-pt{display:none;} }
+  /* --- auto-flight chrome: skip link + control cluster (mono HUD voice) --- */
+  .sw-skip{position:fixed;z-index:55;top:calc(env(safe-area-inset-top,0px) + clamp(14px,2.4vw,26px));right:clamp(16px,5vw,64px);
+    display:inline-flex;align-items:center;gap:.5em;min-height:40px;padding:0 14px;text-decoration:none;
+    font-family:var(--sw-font-mono,var(--font-mono,ui-monospace,monospace));font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--sw-ink-soft);border:1px solid color-mix(in srgb,var(--sw-ink) 24%,transparent);border-radius:2px;
+    background:color-mix(in srgb,var(--sw-bg) 42%,transparent);backdrop-filter:blur(8px);
+    clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);transition:color .25s,border-color .25s;}
+  .sw-skip:hover,.sw-skip:focus-visible{color:var(--sw-accent);border-color:color-mix(in srgb,var(--sw-accent) 60%,transparent);outline:none;}
+  .sw-skip__arw{transition:transform .25s;} .sw-skip:hover .sw-skip__arw{transform:translateX(3px);}
+  .sw-fly{position:fixed;z-index:56;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateX(-50%);
+    display:flex;align-items:stretch;gap:8px;padding:8px;border-radius:4px;
+    font-family:var(--sw-font-mono,var(--font-mono,ui-monospace,monospace));
+    background:color-mix(in srgb,var(--sw-bg) 60%,transparent);backdrop-filter:blur(12px) saturate(1.1);
+    border:1px solid color-mix(in srgb,var(--sw-ink) 16%,transparent);
+    opacity:0;transition:opacity .45s var(--ease-survey,ease);}
+  .sw-fly.is-on{opacity:1;}
+  .sw-fly__btn{appearance:none;font:inherit;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    min-height:44px;min-width:44px;padding:0 14px;cursor:pointer;color:var(--sw-ink);background:transparent;
+    border:1px solid color-mix(in srgb,var(--sw-ink) 24%,transparent);border-radius:2px;
+    clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+    display:inline-flex;align-items:center;justify-content:center;transition:color .2s,border-color .2s,background .2s;}
+  .sw-fly__btn:hover,.sw-fly__btn:focus-visible{color:var(--sw-accent);border-color:color-mix(in srgb,var(--sw-accent) 60%,transparent);outline:none;}
+  .sw-fly__btn.is-active{color:var(--sw-accent);border-color:color-mix(in srgb,var(--sw-accent) 70%,transparent);background:color-mix(in srgb,var(--sw-accent) 12%,transparent);}
+  .sw-fly__step{font-size:1rem;padding:0 10px;}
+  .sw-fly__play{min-width:70px;}
+  .sw-fly__speed{display:flex;align-items:center;gap:4px;}
+  .sw-fly__rate{min-width:3ch;text-align:center;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--sw-ink-soft);}
+  /* Keep the bottom-anchored copy + hint clear of the control cluster. */
+  .sw-root.sw-has-fly .sw-hint{bottom:calc(env(safe-area-inset-bottom,0px) + 96px);}
+  @media (max-width:860px){
+    .sw-fly{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);gap:6px;padding:6px;}
+    .sw-fly__btn{padding:0 11px;}
+    .sw-root.sw-has-fly .sw-copy{bottom:calc(clamp(92px,20dvh,150px) + env(safe-area-inset-bottom,0px));}
+    .sw-root.sw-has-fly .sw-hint{bottom:calc(env(safe-area-inset-bottom,0px) + 84px);}
+  }
   `;
   // Wrap in a cascade layer so the page's own theme tokens (unlayered
   // :root / .sw-root { --sw-bg / --sw-ink / --sw-accent … }) always win over
