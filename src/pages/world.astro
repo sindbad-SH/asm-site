@@ -52,10 +52,71 @@ const asset = (p: string) => `${base}${p}`;
       /* Labels in the surveyor's instrument voice (Space Mono). */
       .sw-root .sw-copy__eyebrow { font-family: var(--font-mono); letter-spacing: .18em; }
       .sw-root .sw-copy__num { font-family: var(--font-mono); }
+
+      /* --- Persistent brand chrome, SERVER-RENDERED (survives no-JS) ----------
+         Top-left ASM logo-mark (reuses /logo-mark.png + BASE_URL like Nav.astro)
+         and a prominent top-CENTER "Enter the site" portal button in the site's
+         chamfered button grammar. Both sit above every engine layer (z-index 90)
+         and are safe-area aware so the flight never occludes them. */
+      .sw-logo {
+        position: fixed; z-index: 90;
+        top: calc(env(safe-area-inset-top, 0px) + clamp(12px, 2vw, 22px));
+        left: clamp(14px, 4vw, 40px);
+        display: inline-flex; align-items: center; line-height: 0;
+        filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+      }
+      .sw-logo img { width: clamp(40px, 6vw, 48px); height: auto; display: block; }
+      .sw-enter {
+        position: fixed; z-index: 90;
+        top: calc(env(safe-area-inset-top, 0px) + clamp(12px, 2vw, 22px));
+        left: 50%; transform: translateX(-50%);
+        display: inline-flex; align-items: center; gap: 0.6em;
+        min-height: 44px; padding: 0 22px; text-decoration: none; white-space: nowrap;
+        font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;
+        letter-spacing: 0.18em; text-transform: uppercase; color: #eef2f5;
+        border: 1px solid rgba(238, 242, 245, 0.34); border-radius: 2px;
+        background: color-mix(in srgb, #0b0e1a 55%, transparent);
+        backdrop-filter: blur(10px) saturate(1.1);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+        transition: color 0.25s, border-color 0.25s, background 0.25s;
+      }
+      .sw-enter:hover, .sw-enter:focus-visible {
+        color: #5eead4; border-color: color-mix(in srgb, #5eead4 60%, transparent);
+        background: color-mix(in srgb, #0b0e1a 42%, transparent); outline: none;
+      }
+      .sw-enter__arw { transition: transform 0.25s; }
+      .sw-enter:hover .sw-enter__arw { transform: translateX(3px); }
+      @media (max-width: 860px) {
+        .sw-enter { font-size: 0.7rem; letter-spacing: 0.12em; padding: 0 15px; min-height: 42px; }
+        .sw-logo img { width: 38px; }
+      }
+      @media (max-width: 430px) {
+        /* ~390px: drop the centre button just below the logo row so the two
+           never collide, and trim it so nothing overflows. */
+        .sw-enter {
+          top: calc(env(safe-area-inset-top, 0px) + 62px);
+          font-size: 0.66rem; letter-spacing: 0.1em; padding: 0 13px;
+        }
+      }
     </style>
   </head>
   <body>
     <div id="top"></div>
+
+    <!--
+      ⚠ OPERATOR READ-APPROVAL REQUIRED — persistent brand chrome (staging-only):
+        · top-left logo-mark links home (aria-label "Adventure Storytelling Media — home")
+        · top-center button reads "ENTER THE SITE" (uppercased by CSS) → home ({base}/)
+      Server-rendered on purpose so both survive with JS disabled.
+    -->
+    <a class="sw-logo" href={`${base}/`} aria-label="Adventure Storytelling Media — home">
+      <img src={asset("/logo-mark.png")} alt="" width="48" height="48" />
+    </a>
+    <a class="sw-enter" href={`${base}/`}>
+      Enter the site<span class="sw-enter__arw" aria-hidden="true">→</span>
+    </a>
+
     <div id="world"></div>
 
     <script>
@@ -65,23 +126,28 @@ const asset = (p: string) => `${base}${p}`;
       const media = (p) => `${base}/media/world/${p}`;
 
       mountScrollWorld(document.getElementById("world"), {
-        brand: { name: "Adventure Storytelling Media", href: "#top" },
-        // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible strings (staging-only):
+        // The persistent top-left logo + top-center "Enter the site" button are
+        // now SERVER-RENDERED in world.astro (survive no-JS), so the engine's own
+        // brand mark + top-right skip link are intentionally omitted here.
+        // ⚠ OPERATOR READ-APPROVAL REQUIRED — visible string (staging-only):
         //   hint: "scroll — or let it fly"   (the flight flies itself)
-        //   skip.label: "Enter site"         (persistent top-right exit to the home page)
         hint: "scroll — or let it fly",
         nav: false,               // immersive: no top section nav
         atmosphere: true,
         autoFlight: true,         // the page flies itself; controls let you drive
-        // P25b — operator: 105s read as static ("moves a little every 20-30s").
-        // The math: 105s stretched each 10s clip to ~2x slow-mo of already-slow
-        // footage = imperceptible. ~55s makes in-scene video play near REALTIME
-        // at 1x, which is the "very slow crawl" he expected; 0.5x gives the old
-        // meditative pace, 2x/4x the skim.
-        autoFlightSeconds: 55,
-        skip: { label: "Enter site", href: base + "/" },  // persistent exit to the real home
+        // ⚠ OPERATOR-TUNABLE — the ONE knob for flight pace. A full forward flight
+        // takes this many seconds. Realtime math: 5 source clips × 10.04s ≈ 50s of
+        // video shown across the whole flight, so in-scene video runs ≈ 50/40 ≈
+        // 1.25× realtime on average — the wide hero/finale scenes ~1.05×, the three
+        // mid scenes ~1.4× (clearly moving, still cinematic). Lower = faster (skim),
+        // higher = slower (meditative). The −/+ speed buttons scale it 0.5/1/2/4×.
+        // Prior tests: 105s read as static, 55s as a near-realtime crawl.
+        autoFlightSeconds: 40,
         diveScroll: 1.3,
         crossfade: 0.14,          // architecture A: soft dissolve at each seam
+        // ⚠ OPERATOR READ-APPROVAL REQUIRED — all scene eyebrow/title/body + CTA
+        // strings below are the operator's approved mapping (staging-only). Each
+        // scene's CTA is a normal link into the matching site section.
         sections: [
           {
             id: "peak", label: "The Peak",
@@ -91,7 +157,8 @@ const asset = (p: string) => `${base}${p}`;
             scroll: 1.7, linger: 0.45,   // hero — long dwell
             eyebrow: "ADVENTURE STORYTELLING MEDIA",
             title: "Every story starts in the wild.",
-            body: "A world under the aurora — scroll to fly through it.",
+            body: "Welcome to the StorySmith's world — scroll, or just sit back and fly.",
+            cta: { primary: { label: "Enter the site", href: base + "/" } },
           },
           {
             id: "basecamp", label: "The Wild",
@@ -99,10 +166,10 @@ const asset = (p: string) => `${base}${p}`;
             clip: media("vid/basecamp.mp4"),
             accent: "#7fe0c3",
             scroll: 1.25,
-            eyebrow: "THE WILD",
+            eyebrow: "ADVENTURE STORIES",
             title: "Where the cameras go that don't get second takes.",
-            body: "Expeditions, glaciers, thin air — the adventure lane.",
-            tags: ["Adventure Stories"],
+            body: "Expeditions, aerials, and field notes from the territory.",
+            cta: { primary: { label: "See the Adventure Stories", href: base + "/adventure" } },
           },
           {
             id: "valley", label: "The Market",
@@ -110,10 +177,10 @@ const asset = (p: string) => `${base}${p}`;
             clip: media("vid/valley.mp4"),
             accent: "#38f8ec",
             scroll: 1.25,
-            eyebrow: "THE MARKET",
-            title: "Down in the valley, founders are telling stories too.",
-            body: "Narrative strategy for the ones building something real.",
-            tags: ["Forge the Saga"],
+            eyebrow: "WORK STORIES",
+            title: "Down in the valley, the work gets made.",
+            body: "Films, coverage, and campaigns for people building something real.",
+            cta: { primary: { label: "See the Work Stories", href: base + "/work" } },
           },
           {
             id: "cinema", label: "The Industry",
@@ -121,10 +188,10 @@ const asset = (p: string) => `${base}${p}`;
             clip: media("vid/cinema.mp4"),
             accent: "#5eead4",
             scroll: 1.25,
-            eyebrow: "THE INDUSTRY",
+            eyebrow: "VENTURE STORIES",
             title: "Under the same sky, the industry gathers.",
-            body: "Festivals, markets, screening rooms — the venture lane.",
-            tags: ["Venture Stories"],
+            body: "Festivals, markets, screening rooms — business stories from the inside.",
+            cta: { primary: { label: "Read the Venture Stories", href: base + "/entertainment" } },
           },
           {
             id: "forge", label: "The StorySmith",
@@ -132,10 +199,10 @@ const asset = (p: string) => `${base}${p}`;
             clip: media("vid/forge.mp4"),
             accent: "#e8a04c",
             scroll: 1.7, linger: 0.4,    // finale — long dwell, holds the CTA
-            eyebrow: "THE STORYSMITH",
+            eyebrow: "FORGE THE SAGA",
             title: "One craft holds it all together.",
-            body: "The full story is inside.",
-            cta: { primary: { label: "Enter the full site", href: base + "/" } },
+            body: "Narrative strategy, forged for founders — this is where we work.",
+            cta: { primary: { label: "Forge your saga", href: base + "/forge-the-saga" } },
           },
         ],
         connectors: [],   // architecture A — no connectors; legs crossfade directly

@@ -332,6 +332,7 @@ function mountScrollWorld(container, config) {
   let playing = false, reversed = false, speedI = 1, autoPos = 0, lastTs = 0, lastSetY = null, autoStarted = false;
   const SPEEDS = [0.5, 1, 2, 4];
   const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  const perfNow = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
   let flyEls = null;
 
   // Persistent "enter the full site" skip control (built regardless of auto-flight).
@@ -340,6 +341,59 @@ function mountScrollWorld(container, config) {
     sk.innerHTML = esc(SKIP.label || 'Enter site') + ' <span class="sw-skip__arw" aria-hidden="true">→</span>';
     container.appendChild(sk);
   }
+
+  // ---- loop wrap-around: fade to ground, jump, fade back in -------------------
+  // Scroll (or fly) past the bottom and you're back at the top of the mountain;
+  // scroll above the top and you drop to the finale. Both the autopilot (on
+  // reaching an end) and a manual wheel/touch/scroll past an edge wrap the same
+  // seamless way: a ~350ms fade-to-ground overlay hides the jump, then the scene/
+  // copy/route state is rebuilt from the new scroll position by read(). A brief
+  // cooldown after each wrap stops momentum from immediately wrapping again.
+  const wrapFade = el('div', 'sw-wrapfade'); wrapFade.setAttribute('aria-hidden', 'true');
+  container.appendChild(wrapFade);
+  let wrapping = false, wrapCooldownUntil = 0;
+  const WRAP_HALF = 175;   // ms per half (fade-out, then fade-in) ≈ 350ms round trip
+  function doWrap(dir) {
+    if (wrapping) return;
+    wrapping = true;
+    const jump = () => {
+      const target = (dir === 'forward') ? 0 : maxScroll();
+      window.scrollTo(0, target);
+      // Keep the autopilot's bookkeeping in lock-step with the jump so it neither
+      // detects "divergence" (see autoTick) nor lurches on the next frame.
+      autoPos = target; lastSetY = Math.round(target); lastTs = 0;
+      read();
+    };
+    if (reduce) {
+      // Reduced-motion: honour the wrap but skip the fade animation — jump straight.
+      jump(); wrapping = false; wrapCooldownUntil = perfNow() + 700; return;
+    }
+    wrapFade.classList.add('is-on');
+    setTimeout(() => {
+      jump();
+      wrapFade.classList.remove('is-on');
+      setTimeout(() => { wrapping = false; wrapCooldownUntil = perfNow() + 700; }, WRAP_HALF);
+    }, WRAP_HALF);
+  }
+  // Manual edge wrap: only fires when a gesture pushes past the very top/bottom
+  // (the browser has already clamped scrollY there), and never during a cooldown.
+  function edgeWrap(dir) {
+    if (wrapping || perfNow() < wrapCooldownUntil) return;
+    const y = window.scrollY || window.pageYOffset;
+    if (dir === 'forward' && y >= maxScroll() - 2) doWrap('forward');
+    else if (dir === 'backward' && y <= 2) doWrap('backward');
+  }
+  // Always-on (works with autopilot off, and under reduced-motion).
+  window.addEventListener('wheel', (e) => {
+    if (e.deltaY > 0) edgeWrap('forward'); else if (e.deltaY < 0) edgeWrap('backward');
+  }, { passive: true });
+  let wrapTouchY = null;
+  window.addEventListener('touchstart', (e) => { wrapTouchY = (e.touches && e.touches[0]) ? e.touches[0].clientY : null; }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (wrapTouchY == null || !e.touches || !e.touches[0]) return;
+    const cy = e.touches[0].clientY, dy = wrapTouchY - cy; wrapTouchY = cy;
+    if (dy > 1) edgeWrap('forward'); else if (dy < -1) edgeWrap('backward');
+  }, { passive: true });
 
   function setPlaying(on) {
     playing = on;
@@ -365,19 +419,26 @@ function mountScrollWorld(container, config) {
       // clip still auto-advances the stills).
       if (!autoStarted && (SECTIONS[0]._seg.ready || ts - flyT0 > 2500)) { autoStarted = true; setPlaying(true); }
       if (playing) {
-        const y = window.scrollY || window.pageYOffset;
-        // Divergence = someone else moved the scroll (scrollbar drag, PgUp/PgDn,
-        // momentum, anchor jump). Hand the stick back; don't fight it.
-        if (lastSetY != null && Math.abs(y - lastSetY) > 3) { setPlaying(false); }
+        // While a wrap fade is mid-flight the scroll position is being jumped;
+        // pause our own bookkeeping so the divergence check below can't misfire.
+        if (wrapping) { lastTs = 0; }
         else {
-          if (!lastTs) lastTs = ts;
-          let dt = (ts - lastTs) / 1000; lastTs = ts;
-          if (dt > 0.1) dt = 0.1;   // clamp after a tab-away so we don't lurch
-          const max = maxScroll();
-          autoPos += (max / AUTOSECONDS) * SPEEDS[speedI] * (reversed ? -1 : 1) * dt;
-          if (autoPos <= 0) { autoPos = 0; window.scrollTo(0, 0); lastSetY = 0; setPlaying(false); }
-          else if (autoPos >= max) { autoPos = max; window.scrollTo(0, max); lastSetY = max; setPlaying(false); }
-          else { window.scrollTo(0, autoPos); lastSetY = Math.round(autoPos); }
+          const y = window.scrollY || window.pageYOffset;
+          // Divergence = someone else moved the scroll (scrollbar drag, PgUp/PgDn,
+          // momentum, anchor jump). Hand the stick back; don't fight it.
+          if (lastSetY != null && Math.abs(y - lastSetY) > 3) { setPlaying(false); }
+          else {
+            if (!lastTs) lastTs = ts;
+            let dt = (ts - lastTs) / 1000; lastTs = ts;
+            if (dt > 0.1) dt = 0.1;   // clamp after a tab-away so we don't lurch
+            const max = maxScroll();
+            autoPos += (max / AUTOSECONDS) * SPEEDS[speedI] * (reversed ? -1 : 1) * dt;
+            // Loop forever: reaching an end wraps to the opposite end and keeps
+            // flying (forward → back to the summit; reverse → down to the finale).
+            if (autoPos <= 0) { doWrap('backward'); }
+            else if (autoPos >= max) { doWrap('forward'); }
+            else { window.scrollTo(0, autoPos); lastSetY = Math.round(autoPos); }
+          }
         }
       } else { lastTs = 0; }
     }
@@ -535,6 +596,9 @@ function injectCSS() {
     .sw-btn{padding:15px 26px;}
   }
   @media (prefers-reduced-motion:reduce){ .sw-hint i::after{animation:none;} .sw-pt{display:none;} }
+  /* --- loop wrap-around: full-bleed fade-to-ground during the seam jump --- */
+  .sw-wrapfade{position:fixed;inset:0;z-index:65;background:var(--sw-bg);opacity:0;pointer-events:none;transition:opacity .175s ease;}
+  .sw-wrapfade.is-on{opacity:1;}
   /* --- auto-flight chrome: skip link + control cluster (mono HUD voice) --- */
   .sw-skip{position:fixed;z-index:55;top:calc(env(safe-area-inset-top,0px) + clamp(14px,2.4vw,26px));right:clamp(16px,5vw,64px);
     display:inline-flex;align-items:center;gap:.5em;min-height:40px;padding:0 14px;text-decoration:none;
