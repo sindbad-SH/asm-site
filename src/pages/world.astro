@@ -269,15 +269,16 @@ const asset = (p: string) => `${base}${p}`;
         // Industry lines are reworked to match the new worlds. Each scene's CTA
         // is a normal link into the matching site section (routes from consts.ts
         // NAV: /adventure, /entertainment = Venture Stories, /work, /forge-the-saga).
-        // NOTE: `clip` intentionally ABSENT while the video legs are in production —
-        // the engine runs the stills with Ken Burns drift + crossfades. When the
-        // operator's Seedance clips land, add per-section
-        //   clip: media("vid/v2-hold-<id>.mp4")
-        // and fill `connectors` below.
+        // v2 VIDEO LEGS LIVE (operator-picked winners, 2026-07-19): each section
+        // now carries its hold clip; the still stays as poster/fallback.
+        // Gateway = the blessed wide→summit flight (ends on the lone climber
+        // under the aurora S); sub-worlds = "the service is the animation"
+        // takes on the museum-still dioramas.
         sections: [
           {
             id: "gateway", label: "The Gateway",
             still: media("gateway.webp"),
+            clip: media("vid/v2-hold-gateway.mp4"),
             accent: "#5eead4",
             scroll: 1.7, linger: 0.45,   // hero — long dwell
             eyebrow: "ADVENTURE STORYTELLING MEDIA",
@@ -288,6 +289,7 @@ const asset = (p: string) => `${base}${p}`;
           {
             id: "adventure", label: "The Wild",
             still: media("adventure.webp"),
+            clip: media("vid/v2-hold-adventure.mp4"),
             accent: "#7fe0c3",
             scroll: 1.25,
             eyebrow: "ADVENTURE STORIES",
@@ -298,6 +300,7 @@ const asset = (p: string) => `${base}${p}`;
           {
             id: "venture", label: "The Town",
             still: media("venture.webp"),
+            clip: media("vid/v2-hold-venture.mp4"),
             accent: "#38f8ec",
             scroll: 1.25,
             eyebrow: "VENTURE STORIES",
@@ -308,6 +311,7 @@ const asset = (p: string) => `${base}${p}`;
           {
             id: "industry", label: "The Set",
             still: media("industry.webp"),
+            clip: media("vid/v2-hold-industry.mp4"),
             accent: "#5eead4",
             scroll: 1.25,
             eyebrow: "WORK STORIES",
@@ -318,6 +322,7 @@ const asset = (p: string) => `${base}${p}`;
           {
             id: "forge", label: "The StorySmith",
             still: media("forge.webp"),
+            clip: media("vid/v2-hold-forge.mp4"),
             accent: "#e8a04c",
             scroll: 1.7, linger: 0.4,    // finale — long dwell, holds the CTA
             eyebrow: "FORGE THE SAGA",
