@@ -393,6 +393,11 @@ function mountScrollWorld(container, config) {
       // stepAuto re-adopts the position and re-arms on its next frame.
       autoPos = target; lastSetY = null; lastTs = 0; armed = false;
       read();
+      // Snap every segment's scrub position to its post-jump target. Without
+      // this the 0.18 lerp in raf() walks each video from its OLD time to the
+      // new one — after a forward wrap the gateway visibly rewinds from its
+      // final frames instead of opening at frame 0.
+      for (let i = 0; i < NSEG; i++) { const s = SEGMENTS[i]; s.cur = s.target; }
     };
     if (reduce) {
       // Reduced-motion: honour the wrap but skip the fade animation — jump straight.

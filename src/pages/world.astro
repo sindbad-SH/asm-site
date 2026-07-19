@@ -276,7 +276,7 @@ const asset = (p: string) => `${base}${p}`;
         // takes on the museum-still dioramas.
         sections: [
           {
-            id: "gateway", label: "The Gateway",
+            id: "gateway", label: "Welcome",
             still: media("gateway.webp"),
             clip: media("vid/v2-hold-gateway.mp4"),
             accent: "#5eead4",
@@ -284,10 +284,13 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "ADVENTURE STORYTELLING MEDIA",
             title: "Every story starts in the wild.",
             body: "Welcome to the StorySmith's worlds — scroll, or just sit back and fly.",
-            cta: { primary: { label: "Enter the site", href: base + "/" } },
+            cta: {
+              primary: { label: "Enter the site", href: base + "/" },
+              secondary: { label: "Skip the flight — talk to us", href: base + "/contact" },
+            },
           },
           {
-            id: "adventure", label: "The Wild",
+            id: "adventure", label: "Adventure Stories",
             still: media("adventure.webp"),
             clip: media("vid/v2-hold-adventure.mp4"),
             accent: "#7fe0c3",
@@ -295,10 +298,13 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "ADVENTURE STORIES",
             title: "Where the cameras go that don't get second takes.",
             body: "Stories gathered by drone, by lens, and by listening at the fire.",
-            cta: { primary: { label: "See the Adventure Stories", href: base + "/adventure" } },
+            cta: {
+              primary: { label: "See the Adventure Stories", href: base + "/adventure" },
+              secondary: { label: "Who's behind the camera?", href: base + "/about" },
+            },
           },
           {
-            id: "venture", label: "The Town",
+            id: "venture", label: "Venture Stories",
             still: media("venture.webp"),
             clip: media("vid/v2-hold-venture.mp4"),
             accent: "#38f8ec",
@@ -306,10 +312,13 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "VENTURE STORIES",
             title: "Every business is a story being built.",
             body: "Pitches, launches, and the framing going up — ventures, told from the inside.",
-            cta: { primary: { label: "Read the Venture Stories", href: base + "/entertainment" } },
+            cta: {
+              primary: { label: "Read the Venture Stories", href: base + "/entertainment" },
+              secondary: { label: "Your business has one too", href: base + "/forge-the-saga" },
+            },
           },
           {
-            id: "industry", label: "The Set",
+            id: "industry", label: "Work Stories",
             still: media("industry.webp"),
             clip: media("vid/v2-hold-industry.mp4"),
             accent: "#5eead4",
@@ -317,7 +326,10 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "WORK STORIES",
             title: "Lights up. This is where the work gets made.",
             body: "Films, coverage, and campaigns for people building something real.",
-            cta: { primary: { label: "See the Work Stories", href: base + "/work" } },
+            cta: {
+              primary: { label: "See the Work Stories", href: base + "/work" },
+              secondary: { label: "Get this made for you", href: base + "/contact" },
+            },
           },
           {
             id: "forge", label: "The StorySmith",
@@ -328,7 +340,13 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "FORGE THE SAGA",
             title: "One craft holds it all together.",
             body: "Raw experience in, stories out — narrative strategy, forged for founders.",
-            cta: { primary: { label: "Forge your saga", href: base + "/forge-the-saga" } },
+            // Finale CTA: the forge clip is the only one that cuts to a CLOSER
+            // angle mid-take — the visitor lands eye-to-eye with the StorySmith,
+            // so the ask goes direct. Calendly URL = consts.ts SITE.bookACall.
+            cta: {
+              primary: { label: "Schedule a talk with the StorySmith", href: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting" },
+              secondary: { label: "Forge your saga", href: base + "/forge-the-saga" },
+            },
           },
         ],
         // Transit clips slot here when the operator generates them (Plan B, or
