@@ -181,6 +181,22 @@ function mountScrollWorld(container, config) {
     }
   });
 
+  // ---- center-stage CTA (finale) --------------------------------------------
+  // A section may declare centerCta:{label,href,at} — a single dead-center
+  // button that pops in once that section's clip crosses progress `at`
+  // (e.g. the forge take's mid-clip push-in to the closer angle). One global
+  // element; toggled from raf() where per-frame clip progress lives.
+  let centerEl = null, centerSeg = null, centerAt = 1, centerOn = false;
+  SECTIONS.forEach((s, i) => {
+    if (!s.centerCta || centerEl) return;
+    centerAt = (s.centerCta.at == null) ? 0.5 : s.centerCta.at;
+    centerEl = el('div', 'sw-centercta');
+    centerEl.style.setProperty('--sw-accent', s.accent || '');
+    centerEl.innerHTML = `<a class="sw-btn sw-btn--primary sw-centercta__btn" href="${esc(s.centerCta.href || '#')}">${esc(s.centerCta.label || '')}</a>`;
+    container.appendChild(centerEl);
+    centerSeg = SEGMENTS.find(g => g.kind === 'dive' && g.si === i) || null;
+  });
+
   // ---- math ----
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const smooth = x => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -300,6 +316,10 @@ function mountScrollWorld(container, config) {
       const dur = s.video.duration || 1;
       const t = clamp(s.cur, 0, 0.999) * dur;
       if (Math.abs(s.video.currentTime - t) > eps) { try { s.video.currentTime = t; } catch (e) {} }
+    }
+    if (centerEl && centerSeg) {
+      const on = !!centerSeg.visible && centerSeg.cur >= centerAt;
+      if (on !== centerOn) { centerOn = on; centerEl.classList.toggle('is-on', on); }
     }
     if (_alive.v) requestAnimationFrame(raf);
   }
@@ -630,7 +650,13 @@ function injectCSS() {
   .sw-scene__still{will-change:transform;} .sw-scene.has-clip .sw-scene__still{opacity:0;} .sw-scene__video{z-index:1;}
   .sw-copylayer{position:fixed;inset:0;z-index:20;pointer-events:none;}
   .sw-copylayer::before{content:"";position:absolute;inset:0;width:min(58vw,780px);background:linear-gradient(90deg,var(--sw-bg) 0%,color-mix(in srgb,var(--sw-bg) 82%,transparent) 34%,color-mix(in srgb,var(--sw-bg) 40%,transparent) 62%,transparent 100%);}
-  .sw-copy{position:absolute;left:clamp(18px,5vw,64px);top:50%;transform:translateY(-50%);width:min(42vw,460px);opacity:0;will-change:opacity,transform;}
+  .sw-copy{position:absolute;right:clamp(18px,4vw,56px);left:auto;top:clamp(84px,13vh,150px);transform:none;width:min(42vw,460px);text-align:right;opacity:0;will-change:opacity,transform;}
+  .sw-copy .sw-copy__tags{justify-content:flex-end;}
+  .sw-copy .sw-copy__cta{justify-content:flex-end;}
+  .sw-centercta{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transform:translateY(14px) scale(.97);transition:opacity .5s ease,transform .5s cubic-bezier(.2,.9,.3,1.2);z-index:40;}
+  .sw-centercta.is-on{opacity:1;transform:none;}
+  .sw-centercta__btn{pointer-events:auto;font-size:1.15rem;padding:18px 34px;box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-accent) 45%,transparent),0 12px 48px rgba(0,0,0,.55),0 0 42px color-mix(in srgb,var(--sw-accent) 35%,transparent);}
+  .sw-centercta:not(.is-on) .sw-centercta__btn{visibility:hidden;}
   .sw-copy__num{font-family:ui-monospace,Menlo,monospace;font-size:.74rem;letter-spacing:.12em;color:var(--sw-ink-soft);}
   .sw-copy__eyebrow{display:block;margin-top:18px;font-family:var(--sw-font-display);font-weight:700;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sw-accent);}
   .sw-copy__title{font-family:var(--sw-font-display);font-weight:700;color:var(--sw-ink);font-size:clamp(2rem,4.4vw,3.5rem);line-height:1.03;margin:12px 0 0;letter-spacing:-.01em;text-shadow:0 2px 20px color-mix(in srgb,var(--sw-bg) 70%,transparent);}

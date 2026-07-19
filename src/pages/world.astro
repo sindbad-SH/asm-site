@@ -340,13 +340,17 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "FORGE THE SAGA",
             title: "One craft holds it all together.",
             body: "Raw experience in, stories out — narrative strategy, forged for founders.",
-            // Finale CTA: the forge clip is the only one that cuts to a CLOSER
-            // angle mid-take — the visitor lands eye-to-eye with the StorySmith,
-            // so the ask goes direct. Calendly URL = consts.ts SITE.bookACall.
-            cta: {
-              primary: { label: "Schedule a talk with the StorySmith", href: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting" },
-              secondary: { label: "Forge your saga", href: base + "/forge-the-saga" },
+            // Finale: the forge take pushes in to a CLOSER angle mid-clip
+            // (~50% progress) — the visitor lands eye-to-eye with the StorySmith,
+            // so the direct ask POPS DEAD-CENTER right there (engine centerCta).
+            // If they flew the whole world, they're sold — make the ask easy.
+            // Calendly URL = consts.ts SITE.bookACall.
+            centerCta: {
+              label: "Schedule a talk with the StorySmith",
+              href: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting",
+              at: 0.5,
             },
+            cta: { primary: { label: "Forge your saga", href: base + "/forge-the-saga" } },
           },
         ],
         // Transit clips slot here when the operator generates them (Plan B, or
