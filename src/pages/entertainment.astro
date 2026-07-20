@@ -29,12 +29,21 @@
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES, WORK } from "../consts";
+import { PAGES, WORK, FORGE_SERVICES, SAGA_STAGES, SITE } from "../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.entertainment;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
+const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
+// P29 — the E1b services block prices resolve VERBATIM from their existing
+// staged floors (FORGE_SERVICES by `serviceNo`, SAGA_STAGES by `stageIdx`) —
+// single-sourced, never restated as new numbers.
+const svcPrice = (item: (typeof p.services.items)[number]) =>
+  item.serviceNo
+    ? FORGE_SERVICES.find((s) => s.no === item.serviceNo)!.price
+    : SAGA_STAGES[item.stageIdx!].price;
 
 // build-time media gating (cwd-anchored, per repo convention): a card only
 // renders when its file shipped. avif+webp pairs preferred; lone files
@@ -182,6 +191,7 @@ const railCards = [...coverage, ...mfgCard].map((c) => {
 // P13c — meme ground removed (the S2 statement is now chapter 03); ch03 added.
 const GROUNDS = {
   intro: "#101020",
+  hire: "#12182b", // P29 — the E1b services/floors chapter
   ch01: "#191031",
   ch02: "#261118",
   ch03: "#0e2230",
@@ -212,6 +222,41 @@ const GROUNDS = {
         <span class="im-line im-line--push"><span class="im-turn">in</span> ADVENTURE.</span>
       </h1>
       <p class="im-turn im-intro-sub" data-reveal>{p.hero.subline}</p>
+    </section>
+
+    <!-- ═══ E1b · HIRE THIS LANE (P29 money-now) — the corporate-storytelling
+         services + floors, ahead of the portfolio chapters so a buyer gets
+         numbers and a booking link before the art. Prices resolve verbatim
+         from existing staged floors (see frontmatter); trust lines from
+         SITE.trust (⚠ OPERATOR-CONFIRM flags in consts). ═══ -->
+    <section class="im-sec im-hire" data-im-section data-ground={GROUNDS.hire} style={`--sec-ground:${GROUNDS.hire}`}>
+      <p class="hud-label im-kicker" data-reveal>{p.services.kicker}</p>
+      <h2 class="im-title im-hire-title" data-reveal>
+        <span class="im-line"><span class="im-turn">Hire</span> THIS LANE</span>
+      </h2>
+      <p class="im-turn im-hire-intro" data-reveal>{p.services.intro}</p>
+      <div class="im-hire-grid">
+        {
+          p.services.items.map((item) => (
+            <article class="im-hire-card" data-reveal data-reveal-stagger="80">
+              <h3 class="im-hire-name">{item.name}</h3>
+              <p class="im-hire-price">{svcPrice(item)}</p>
+              <p class="im-hire-scope">scoped per engagement</p>
+              <p class="im-hire-line im-turn">{item.line}</p>
+            </article>
+          ))
+        }
+      </div>
+      <p class="im-hire-note im-turn" data-reveal>{p.services.note}</p>
+      <div class="im-hire-actions" data-reveal>
+        <a href={href(p.services.cta.href)} class="im-cta" rel="noopener">
+          <span class="im-cta-label">{p.services.cta.label}</span>
+          <span class="im-cta-arrow" aria-hidden="true">→</span>
+        </a>
+        <p class="im-hire-trust hud-label">
+          {SITE.trust.response} · {SITE.trust.base} · {SITE.trust.travel}
+        </p>
+      </div>
     </section>
 
     <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══
@@ -372,6 +417,15 @@ const GROUNDS = {
         </div>
         <div class="im-chapter-meta" data-reveal>
           {pebbleRoom && <LegendMark proof={pebbleRoom.proof} />}
+          {/* P29 — the Jack Bell testimonial, ACTIVATED per operator (consts
+              TESTIMONIALS[1]): the owner's own words beside the owner's story. */}
+          {
+            pebbleRoom?.testimonialId && (
+              <div class="im-quote">
+                <Testimonial testimonialId={pebbleRoom.testimonialId} showProof={false} />
+              </div>
+            )
+          }
           {
             shelby?.href && (
               /* P12.6b — same unmissable story CTA. ⚠ OPERATOR READ-APPROVAL
@@ -517,10 +571,11 @@ const GROUNDS = {
       </ul>
     </section>
 
-    <!-- ═══ S5 · HANDOFF — one soft exit, back to base ground ═══ -->
+    <!-- ═══ S5 · HANDOFF — P29: closes on this lane's OWN buyer action
+         (Calendly direct), not a consulting handoff. ═══ -->
     <section class="im-sec im-handoff" data-im-section data-ground={GROUNDS.handoff} style={`--sec-ground:${GROUNDS.handoff}`}>
       <p class="im-turn im-handoff-line" data-reveal>{p.handoff.body}</p>
-      <a href={`${base}${p.handoff.cta.href}`} class="btn" data-reveal>{p.handoff.cta.label}</a>
+      <a href={href(p.handoff.cta.href)} class="btn" data-reveal rel="noopener">{p.handoff.cta.label}</a>
     </section>
   </main>
 </Base>
@@ -623,6 +678,86 @@ const GROUNDS = {
   .im-ghost:nth-child(3) { left: 48%; top: 8%; }
   .im-ghost:nth-child(4) { left: 68%; top: 58%; }
   .im-ghost:nth-child(5) { left: 86%; top: 22%; }
+
+  /* ── P29 · E1b hire this lane — floors + booking in the page's own plate
+     grammar: jewel-ground section, near-solid plate cards (AA-safe over the
+     morphing ground), Fraunces numerals for the floors. ── */
+  .im-hire {
+    padding: 5.5rem clamp(1.5rem, 6vw, 8rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 1.2rem;
+  }
+  .im-hire-title {
+    font-size: clamp(2.2rem, 6vw, 5.5rem);
+  }
+  .im-hire-intro {
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    line-height: 1.45;
+    max-width: 44rem;
+  }
+  .im-hire-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 0.8rem;
+  }
+  @media (min-width: 860px) {
+    .im-hire-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .im-hire-card {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+    padding: 1.4rem 1.5rem;
+    background: color-mix(in srgb, var(--sec-ground, #12182b) 90%, #000 10%);
+    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
+    border-radius: 10px;
+    box-shadow: 0 22px 60px -30px rgba(0, 0, 0, 0.7);
+  }
+  .im-hire-name {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.25;
+    color: #f2f4f8;
+  }
+  .im-hire-price {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1.1;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--color-accent, #38f8ec);
+  }
+  .im-hire-scope {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #e8f6f3 55%, transparent);
+  }
+  .im-hire-line {
+    font-size: 1.02rem;
+    line-height: 1.45;
+  }
+  .im-hire-note {
+    font-size: 1.05rem;
+    color: color-mix(in srgb, #eef1f6 80%, transparent);
+  }
+  .im-hire-actions {
+    display: grid;
+    gap: 0.8rem;
+    justify-items: start;
+    margin-top: 0.4rem;
+  }
+  .im-hire-trust {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #e8f6f3 62%, transparent);
+  }
 
   /* ── S3 chapters ──
      P23 — dead air deliberately compressed: the section was 130svh tall with

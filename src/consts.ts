@@ -50,6 +50,25 @@ export const SITE = {
    * xxx.goatcounter.com), then update /privacy to match.
    */
   analytics: "",
+  /**
+   * P29 (money-now restructure, 2026-07-20) — sitewide trust/logistics signals,
+   * surfaced near CTAs and in the footer.
+   * ⚠ OPERATOR-CONFIRM (staging-only until read):
+   *  • `drone` reuses the EXISTING repo phrasing from the aerial service blurb
+   *    ("Licensed, insured drone work"). "FAA Part 107" is deliberately NOT
+   *    claimed — it appears nowhere in confirmed repo copy; if he holds the
+   *    cert, he swaps this line to name it.
+   *  • `response` is a service promise he has to actually keep — one word from
+   *    him confirms or adjusts it.
+   *  • `travel` claims international PRODUCTION availability only — never
+   *    international flight authority (FAA certs don't transfer abroad).
+   */
+  trust: {
+    drone: "Licensed, insured drone work",
+    response: "Replies within one business day",
+    base: "Boulder, Colorado (UTC-6)",
+    travel: "Available for travel and international productions",
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -65,13 +84,20 @@ export const SITE = {
 // as investment terms on their own ("Venture" especially). Appending "Stories"
 // disambiguates them as the storytelling lanes they are. Labels ONLY changed;
 // hrefs unchanged. (Forge the Saga / About / Contact keep their labels.)
-export const NAV = [
-  { label: "Adventure Stories", href: "/adventure" },
-  { label: "Venture Stories", href: "/entertainment" },
-  { label: "Work Stories", href: "/work" },
-  { label: "Forge the Saga", href: "/forge-the-saga" },
+// P29 (money-now restructure, 2026-07-20) — BUYER-LANGUAGE PAIRING: every
+// world-name keeps its label but gains a plain buyer term (`buyer`), rendered
+// as a small sub-line in the nav/menus and an em-dash pairing in the footer,
+// so a producer/CMO decodes each lane within seconds. Labels + hrefs unchanged.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — the buyer sub-labels are new visible copy
+// (staging-only until read).
+export type NavItem = { label: string; href: string; buyer?: string };
+export const NAV: readonly NavItem[] = [
+  { label: "Adventure Stories", buyer: "Drone & aerial production", href: "/adventure" },
+  { label: "Venture Stories", buyer: "Corporate storytelling & research", href: "/entertainment" },
+  { label: "Work Stories", buyer: "Case studies", href: "/work" },
+  { label: "Forge the Saga", buyer: "Consulting — research + production", href: "/forge-the-saga" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact", buyer: "Book a call", href: "/contact" },
 ] as const;
 
 export const PRIMARY_CTA = { label: "Forge your saga", href: "/forge-the-saga" } as const;
@@ -133,6 +159,11 @@ export const COPY = {
     headline: "The StorySmith. I forge stories for the wild, the market, and the industry.",
     subline:
       "Sindbad Horizon — Boulder, Colorado. I find the truest version of a story and forge it into something people feel: on the trail, in the boardroom, on set.",
+    // P29 buyer-language pairing — one plain line under the hero so a cold
+    // buyer decodes the offer in seconds. ⚠ OPERATOR READ-APPROVAL REQUIRED —
+    // new visible copy (staging-only until read).
+    buyerLine:
+      "Drone & aerial production · Corporate storytelling & market research · Boulder, Colorado — working worldwide",
     globeCaption: "Where the stories are told", // LOCKED — see GLOBE below
   },
   anchors: {
@@ -142,10 +173,13 @@ export const COPY = {
     homeBase: "Boulder is home base. The world is the territory.",
     testing: "find out what works before you spend real money finding out what doesn't.",
   },
+  // P29 — signpost paths reordered money-first and PAIRED with buyer terms
+  // (the world names stay; the plain term leads so it decodes instantly).
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible labels (staging-only).
   paths: [
-    { label: "Forge your saga", href: "/forge-the-saga" },
-    { label: "See the adventure work", href: "/adventure" },
-    { label: "The network", href: "/entertainment" },
+    { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
+    { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
+    { label: "Both, end to end — Forge the Saga", href: "/forge-the-saga" },
   ],
 } as const;
 
@@ -297,6 +331,66 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     blurb:
       "Licensed, insured drone work for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye I bring to the ground, lifted a few hundred feet.",
     note: "Aerial work licensed through Amazing Aerial Agency",
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// FORGE_PACKAGES — P29 money-now restructure (operator-directed, 2026-07-20).
+// Forge the Saga is now the CONSULTING page: the odd case who does BOTH
+// production and market research, for buyers who want everything. These three
+// packages are MOCK SCOPES cut from the existing five-stage method
+// (SAGA_STAGES stays the single source of the stage names). Pure-production
+// deliverables moved to their lanes: /adventure (aerial day rate) and
+// /entertainment (coverage + brand films) each price their own buyer.
+//
+// ⚠ OPERATOR-CONFIRM pricing (placeholder) — the first two package floors are
+// NEW numbers for staging: each is the SUM of the per-stage "from $X" floors
+// it bundles (themselves researched staging numbers, above). The Full Saga
+// REUSES the existing flagship floor ($12,000 — deliberately under the
+// $13.5k stage-sum; a bundle floor, not a new number). All render with honest
+// "from $X — scoped per project" framing. He adjusts from staging.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — names/blurbs/bestFor are new copy.
+// ---------------------------------------------------------------------------
+
+export type ForgePackage = {
+  name: string;
+  /** Indexes into SAGA_STAGES — the stages this package bundles. */
+  stageIdx: readonly number[];
+  price: string;
+  blurb: string;
+  bestFor: string;
+  flagship?: boolean;
+};
+
+/** ⚠ OPERATOR-CONFIRM pricing (placeholder) — starting consultant rate; always
+ *  rendered with "scoped per project" framing, never as a fixed quote. */
+export const FORGE_CONSULT_RATE = "from $150 / hr";
+
+export const FORGE_PACKAGES: readonly ForgePackage[] = [
+  {
+    name: "The Scouting Report",
+    stageIdx: [0, 1],
+    price: "from $5,000", // ⚠ OPERATOR-CONFIRM pricing (placeholder) — sum of stage 01+02 floors
+    blurb:
+      "The research half on its own: who your audience actually is, the exact language they use, and a Core Narrative Blueprint your team can run without me.",
+    bestFor: "You want the market research and the strategy — you have your own production.",
+  },
+  {
+    name: "Forge & Test",
+    stageIdx: [2, 3],
+    price: "from $7,000", // ⚠ OPERATOR-CONFIRM pricing (placeholder) — sum of stage 03+04 floors
+    blurb:
+      "The production half with proof attached: I build the assets, then put them in front of a real audience before you spend to distribute them.",
+    bestFor: "Your strategy is set — you need the assets built and validated.",
+  },
+  {
+    name: "The Full Saga",
+    stageIdx: [0, 1, 2, 3, 4],
+    price: "from $12,000", // existing flagship floor, reused — not a new number
+    flagship: true,
+    blurb:
+      "Everything, one consultant: raw market intelligence to a tested, ready-to-run story. I carry the whole arc — the research, the production, and the read on what the data says to do next.",
+    bestFor: "You want the whole thing handled by one person, start to finish.",
   },
 ] as const;
 
@@ -726,26 +820,23 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     context: "The primary proof anchor.",
   },
   // ---------------------------------------------------------------------------
-  // TESTIMONIALS[1] — Pebble Beach / Jack Bell — RESERVED (COPY.md §2.2).
-  //
-  // Operator instruction: ship this slot reserved; never invent. The
-  // `pebble-beach-owner` entry is therefore REMOVED from the array (and its
-  // `testimonialId` references dropped from the Shelby case + entertainment E4
-  // room) so no [confirm] can block a production build.
-  //
-  // STAGED CANDIDATE — already published on his live site (adventure-media-v2,
-  // Work page, live at the apex today), awaiting operator one-word approval to
-  // activate. Do NOT render this string. To activate: paste it verbatim as a
-  // TESTIMONIALS[1] entry (id "pebble-beach-owner", relationshipId
-  // "pebble-beach") and re-wire `testimonialId` into the Shelby case study and
-  // the entertainment E4 room.
-  //
-  //   "Working with Sindbad Horizon of Adventure Storytelling Media was a great
-  //   experience. He not only captured stunning footage and photographs of the
-  //   Cobra at Pebble Beach, but also brought the story and character of the car
-  //   to life through his editing and creative direction. The results went far
-  //   beyond documentation." — Jack Bell, Owner, 1967 Shelby Cobra 427 S/C
+  // TESTIMONIALS[1] — Pebble Beach / Jack Bell — ACTIVATED (P29, 2026-07-20)
+  // per operator direction ("enable the commented-out second testimonial —
+  // only two exist, that's fine"). The quote is VERBATIM the staged candidate
+  // already published on his live site (adventure-media-v2, Work page, live at
+  // the apex) — attributed to the OWNER, never to the event/Concours.
+  // Wired into the Shelby case study (Words chapter) + entertainment ch.02.
   // ---------------------------------------------------------------------------
+  {
+    id: "pebble-beach-owner",
+    quote:
+      "Working with Sindbad Horizon of Adventure Storytelling Media was a great experience. He not only captured stunning footage and photographs of the Cobra at Pebble Beach, but also brought the story and character of the car to life through his editing and creative direction. The results went far beyond documentation.",
+    attribution: "Jack Bell, Owner, 1967 Shelby Cobra 427 S/C",
+    relationshipId: "pebble-beach",
+    // Existing approved framing phrase reused (entertainment E4) — outcome
+    // framing, never a status claim.
+    context: "A coverage endorsement from the car owner.",
+  },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -811,10 +902,13 @@ export type CaseStudyData = {
 export const PAGES = {
   // ---- HOME (§1.1). Hero + paths live in COPY; sections below follow. ------
   home: {
+    // P29 buyer-language pairing — persona kept, plain buyer terms added so
+    // search snippets and tabs decode instantly. ⚠ OPERATOR READ-APPROVAL
+    // REQUIRED — new meta copy (staging-only until read).
     meta: {
-      title: `${SITE.name} — ${SITE.persona}`,
+      title: `${SITE.name} — Drone & Aerial Production, Corporate Storytelling & Market Research | Boulder, CO`,
       description:
-        "Sindbad Horizon, the StorySmith — one craft, told across the wild, the market, and the industry. Narrative strategy for founders under Forge the Saga.",
+        "Sindbad Horizon, the StorySmith — drone & aerial production, corporate storytelling, and market research from Boulder, Colorado. One operator, research to final cut, working worldwide.",
     },
     // H3 — three-pillar scroll tableaux, equal grammatical weight.
     tableaux: [
@@ -840,19 +934,25 @@ export const PAGES = {
         link: { label: "The network", href: "/entertainment" },
       },
     ] as readonly TableauChapter[],
-    // H4 — proof band. Replaces the v1 flat marquee with honest tiering.
+    // H4 — proof band. P29 INVERSION (operator-directed): lead with the
+    // strongest delivered work, not the caveats. The honesty DISCIPLINE is
+    // unchanged (every line still renders its verbatim permittedPhrasing);
+    // only the self-narrating tier framing is gone and the order now runs
+    // paid/delivered first. ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading +
+    // intro copy (staging-only until read).
     proof: {
-      heading: "The honest version of the network.",
+      heading: "Paid, delivered, ongoing.",
       intro:
-        "Every relationship here is marked at exactly what it is — official, delivered, informal, or simply a room I was in. No logo wall, no borrowed credit.",
+        "Real work for real clients — and every relationship on this site stated at exactly what it is, in its own words. No logo wall, no borrowed credit.",
       anchor: { relationshipId: "pitchboulder" } as ProofLine,
       testimonialId: "pitchboulder",
-      // Order = descending honesty weight; each renders with its legend symbol.
+      // P29 order = delivered/paying work first, rooms last (was tier-formal
+      // first, which led with a nonprofit role and closed on caveats).
       tiered: [
-        "meme",
-        "amazing-aerial",
         "pitchboulder",
+        "amazing-aerial",
         "workshop-coverage",
+        "meme",
         "pebble-beach",
         "seriesfest",
         "afm",
@@ -888,19 +988,30 @@ export const PAGES = {
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — hero (kicker/headline/subline), both
   // class taglines, flagshipStrip, and the pricing.body are ALL new copy for
   // staging. whoFor, pretestShelved, proof, pricing.note, and cta are KEPT.
+  // P29 (money-now restructure, 2026-07-20): this is now the CONSULTING page.
+  // Positioning per operator: he's the odd case who does BOTH production and
+  // market research; Forge the Saga is for buyers who want everything. It sells
+  // a starting consultant rate + three mock packages cut from the five-stage
+  // method. Pure-production offers point out to their own lanes.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, subline, rateLine, bothHalves,
+  // packagesIntro, ongoingIntro, and laneNote are NEW copy (staging-only).
   forge: {
     meta: {
-      title: "Forge the Saga — what you can hire a StorySmith for",
+      title: "Forge the Saga — Story Consulting: Market Research + Production, One Operator",
       description:
-        "The services a StorySmith forges: deep narrative engagements and specific deliverables — brand-story films, event coverage, aerial cinematography. Your product works; let's make the story land.",
+        "Hire the consultant who does both halves: market research and story strategy, plus the production to prove it on screen. Starting rate, packages built on a five-stage method, and a direct booking link.",
     },
     // F1 — belief hero, pivoted to the StorySmith definition move.
     hero: {
-      kicker: "The StorySmith",
+      kicker: "The StorySmith · Story Consulting",
       headline: "A smith forges steel. A StorySmith forges the saga.",
       subline:
-        "Your product works — the story just isn't landing yet. That's the raw material I work. Here's what you can actually hire a StorySmith to forge: a few deep engagements, and a handful of things I do all the time.",
-      cta: { label: "Book a call", href: "/contact" },
+        "Most shops sell you production or market research. I'm the odd case who does both — I research what your market actually hears, then produce the story that lands. Forge the Saga is for buyers who want everything: one consultant, research to final cut.",
+      // ⚠ OPERATOR-CONFIRM pricing (placeholder) — FORGE_CONSULT_RATE renders
+      // beside this framing; always "scoped per project", never a fixed quote.
+      rateLine: "Consulting",
+      rateNote: "— scoped per project; package floors below.",
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
     // F2 — who it's for.
     whoFor: {
@@ -912,18 +1023,34 @@ export const PAGES = {
         "You're about to spend on ads, and you want to know the story works first.",
       ] as readonly string[],
     },
-    // F3 — the two service classes. Cards themselves come from FORGE_SERVICES
-    // (filtered by klass); the copy below is the class framing.
+    // F2b — P29: the both-halves positioning move. The weird-case pitch, plus
+    // pointers to the two lanes that now carry their own production pricing.
+    bothHalves: {
+      heading: "Both halves of the job",
+      body: "Production people don't usually do research. Research people don't usually shoot. I do both — which is why the testing stages here run on real footage, not decks. If you only need one half, it has its own page and its own floor:",
+      lanes: [
+        { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
+        { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
+      ] as readonly Cta[],
+    },
+    // F3 — P29: the consulting packages (FORGE_PACKAGES) + the ongoing class
+    // (Standing Forge + Story Intensive, reused verbatim from FORGE_SERVICES).
     classes: {
-      heading: "What you can hire a StorySmith for",
+      heading: "The packages",
       engagements: {
-        label: "Engagements",
-        tagline: "When you want me in it with you — over a span, not a single handoff.",
+        label: "Packages",
+        tagline: "Three cuts of the five-stage method — pick how much of the arc you want me to carry.",
       },
       deliverables: {
-        label: "Deliverables",
-        tagline: "One specific thing I do all the time. Here's the floor to bring me in for it.",
+        label: "Ongoing & focused",
+        tagline: "When it isn't a one-arc project: a standing retainer, or one sharp session.",
       },
+    },
+    // F3c — pointer row under the packages: production-only buyers exit to
+    // their lane instead of being sold consulting.
+    laneNote: {
+      heading: "Just need production?",
+      body: "Straight production is priced on its own pages — no consulting required.",
     },
     // F3b — the DEMOTED method: the five stage NAMES only (from SAGA_STAGES),
     // shown as a quiet strip inside the flagship engagement. No per-stage
@@ -952,32 +1079,48 @@ export const PAGES = {
       deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
       note: "No second consulting testimonial at launch. Everything shown is work I actually delivered, labeled paid or unpaid as it truly was.",
     },
-    // F6 — pricing. Every service already shows its own "Starts at" floor; this
-    // is the honest note about what the floors mean. body: NEW; note: KEPT verbatim.
+    // F6 — pricing. Every package shows its own floor; this is the honest note
+    // about what the floors mean. ⚠ OPERATOR READ-APPROVAL REQUIRED — body
+    // updated for the packages framing (staging-only); note: KEPT verbatim.
     pricing: {
       heading: "On pricing",
-      body: "Every number here is a floor, not a quote. Engagements run deeper the longer the arc; deliverables scale with the shape of the shoot. Tell me what you're building and I'll tell you what it actually takes.",
+      body: "Every number here is a floor, not a quote — packages are scoped per project, and hourly consulting starts where the rate above says it does. Tell me what you're building and I'll tell you what it actually takes.",
       note: "Every price is a starting point — the shape of the work sets the rest.",
     },
-    // F7 — CTA.
+    // F7 — CTA. P29: straight to the booking link (no /contact hop).
     cta: {
       headline: COPY.anchors.noPressure,
       body: "Tell me where the story isn't landing. If Forge the Saga is a fit, we'll map it. If it isn't, I'll say so.",
-      cta: { label: "Book a call", href: "/contact" },
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
   },
 
-  // ---- ADVENTURE (§1.3) — credibility lane, the wild. ----------------------
+  // ---- ADVENTURE (§1.3) — P29: now ALSO the adventure-production SALES page
+  // (largely drone filming): samples + its own day-rate pricing + booking.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, hero.eyebrow, hire block, and
+  // the production handoff are NEW copy (staging-only until read).
   adventure: {
     meta: {
-      title: "Adventure — the wild",
+      title: "Adventure Stories — Drone & Aerial Production | Boulder, Colorado",
       description:
-        "Expedition and adventure coverage, photo and film, from the places hardest to reach.",
+        "Cinematic drone and aerial production, plus expedition photo & film from the places hardest to reach. Licensed, insured drone work — day rates, samples, and direct booking.",
     },
     hero: {
+      eyebrow: "Adventure Stories — Drone & Aerial Production",
       headline: "The wild doesn't do second takes.",
       subline:
         "Expedition and adventure coverage — photo and film — from the places that are hardest to reach.",
+    },
+    // A1b — HIRE THE OPERATOR: the production-services block, above the
+    // gallery and the AA licensing funnel. The day rate is REUSED verbatim
+    // from the aerial service floor (FORGE_SERVICES 06) — single-sourced, not
+    // a new number. Trust lines come from SITE.trust (see its ⚠ flags).
+    hire: {
+      kicker: "Production services",
+      heading: "Hire the operator",
+      body: "Aerial and ground cinematography for productions, brands, tourism, and film — the same eye that shoots these expeditions, on your call sheet. One operator, fast on his feet, gear that travels.",
+      priceNote: "— a floor, not a quote; scoped per shoot.",
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
     territory: {
       heading: "The territory",
@@ -1013,10 +1156,12 @@ export const PAGES = {
         href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
       },
     },
-    // A5 — soft handoff toward consulting.
+    // A5 — P29: the close now points at PRODUCTION (this lane's own buyer),
+    // not at consulting — adventure buyers aren't founders. Calendly direct.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new closing line (staging-only).
     handoff: {
-      body: PILLARS.find((p) => p.id === "adventure")!.handoff,
-      cta: PRIMARY_CTA,
+      body: "Need this eye on your production? Tell me where and when.",
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
   },
 
@@ -1027,18 +1172,53 @@ export const PAGES = {
   // verbatim review:
   //   1. meta.title  2. meta.description  3. hero.headline  4. hero.subline
   // Every relationship claim below (MEME/PitchBoulder/rooms) is UNCHANGED.
+  // P29 (money-now restructure): now ALSO the corporate-storytelling SALES
+  // page (largely market research + story advisory): samples + its own
+  // pricing + booking. ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, eyebrow, and
+  // the services block are NEW copy (staging-only until read).
   entertainment: {
     meta: {
-      title: "Venture — business stories",
+      title: "Venture Stories — Corporate Storytelling & Market Research",
       description:
-        "The venture in adventure: business stories — board work, real coverage, and the rooms of the industry, each stated at exactly what it is.",
+        "Corporate storytelling with a research spine: event & conference coverage, brand-story films, and market research that tells you what your audience actually hears. Floors and direct booking.",
     },
     // E1 — the pun IS the headline; the subline makes it land honestly.
+    // P29: eyebrow carries the buyer pairing.
     hero: {
-      eyebrow: "Venture",
+      eyebrow: "Venture Stories — Corporate Storytelling & Market Research",
       headline: "The venture in adventure.",
       subline:
         "I tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where the industry does business. Board work, real coverage, and the festivals I attend — each stated at exactly what it is.",
+    },
+    // E1b — HIRE THIS LANE: the corporate-storytelling services + floors.
+    // Prices are REUSED verbatim from existing staged floors — Event coverage
+    // + Brand-Story Film from FORGE_SERVICES (05/04), market research from the
+    // Story Scouting stage floor (SAGA_STAGES 01). Single-sourced, no new
+    // numbers. Every floor renders with "scoped per engagement" framing.
+    services: {
+      kicker: "Corporate storytelling — services & floors",
+      heading: "Hire this lane",
+      intro:
+        "Coverage, films, and research for companies that need their story to work — built by one operator who also tests what the market actually hears.",
+      items: [
+        {
+          name: "Event & Conference Coverage",
+          serviceNo: "05", // price pulled verbatim from FORGE_SERVICES
+          line: "Photo + film coverage of your conference, summit, or pitch night — recap plus same-week clips.",
+        },
+        {
+          name: "The Brand-Story Film",
+          serviceNo: "04",
+          line: "A two-to-four-minute film that anchors your homepage — scripted, shot, and cut by one person.",
+        },
+        {
+          name: "Market Research & Story Testing",
+          stageIdx: 0, // price pulled verbatim from SAGA_STAGES 01
+          line: "Who your audience actually is, the language they use, and what your competitors are missing.",
+        },
+      ] as readonly { name: string; line: string; serviceNo?: string; stageIdx?: number }[],
+      note: "Floors, not quotes — every engagement is scoped to the room.",
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
     // E2 — MEME (the most formal role).
     meme: {
@@ -1060,38 +1240,40 @@ export const PAGES = {
       link: { label: "See the work", href: "/work/pitchboulder" },
     },
     // E4 — the rooms; each honest about itself. Testimonial #2 sits here.
+    // P29: the Jack Bell testimonial is ACTIVATED (operator direction) — its
+    // id rides the pebble-beach room and renders in chapter 02.
     rooms: {
       heading: "The rooms",
       intro: "The rest is honest about itself.",
       items: [
         {
-          // Pebble Beach room. The testimonial (Jack Bell) is RESERVED per
-          // operator (COPY.md §2.2) — the `pebble-beach-owner` testimonial entry
-          // is removed until his one-word approval, so no `testimonialId` here.
-          // The proof line + context still state the relationship once, honestly.
           proof: {
             relationshipId: "pebble-beach",
             context: "A coverage endorsement from the car owner.",
           } as ProofLine,
+          testimonialId: "pebble-beach-owner",
         },
         { proof: { relationshipId: "seriesfest" } as ProofLine },
         { proof: { relationshipId: "afm" } as ProofLine },
         { proof: { relationshipId: "workshop-coverage" } as ProofLine },
-      ],
+      ] as readonly { proof: ProofLine; testimonialId?: string }[],
     },
-    // E5 — soft handoff.
+    // E5 — soft handoff. P29: this lane closes on its OWN buyer action
+    // (Calendly direct), not a consulting handoff.
     handoff: {
       body: PILLARS.find((p) => p.id === "entertainment")!.handoff,
-      cta: PRIMARY_CTA,
+      cta: { label: "Book a call", href: SITE.bookACall },
     },
   },
 
   // ---- WORK (§1.5) — cross-lane proof index + case-study template. ---------
   work: {
+    // P29 buyer-language pairing in the meta (⚠ OPERATOR READ-APPROVAL — new
+    // title/description copy, staging-only until read).
     meta: {
-      title: "Work",
+      title: "Work Stories — Portfolio & Case Studies",
       description:
-        "Everything I've actually done — each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+        "Portfolio and case studies — drone & aerial production, event coverage, and brand films. Each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
     },
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — strengthened intro copy (staging-only
     // until read). Same honesty backbone (attribution-first, no borrowed
@@ -1135,8 +1317,8 @@ export const PAGES = {
       // ---- Shelby / Pebble Beach case study (NEW — COPY.md §4). ------------
       // Honesty rails: relationship tier = `attended`; the proof line carries
       // the only status claim; prose never implies an official Pebble Beach
-      // engagement. Testimonial (Jack Bell) is RESERVED per operator (§2.2) —
-      // `testimonialId` omitted (the field is optional on CaseStudyData).
+      // engagement. P29: the Jack Bell testimonial is ACTIVATED (operator
+      // direction 2026-07-20) — see TESTIMONIALS[1].
       shelbyPebbleBeach: {
         meta: {
           title: "A restored Shelby at Pebble Beach",
@@ -1161,7 +1343,8 @@ export const PAGES = {
           heading: "The outcome",
           body: "Jack got a finished cinematic film of his car — the machine's story and character on screen, delivered. It's below; watch it.",
         },
-        // testimonialId omitted until §2.2 resolves (Jack Bell approval).
+        // P29 — Jack Bell testimonial ACTIVATED (operator direction, 2026-07-20).
+        testimonialId: "pebble-beach-owner",
         cta: { label: "Forge your saga", href: "/forge-the-saga" },
       },
     },
@@ -1193,10 +1376,11 @@ export const PAGES = {
 
   // ---- CONTACT (§1.7) — conversion. ----------------------------------------
   contact: {
+    // P29 buyer pairing (⚠ OPERATOR READ-APPROVAL — new title, staging-only).
     meta: {
-      title: "Contact",
+      title: "Contact — Book a Call",
       description:
-        "Tell me what you're building. No pitch, no pressure — if Forge the Saga is a fit, we'll talk.",
+        "Tell me what you're building. No pitch, no pressure — book a call or send a note.",
     },
     headline: COPY.anchors.noPressure,
     body: "Tell me what you're building. If Forge the Saga is a fit, we'll talk. If it isn't, I'll point you somewhere better.",

@@ -19,7 +19,7 @@ import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES } from "../consts";
+import { PAGES, FORGE_SERVICES, SITE } from "../consts";
 import { TERRITORY, TERRITORY_TOTALS } from "../data/territory";
 import { getCollection } from "astro:content";
 
@@ -28,6 +28,11 @@ import { join } from "node:path";
 
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
+const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
+// P29 — the day rate is the aerial service's EXISTING staged floor (FORGE_SERVICES
+// 06), rendered verbatim — single-sourced, never restated as a new number.
+const aerialSvc = FORGE_SERVICES.find((s) => s.no === "06")!;
 
 /* ─────────────────────────────────────────────────────────────────────────
  * "THE TERRITORY" constellation geometry — now SEATED ON THE WORLD MAP.
@@ -232,9 +237,39 @@ const fmtSlate = (d: Date) =>
          state. Compact vs. home's old treatment — this is a lane header,
          not a full-bleed moment. -->
     <section class="mx-auto max-w-3xl space-y-6 p-8 text-center">
+      <!-- P29 buyer-language pairing: the plain buyer term rides above the H1
+           so a producer decodes the lane in seconds (consts ⚠ flag). -->
+      <p class="hud-label">{p.hero.eyebrow}</p>
       <h1 class="text-3xl font-bold sm:text-5xl">{p.hero.headline}</h1>
       <p class="mx-auto max-w-2xl text-lg text-ink">{p.hero.subline}</p>
       <GlobeHero />
+    </section>
+
+    <!-- A1b — HIRE THE OPERATOR (P29 money-now): the production-services
+         block, ABOVE the gallery and the AA licensing funnel — the buyer who
+         wants to hire the pilot gets a rate, the compliance answer, and a
+         direct booking link before any licensing referral. The day rate is
+         FORGE_SERVICES 06 verbatim; trust lines are SITE.trust (⚠ flags). -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
+      <hr class="flight-line mb-6" aria-hidden="true" />
+      <p class="hud-label" data-reveal>{p.hire.kicker}</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.hire.heading}</h2>
+      <p class="text-ink" data-reveal>{p.hire.body}</p>
+      <div class="panel hire-panel space-y-4 p-6" data-reveal>
+        <p class="hire-price">
+          <span class="hire-amt">{aerialSvc.price}</span>
+          <span class="hire-scope">{p.hire.priceNote}</span>
+        </p>
+        <ul class="hire-trust">
+          <li>{SITE.trust.drone}</li>
+          <li>{SITE.trust.travel}</li>
+          <li>{SITE.trust.response} · {SITE.trust.base}</li>
+        </ul>
+        <div class="flex flex-wrap items-center gap-4">
+          <a href={p.hire.cta.href} class="btn" rel="noopener">{p.hire.cta.label}</a>
+          <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+        </div>
+      </div>
     </section>
 
     <!-- A2 — the territory -->
@@ -533,10 +568,11 @@ const fmtSlate = (d: Date) =>
       )
     }
 
-    <!-- A5 — soft handoff -->
+    <!-- A5 — P29: the close is this lane's OWN buyer action (production →
+         Calendly direct), not a consulting handoff. -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
       <p class="text-lg italic text-ink">{p.handoff.body}</p>
-      <a href={`${base}${p.handoff.cta.href}`} class="btn">{p.handoff.cta.label}</a>
+      <a href={href(p.handoff.cta.href)} class="btn" rel="noopener">{p.handoff.cta.label}</a>
       <!-- P12.4d wayfinder — the field log lives off-nav for now (IA reserves
            /field-notes); this quiet link is its only surface until it earns
            a nav slot. -->
@@ -547,6 +583,49 @@ const fmtSlate = (d: Date) =>
   <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
   <DistortionLayer />
 </Base>
+
+<style>
+  /* ── P29 · A1b hire-the-operator panel — the day rate in the display serif
+     (same price grammar as the forge cards), honest scope note beside it, and
+     the compliance/logistics answers as a quiet mono list. ── */
+  .hire-price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .hire-amt {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--color-accent, #38f8ec);
+  }
+  .hire-scope {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .hire-trust {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .hire-trust li::before {
+    content: "—";
+    margin-right: 0.5rem;
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+</style>
 
 <script>
   // ── P19 — "jump into the painting" click transition ──────────────────────

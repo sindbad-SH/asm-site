@@ -197,7 +197,13 @@ const archive = WORK_ARCHIVE.map((a) => {
                   <span class="wtile-line wtile-line--locked">{attribution}</span>
                 ) : (
                   <span class="wtile-line">
-                    For {item.forOrg} · {item.what} — {item.engagement}
+                    {/* P29 — an unresolved "[confirm]" engagement label (the
+                        Shelby paid/unpaid fact) no longer renders to buyers:
+                        the segment is HIDDEN until the operator resolves it in
+                        consts. The consts value stays "[confirm]" so the fact
+                        stays tracked; only the rendering is gated. */}
+                    For {item.forOrg} · {item.what}
+                    {item.engagement && item.engagement !== "[confirm]" ? ` — ${item.engagement}` : ""}
                   </span>
                 )}
               </figcaption>

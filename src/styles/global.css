@@ -510,6 +510,17 @@
     opacity: 1;
     transform: none;
   }
+  /* P29 — buyer-language pairing in the fullscreen menu: the plain buyer term
+     as a quiet mono sub-line under each world-name link. */
+  .fs-menu-buyer {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    margin: 0.15rem 0 0 2.6rem;
+  }
   @media (prefers-reduced-motion: reduce) {
     .fs-menu,
     .fs-menu-item,

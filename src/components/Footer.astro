@@ -29,6 +29,8 @@ const socialEntries = Object.entries(SITE.socials);
             <li>
               <a href={`${base}${item.href}`} class="text-ink-muted hover:text-accent">
                 {item.label}
+                {/* P29 buyer-language pairing (NAV.buyer) — em-dash pairing */}
+                {item.buyer && <span class="footer-buyer"> — {item.buyer}</span>}
               </a>
             </li>
           ))
@@ -53,4 +55,44 @@ const socialEntries = Object.entries(SITE.socials);
       }
     </ul>
   </div>
+  <!-- P29 — sitewide trust row (SITE.trust — see its ⚠ OPERATOR-CONFIRM flags
+       in consts.ts) + the direct booking link, so every page terminates on a
+       call-to-action with the logistics answered beside it. -->
+  <div class="footer-trust mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-between gap-4 border-t border-hairline pt-5">
+    <ul class="footer-trust-list">
+      <li>{SITE.trust.drone}</li>
+      <li>{SITE.trust.response}</li>
+      <li>{SITE.trust.base}</li>
+      <li>{SITE.trust.travel}</li>
+    </ul>
+    <a href={SITE.bookACall} class="btn" rel="noopener">Book a call</a>
+  </div>
 </footer>
+
+<style>
+  .footer-buyer {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 62%, transparent);
+  }
+  .footer-trust-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .footer-trust-list li + li::before {
+    content: "·";
+    margin-inline: 0.6rem;
+    color: color-mix(in srgb, currentColor 55%, transparent);
+  }
+</style>

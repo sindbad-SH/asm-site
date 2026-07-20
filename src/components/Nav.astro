@@ -50,6 +50,9 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
                 class={`nav-label transition-colors ${isCurrent ? "text-accent" : "hover:text-ink"}`}
               >
                 {item.label}
+                {/* P29 buyer-language pairing — plain buyer term under each
+                    world name so the nav decodes in seconds (NAV.buyer). */}
+                {item.buyer && <span class="nav-buyer">{item.buyer}</span>}
               </a>
             </li>
           );
@@ -83,6 +86,22 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
   .nav-item {
     display: flex;
     align-items: center;
+  }
+  /* P29 — the buyer sub-line: tiny mono under the serif label, muted, never
+     wrapping (each term is short by design). Inherits the accent on the
+     current page via currentColor mixing. */
+  .nav-label {
+    display: block;
+  }
+  .nav-buyer {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: color-mix(in srgb, currentColor 55%, transparent);
+    margin-top: 1px;
   }
   .nav-item + .nav-item::before {
     content: "/";
