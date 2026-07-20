@@ -41,9 +41,14 @@ const formReady = SITE.formEndpoint !== "[confirm]";
           <p class="hud-label ct-form-label">Or send a note</p>
           {
             !formReady && (
+              /* P29 — buyers no longer see internal plumbing language or the
+                 literal "[confirm]" token. The form stays disabled until
+                 SITE.formEndpoint resolves (operator task AS-2, unchanged);
+                 only the visible wording is now buyer-facing.
+                 ⚠ OPERATOR READ-APPROVAL REQUIRED — new sentence (staging). */
               <p class="ct-inert">
-                The form is inert until its endpoint is wired ({SITE.formEndpoint}). Use the booking
-                button or email in the meantime.
+                The form isn't taking messages yet — book a call above or email me directly and
+                I'll get right back to you.
               </p>
             )
           }
@@ -84,8 +89,16 @@ const formReady = SITE.formEndpoint !== "[confirm]";
             stroke-linecap="round"></path>
         </svg>
         <div class="ct-action" data-reveal>
-          <a href={SITE.bookACall} class="ct-pill" rel="noopener">Book a Strategy Call</a>
+          {/* P29 — "Book a call" (buyer-neutral; "Strategy Call" was consulting
+              language a production buyer doesn't want) + the logistics answered
+              right beside the CTA (SITE.trust — ⚠ flags in consts). */}
+          <a href={SITE.bookACall} class="ct-pill" rel="noopener">Book a call</a>
           <a href={`mailto:${p.email}`} class="ct-mail">{p.email}</a>
+          <ul class="ct-trust">
+            <li>{SITE.trust.response}</li>
+            <li>{SITE.trust.base}</li>
+            <li>{SITE.trust.travel}</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -237,6 +250,19 @@ const formReady = SITE.formEndpoint !== "[confirm]";
   }
   .ct-mail:hover {
     color: var(--color-accent, #38f8ec);
+  }
+  /* P29 — logistics list under the booking CTA */
+  .ct-trust {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #eef4f7 60%, transparent);
   }
 
   @media (max-width: 860px) {

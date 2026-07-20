@@ -5,7 +5,7 @@ import Testimonial from "../components/Testimonial.astro";
 import PortalHero from "../components/PortalHero.astro";
 import Tableaux from "../components/Tableaux.astro";
 import TrailJourney from "../components/TrailJourney.astro";
-import { COPY, PAGES, SAGA_STAGES, SITE } from "../consts";
+import { COPY, PAGES, PRIMARY_CTA, SAGA_STAGES, SITE } from "../consts";
 
 const p = PAGES.home;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -39,8 +39,14 @@ const heroTurn = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(
       {heroTurn && <span class="portal-headline-turn">{heroTurn}</span>}
     </h1>
     <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:180ms">{COPY.hero.subline}</p>
-    <a href={`${base}/forge-the-saga`} class="btn" data-portal-arrive style="--arrive-delay:270ms">
-      {COPY.paths[0].label}
+    <!-- P29 buyer-language pairing: one plain line so a cold buyer decodes the
+         offer in seconds (COPY.hero.buyerLine, ⚠ flagged in consts). -->
+    <p class="hud-label" data-portal-arrive style="--arrive-delay:230ms">{COPY.hero.buyerLine}</p>
+    <!-- P29 — the hero CTA is PRIMARY_CTA (label + href travel together; the
+         signpost paths below were reordered money-first and no longer lead
+         with the forge). -->
+    <a href={`${base}${PRIMARY_CTA.href}`} class="btn" data-portal-arrive style="--arrive-delay:270ms">
+      {PRIMARY_CTA.label}
     </a>
   </PortalHero>
 

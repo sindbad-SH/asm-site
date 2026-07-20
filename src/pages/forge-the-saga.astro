@@ -1,17 +1,17 @@
 ---
 /**
- * /forge-the-saga — P12.x "THE SERVICES" repackage (operator-directed).
+ * /forge-the-saga — P29 "THE CONSULTANT PAGE" (operator-directed, 2026-07-20,
+ * money-now restructure over the P12.x services repackage).
  *
- * The page stopped selling a numbered "secret sauce" process and now sells the
- * SERVICES you can hire a StorySmith for, in the operator's own two classes:
- *
- *   ENGAGEMENTS  — long-span / retainer ("if you want me in it with you")
- *   DELIVERABLES — "one specific thing I do all the time", priced at a floor
- *
- * Cards come from FORGE_SERVICES (researched market floors, "Starts at $X").
- * The five-stage method is DEMOTED, not deleted: it survives as a quiet
- * names-only strip inside the flagship engagement (SAGA_STAGES stays the
- * source of those names; home H5 still maps them; per-stage prices die).
+ * The page now sells CONSULTING: he's the odd case who does BOTH production
+ * and market research, and Forge the Saga is for buyers who want everything.
+ * It leads with a starting consultant rate (⚠ OPERATOR-CONFIRM pricing
+ * placeholder) and sells three MOCK PACKAGES cut from the existing five-stage
+ * method (FORGE_PACKAGES; SAGA_STAGES stays the source of stage names), plus
+ * the two ongoing/focused services kept verbatim from FORGE_SERVICES
+ * (Standing Forge + Story Intensive). Pure-production deliverables moved to
+ * their own lanes (/adventure day rate, /entertainment corporate floors) and
+ * this page links out to both. Every CTA goes straight to Calendly.
  *
  * SIGNATURE (evolved, not multiplied): the temper line lives on as ONE
  * continuous vertical rail down the services column — a heat→aqua gradient
@@ -34,21 +34,27 @@
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES, SAGA_STAGES, FORGE_SERVICES } from "../consts";
+import { PAGES, SAGA_STAGES, FORGE_SERVICES, FORGE_PACKAGES, FORGE_CONSULT_RATE, SITE } from "../consts";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// P29 — CTA hrefs may now be external (Calendly direct); only prefix the base
+// on internal routes.
+const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-const engagements = FORGE_SERVICES.filter((s) => s.klass === "engagement");
-const deliverables = FORGE_SERVICES.filter((s) => s.klass === "deliverable");
-const total = FORGE_SERVICES.length;
+// P29 (money-now restructure): the page sells CONSULTING — three mock packages
+// cut from the five-stage method (FORGE_PACKAGES), plus the two ongoing/
+// focused services reused verbatim from FORGE_SERVICES (Standing Forge 02 +
+// Story Intensive 03). Pure-production deliverables moved to their lanes.
+const packages = FORGE_PACKAGES;
+const ongoing = FORGE_SERVICES.filter((s) => s.no === "02" || s.no === "03");
+const total = packages.length + ongoing.length;
 
-// Each card's temper color — the v1 thermal progression across ALL services,
-// hot working end (first engagement) → set aqua end (last deliverable). Keyed
-// by the card's global position so the rail and the ticks agree.
+// Each card's temper color — the v1 thermal progression across ALL cards,
+// hot working end (first package) → set aqua end (last ongoing card). Keyed
+// by the card's global position in the column so the rail and ticks agree.
 const temper = (i: number) =>
   `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (total - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
-const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.indexOf(svc));
 
 // PRICE TYPOGRAPHY split (operator: "make the pricing bigger + a nicer font").
 // This is a purely TYPOGRAPHIC split — NOT a copy edit. The three captured
@@ -57,7 +63,9 @@ const heatOf = (svc: (typeof FORGE_SERVICES)[number]) => temper(FORGE_SERVICES.i
 // untouched; we only let Fraunces carry the dollar numerals while "Starts at"
 // and "/ mo" · "/ day" stay as small Space Mono labels around them.
 const priceParts = (price: string) => {
-  const m = price.match(/^(Starts at\s+)?(\$[\d,]+)(\s*\/\s*\S+)?$/);
+  // P29 — the package floors read "from $X" (lowercase), the kept services
+  // still read "Starts at $X"; both split the same way.
+  const m = price.match(/^((?:Starts at|from)\s+)?(\$[\d,]+)(\s*\/\s*\S+)?$/);
   return m ? { pre: m[1] ?? "", amt: m[2], unit: m[3] ?? "" } : { pre: "", amt: price, unit: "" };
 };
 ---
@@ -74,7 +82,14 @@ const priceParts = (price: string) => {
         </p>
         <h1 class="fg-headline" data-reveal>{p.hero.headline}</h1>
         <p class="fg-sub" data-reveal>{p.hero.subline}</p>
-        <a href={`${base}${p.hero.cta.href}`} class="btn fg-cta" data-reveal>
+        {/* P29 — the starting consultant rate, right in the hero.
+            ⚠ OPERATOR-CONFIRM pricing (placeholder): FORGE_CONSULT_RATE. */}
+        <p class="fg-rate" data-reveal>
+          <span class="fg-rate-lead">{p.hero.rateLine}</span>
+          <span class="fg-rate-amt">{FORGE_CONSULT_RATE}</span>
+          <span class="fg-rate-note">{p.hero.rateNote}</span>
+        </p>
+        <a href={href(p.hero.cta.href)} class="btn fg-cta" data-reveal rel="noopener">
           <span>{p.hero.cta.label}</span>
           <span class="arrow" aria-hidden="true">→</span>
         </a>
@@ -97,14 +112,34 @@ const priceParts = (price: string) => {
       </ul>
     </section>
 
-    <!-- ═══ T3 · THE SERVICES — two classes, one temper rail ═══ -->
+    <!-- ═══ T2b · BOTH HALVES — the weird-case positioning (P29): production
+         AND market research, one operator; each half's lane linked with its
+         own pricing so a single-half buyer self-routes. ═══ -->
+    <section class="fg-sec fg-halves">
+      <h2 class="fg-h2" data-reveal>{p.bothHalves.heading}</h2>
+      <p class="fg-body" data-reveal>{p.bothHalves.body}</p>
+      <div class="fg-halves-lanes">
+        {
+          p.bothHalves.lanes.map((lane) => (
+            <a href={`${base}${lane.href}`} class="fg-lane" data-reveal data-reveal-stagger="80">
+              <span>{lane.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ═══ T3 · THE PACKAGES — two classes, one temper rail (P29) ═══ -->
     <section class="fg-sec fg-services" data-fg-services>
       <h2 class="fg-h2 fg-services-head" data-reveal>{p.classes.heading}</h2>
 
       <div class="fg-services-inner">
         <span class="fg-rail" aria-hidden="true"></span>
 
-        <!-- ENGAGEMENTS — long-span, "in it with you" -->
+        <!-- PACKAGES — three cuts of the five-stage method (FORGE_PACKAGES).
+             ⚠ OPERATOR-CONFIRM pricing (placeholder) — see the const's flags;
+             every floor renders with "scoped per project" framing. -->
         <div class="fg-class fg-class--engage">
           <header class="fg-class-head" data-reveal>
             <span class="hud-label fg-class-label">{p.classes.engagements.label}</span>
@@ -113,30 +148,32 @@ const priceParts = (price: string) => {
           </header>
           <ol class="fg-cards">
             {
-              engagements.map((svc) => {
-                const pp = priceParts(svc.price);
+              packages.map((pkg, i) => {
+                const pp = priceParts(pkg.price);
                 return (
-                <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
+                <li class="fg-svc" style={`--heat:${temper(i)}`}>
                   <article class="fg-card" data-reveal data-reveal-stagger="80">
                     <header class="fg-card-head">
-                      <h3 class="fg-name">{svc.name}</h3>
+                      <h3 class="fg-name">{pkg.name}</h3>
                       {/* one line, tags adjacent — no whitespace text nodes, so
-                          the rendered text stays byte-identical to svc.price */}
+                          the rendered text stays byte-identical to pkg.price */}
                       <p class="fg-price">{pp.pre && <span class="fg-price-lead">{pp.pre}</span>}<span class="fg-price-amt">{pp.amt}</span>{pp.unit && <span class="fg-price-unit">{pp.unit}</span>}</p>
+                      <p class="fg-price-scope">scoped per project</p>
                     </header>
-                    <p class="fg-blurb">{svc.blurb}</p>
-                    {svc.flagship && (
-                      <div class="fg-strip">
-                        <p class="hud-label fg-strip-label">{p.flagshipStrip.label}</p>
-                        <span class="fg-strip-line" aria-hidden="true"></span>
-                        <ol class="fg-strip-stages">
-                          {SAGA_STAGES.map((s) => (
-                            <li class="fg-strip-stage">{s.name}</li>
-                          ))}
-                        </ol>
-                        <p class="fg-strip-note">{p.flagshipStrip.note}</p>
-                      </div>
-                    )}
+                    <p class="fg-blurb">{pkg.blurb}</p>
+                    <div class="fg-strip">
+                      <p class="hud-label fg-strip-label">
+                        {pkg.flagship ? p.flagshipStrip.label : "Stages covered"}
+                      </p>
+                      <span class="fg-strip-line" aria-hidden="true"></span>
+                      <ol class="fg-strip-stages">
+                        {pkg.stageIdx.map((si) => (
+                          <li class="fg-strip-stage">{SAGA_STAGES[si].name}</li>
+                        ))}
+                      </ol>
+                      {pkg.flagship && <p class="fg-strip-note">{p.flagshipStrip.note}</p>}
+                    </div>
+                    <p class="fg-ledger">Best if: {pkg.bestFor}</p>
                   </article>
                 </li>
                 );
@@ -145,7 +182,8 @@ const priceParts = (price: string) => {
           </ol>
         </div>
 
-        <!-- DELIVERABLES — one specific thing, a floor -->
+        <!-- ONGOING & FOCUSED — the retainer + the intensive, reused verbatim
+             from FORGE_SERVICES (their researched staging floors unchanged). -->
         <div class="fg-class fg-class--deliver">
           <header class="fg-class-head" data-reveal>
             <span class="hud-label fg-class-label">{p.classes.deliverables.label}</span>
@@ -154,10 +192,10 @@ const priceParts = (price: string) => {
           </header>
           <ol class="fg-cards fg-cards--grid">
             {
-              deliverables.map((svc) => {
+              ongoing.map((svc, i) => {
                 const pp = priceParts(svc.price);
                 return (
-                <li class="fg-svc" style={`--heat:${heatOf(svc)}`}>
+                <li class="fg-svc" style={`--heat:${temper(packages.length + i)}`}>
                   <article class="fg-card" data-reveal data-reveal-stagger="80">
                     <header class="fg-card-head">
                       <h3 class="fg-name">{svc.name}</h3>
@@ -174,6 +212,22 @@ const priceParts = (price: string) => {
             }
           </ol>
         </div>
+      </div>
+
+      <!-- P29 — production-only buyers exit to their lane (each lane carries
+           its own floor); nobody gets sold consulting they didn't come for. -->
+      <div class="fg-lanenote" data-reveal>
+        <h3 class="fg-h3">{p.laneNote.heading}</h3>
+        <p class="fg-note">{p.laneNote.body}</p>
+        <p class="fg-lanenote-links">
+          {
+            p.bothHalves.lanes.map((lane) => (
+              <a href={`${base}${lane.href}`} class="fg-pill--quiet">
+                {lane.label} <span aria-hidden="true">→</span>
+              </a>
+            ))
+          }
+        </p>
       </div>
 
       <div class="fg-pricing" data-reveal>
@@ -210,10 +264,14 @@ const priceParts = (price: string) => {
       <div class="fg-saga-inner">
         <h2 class="fg-headline fg-headline--close" data-reveal>{p.cta.headline}</h2>
         <p class="fg-sub" data-reveal>{p.cta.body}</p>
-        <a href={`${base}${p.cta.cta.href}`} class="btn fg-cta" data-reveal>
+        <a href={href(p.cta.cta.href)} class="btn fg-cta" data-reveal rel="noopener">
           <span>{p.cta.cta.label}</span>
           <span class="arrow" aria-hidden="true">→</span>
         </a>
+        <!-- P29 — logistics answered beside the CTA (SITE.trust, ⚠ flags in consts) -->
+        <p class="fg-trustline" data-reveal>
+          {SITE.trust.response} · {SITE.trust.base} · {SITE.trust.travel}
+        </p>
       </div>
     </section>
   </main>
@@ -304,6 +362,91 @@ const priceParts = (price: string) => {
     line-height: 1.55;
     color: color-mix(in srgb, #f6f2ec 85%, transparent);
     max-width: 52ch;
+  }
+
+  /* ── P29 · the starting consultant rate in the hero — Fraunces numerals in
+     the card-price grammar, framed by small mono labels. ── */
+  .fg-rate {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .fg-rate-lead,
+  .fg-rate-note {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, #f6f2ec 68%, transparent);
+  }
+  .fg-rate-amt {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: color-mix(in srgb, var(--color-forge-heat, #ff9d45) 80%, #fff);
+  }
+
+  /* ── P29 · T2b both halves — two lane cards in the glass grammar ── */
+  .fg-halves {
+    max-width: 64rem;
+    margin-inline: auto;
+    padding: 3.5rem clamp(1.5rem, 6vw, 4rem) 0.5rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .fg-halves-lanes {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 0.4rem;
+  }
+  @media (min-width: 720px) {
+    .fg-halves-lanes {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .fg-lane {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    min-height: 44px;
+    padding: 1rem 1.2rem;
+    background: var(--fg-glass);
+    border: 1px solid var(--fg-hair);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f0ece6;
+    text-decoration: none;
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift, ease-out),
+      color var(--dur-hover, 160ms) var(--ease-swift, ease-out);
+  }
+  .fg-lane .arrow {
+    color: var(--color-accent, #38f8ec);
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift, ease-out);
+  }
+  .fg-lane:hover,
+  .fg-lane:focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+    color: var(--color-accent, #38f8ec);
+  }
+  .fg-lane:hover .arrow,
+  .fg-lane:focus-visible .arrow {
+    transform: translateX(6px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fg-lane,
+    .fg-lane .arrow {
+      transition: none;
+    }
+    .fg-lane:hover .arrow {
+      transform: none;
+    }
   }
 
   /* ── the CTA: the site's button grammar (1px accent border, mono caps, ≥44px)
@@ -680,6 +823,37 @@ const priceParts = (price: string) => {
     font-size: 0.86rem;
     line-height: 1.45;
     color: color-mix(in srgb, #f0ece6 60%, transparent);
+  }
+
+  /* P29 — honest per-card scope framing under the package price */
+  .fg-price-scope {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #f0ece6 48%, transparent);
+  }
+
+  /* P29 — the production-only exit row */
+  .fg-lanenote {
+    margin-top: 2.6rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+  .fg-lanenote-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.8rem;
+    margin-top: 0.2rem;
+  }
+
+  /* P29 — logistics line under the closing CTA */
+  .fg-trustline {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #f0ece6 55%, transparent);
   }
 
   .fg-pricing {
