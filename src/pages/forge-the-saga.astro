@@ -5,8 +5,9 @@
  *
  * The page now sells CONSULTING: he's the odd case who does BOTH production
  * and market research, and Forge the Saga is for buyers who want everything.
- * It leads with a starting consultant rate (⚠ OPERATOR-CONFIRM pricing
- * placeholder) and sells three MOCK PACKAGES cut from the existing five-stage
+ * It leads with a starting consultant rate (P30: $250/hr — mid-band of the
+ * verified 2025-26 $200–$500/hr fractional-creative/strategy range) and sells
+ * three MOCK PACKAGES cut from the existing five-stage
  * method (FORGE_PACKAGES; SAGA_STAGES stays the source of stage names), plus
  * the two ongoing/focused services kept verbatim from FORGE_SERVICES
  * (Standing Forge + Story Intensive). Pure-production deliverables moved to
@@ -82,8 +83,8 @@ const priceParts = (price: string) => {
         </p>
         <h1 class="fg-headline" data-reveal>{p.hero.headline}</h1>
         <p class="fg-sub" data-reveal>{p.hero.subline}</p>
-        {/* P29 — the starting consultant rate, right in the hero.
-            ⚠ OPERATOR-CONFIRM pricing (placeholder): FORGE_CONSULT_RATE. */}
+        {/* P29 — the starting consultant rate, right in the hero. P30: $250/hr,
+            mid-band of the verified $200–$500/hr fractional-creative range. */}
         <p class="fg-rate" data-reveal>
           <span class="fg-rate-lead">{p.hero.rateLine}</span>
           <span class="fg-rate-amt">{FORGE_CONSULT_RATE}</span>
@@ -138,8 +139,8 @@ const priceParts = (price: string) => {
         <span class="fg-rail" aria-hidden="true"></span>
 
         <!-- PACKAGES — three cuts of the five-stage method (FORGE_PACKAGES).
-             ⚠ OPERATOR-CONFIRM pricing (placeholder) — see the const's flags;
-             every floor renders with "scoped per project" framing. -->
+             P30 repriced against 2025-26 market benchmarks (citations at the
+             const); every floor renders with "scoped per project" framing. -->
         <div class="fg-class fg-class--engage">
           <header class="fg-class-head" data-reveal>
             <span class="hud-label fg-class-label">{p.classes.engagements.label}</span>
