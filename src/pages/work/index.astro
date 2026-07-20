@@ -1,7 +1,9 @@
 ---
 /**
- * /work — "Work Stories" (name still being chosen; DO NOT rename). The wall,
- * simplified to the real engagements after the P-work (2026-07-12) edit.
+ * /work — "Industry Stories" (P30, 2026-07-20 — lane name DECIDED and unified
+ * sitewide: the film & entertainment industry lane, matching /world and the
+ * nav; the /work URL deliberately stays). The wall, simplified to the real
+ * engagements after the P-work (2026-07-12) edit.
  *
  * What changed this round (operator direction):
  *   1. FILTER BUG FIXED. The lane buttons toggled Tailwind's `.hidden` utility,
@@ -129,6 +131,8 @@ const archive = WORK_ARCHIVE.map((a) => {
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-3xl space-y-4 p-8">
+    <!-- P30 lane pairing: same eyebrow grammar as /adventure and /entertainment. -->
+    <p class="hud-label" data-reveal>{p.eyebrow}</p>
     <h1 class="text-3xl font-bold" data-reveal>{p.intro.heading}</h1>
     <p class="text-ink" data-reveal>{p.intro.body}</p>
   </section>

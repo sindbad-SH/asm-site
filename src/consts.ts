@@ -51,23 +51,23 @@ export const SITE = {
    */
   analytics: "",
   /**
-   * P29 (money-now restructure, 2026-07-20) — sitewide trust/logistics signals,
-   * surfaced near CTAs and in the footer.
-   * ⚠ OPERATOR-CONFIRM (staging-only until read):
-   *  • `drone` reuses the EXISTING repo phrasing from the aerial service blurb
-   *    ("Licensed, insured drone work"). "FAA Part 107" is deliberately NOT
-   *    claimed — it appears nowhere in confirmed repo copy; if he holds the
-   *    cert, he swaps this line to name it.
+   * P30 (round 2, 2026-07-20) — sitewide trust/logistics signals, surfaced
+   * near CTAs and in the footer. COPY RULES (operator-directed):
+   *  • `drone` — "FAA Part 107" is operator-CONFIRMED (2026-07-20) and is the
+   *    stated credential. NEVER claim "insured" anywhere on the site:
+   *    insurance is project-dependent and often the client's responsibility —
+   *    no false assurance, ever.
+   *  • `travel` — international framing stays POSITIVE and capable: shoots
+   *    welcome, operations accommodated to local aviation rules. Never imply
+   *    he can't fly internationally; never claim US flight authority abroad.
    *  • `response` is a service promise he has to actually keep — one word from
    *    him confirms or adjusts it.
-   *  • `travel` claims international PRODUCTION availability only — never
-   *    international flight authority (FAA certs don't transfer abroad).
    */
   trust: {
-    drone: "Licensed, insured drone work",
+    drone: "FAA Part 107 licensed drone operations (US)",
     response: "Replies within one business day",
     base: "Boulder, Colorado (UTC-6)",
-    travel: "Available for travel and international productions",
+    travel: "International shoots welcome — operations accommodated to local aviation rules",
   },
 } as const;
 
@@ -94,7 +94,11 @@ export type NavItem = { label: string; href: string; buyer?: string };
 export const NAV: readonly NavItem[] = [
   { label: "Adventure Stories", buyer: "Drone & aerial production", href: "/adventure" },
   { label: "Venture Stories", buyer: "Corporate storytelling & research", href: "/entertainment" },
-  { label: "Work Stories", buyer: "Case studies", href: "/work" },
+  // P30 (round 2, 2026-07-20) — third lane UNIFIED as "Industry Stories" (the
+  // entertainment-industry lane; /world already used this name — in the
+  // entertainment world "the industry" means film, which is exactly the read).
+  // URL stays /work (labels unify; routes don't churn).
+  { label: "Industry Stories", buyer: "Film & entertainment industry", href: "/work" },
   { label: "Forge the Saga", buyer: "Consulting — research + production", href: "/forge-the-saga" },
   { label: "About", href: "/about" },
   { label: "Contact", buyer: "Book a call", href: "/contact" },
@@ -186,6 +190,13 @@ export const COPY = {
 // ---------------------------------------------------------------------------
 // SAGA_STAGES — ported from v1, voice converted to first-person solo.
 // Real productized IP; prices display per OD-4 (exact "from $X").
+// P30 REPRICE (2026-07-20, market-researched): stage floors raised to the
+// upper band for a boutique specialist who does BOTH research and production.
+// Benchmarks: custom market-research projects run $25k–$65k agency-side and
+// ~$8k–$12k small-scope (Farnsworth Group / IntoTheMinds / Drive Research
+// 2025-26); strategy consulting $150–$500/hr (consultfees.com). Only stage 01
+// renders directly (the /entertainment research floor); 02–05 feed the
+// package sums below.
 // ---------------------------------------------------------------------------
 
 export type SagaStage = {
@@ -204,7 +215,8 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Scouting",
     sub: "Market & Audience Research",
     deliverable: "Field Notes Brief",
-    price: "from $2,500",
+    price: "from $4,000", // boutique research sprint — small-scope custom research benchmarks ~$8k–$12k; this is a deliberate specialist floor, not an agency study
+
     process:
       "Raw market intelligence. I uncover who your audience actually is, the exact language they use, and what your competitors are missing.",
     bestFor: "You have a product but don't yet know who your real buyer is or how to talk to them.",
@@ -214,7 +226,8 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Mapping",
     sub: "Messaging Strategy & Positioning",
     deliverable: "Core Narrative Blueprint",
-    price: "from $2,500",
+    price: "from $3,500", // messaging/positioning strategy — indep. strategy consultants $150–$275+/hr; ~2 wk engagement floor
+
     process:
       "I shape raw intelligence into narrative strategy — who the audience is, what arc moves them, and what that looks like as tangible content.",
     bestFor: "You have research but need it shaped into a clear, actionable strategic direction.",
@@ -224,7 +237,8 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Forging",
     sub: "Asset Creation & Production",
     deliverable: "Test-Ready Creative Assets",
-    price: "from $5,000",
+    price: "from $6,000", // production floor — boutique brand-video band $5k–$15k (Vidico/Firework 2025-26)
+
     process:
       "The strategy becomes reality. I build high-quality video or copy assets designed specifically for market validation.",
     bestFor: "You have a solid strategy and need the actual creative assets built and ready for feedback.",
@@ -234,7 +248,8 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Testing",
     sub: "A/B Testing & Analytics",
     deliverable: "Live Market Data",
-    price: "from $2,000 + audience",
+    price: "from $2,500 + audience", // testing/analytics sprint — priced under IDI-round benchmarks ($5k–$15k per 10–15 interviews)
+
     process:
       "Your assets meet a real audience. I use curated human panels, AI audience simulations, or both to gather targeted data.",
     bestFor: "You want data-backed proof it works before committing budget to distribution or ad spend.",
@@ -244,7 +259,8 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Assessing",
     sub: "Iterative Refinement & ROI Reporting",
     deliverable: "Action & Refinement Playbook",
-    price: "from $1,500",
+    price: "from $2,000", // analysis + playbook — ~a consulting week at the researched $200–$500/hr band's floor
+
     process:
       "I decode the data — what held attention, where people dropped off, what it means, and the exact steps to take next.",
     bestFor: "You have campaign data but need an expert to decode it and point the way forward.",
@@ -258,10 +274,12 @@ export const SAGA_STAGES: readonly SagaStage[] = [
 //   • engagement  — long-span / retainer, "if you want me in it with you"
 //   • deliverable — "one specific thing I do all the time", priced at a floor
 //
-// Prices are RESEARCHED 2025-26 US market floors set at roughly the 65th-75th
-// percentile ("above the median line, not the most expensive") for a solo,
-// experienced operator, shown as "Starts at $X" / "$X / mo". They ship to
-// STAGING and the operator adjusts from there.
+// Prices are RESEARCHED 2025-26 US + international-remote market floors,
+// REPRICED P30 (2026-07-20) to the HIGHER end of each verified band —
+// positioning: boutique specialist who does BOTH production and market
+// research, priced for internet-found clients (he can always discount in
+// person), never competing with $50/hr volume operators. Per-service market
+// ranges are cited inline. Shown as "Starts at $X" / "$X / mo".
 //
 // ⚠ OPERATOR READ-APPROVAL REQUIRED — every name/price/blurb below is NEW copy.
 //
@@ -286,7 +304,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "01",
     klass: "engagement",
     name: "Forge the Saga",
-    price: "Starts at $12,000",
+    price: "Starts at $15,000", // P30 — research+strategy+production+testing in one arc; custom research alone runs $25k–$65k agency-side
     flagship: true,
     blurb:
       "My deepest engagement — the one the whole studio is named for. I take a founder's story from raw market intelligence to a tested Core Narrative Blueprint your team can actually run: the full arc, start to finish. It moves through five stages, and once the spine is set it can carry on as a retainer if there's a reason to keep steering.",
@@ -295,7 +313,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "02",
     klass: "engagement",
     name: "The Standing Forge",
-    price: "$4,000 / mo",
+    price: "$5,000 / mo", // P30 — fractional creative-direction retainers verify at $5k–$15k/mo (GTM 8020 2025-26); this is that band's floor
     blurb:
       "For companies that need the forge kept lit. A standing monthly engagement for the story work that never really finishes — ongoing video and photo, the next campaign, the content that keeps a brand's voice steady while it grows. One retainer, a predictable rhythm, no re-quoting every shoot.",
   },
@@ -303,7 +321,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "03",
     klass: "deliverable",
     name: "The Story Intensive",
-    price: "Starts at $3,000",
+    price: "Starts at $3,500", // P30 — ~1.5 consulting days at the researched $200–$500/hr fractional-creative band
     blurb:
       "The fastest way to work with me. A focused session on one thing — your positioning, your pitch, the story your launch has to carry. You bring the problem; I bring the questions, and you leave with sharp, usable language and a direction you can act on. The front door to everything else here.",
   },
@@ -311,7 +329,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "04",
     klass: "deliverable",
     name: "The Brand-Story Film",
-    price: "Starts at $6,500",
+    price: "Starts at $8,500", // P30 — boutique brand-story films verify at $5k–$15k (Vidico/Firework/Storyteller 2025-26); upper-middle of the band
     blurb:
       "A two-to-four-minute film that tells your story the way it deserves to be told — scripted, shot, and cut by one person who's thought hard about what it needs to say. Founder stories, product films, the piece that anchors your homepage. Pro gear, a real point of view, no committee.",
   },
@@ -319,7 +337,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "05",
     klass: "deliverable",
     name: "Event & Conference Coverage",
-    price: "Starts at $2,500",
+    price: "Starts at $3,500", // P30 — solo full-day event/conference coverage verifies at $1.5k–$4k, conferences $3k–$7k (D-MAK/Bonomotion 2025-26); high end of the solo band
     blurb:
       "I come cover your event — photo and film — and hand back more than a folder of files. Conferences, pitch nights, summits, workshops: the recap that makes people wish they'd been there, plus clean speaker and session clips you can use the same week. One operator, on my feet all day, reading the room.",
   },
@@ -327,9 +345,9 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     no: "06",
     klass: "deliverable",
     name: "Aerial Cinematography",
-    price: "Starts at $2,000 / day",
+    price: "Starts at $2,500 / day", // P30 — established commercial drone-op day rates verify at $1.5k–$4k (UAV Coach/Dronesgator 2025-26); upper-middle for cinema work with own gear
     blurb:
-      "Licensed, insured drone work for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye I bring to the ground, lifted a few hundred feet.",
+      "FAA Part 107 licensed drone work (US) for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye I bring to the ground, lifted a few hundred feet. International shoots welcome — operations accommodated to local aviation rules.",
     note: "Aerial work licensed through Amazing Aerial Agency",
   },
 ] as const;
@@ -343,12 +361,12 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
 // deliverables moved to their lanes: /adventure (aerial day rate) and
 // /entertainment (coverage + brand films) each price their own buyer.
 //
-// ⚠ OPERATOR-CONFIRM pricing (placeholder) — the first two package floors are
-// NEW numbers for staging: each is the SUM of the per-stage "from $X" floors
-// it bundles (themselves researched staging numbers, above). The Full Saga
-// REUSES the existing flagship floor ($12,000 — deliberately under the
-// $13.5k stage-sum; a bundle floor, not a new number). All render with honest
-// "from $X — scoped per project" framing. He adjusts from staging.
+// P30 REPRICE (2026-07-20, market-researched): the first two package floors
+// are the SUM of the per-stage floors each bundles (themselves repriced above
+// against 2025-26 benchmarks). The Full Saga is a bundle floor deliberately
+// UNDER the ~$18k stage-sum — and still a fraction of the $25k–$65k that a
+// custom research project alone runs agency-side. All render with honest
+// "from $X — scoped per project" framing.
 // ⚠ OPERATOR READ-APPROVAL REQUIRED — names/blurbs/bestFor are new copy.
 // ---------------------------------------------------------------------------
 
@@ -362,15 +380,17 @@ export type ForgePackage = {
   flagship?: boolean;
 };
 
-/** ⚠ OPERATOR-CONFIRM pricing (placeholder) — starting consultant rate; always
- *  rendered with "scoped per project" framing, never as a fixed quote. */
-export const FORGE_CONSULT_RATE = "from $150 / hr";
+/** P30 — starting consultant rate: fractional creative-director / strategy
+ *  consulting verifies at $200–$500/hr (GTM 8020, consultfees.com, 2025-26);
+ *  $250 sits mid-band for the rare research+production combo. Always rendered
+ *  with "scoped per project" framing, never as a fixed quote. */
+export const FORGE_CONSULT_RATE = "from $250 / hr";
 
 export const FORGE_PACKAGES: readonly ForgePackage[] = [
   {
     name: "The Scouting Report",
     stageIdx: [0, 1],
-    price: "from $5,000", // ⚠ OPERATOR-CONFIRM pricing (placeholder) — sum of stage 01+02 floors
+    price: "from $7,500", // P30 — sum of stage 01+02 floors; research+strategy engagements verify at ~$8k–$12k small-scope, $25k+ agency-side
     blurb:
       "The research half on its own: who your audience actually is, the exact language they use, and a Core Narrative Blueprint your team can run without me.",
     bestFor: "You want the market research and the strategy — you have your own production.",
@@ -378,7 +398,7 @@ export const FORGE_PACKAGES: readonly ForgePackage[] = [
   {
     name: "Forge & Test",
     stageIdx: [2, 3],
-    price: "from $7,000", // ⚠ OPERATOR-CONFIRM pricing (placeholder) — sum of stage 03+04 floors
+    price: "from $8,500", // P30 — sum of stage 03+04 floors; boutique brand-video band $5k–$15k plus a testing round priced under IDI benchmarks
     blurb:
       "The production half with proof attached: I build the assets, then put them in front of a real audience before you spend to distribute them.",
     bestFor: "Your strategy is set — you need the assets built and validated.",
@@ -386,7 +406,7 @@ export const FORGE_PACKAGES: readonly ForgePackage[] = [
   {
     name: "The Full Saga",
     stageIdx: [0, 1, 2, 3, 4],
-    price: "from $12,000", // existing flagship floor, reused — not a new number
+    price: "from $15,000", // P30 — bundle floor under the ~$18k stage-sum; custom research alone runs $25k–$65k agency-side (Farnsworth/Drive Research 2025-26)
     flagship: true,
     blurb:
       "Everything, one consultant: raw market intelligence to a tested, ready-to-run story. I carry the whole arc — the research, the production, and the read on what the data says to do next.",
@@ -1007,8 +1027,9 @@ export const PAGES = {
       headline: "A smith forges steel. A StorySmith forges the saga.",
       subline:
         "Most shops sell you production or market research. I'm the odd case who does both — I research what your market actually hears, then produce the story that lands. Forge the Saga is for buyers who want everything: one consultant, research to final cut.",
-      // ⚠ OPERATOR-CONFIRM pricing (placeholder) — FORGE_CONSULT_RATE renders
-      // beside this framing; always "scoped per project", never a fixed quote.
+      // P30 — FORGE_CONSULT_RATE ($250/hr, mid-band of the verified $200–$500/hr
+      // fractional-creative range) renders beside this framing; always
+      // "scoped per project", never a fixed quote.
       rateLine: "Consulting",
       rateNote: "— scoped per project; package floors below.",
       cta: { label: "Book a call", href: SITE.bookACall },
@@ -1103,7 +1124,7 @@ export const PAGES = {
     meta: {
       title: "Adventure Stories — Drone & Aerial Production | Boulder, Colorado",
       description:
-        "Cinematic drone and aerial production, plus expedition photo & film from the places hardest to reach. Licensed, insured drone work — day rates, samples, and direct booking.",
+        "Cinematic drone and aerial production, plus expedition photo & film from the places hardest to reach. FAA Part 107 licensed (US), international shoots welcome — day rates, samples, and direct booking.",
     },
     hero: {
       eyebrow: "Adventure Stories — Drone & Aerial Production",
@@ -1267,14 +1288,19 @@ export const PAGES = {
   },
 
   // ---- WORK (§1.5) — cross-lane proof index + case-study template. ---------
+  // P30 (round 2, 2026-07-20) — lane UNIFIED as "Industry Stories" (film &
+  // entertainment industry; matches /world and the nav). URL stays /work.
   work: {
-    // P29 buyer-language pairing in the meta (⚠ OPERATOR READ-APPROVAL — new
-    // title/description copy, staging-only until read).
+    // ⚠ OPERATOR READ-APPROVAL — new title/description/eyebrow copy,
+    // staging-only until read.
     meta: {
-      title: "Work Stories — Portfolio & Case Studies",
+      title: "Industry Stories — Film & Entertainment Industry | Portfolio & Case Studies",
       description:
-        "Portfolio and case studies — drone & aerial production, event coverage, and brand films. Each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+        "Industry Stories — film & entertainment industry work, portfolio, and case studies: festival and event coverage, brand films, drone & aerial production. Each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
     },
+    // Rendered as the hud-label eyebrow above the H1 — the same lane-pairing
+    // grammar as /adventure and /entertainment.
+    eyebrow: "Industry Stories — Film & Entertainment Industry",
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — strengthened intro copy (staging-only
     // until read). Same honesty backbone (attribution-first, no borrowed
     // credit), sharper voice. Operator note: "the copy of the work field can be

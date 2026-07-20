@@ -21,6 +21,12 @@ const socialEntries = Object.entries(SITE.socials);
       <p class="pt-2">
         <a href={`${base}/privacy`} class="hud-label hover:text-accent">Privacy</a>
       </p>
+      <!-- P30 — quiet persistent way back into the /world experience: a
+           delight-invite in the footer's hud grammar, deliberately NOT a nav
+           item (it never competes with the money lanes). -->
+      <p>
+        <a href={`${base}/world`} class="hud-label world-invite hover:text-accent">✦ Fly the world</a>
+      </p>
     </div>
     <nav aria-label="Footer">
       <ul class="space-y-1.5">
@@ -55,9 +61,9 @@ const socialEntries = Object.entries(SITE.socials);
       }
     </ul>
   </div>
-  <!-- P29 — sitewide trust row (SITE.trust — see its ⚠ OPERATOR-CONFIRM flags
-       in consts.ts) + the direct booking link, so every page terminates on a
-       call-to-action with the logistics answered beside it. -->
+  <!-- P29 — sitewide trust row (SITE.trust — P30 copy rules in consts.ts) +
+       the direct booking link, so every page terminates on a call-to-action
+       with the logistics answered beside it. -->
   <div class="footer-trust mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-between gap-4 border-t border-hairline pt-5">
     <ul class="footer-trust-list">
       <li>{SITE.trust.drone}</li>
@@ -70,6 +76,11 @@ const socialEntries = Object.entries(SITE.socials);
 </footer>
 
 <style>
+  /* P30 — the world invite glints softly toward the accent; an easter-egg
+     whisper, not a button. */
+  .world-invite {
+    color: color-mix(in srgb, var(--color-accent, #5eead4) 55%, currentColor);
+  }
   .footer-buyer {
     font-family: var(--font-mono);
     font-size: 0.62rem;
