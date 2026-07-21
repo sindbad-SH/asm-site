@@ -170,6 +170,16 @@ await clip({ src: V67, start: 42, dur: 7, outMp4: join(vybeClips, "vybe-fest.mp4
 // ── new archive-band stills ──
 await diptych({ leftSrc: NORD, leftAt: 300, leftCropX: 280, rightSrc: SFT, rightAt: 12, outBase: join(archiveDir, "nordic-daughter") });
 await stillFromVideo({ src: BRAZ, seconds: 15, outBase: join(archiveDir, "brazilian-living"), width: 1600 });
-await stillFromVideo({ src: PNUMIX, seconds: 20, outBase: join(archiveDir, "pnumix"), width: 1600 });
+// PNUMIX still — RE-FRAMED (Round 4, 2026-07-21, operator-directed). The old
+// @20s frame centered a costumed performer in revealing attire — too risqué for
+// a business site. Re-timed to @32s: the PNUMIX brand-activation table (product
+// display, lighting truss, floral backdrop) with only fully-costumed guests in
+// frame. Same source video, same tile slot — a timestamp change, not a new
+// asset, so nothing else in the archive band churns. Candidate frames at
+// 24/28/30/32/36/60/66/90s were reviewed on a contact sheet; 32s was the one
+// that is both on-brand (the pnumix product wall reads instantly) and clean.
+// If an even more conservative frame is ever wanted, @28s is a pure product-
+// display shot with no faces at all — swap the number and re-run this script.
+await stillFromVideo({ src: PNUMIX, seconds: 32, outBase: join(archiveDir, "pnumix"), width: 1600 });
 
 console.log("done.\n");

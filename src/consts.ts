@@ -16,7 +16,22 @@
  *     real-estate business (research-brief §4 "HARD EXCLUSION"), the
  *     unverified law-firm client, and the exploratory film-group venture.
  *     They are deliberately not named in this file.
- *  4. Voice is first-person solo ("I"), never "we".
+ *  4. VOICE — COMPANY VOICE, not a personal blog (Round 4, 2026-07-21,
+ *     operator-directed; this REPLACES the former "first-person solo (I),
+ *     never we" rule). Site copy speaks as Adventure Storytelling Media:
+ *     "we/our", or a neutral construction where a plural would sound absurd
+ *     for a solo operator ("Adventure Storytelling Media films…", "The work
+ *     spans…", "One operator, on foot all day…"). Prefer neutral over forced
+ *     plural — never contort a sentence just to avoid "I".
+ *
+ *     THREE EXCEPTIONS, and only these:
+ *       (a) PAGES.about — he is genuinely speaking about himself there.
+ *       (b) TESTIMONIALS — verbatim client quotes. NEVER alter a quote.
+ *       (c) A direct PERSONAL relationship that is itself the fact being
+ *           stated — his MEME Member At-Large role is the canonical case.
+ *           Those stay verbatim.
+ *     Everything else — home, the three lanes, forge, contact, privacy, the
+ *     case pages, the venture articles, and every component — is company voice.
  */
 
 // ---------------------------------------------------------------------------
@@ -130,7 +145,7 @@ export const PILLARS: readonly Pillar[] = [
     terrain: "the wild",
     role: "credibility",
     href: "/adventure",
-    handoff: "This is the caliber of story I forge for founders.",
+    handoff: "This is the caliber of story we forge for founders.",
   },
   {
     id: "consulting",
@@ -147,7 +162,7 @@ export const PILLARS: readonly Pillar[] = [
     role: "credibility",
     href: "/entertainment",
     handoff:
-      "The rooms I keep a pulse on are the same rooms your story eventually has to survive.",
+      "The rooms this work keeps a pulse on are the same rooms your story eventually has to survive.",
   },
 ] as const;
 
@@ -160,9 +175,9 @@ export const PILLARS: readonly Pillar[] = [
 export const COPY = {
   hero: {
     kicker: "Every story, taken as far as it goes.",
-    headline: "The StorySmith. I forge stories for the wild, the market, and the industry.",
+    headline: "The StorySmith. We forge stories for the wild, the market, and the industry.",
     subline:
-      "Sindbad Horizon — Boulder, Colorado. I find the truest version of a story and forge it into something people feel: on the trail, in the boardroom, on set.",
+      "Sindbad Horizon — Boulder, Colorado. We find the truest version of a story and forge it into something people feel: on the trail, in the boardroom, on set.",
     // P29 buyer-language pairing — one plain line under the hero so a cold
     // buyer decodes the offer in seconds. ⚠ OPERATOR READ-APPROVAL REQUIRED —
     // new visible copy (staging-only until read).
@@ -218,7 +233,7 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     price: "from $4,000", // boutique research sprint — small-scope custom research benchmarks ~$8k–$12k; this is a deliberate specialist floor, not an agency study
 
     process:
-      "Raw market intelligence. I uncover who your audience actually is, the exact language they use, and what your competitors are missing.",
+      "Raw market intelligence. We uncover who your audience actually is, the exact language they use, and what your competitors are missing.",
     bestFor: "You have a product but don't yet know who your real buyer is or how to talk to them.",
   },
   {
@@ -229,7 +244,7 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     price: "from $3,500", // messaging/positioning strategy — indep. strategy consultants $150–$275+/hr; ~2 wk engagement floor
 
     process:
-      "I shape raw intelligence into narrative strategy — who the audience is, what arc moves them, and what that looks like as tangible content.",
+      "We shape raw intelligence into narrative strategy — who the audience is, what arc moves them, and what that looks like as tangible content.",
     bestFor: "You have research but need it shaped into a clear, actionable strategic direction.",
   },
   {
@@ -240,7 +255,7 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     price: "from $6,000", // production floor — boutique brand-video band $5k–$15k (Vidico/Firework 2025-26)
 
     process:
-      "The strategy becomes reality. I build high-quality video or copy assets designed specifically for market validation.",
+      "The strategy becomes reality. We build high-quality video or copy assets designed specifically for market validation.",
     bestFor: "You have a solid strategy and need the actual creative assets built and ready for feedback.",
   },
   {
@@ -251,7 +266,7 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     price: "from $2,500 + audience", // testing/analytics sprint — priced under IDI-round benchmarks ($5k–$15k per 10–15 interviews)
 
     process:
-      "Your assets meet a real audience. I use curated human panels, AI audience simulations, or both to gather targeted data.",
+      "Your assets meet a real audience. We use curated human panels, AI audience simulations, or both to gather targeted data.",
     bestFor: "You want data-backed proof it works before committing budget to distribution or ad spend.",
   },
   {
@@ -262,7 +277,7 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     price: "from $2,000", // analysis + playbook — ~a consulting week at the researched $200–$500/hr band's floor
 
     process:
-      "I decode the data — what held attention, where people dropped off, what it means, and the exact steps to take next.",
+      "We decode the data — what held attention, where people dropped off, what it means, and the exact steps to take next.",
     bestFor: "You have campaign data but need an expert to decode it and point the way forward.",
   },
 ] as const;
@@ -307,7 +322,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     price: "Starts at $15,000", // P30 — research+strategy+production+testing in one arc; custom research alone runs $25k–$65k agency-side
     flagship: true,
     blurb:
-      "My deepest engagement — the one the whole studio is named for. I take a founder's story from raw market intelligence to a tested Core Narrative Blueprint your team can actually run: the full arc, start to finish. It moves through five stages, and once the spine is set it can carry on as a retainer if there's a reason to keep steering.",
+      "Our deepest engagement — the one the whole studio is named for. We take a founder's story from raw market intelligence to a tested Core Narrative Blueprint your team can actually run: the full arc, start to finish. It moves through five stages, and once the spine is set it can carry on as a retainer if there's a reason to keep steering.",
   },
   {
     no: "02",
@@ -323,7 +338,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     name: "The Story Intensive",
     price: "Starts at $3,500", // P30 — ~1.5 consulting days at the researched $200–$500/hr fractional-creative band
     blurb:
-      "The fastest way to work with me. A focused session on one thing — your positioning, your pitch, the story your launch has to carry. You bring the problem; I bring the questions, and you leave with sharp, usable language and a direction you can act on. The front door to everything else here.",
+      "The fastest way to work with us. A focused session on one thing — your positioning, your pitch, the story your launch has to carry. You bring the problem; we bring the questions, and you leave with sharp, usable language and a direction you can act on. The front door to everything else here.",
   },
   {
     no: "04",
@@ -339,7 +354,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     name: "Event & Conference Coverage",
     price: "Starts at $3,500", // P30 — solo full-day event/conference coverage verifies at $1.5k–$4k, conferences $3k–$7k (D-MAK/Bonomotion 2025-26); high end of the solo band
     blurb:
-      "I come cover your event — photo and film — and hand back more than a folder of files. Conferences, pitch nights, summits, workshops: the recap that makes people wish they'd been there, plus clean speaker and session clips you can use the same week. One operator, on my feet all day, reading the room.",
+      "We cover your event — photo and film — and hand back more than a folder of files. Conferences, pitch nights, summits, workshops: the recap that makes people wish they'd been there, plus clean speaker and session clips you can use the same week. One operator, on foot all day, reading the room.",
   },
   {
     no: "06",
@@ -347,7 +362,7 @@ export const FORGE_SERVICES: readonly ForgeService[] = [
     name: "Aerial Cinematography",
     price: "Starts at $2,500 / day", // P30 — established commercial drone-op day rates verify at $1.5k–$4k (UAV Coach/Dronesgator 2025-26); upper-middle for cinema work with own gear
     blurb:
-      "FAA Part 107 licensed drone work (US) for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye I bring to the ground, lifted a few hundred feet. International shoots welcome — operations accommodated to local aviation rules.",
+      "FAA Part 107 licensed drone work (US) for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye we bring to the ground, lifted a few hundred feet. International shoots welcome — operations accommodated to local aviation rules.",
     note: "Aerial work licensed through Amazing Aerial Agency",
   },
 ] as const;
@@ -392,7 +407,7 @@ export const FORGE_PACKAGES: readonly ForgePackage[] = [
     stageIdx: [0, 1],
     price: "from $7,500", // P30 — sum of stage 01+02 floors; research+strategy engagements verify at ~$8k–$12k small-scope, $25k+ agency-side
     blurb:
-      "The research half on its own: who your audience actually is, the exact language they use, and a Core Narrative Blueprint your team can run without me.",
+      "The research half on its own: who your audience actually is, the exact language they use, and a Core Narrative Blueprint your team can run without us.",
     bestFor: "You want the market research and the strategy — you have your own production.",
   },
   {
@@ -400,7 +415,7 @@ export const FORGE_PACKAGES: readonly ForgePackage[] = [
     stageIdx: [2, 3],
     price: "from $8,500", // P30 — sum of stage 03+04 floors; boutique brand-video band $5k–$15k plus a testing round priced under IDI benchmarks
     blurb:
-      "The production half with proof attached: I build the assets, then put them in front of a real audience before you spend to distribute them.",
+      "The production half with proof attached: we build the assets, then put them in front of a real audience before you spend to distribute them.",
     bestFor: "Your strategy is set — you need the assets built and validated.",
   },
   {
@@ -409,7 +424,7 @@ export const FORGE_PACKAGES: readonly ForgePackage[] = [
     price: "from $15,000", // P30 — bundle floor under the ~$18k stage-sum; custom research alone runs $25k–$65k agency-side (Farnsworth/Drive Research 2025-26)
     flagship: true,
     blurb:
-      "Everything, one consultant: raw market intelligence to a tested, ready-to-run story. I carry the whole arc — the research, the production, and the read on what the data says to do next.",
+      "Everything, one consultant: raw market intelligence to a tested, ready-to-run story. We carry the whole arc — the research, the production, and the read on what the data says to do next.",
     bestFor: "You want the whole thing handled by one person, start to finish.",
   },
 ] as const;
@@ -476,7 +491,7 @@ export const RELATIONSHIPS: readonly Relationship[] = [
     name: "PitchBoulder",
     tier: "delivered",
     permittedPhrasing:
-      "I run PitchBoulder's event coverage & recaps, and produced their commercial",
+      "We run PitchBoulder's event coverage & recaps, and produced their commercial",
   },
   /**
    * Testimonial #2 source (OD-5): the car owner's quote about the Shelby
@@ -696,7 +711,7 @@ export const WORK: readonly WorkItem[] = [
   // (staging-only until read).
   {
     slug: "amazing-aerial",
-    title: "My top shots with Amazing Aerial",
+    title: "Top shots with Amazing Aerial",
     pillar: "adventure",
     relationshipId: "amazing-aerial",
     lockedAttribution: true,
@@ -726,6 +741,17 @@ export type ArchiveItem = {
   /** When set, the archive tile links to its own light case page and shows the
    *  "Read the story →" affordance; unset tiles are display-only (no page). */
   href?: string;
+  /**
+   * Round 4 (2026-07-21, operator-directed) — the archive band SPLITS across two
+   * lane pages instead of all sitting on /entertainment:
+   *   • "venture"   → /entertainment — gig/brand/event work for an organization.
+   *   • "adventure" → /adventure — pieces that read as travel/coverage ("was
+   *     around here, filmed this"), shown modestly as a small coverage band.
+   * One source of truth; each page filters this field. Vybe was not named in the
+   * split direction, so it HOLDS its existing home (venture) — see the ⚠ flag on
+   * the array below.
+   */
+  lane: "venture" | "adventure";
 };
 
 export const WORK_ARCHIVE: readonly ArchiveItem[] = [
@@ -739,35 +765,49 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     date: "2024–2025",
     relationshipId: "gigs-go-green",
     href: "/work/gigs-go-green",
+    lane: "venture", // operator-named: STAYS on /entertainment
   },
+  // ⚠ OPERATOR READ-APPROVAL — Vybe was NOT named in the Round 4 split
+  // direction (which named Gigs Go Green + PNUMIX to stay and Nordic Daughter +
+  // Brazilian Living to move), so it HOLDS its existing home rather than being
+  // re-laned on a guess. It reads as venture/event work (a Denver arts + music
+  // collective), which is consistent with staying — but flagging it for a call.
   {
     slug: "vybe",
     title: "Vybe",
     date: "2023–2024",
     relationshipId: "vybe",
     href: "/work/vybe",
+    lane: "venture",
   },
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — three new archive tiles (the `title` +
   // `date` strings are new visible copy, staging-only). Tiles-only (no case
   // pages), per operator. One-liners render verbatim from the RELATIONSHIPS
   // above; dates read from the source files, never invented.
+  // Round 4 — these two MOVE to /adventure: both read as travel/coverage
+  // pieces ("was around here, filmed this") rather than commissioned venture
+  // work. They render there as a modest coverage band, deliberately smaller
+  // than the lane's own features — padding until stronger work replaces them.
   {
     slug: "nordic-daughter",
     title: "Nordic Daughter & Something for Tomorrow",
     date: "2024",
     relationshipId: "nordic-daughter",
+    lane: "adventure",
   },
   {
     slug: "brazilian-living",
     title: "The Art of Brazilian Living",
     date: "2025",
     relationshipId: "brazilian-living",
+    lane: "adventure",
   },
   {
     slug: "pnumix",
     title: "PNUMIX — Paranormal Palace",
     date: "2024",
     relationshipId: "pnumix",
+    lane: "venture", // operator-named: STAYS on /entertainment
   },
 ] as const;
 
@@ -941,21 +981,21 @@ export const PAGES = {
       {
         terrain: "The wild",
         headline: "The story is usually where it's hardest to reach.",
-        body: "I cover expeditions and wild places most cameras never get to — on foot, in the air, in conditions that don't wait for a second take.",
+        body: "We cover expeditions and wild places most cameras never get to — on foot, in the air, in conditions that don't wait for a second take.",
         proof: { relationshipId: "amazing-aerial" },
         link: { label: "See the adventure work", href: "/adventure" },
       },
       {
         terrain: "The market",
         headline: COPY.anchors.belief, // "Your product works. Your story isn't landing."
-        body: "Under Forge the Saga, I turn a founder's real advantage into a narrative the market actually feels — and I pressure-test it before you spend to find out.",
+        body: "Under Forge the Saga, we turn a founder's real advantage into a narrative the market actually feels — and pressure-test it before you spend to find out.",
         proof: { relationshipId: "pitchboulder" },
         link: { label: "Forge your saga", href: "/forge-the-saga" },
       },
       {
         terrain: "The industry",
-        headline: "I keep a pulse on the rooms your story has to survive.",
-        body: "I stay close to how the industry moves — the board work, the coverage, the festivals and markets — and I'm honest about exactly how close each relationship is.",
+        headline: "We keep a pulse on the rooms your story has to survive.",
+        body: "We stay close to how the industry moves — the board work, the coverage, the festivals and markets — and we are honest about exactly how close each relationship is.",
         proof: { relationshipId: "meme" },
         // Round 3 — the industry tableau now points at ITS lane: /work is
         // Industry Stories (MEME + festival/market coverage live there).
@@ -1002,7 +1042,7 @@ export const PAGES = {
     // H7 — contact CTA band.
     contactBand: {
       headline: COPY.anchors.noPressure, // "No pitch, no pressure."
-      body: "Tell me what you're building. If I can help you make it land, I'll tell you how. If I can't, I'll tell you that too.",
+      body: "Tell us what you're building. If we can help you make it land, we'll tell you how. If we can't, we'll tell you that too.",
       cta: { label: "Book a call", href: "/contact" },
     },
   },
@@ -1034,7 +1074,7 @@ export const PAGES = {
       kicker: "The StorySmith · Story Consulting",
       headline: "A smith forges steel. A StorySmith forges the saga.",
       subline:
-        "Most shops sell you production or market research. I'm the odd case who does both — I research what your market actually hears, then produce the story that lands. Forge the Saga is for buyers who want everything: one consultant, research to final cut.",
+        "Most shops sell you production or market research. Adventure Storytelling Media is the odd case that does both — we research what your market actually hears, then produce the story that lands. Forge the Saga is for buyers who want everything: one consultant, research to final cut.",
       // P30 — FORGE_CONSULT_RATE ($250/hr, mid-band of the verified $200–$500/hr
       // fractional-creative range) renders beside this framing; always
       // "scoped per project", never a fixed quote.
@@ -1056,7 +1096,7 @@ export const PAGES = {
     // pointers to the two lanes that now carry their own production pricing.
     bothHalves: {
       heading: "Both halves of the job",
-      body: "Production people don't usually do research. Research people don't usually shoot. I do both — which is why the testing stages here run on real footage, not decks. If you only need one half, it has its own page and its own floor:",
+      body: "Production people don't usually do research. Research people don't usually shoot. We do both — which is why the testing stages here run on real footage, not decks. If you only need one half, it has its own page and its own floor:",
       lanes: [
         { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
         { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
@@ -1068,7 +1108,7 @@ export const PAGES = {
       heading: "The packages",
       engagements: {
         label: "Packages",
-        tagline: "Three cuts of the five-stage method — pick how much of the arc you want me to carry.",
+        tagline: "Three cuts of the five-stage method — pick how much of the arc you want us to carry.",
       },
       deliverables: {
         label: "Ongoing & focused",
@@ -1096,7 +1136,7 @@ export const PAGES = {
     pretestShelved: {
       rendered: false,
       heading: "Before your story meets investors, it meets the panel.",
-      body: "Echo Panel is an AI investor-pitch pretest tool I built — your pitch gets stress-tested before it costs you a real meeting.",
+      body: "Echo Panel is an AI investor-pitch pretest tool built in-house — your pitch gets stress-tested before it costs you a real meeting.",
     },
     // F5 — proof.
     proof: {
@@ -1106,20 +1146,20 @@ export const PAGES = {
       // Delivered-work cards — services actually delivered for real people,
       // each labeled at exact status (WORK[].engagement, [confirm] until set).
       deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
-      note: "No second consulting testimonial at launch. Everything shown is work I actually delivered, labeled paid or unpaid as it truly was.",
+      note: "No second consulting testimonial at launch. Everything shown is work actually delivered, labeled paid or unpaid as it truly was.",
     },
     // F6 — pricing. Every package shows its own floor; this is the honest note
     // about what the floors mean. ⚠ OPERATOR READ-APPROVAL REQUIRED — body
     // updated for the packages framing (staging-only); note: KEPT verbatim.
     pricing: {
       heading: "On pricing",
-      body: "Every number here is a floor, not a quote — packages are scoped per project, and hourly consulting starts where the rate above says it does. Tell me what you're building and I'll tell you what it actually takes.",
+      body: "Every number here is a floor, not a quote — packages are scoped per project, and hourly consulting starts where the rate above says it does. Tell us what you're building and we'll tell you what it actually takes.",
       note: "Every price is a starting point — the shape of the work sets the rest.",
     },
     // F7 — CTA. P29: straight to the booking link (no /contact hop).
     cta: {
       headline: COPY.anchors.noPressure,
-      body: "Tell me where the story isn't landing. If Forge the Saga is a fit, we'll map it. If it isn't, I'll say so.",
+      body: "Tell us where the story isn't landing. If Forge the Saga is a fit, we'll map it. If it isn't, we'll say so.",
       cta: { label: "Book a call", href: SITE.bookACall },
     },
   },
@@ -1166,7 +1206,7 @@ export const PAGES = {
     },
     personal: {
       heading: "Personal & editorial",
-      body: "The self-driven expedition work — the frames I chase for their own sake.",
+      body: "The self-driven expedition work — the frames we chase for their own sake.",
     },
     gallery: {
       heading: "The field",
@@ -1187,7 +1227,22 @@ export const PAGES = {
     festival: {
       kicker: "Adventure story · Loveland, Colorado",
       heading: "A medieval festival in Loveland",
-      body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. I covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
+      body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. We covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
+    },
+    // A4c — FROM THE ARCHIVE (Round 4, 2026-07-21, operator-directed). Two
+    // tiles moved off /entertainment's archive band because they read as
+    // travel/coverage pieces, not commissioned venture work: Nordic Daughter &
+    // Something for Tomorrow, and The Art of Brazilian Living. Rendered
+    // DELIBERATELY SMALL and quiet — the operator's note is that these are
+    // padding until stronger work replaces them, so the copy claims nothing
+    // beyond what happened. Every one-liner still renders VERBATIM from the
+    // relationship's permittedPhrasing (no prose restates a status).
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new visible
+    // copy (staging-only until read).
+    coverage: {
+      kicker: "From the archive",
+      heading: "Filmed along the way",
+      body: "Earlier live-music and festival coverage, picked up while passing through. Small pieces, kept here for the record.",
     },
     // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
     // are watermarked previews; the gallery is a referral to the agency that
@@ -1196,7 +1251,7 @@ export const PAGES = {
     // homepage. Copy invites licensing THROUGH Amazing Aerial.
     aaFunnel: {
       heading: "License the full collection",
-      body: "The aerial work is represented by Amazing Aerial Agency. The watermarked frames here are previews — see the full, licensable collection on my Amazing Aerial portfolio.",
+      body: "The aerial work is represented by Amazing Aerial Agency. The watermarked frames here are previews — see the full, licensable collection on the Amazing Aerial portfolio.",
       cta: {
         label: "See the full collection at Amazing Aerial",
         href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
@@ -1206,7 +1261,7 @@ export const PAGES = {
     // not at consulting — adventure buyers aren't founders. Calendly direct.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — new closing line (staging-only).
     handoff: {
-      body: "Need this eye on your production? Tell me where and when.",
+      body: "Need this eye on your production? Tell us where and when.",
       cta: { label: "Book a call", href: SITE.bookACall },
     },
   },
@@ -1239,7 +1294,7 @@ export const PAGES = {
       // purely the business-storytelling one. ⚠ OPERATOR READ-APPROVAL
       // REQUIRED — new sentence (staging-only until read).
       subline:
-        "I tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Real client work, real coverage — each stated at exactly what it is.",
+        "We tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Real client work, real coverage — each stated at exactly what it is.",
     },
     // E1b — HIRE THIS LANE: the corporate-storytelling services + floors.
     // Prices are REUSED verbatim from existing staged floors — Event coverage
@@ -1333,17 +1388,21 @@ export const PAGES = {
     meta: {
       title: "Industry Stories — Film & Entertainment Industry | Coverage & Roles",
       description:
-        "Industry Stories — the film & entertainment industry lane: a formal role at MEME, coverage from SeriesFest and the American Film Market, and the rooms I keep a pulse on. Each relationship stated at its true status. No logo walls, no borrowed credit.",
+        "Industry Stories — the film & entertainment industry lane of Adventure Storytelling Media: an affiliation with MEME, a Colorado film nonprofit, plus coverage from SeriesFest and the American Film Market. Every relationship stated at its true status. No logo walls, no borrowed credit.",
     },
     // Rendered as the hud-label eyebrow above the H1 — the same lane-pairing
     // grammar as /adventure and /entertainment.
     eyebrow: "Industry Stories — Film & Entertainment Industry",
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — industry-lane intro copy (Round 3,
-    // staging-only until read). Honest posture: works in + covers the
-    // industry; no credentialed-coverage claim, no "at the table" claim.
+    // ROUND 4 REWRITE (2026-07-21, operator-directed): the previous intro was
+    // written for the older, broader page and no longer fit. This one states
+    // the lane plainly — the affiliation that anchors it, the two events it
+    // covers, and the honesty rule — in company voice.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy (staging-only).
+    // Honest posture unchanged: works in + covers the industry; NO credentialed-
+    // coverage claim, NO "at the table where the industry decides" claim.
     intro: {
-      heading: "I work in the industry, and I cover it.",
-      body: "Film and entertainment is the terrain I'm building in — a formal role at a Colorado film nonprofit, coverage from the festivals and markets where the industry does business, and every relationship here stated at exactly what it is. No logo walls, no borrowed credit.",
+      heading: "The film and entertainment lane.",
+      body: "This is the terrain Adventure Storytelling Media is building in: an affiliation with MEME, a Colorado film nonprofit, and coverage from the festivals and markets where the industry actually does business — SeriesFest in Denver, the American Film Market in Los Angeles. Every relationship on this page is stated at exactly what it is. No logo walls, no borrowed credit.",
     },
     // W2 — MEME, the anchor of the lane (TOP BILLING, operator-directed:
     // "he's affiliated with the org, content will grow; future-facing").
@@ -1351,12 +1410,20 @@ export const PAGES = {
     // permittedPhrasing); the body is authored framing, never a status claim.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading/body/growth are new visible
     // copy (staging-only until read).
+    // ROUND 4 (2026-07-21) — MEME keeps TOP BILLING. The body is rewritten in
+    // company voice EXCEPT the one sentence that states his personal role:
+    // "the most formal role I hold in the industry" is the direct personal
+    // relationship being stated, which is the standing exception to the voice
+    // rule (see the VOICE governance note at the top of this file) — it stays
+    // first-person on purpose, matching the verbatim permittedPhrasing beside
+    // it. `growth` states the MECHANISM (as things happen, they land here) and
+    // deliberately promises no specific future output.
     meme: {
       kicker: "The anchor · MEME",
       heading: "MEME is where this lane starts.",
       proof: { relationshipId: "meme" } as ProofLine,
       body: "Makeshift Entertainment Media Education is a Colorado nonprofit building a stronger independent film community — education, workforce development, a way in for new talent. It's the most formal role I hold in the industry, and the affiliation this whole lane grows from.",
-      growth: "The work here is just beginning — workshops, productions, and the stories around them will land on this page as they happen.",
+      growth: "This is a young affiliation and the page is built to grow with it — as MEME workshops, productions, and the stories around them happen, they land here.",
       ctas: [
         { label: "Read the full story", href: "/venture/meme" },
         { label: "About the organization", href: "https://www.meme.ngo" },
@@ -1369,9 +1436,13 @@ export const PAGES = {
     // verbatim permittedPhrasing on the shelf intro, never upgraded per-tile.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading + intro are new visible copy
     // (staging-only until read).
+    // ROUND 4 (2026-07-21) — company voice, and the two events NAMED rather
+    // than left as "the festivals and markets". The closing line makes room for
+    // future additions without promising any: it describes how the shelf works,
+    // not what will be on it.
     coverage: {
       heading: "Coverage from the rooms",
-      intro: "The festivals and markets I attend and cover — written up, shot, and published here.",
+      intro: "Two rooms so far: SeriesFest in Denver and the American Film Market in Los Angeles — attended, shot, written up, and published here. The shelf fills as the slate does.",
       items: [
         { href: "/venture/seriesfest-2026", slate: "SeriesFest · May 7–8, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story", relationshipId: "seriesfest" },
         { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story", relationshipId: "seriesfest" },
@@ -1387,7 +1458,7 @@ export const PAGES = {
     // visible copy (staging-only until read).
     close: {
       headline: "Bringing a production to Colorado — or a story to a festival?",
-      body: "If you need coverage of an industry event, a set documented, or simply someone who knows these rooms — tell me what you're making.",
+      body: "If you need coverage of an industry event, a set documented, or simply an operator who already knows these rooms — tell us what you're making.",
       cta: { label: "Book a call", href: SITE.bookACall },
       lanes: [
         { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
@@ -1403,12 +1474,12 @@ export const PAGES = {
         meta: {
           title: "PitchBoulder — coverage, recaps & a commercial",
           description:
-            "How I run PitchBoulder's event coverage and recaps, and produced their commercial.",
+            "How we run PitchBoulder's event coverage and recaps, and produced their commercial.",
         },
-        hook: "The work I do for PitchBoulder, start to finish.",
+        hook: "The work we do for PitchBoulder, start to finish.",
         context: {
           heading: "Who they are",
-          body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. I've been in that room for nearly three years, across dozens of weekly pitch events, watching the gap between what a founder says and what the room actually hears.",
+          body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. Adventure Storytelling Media has been in that room for nearly three years, across dozens of weekly pitch events, watching the gap between what a founder says and what the room actually hears.",
         },
         ask: {
           heading: "The ask",
@@ -1449,7 +1520,7 @@ export const PAGES = {
         work: {
           heading: "The work",
           proof: { relationshipId: "pebble-beach" } as ProofLine,
-          body: "I shot the Cobra on the lawn, then shaped the footage into a narrative built on emotion and craftsmanship — what the car means, not just what it is.",
+          body: "We shot the Cobra on the lawn, then shaped the footage into a narrative built on emotion and craftsmanship — what the car means, not just what it is.",
         },
         outcome: {
           heading: "The outcome",
@@ -1492,10 +1563,10 @@ export const PAGES = {
     meta: {
       title: "Contact — Book a Call",
       description:
-        "Tell me what you're building. No pitch, no pressure — book a call or send a note.",
+        "Tell us what you're building. No pitch, no pressure — book a call or send a note.",
     },
     headline: COPY.anchors.noPressure,
-    body: "Tell me what you're building. If Forge the Saga is a fit, we'll talk. If it isn't, I'll point you somewhere better.",
+    body: "Tell us what you're building. If Forge the Saga is a fit, we'll talk. If it isn't, we'll point you somewhere better.",
     email: SITE.email,
     // Form endpoint, book-a-call, and socials resolve from SITE ([confirm]).
   },

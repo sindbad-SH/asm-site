@@ -138,7 +138,12 @@ const otherRooms = p.rooms.items.filter((r) => !HANDLED_ELSEWHERE.has(r.proof.re
 // event coverage is venture-storytelling-natured, not film-industry work. Same
 // data (WORK_ARCHIVE) and honesty contract (verbatim permittedPhrasing only);
 // media stays at public/media/work/archive/<slug>.* (no asset churn).
-const archive = WORK_ARCHIVE.map((a) => ({
+// Round 4 (2026-07-21, operator-directed) — the band SPLITS: only the VENTURE
+// tiles stay here (Gigs Go Green, Vybe, PNUMIX). Nordic Daughter and The Art of
+// Brazilian Living moved to /adventure's coverage band — they read as travel/
+// coverage pieces, not commissioned venture work. The lane lives on the DATA
+// (WORK_ARCHIVE[].lane), so neither page hardcodes a slug list.
+const archive = WORK_ARCHIVE.filter((a) => a.lane === "venture").map((a) => ({
   item: a,
   media: pair(`work/archive/${a.slug}`),
   href: a.href ? `${base}${a.href}` : undefined,
@@ -162,7 +167,7 @@ const coverage = [
   // from the article page's own ARTICLE block (already operator-flagged there;
   // reuse adds no new copy here). Card image resolves as venture/<slug>/hero-900.
   { href: "/venture/ko-law-workshops", slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026", title: "Four startup workshops, on camera." },
-  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes my aerials to market." },
+  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes our aerials to market." },
 ];
 
 // P12.6b — the STORY RAIL cards: the coverage stories PLUS the emerging film
