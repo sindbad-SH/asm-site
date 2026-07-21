@@ -588,9 +588,15 @@ export const RELATIONSHIPS: readonly Relationship[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// WORK — cross-lane proof index. Attribution-first cards: "For [org] · [what]".
-// `engagement` labels paid vs unpaid honestly (BUILD-PLAN §1.2 F5) — [confirm]
-// blocks production until each is resolved with Sindbad.
+// WORK — cross-lane proof RECORD. Round 3 (2026-07-21, operator-directed lane
+// redistribution): /work no longer renders this array as a wall — every piece
+// moved to its true lane page (Shelby + PitchBoulder → /entertainment, which
+// already featured both; Knights of Mayhem → the /adventure festival feature;
+// the AA flagship → /adventure's AA bands). The array STAYS as the single
+// source of each engagement's attribution facts (title / forOrg / what /
+// engagement / href) — lane pages compose their attribution lines FROM it,
+// never restate them. `engagement` labels paid vs unpaid honestly (BUILD-PLAN
+// §1.2 F5) — [confirm] blocks production until each is resolved with Sindbad.
 // ---------------------------------------------------------------------------
 
 export type WorkItem = {
@@ -951,7 +957,9 @@ export const PAGES = {
         headline: "I keep a pulse on the rooms your story has to survive.",
         body: "I stay close to how the industry moves — the board work, the coverage, the festivals and markets — and I'm honest about exactly how close each relationship is.",
         proof: { relationshipId: "meme" },
-        link: { label: "The network", href: "/entertainment" },
+        // Round 3 — the industry tableau now points at ITS lane: /work is
+        // Industry Stories (MEME + festival/market coverage live there).
+        link: { label: "The network", href: "/work" },
       },
     ] as readonly TableauChapter[],
     // H4 — proof band. P29 INVERSION (operator-directed): lead with the
@@ -1164,6 +1172,23 @@ export const PAGES = {
       heading: "The field",
       note: "Real stills replace these slots as footage arrives (BUILD-PLAN.md §5A S2).",
     },
+    // A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3, 2026-07-21). The Knights of
+    // Mayhem piece RE-LANED here from the /work wall (operator: "Knights of
+    // Mayhem is an adventure story") and BROADENED into one cohesive festival
+    // story block: the jousting showcase video remains the feature, ringed by
+    // the operator's own drone frames of the joust lane and the armored
+    // ground-combat arena (baked by scripts/make-festival-photos.mjs). The
+    // attribution line composes from the WORK record (single source); the
+    // aerial-licensing note renders ONLY via LegendMark (amazing-aerial's
+    // verbatim permittedPhrasing) as an inline credibility marker.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new visible
+    // copy (staging-only until read). Facts: Colorado Medieval Festival,
+    // Loveland, CO, June 2024 — dates read from the source files.
+    festival: {
+      kicker: "Adventure story · Loveland, Colorado",
+      heading: "A medieval festival in Loveland",
+      body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. I covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
+    },
     // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
     // are watermarked previews; the gallery is a referral to the agency that
     // licenses the full collection. Points directly at the operator's AA
@@ -1208,8 +1233,13 @@ export const PAGES = {
     hero: {
       eyebrow: "Venture Stories — Corporate Storytelling & Market Research",
       headline: "The venture in adventure.",
+      // Round 3 (2026-07-21) — subline re-worded off "the industry" and the
+      // festivals: the film-industry material (MEME, SeriesFest, AFM) moved to
+      // /work under the final lane definitions, so this lane's promise is now
+      // purely the business-storytelling one. ⚠ OPERATOR READ-APPROVAL
+      // REQUIRED — new sentence (staging-only until read).
       subline:
-        "I tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where the industry does business. Board work, real coverage, and the festivals I attend — each stated at exactly what it is.",
+        "I tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Real client work, real coverage — each stated at exactly what it is.",
     },
     // E1b — HIRE THIS LANE: the corporate-storytelling services + floors.
     // Prices are REUSED verbatim from existing staged floors — Event coverage
@@ -1287,27 +1317,83 @@ export const PAGES = {
     },
   },
 
-  // ---- WORK (§1.5) — cross-lane proof index + case-study template. ---------
+  // ---- WORK (§1.5) — the INDUSTRY STORIES lane page + case-study template. --
   // P30 (round 2, 2026-07-20) — lane UNIFIED as "Industry Stories" (film &
   // entertainment industry; matches /world and the nav). URL stays /work.
+  // Round 3 (2026-07-21, operator-directed) — /work REBUILT as the film &
+  // entertainment INDUSTRY lane: MEME anchors it (top billing — the org he's
+  // affiliated with, where the content will grow), then the SeriesFest and
+  // American Film Market coverage. The old cross-lane wall redistributed to
+  // its true lanes (see the WORK record's comment). The page sells presence +
+  // coverage conservatively; production/consulting CTAs point to the lanes
+  // that own those offers.
   work: {
     // ⚠ OPERATOR READ-APPROVAL — new title/description/eyebrow copy,
     // staging-only until read.
     meta: {
-      title: "Industry Stories — Film & Entertainment Industry | Portfolio & Case Studies",
+      title: "Industry Stories — Film & Entertainment Industry | Coverage & Roles",
       description:
-        "Industry Stories — film & entertainment industry work, portfolio, and case studies: festival and event coverage, brand films, drone & aerial production. Each piece attributed and labeled at its true status. No logo walls, no borrowed credit.",
+        "Industry Stories — the film & entertainment industry lane: a formal role at MEME, coverage from SeriesFest and the American Film Market, and the rooms I keep a pulse on. Each relationship stated at its true status. No logo walls, no borrowed credit.",
     },
     // Rendered as the hud-label eyebrow above the H1 — the same lane-pairing
     // grammar as /adventure and /entertainment.
     eyebrow: "Industry Stories — Film & Entertainment Industry",
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — strengthened intro copy (staging-only
-    // until read). Same honesty backbone (attribution-first, no borrowed
-    // credit), sharper voice. Operator note: "the copy of the work field can be
-    // a little stronger."
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — industry-lane intro copy (Round 3,
+    // staging-only until read). Honest posture: works in + covers the
+    // industry; no credentialed-coverage claim, no "at the table" claim.
     intro: {
-      heading: "The work, on the record.",
-      body: "Every piece here I actually shot, cut, or led — credited to exactly who it was for and marked at its true status. No logo walls, no borrowed credit, nothing I can't stand behind.",
+      heading: "I work in the industry, and I cover it.",
+      body: "Film and entertainment is the terrain I'm building in — a formal role at a Colorado film nonprofit, coverage from the festivals and markets where the industry does business, and every relationship here stated at exactly what it is. No logo walls, no borrowed credit.",
+    },
+    // W2 — MEME, the anchor of the lane (TOP BILLING, operator-directed:
+    // "he's affiliated with the org, content will grow; future-facing").
+    // The status claim renders ONLY through LegendMark (verbatim
+    // permittedPhrasing); the body is authored framing, never a status claim.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading/body/growth are new visible
+    // copy (staging-only until read).
+    meme: {
+      kicker: "The anchor · MEME",
+      heading: "MEME is where this lane starts.",
+      proof: { relationshipId: "meme" } as ProofLine,
+      body: "Makeshift Entertainment Media Education is a Colorado nonprofit building a stronger independent film community — education, workforce development, a way in for new talent. It's the most formal role I hold in the industry, and the affiliation this whole lane grows from.",
+      growth: "The work here is just beginning — workshops, productions, and the stories around them will land on this page as they happen.",
+      ctas: [
+        { label: "Read the full story", href: "/venture/meme" },
+        { label: "About the organization", href: "https://www.meme.ngo" },
+      ] as readonly Cta[],
+    },
+    // W3 — the coverage shelf: SeriesFest + American Film Market. Tiles link to
+    // the published coverage articles; slate + title strings are COPIED
+    // VERBATIM from each article page (already operator-flagged there — reuse
+    // adds no new copy). Each event's status renders via its relationship's
+    // verbatim permittedPhrasing on the shelf intro, never upgraded per-tile.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading + intro are new visible copy
+    // (staging-only until read).
+    coverage: {
+      heading: "Coverage from the rooms",
+      intro: "The festivals and markets I attend and cover — written up, shot, and published here.",
+      items: [
+        { href: "/venture/seriesfest-2026", slate: "SeriesFest · May 7–8, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story", relationshipId: "seriesfest" },
+        { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story", relationshipId: "seriesfest" },
+        { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story", relationshipId: "seriesfest" },
+        { href: "/venture/seriesfest-2025", slate: "SeriesFest · Apr 30 – May 4, 2025 · Denver, CO", title: "SeriesFest 2025 — a venture story", relationshipId: "seriesfest" },
+        { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story", relationshipId: "afm" },
+      ] as readonly { href: string; slate: string; title: string; relationshipId: string }[],
+    },
+    // W4 — the industry-lane close. CONSERVATIVE by design: this lane sells
+    // presence + coverage; the production and consulting offers live on their
+    // own lanes and are pointed to, not restated here.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — headline/body/lane labels are new
+    // visible copy (staging-only until read).
+    close: {
+      headline: "Bringing a production to Colorado — or a story to a festival?",
+      body: "If you need coverage of an industry event, a set documented, or simply someone who knows these rooms — tell me what you're making.",
+      cta: { label: "Book a call", href: SITE.bookACall },
+      lanes: [
+        { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
+        { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
+        { label: "Research + production, one consultant — Forge the Saga", href: "/forge-the-saga" },
+      ] as readonly Cta[],
     },
     // Case-study copy (Immersive-Garden walkthrough). PitchBoulder ships first
     // and sets the template. Facts I can't verify are [confirm] (asset S3);

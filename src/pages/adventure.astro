@@ -19,7 +19,7 @@ import GlobeHero from "../components/GlobeHero.astro";
 import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES, FORGE_SERVICES, SITE } from "../consts";
+import { PAGES, FORGE_SERVICES, SITE, WORK } from "../consts";
 import { TERRITORY, TERRITORY_TOTALS } from "../data/territory";
 import { getCollection } from "astro:content";
 
@@ -170,6 +170,45 @@ const reelSources = reelHasLoop
   ? [{ src: `${base}/media/adventure/reel-loop.mp4`, type: "video/mp4" }]
   : [];
 const reelPoster = reelHasPoster ? `${base}/media/adventure/reel-poster.avif` : undefined;
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3, 2026-07-21).
+ *
+ * The Knights of Mayhem piece RE-LANED here from the /work wall (operator:
+ * "Knights of Mayhem is an adventure story") and BROADENED into one cohesive
+ * festival story block: the showcase video (the existing loop + poster export
+ * under media/work/knights-of-mayhem/ — path unchanged, no asset churn) stays
+ * the feature, ringed by four of the operator's own drone frames of the joust
+ * lane and the armored ground-combat arena (baked to media/adventure/festival/
+ * by scripts/make-festival-photos.mjs). The attribution line composes from the
+ * WORK record — single source, same "For [org] · [what] — [engagement]"
+ * grammar the wall used. The aerial-licensing credibility marker renders ONLY
+ * via LegendMark (amazing-aerial's verbatim permittedPhrasing).
+ * ───────────────────────────────────────────────────────────────────────── */
+const knights = WORK.find((w) => w.slug === "knights-of-mayhem");
+const festDir = join(process.cwd(), "public", "media", "work", "knights-of-mayhem");
+const festPoster = existsSync(join(festDir, "poster.avif"))
+  ? `${base}/media/work/knights-of-mayhem/poster.avif`
+  : undefined;
+const festSources = existsSync(join(festDir, "loop.mp4"))
+  ? [{ src: `${base}/media/work/knights-of-mayhem/loop.mp4`, type: "video/mp4" }]
+  : [];
+// Photo band — existence-gated per file, like every other baked set.
+const festPhoto = (slug: string) => {
+  const dir = join(process.cwd(), "public", "media", "adventure", "festival");
+  if (!existsSync(join(dir, `${slug}-900.avif`))) return undefined;
+  return {
+    avif: [900, 1600].map((w) => `${base}/media/adventure/festival/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: [900, 1600].map((w) => `${base}/media/adventure/festival/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/festival/${slug}-900.webp`,
+  };
+};
+const FESTIVAL_PHOTOS = [
+  { slug: "joust-charge", alt: "Aerial view of a knight on a white horse charging down the jousting lane between festival crowds" },
+  { slug: "joust-riders", alt: "Two armored riders in the lists, the white horse in the foreground, crowds along both rails" },
+  { slug: "melee-arena", alt: "Aerial view of two armored fighters squaring up in the wooden combat arena, ringed by spectators" },
+  { slug: "melee-brawl", alt: "Three simultaneous armored bouts at the corners of the combat arena, seen from above" },
+].map((ph) => ({ ...ph, media: festPhoto(ph.slug) })).filter((ph) => ph.media);
 
 // Slug → gallery media map. Round 2 (R3): widths are orientation-aware —
 // landscape cards export 800/1400/2200 (3:2), vertical cards 800/1120/1600
@@ -439,6 +478,15 @@ const fmtSlate = (d: Date) =>
                 The stills here are watermarked previews — license the
                 full-resolution frames through Amazing Aerial.
               </p>
+              {/* Round 3 — the AA flagship moved here from the /work wall: the
+                  highlights reel now surfaces in this lane (its /work/
+                  amazing-aerial URL is unchanged). Link label reuses the
+                  tile's existing staged CTA copy ("See the highlights"). */}
+              <p>
+                <a href={`${base}/work/amazing-aerial`} class="link text-sm">
+                  See the highlights — my top shots with Amazing Aerial <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </p>
             </div>
           </div>
           <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
@@ -552,6 +600,80 @@ const fmtSlate = (d: Date) =>
       </div>
     </section>
 
+    <!-- A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3): the Knights of Mayhem
+         piece, re-laned from /work and broadened into one cohesive festival
+         story block — feature video + joust & ground-combat drone frames.
+         The attribution line composes from the WORK record (the wall's own
+         "For [org] · [what] — [engagement]" grammar); the aerial-licensing
+         credibility marker renders via LegendMark (the _AA source folders
+         carry these festival frames — the relationship's verbatim phrasing is
+         the only way it may be stated). -->
+    {
+      knights && (
+        <section class="border-t border-hairline p-8">
+          <div class="mx-auto max-w-5xl space-y-4">
+            <hr class="flight-line mb-6" aria-hidden="true" />
+            <p class="hud-label" data-reveal>{p.festival.kicker}</p>
+            <h2 class="text-2xl font-bold" data-reveal>{p.festival.heading}</h2>
+            <p class="max-w-3xl text-ink" data-reveal>{p.festival.body}</p>
+
+            {/* Feature loop — poster-first ambient figure (NOT HeroVideo: that
+                component is the fullscreen hero with a scroll cue; this is an
+                inline feature card). Poster is the permanent base layer; the
+                muted loop fades in and plays only while on-screen — the same
+                IO-gated pattern as the venture ambient loops. */}
+            {festSources.length > 0 && festPoster && (
+              <figure class="fest-feature" data-reveal>
+                <div class="fest-video">
+                  <img class="fest-poster" src={festPoster} alt="" loading="lazy" decoding="async" />
+                  <video
+                    class="fest-loop"
+                    data-fest-loop
+                    data-loop-src={festSources[0]!.src}
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                    aria-hidden="true"
+                  ></video>
+                </div>
+                <figcaption class="hud-label fest-cap">{knights.title}</figcaption>
+              </figure>
+            )}
+
+            {FESTIVAL_PHOTOS.length > 0 && (
+              <div class="fest-grid">
+                {FESTIVAL_PHOTOS.map((ph) => (
+                  <figure class="fest-photo" data-reveal data-reveal-stagger="60">
+                    <picture>
+                      <source type="image/avif" srcset={ph.media!.avif} sizes="(min-width: 1024px) 45vw, 90vw" />
+                      <source type="image/webp" srcset={ph.media!.webp} sizes="(min-width: 1024px) 45vw, 90vw" />
+                      <img
+                        src={ph.media!.src}
+                        alt={ph.alt}
+                        style="aspect-ratio:16/9;object-fit:cover"
+                        class="block w-full"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
+                  </figure>
+                ))}
+              </div>
+            )}
+
+            <div class="fest-attrib space-y-1" data-reveal>
+              <p class="fest-line">
+                For {knights.forOrg} · {knights.what}
+                {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
+              </p>
+              <LegendMark proof={{ relationshipId: "amazing-aerial" }} class="fest-aa" />
+            </div>
+          </div>
+        </section>
+      )
+    }
+
     <!-- Ambient reel — OPTIONAL / selective (§9.5 / DIRECTION §2.3). SKIPPED by
          default: the only loop candidates on disk are unverified content, so
          per DIRECTION the reel renders NOTHING (not a placeholder box) unless
@@ -627,9 +749,103 @@ const fmtSlate = (d: Date) =>
     margin-right: 0.5rem;
     color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
   }
+
+  /* ── A4b · the festival story block: feature video captioned in the mono
+     slate voice, a two-up photo band, and the wall's attribution grammar as
+     the honest sign-off. ── */
+  .fest-feature {
+    margin: 0;
+  }
+  .fest-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .fest-poster,
+  .fest-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fest-loop {
+    opacity: 0;
+    transition: opacity 500ms var(--ease-survey, ease);
+    pointer-events: none;
+  }
+  .fest-video.is-playing .fest-loop {
+    opacity: 1;
+  }
+  .fest-cap {
+    display: block;
+    margin-top: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .fest-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 1rem;
+  }
+  @media (max-width: 640px) {
+    .fest-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .fest-photo {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .fest-attrib {
+    padding-top: 0.6rem;
+  }
+  .fest-line {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .fest-attrib :global(.fest-aa) {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted, #8a9a96);
+  }
 </style>
 
 <script>
+  // ── A4b — festival feature ambient loop: plays only when motion is allowed
+  // and the figure is on-screen; the poster underneath is the permanent base
+  // layer (reduced-motion / no-JS / Save-Data / autoplay-refused all show the
+  // still). Same IO-gated pattern as the venture ambient loops. ──
+  (() => {
+    const video = document.querySelector<HTMLVideoElement>("[data-fest-loop]");
+    const box = video?.closest<HTMLElement>(".fest-video");
+    if (!box || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => box.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {}); // refusal → poster stands
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(box);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+
   // ── P19 — "jump into the painting" click transition ──────────────────────
   // Progressive enhancement over a plain link. On a primary click of a painting
   // we briefly zoom it toward the viewer, then navigate — the Super Mario 64

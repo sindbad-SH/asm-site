@@ -1,306 +1,292 @@
 ---
 /**
- * /work — "Industry Stories" (P30, 2026-07-20 — lane name DECIDED and unified
- * sitewide: the film & entertainment industry lane, matching /world and the
- * nav; the /work URL deliberately stays). The wall, simplified to the real
- * engagements after the P-work (2026-07-12) edit.
+ * /work — "Industry Stories": the film & entertainment industry lane
+ * (Round 3, 2026-07-21 — operator-directed lane redistribution).
  *
- * What changed this round (operator direction):
- *   1. FILTER BUG FIXED. The lane buttons toggled Tailwind's `.hidden` utility,
- *      but Tailwind v4 emits utilities inside `@layer utilities`, and Astro's
- *      scoped `.wtile { display:block }` is UNLAYERED — an unlayered rule beats
- *      ANY layered one regardless of specificity, so `.hidden` never took and
- *      every tile stayed visible. Fix: a scoped `.wtile.hidden { display:none }`
- *      (also unlayered, higher specificity) actually hides. The JS is unchanged.
- *   2. Knights of Mayhem RE-LANED venture → adventure (it's an adventure story).
- *      The only two VENTURE tiles are now Shelby/Pebble Beach + PitchBoulder.
- *   3. The watermarked Amazing Aerial gallery stills were REMOVED from the wall
- *      (they belong on /adventure). One AA FLAGSHIP tile replaces them, linking
- *      to the new highlights reel at /work/amazing-aerial. Its line is the AA
- *      relationship's permittedPhrasing, VERBATIM (lockedAttribution).
- *   4. The Pebble tile shows a real photo AT REST (the logo frame), not just on
- *      hover — caseMedia() now prefers a `tile.*` face over `poster.*`.
- *   5. A quiet "from the archive" band rounds out the bottom — honest one-liners
- *      (each relationship's permittedPhrasing, verbatim), dated from the source
- *      files. P-work-2 (2026-07-12): Gigs Go Green + Vybe now LINK to their own
- *      light case pages (with the "Read the story →" affordance); three early-work
- *      tiles joined the band, display-only (Nordic Daughter & Something for
- *      Tomorrow, The Art of Brazilian Living, PNUMIX — Paranormal Palace).
+ * WHAT THIS PAGE NOW IS: the lane he works in and covers — anchored by MEME
+ * (top billing: the org he's affiliated with, where the content will grow),
+ * then the SeriesFest + American Film Market coverage shelf, then a
+ * conservative close that sells presence + coverage and points the
+ * production/consulting money questions at the lanes that own them.
  *
- * Honesty: attribution-first — every tile carries its status verbatim from
- * consts (LegendMark-style phrasing for the AA + archive relationships; the
- * composed "For [org] · [what] — [engagement]" line for the rest). Filters are
- * pure enhancement: every tile visible by default (no-JS baseline).
+ * WHAT LEFT (moved, never discarded — each piece lives in its true lane):
+ *   • Shelby / Pebble Beach → /entertainment (it already carried the full
+ *     chapter-02 feature + the Jack Bell testimonial; corporate event
+ *     coverage for a private client = venture lane). Case page URL unchanged.
+ *   • PitchBoulder → /entertainment (chapter 01 — its slot now carries the
+ *     actual commercial embed, not just the hover loop). Case page unchanged.
+ *   • Knights of Mayhem → /adventure (broadened into the "Medieval Festival
+ *     in Loveland" feature block).
+ *   • The AA flagship tile → /adventure (the AA bands there now link the
+ *     highlights reel; /work/amazing-aerial URL unchanged).
+ *   • The "from the archive" band → /entertainment (early gig/event coverage
+ *     is venture-storytelling-natured, not film-industry work).
+ *
+ * HONESTY (unchanged contract): every relationship claim renders through
+ * LegendMark (verbatim permittedPhrasing); coverage tile slate/title strings
+ * are copied verbatim from their article pages; prose never upgrades a status.
+ * The MEME ambient loop mirrors /venture/meme.astro's poster-first gating.
  */
 import Base from "../../layouts/Base.astro";
-import DistortionLayer from "../../components/DistortionLayer.astro";
-import { PAGES, WORK, WORK_ARCHIVE, PILLARS, RELATIONSHIP_BY_ID, LEGEND } from "../../consts";
-import { existsSync } from "node:fs";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const p = PAGES.work;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-// Slug → grid media: responsive exports from the shared gallery folder,
-// orientation-aware widths, every file existence-gated at build so nothing 404s.
-// (Kept for any future non-case gallery item; the current wall is all cases.)
-function gridMedia(slug: string, orientation: "landscape" | "vertical" = "landscape") {
-  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
-  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
-  const widths = (orientation === "vertical" ? [800, 1120, 1600] : [800, 1400, 2200]).filter((w) =>
-    existsSync(join(g, `${slug}-${w}.avif`)),
-  );
-  return {
-    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
-    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
-    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
-  };
-}
+// build-time media gating (repo convention): a tile only renders media that
+// shipped. Coverage tiles reuse each article's own hero-900 export.
+const mediaRoot = join(process.cwd(), "public", "media");
+const media = (rel: string) => (existsSync(join(mediaRoot, ...rel.split("/"))) ? `${base}/media/${rel}` : undefined);
+const pair = (relBase: string) => {
+  const avif = media(`${relBase}.avif`);
+  const webp = media(`${relBase}.webp`);
+  return avif || webp ? { avif, webp } : undefined;
+};
+const mtimeV = (rel: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(mediaRoot, ...rel.split("/"))).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
+const bust = (relBase: string, pr: ReturnType<typeof pair>) =>
+  pr
+    ? {
+        avif: pr.avif ? pr.avif + mtimeV(`${relBase}.avif`) : undefined,
+        webp: pr.webp ? pr.webp + mtimeV(`${relBase}.webp`) : undefined,
+      }
+    : undefined;
 
-// Case-study feature media: an always-visible face (+ optional hover loop).
-// Preference order: a purpose-made `tile.*` beats the case-page `poster.*`, so
-// the index tile can show a different frame than the case hero (the Pebble tile
-// uses its logo photo; its case page keeps the clean beauty poster). Existence-
-// gated per file — a tile only ever references media that shipped.
-function caseMedia(slug: string) {
-  const dir = join(process.cwd(), "public", "media", "work", slug);
-  const posterName = ["tile", "poster", "hook-poster", "context"].find((n) =>
-    existsSync(join(dir, `${n}.avif`)),
-  );
-  if (!posterName) return undefined;
-  return {
-    avif: `${base}/media/work/${slug}/${posterName}.avif`,
-    webp: existsSync(join(dir, `${posterName}.webp`)) ? `${base}/media/work/${slug}/${posterName}.webp` : undefined,
-    loop: existsSync(join(dir, "loop.mp4")) ? `${base}/media/work/${slug}/loop.mp4` : undefined,
-  };
-}
+// MEME anchor media — the org's own logo animatic, SAME processed loop the
+// /venture/meme article and /entertainment ch.03 carry (reused, existence-
+// gated, poster-first). No new asset.
+const memeLoop = media("venture/meme/meme-loop.mp4")
+  ? {
+      mp4: `${base}/media/venture/meme/meme-loop.mp4${mtimeV("venture/meme/meme-loop.mp4")}`,
+      poster: bust("venture/meme/meme-poster", pair("venture/meme/meme-poster")),
+    }
+  : undefined;
 
-// Archive-band still: a single frame per older project (public/media/work/archive/).
-function archiveMedia(slug: string) {
-  const dir = join(process.cwd(), "public", "media", "work", "archive");
-  if (!existsSync(join(dir, `${slug}.avif`))) return undefined;
+// Coverage shelf tiles — each resolves its article's hero export.
+const tiles = p.coverage.items.map((item, i) => {
+  const slug = item.href.replace(/^\/venture\//, "");
   return {
-    avif: `${base}/media/work/archive/${slug}.avif`,
-    webp: existsSync(join(dir, `${slug}.webp`)) ? `${base}/media/work/archive/${slug}.webp` : undefined,
-  };
-}
-
-const tiles = WORK.map((item, i) => {
-  const caseArt = caseMedia(item.slug);
-  const isCase = !!item.href || !!caseArt;
-  // A licensed relationship (Amazing Aerial) may ONLY be stated in its verbatim
-  // permittedPhrasing — never a composed "For … · … — …" line.
-  const attribution =
-    item.lockedAttribution && item.relationshipId
-      ? RELATIONSHIP_BY_ID[item.relationshipId]?.permittedPhrasing
-      : undefined;
-  return {
-    item,
-    index: String(i + 1).padStart(3, "0"),
-    media: isCase ? undefined : gridMedia(item.slug, item.orientation ?? "landscape"),
-    caseArt: isCase ? caseArt : undefined,
-    attribution,
-    pillarName: PILLARS.find((pl) => pl.id === item.pillar)?.name ?? item.pillar,
+    ...item,
+    index: String(i + 1).padStart(2, "0"),
+    img: bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`)),
   };
 });
-
-const presentPillars = new Set(WORK.map((item) => item.pillar));
-const filters = [
-  { id: "all", label: "All" },
-  ...PILLARS.filter((pillar) => presentPillars.has(pillar.id)).map((pillar) => ({
-    id: pillar.id,
-    label: pillar.name,
-  })),
-] as const;
-
-// Archive band — honest one-liners rendered verbatim from consts. A tile with an
-// `href` (Gigs Go Green, Vybe) links to its own light case page and shows the
-// "Read the story →" affordance; the rest are display-only.
-const archive = WORK_ARCHIVE.map((a) => {
-  const rel = RELATIONSHIP_BY_ID[a.relationshipId];
-  return {
-    item: a,
-    media: archiveMedia(a.slug),
-    href: a.href ? `${base}${a.href}` : undefined,
-    symbol: rel ? LEGEND[rel.tier].symbol : "",
-    tierLabel: rel ? LEGEND[rel.tier].label : "",
-    phrasing: rel?.permittedPhrasing ?? "",
-  };
-});
+// The shelf states each event relationship ONCE (verbatim phrasing), not per
+// tile — SeriesFest and AFM share the same honest line.
+const shelfProofIds = [...new Set(p.coverage.items.map((i) => i.relationshipId))];
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
   <section class="mx-auto max-w-3xl space-y-4 p-8">
-    <!-- P30 lane pairing: same eyebrow grammar as /adventure and /entertainment. -->
+    <!-- Lane pairing: same eyebrow grammar as /adventure and /entertainment. -->
     <p class="hud-label" data-reveal>{p.eyebrow}</p>
     <h1 class="text-3xl font-bold" data-reveal>{p.intro.heading}</h1>
     <p class="text-ink" data-reveal>{p.intro.body}</p>
   </section>
 
-  <!-- Lane filters — inert without JS; every tile already shows. -->
-  <div class="wall-rail">
-    <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by lane" data-work-filters>
+  <!-- ═══ W2 · MEME — TOP BILLING (the anchor of the lane) ═══
+       ⚠ OPERATOR READ-APPROVAL REQUIRED — heading/body/growth copy is new
+       (staging-only until read; see consts). The status claim renders ONLY
+       via LegendMark, verbatim. -->
+  <section class="mx-auto max-w-5xl border-t border-hairline p-8">
+    <p class="hud-label mb-4" data-reveal>{p.meme.kicker}</p>
+    <div class="anchor-panel panel" data-reveal>
       {
-        filters.map((f) => (
-          <button
-            type="button"
-            class="btn-quiet border border-hairline px-3 py-1.5"
-            data-filter={f.id}
-            aria-pressed={f.id === "all" ? "true" : "false"}
-          >
-            {f.label}
-          </button>
+        memeLoop && (
+          <figure class="anchor-media" aria-hidden="true">
+            <picture>
+              {memeLoop.poster?.avif && <source type="image/avif" srcset={memeLoop.poster.avif} />}
+              <img
+                class="anchor-poster"
+                src={memeLoop.poster?.webp ?? memeLoop.poster?.avif}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <video
+              class="anchor-loop"
+              data-anchor-loop
+              data-loop-src={memeLoop.mp4}
+              muted
+              loop
+              playsinline
+              preload="none"
+            ></video>
+          </figure>
+        )
+      }
+      <div class="anchor-copy space-y-4">
+        <h2 class="text-2xl font-bold">{p.meme.heading}</h2>
+        <LegendMark proof={p.meme.proof} />
+        <p class="text-ink">{p.meme.body}</p>
+        <p class="anchor-growth">{p.meme.growth}</p>
+        <div class="flex flex-wrap items-center gap-4">
+          {
+            p.meme.ctas.map((cta, i) =>
+              i === 0 ? (
+                <a href={href(cta.href)} class="btn">
+                  {cta.label}
+                </a>
+              ) : (
+                <a href={cta.href} class="link" target="_blank" rel="noopener">
+                  {cta.label} <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              ),
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ W3 · THE COVERAGE SHELF — SeriesFest + American Film Market ═══
+       Tiles keep the wall's wtile grammar (16:9 cinematic cards, corner
+       instruments, always-visible CTA); slate/title strings verbatim from the
+       article pages. The honest status line renders ONCE per relationship
+       below the shelf heading — never upgraded per tile. -->
+  <section class="wall-rail py-8 border-t border-hairline">
+    <div class="mx-auto mb-6 max-w-3xl space-y-3">
+      <h2 class="text-2xl font-bold" data-reveal>{p.coverage.heading}</h2>
+      <p class="text-ink" data-reveal>{p.coverage.intro}</p>
+      <ul class="shelf-proofs" aria-label="How close each relationship is">
+        {
+          shelfProofIds.map((id) => (
+            <li data-reveal>
+              <LegendMark proof={{ relationshipId: id }} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="wall">
+      {
+        tiles.map((tile) => (
+          <a class="wtile wtile--link" href={`${base}${tile.href}`} data-reveal data-reveal-stagger="50">
+            <figure class="wtile-media" aria-hidden="true">
+              {tile.img ? (
+                <picture>
+                  {tile.img.avif && <source type="image/avif" srcset={tile.img.avif} />}
+                  <img src={tile.img.webp ?? tile.img.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              ) : (
+                <div class="wtile-placeholder placeholder" />
+              )}
+            </figure>
+            <span class="wtile-index">{tile.index}</span>
+            <figcaption class="wtile-meta">
+              <span class="wtile-slate">{tile.slate}</span>
+              <span class="wtile-title">{tile.title}</span>
+            </figcaption>
+            <span class="wtile-cta">
+              Read the story <span class="arrow" aria-hidden="true">→</span>
+            </span>
+          </a>
         ))
       }
     </div>
-  </div>
-
-  <section class="wall-rail py-8">
-    <div class="wall" data-distort-grid data-work-grid>
-      {
-        tiles.map(({ item, index, media, caseArt, attribution, pillarName }) => {
-          const Tag = item.href ? "a" : "div";
-          return (
-            <Tag
-              class={`wtile${item.href ? " wtile--link" : ""}`}
-              href={item.href ? `${base}${item.href}` : undefined}
-              data-pillar={item.pillar}
-              data-reveal
-              data-reveal-stagger="50"
-            >
-              <figure class="wtile-media" aria-hidden="true">
-                {media && (
-                  <picture>
-                    <source type="image/avif" srcset={media.avif} sizes="(max-width: 640px) 100vw, 48vw" />
-                    <source type="image/webp" srcset={media.webp} sizes="(max-width: 640px) 100vw, 48vw" />
-                    <img src={media.src} alt="" loading="lazy" decoding="async" />
-                  </picture>
-                )}
-                {caseArt && (
-                  <picture>
-                    <source type="image/avif" srcset={caseArt.avif} />
-                    <img
-                      src={caseArt.webp ?? caseArt.avif}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      style={item.objectPosition ? `object-position:${item.objectPosition}` : undefined}
-                    />
-                  </picture>
-                )}
-                {!media && !caseArt && <div class="wtile-placeholder placeholder" />}
-                {caseArt?.loop && (
-                  <video class="wtile-loop" data-tile-loop data-loop-src={caseArt.loop} muted loop playsinline preload="none" />
-                )}
-              </figure>
-              <span class="wtile-index">{index}</span>
-              <span class="wtile-tag">{pillarName}</span>
-              <figcaption class="wtile-meta">
-                <span class="wtile-title">{item.title}</span>
-                {attribution ? (
-                  <span class="wtile-line wtile-line--locked">{attribution}</span>
-                ) : (
-                  <span class="wtile-line">
-                    {/* P29 — an unresolved "[confirm]" engagement label (the
-                        Shelby paid/unpaid fact) no longer renders to buyers:
-                        the segment is HIDDEN until the operator resolves it in
-                        consts. The consts value stays "[confirm]" so the fact
-                        stays tracked; only the rendering is gated. */}
-                    For {item.forOrg} · {item.what}
-                    {item.engagement && item.engagement !== "[confirm]" ? ` — ${item.engagement}` : ""}
-                  </span>
-                )}
-              </figcaption>
-              {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — visible CTA labels ("Read the story",
-                  and "See the highlights" for the Amazing Aerial flagship), staging-only.
-                  Pulled OUT of the hover-hidden meta strip so the click-through is always
-                  visible (mobile has no hover), as a bordered mono button. */}
-              {item.href && (
-                <span class="wtile-cta">
-                  {item.cta ?? "Read the story"} <span class="arrow" aria-hidden="true">→</span>
-                </span>
-              )}
-            </Tag>
-          );
-        })
-      }
-    </div>
-    <p class="mx-auto mt-4 max-w-3xl text-sm text-ink-muted" data-work-empty hidden>
-      Nothing in this lane yet.
-    </p>
   </section>
 
-  <!-- ═══ FROM THE ARCHIVE — quieter band of older projects (unfiltered) ═══
-       ⚠ OPERATOR READ-APPROVAL REQUIRED — the "From the archive" kicker and each
-       tile's title + date are new visible copy (staging-only). The honest
-       one-liner under each is its relationship's permittedPhrasing, VERBATIM. -->
-  {
-    archive.length > 0 && (
-      <section class="wall-rail archive-rail">
-        <div class="archive">
-          <p class="hud-label archive-kicker">From the archive</p>
-          <div class="archive-grid">
-            {archive.map(({ item, media, href, tierLabel, phrasing }) => {
-              const Tag = href ? "a" : "div";
-              return (
-                <Tag class={`atile${href ? " atile--link" : ""}`} href={href} data-archive>
-                  <figure class="atile-media" aria-hidden="true">
-                    {media ? (
-                      <picture>
-                        <source type="image/avif" srcset={media.avif} />
-                        <img src={media.webp ?? media.avif} alt="" loading="lazy" decoding="async" />
-                      </picture>
-                    ) : (
-                      <div class="wtile-placeholder placeholder" />
-                    )}
-                  </figure>
-                  <div class="atile-meta">
-                    <span class="atile-head">
-                      <span class="atile-title">{item.title}</span>
-                      <span class="atile-date">{item.date}</span>
-                    </span>
-                    {/* P23 — the visible tier glyph (●/○) is retired site-wide;
-                        the status now reads in words only. sr-only label kept for
-                        AT (mirrors LegendMark); the phrasing is unchanged. */}
-                    <span class="atile-line">
-                      <span class="sr-only">{tierLabel}: </span>
-                      {phrasing}
-                    </span>
-                    {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — "Read the story" CTA label
-                        (staging-only). Shown only on linked tiles; the whole tile is
-                        the link, so the button is an affordance, not the tap target. */}
-                    {href && (
-                      <span class="atile-cta">
-                        Read the story <span class="arrow" aria-hidden="true">→</span>
-                      </span>
-                    )}
-                  </div>
-                </Tag>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
-  <DistortionLayer />
+  <!-- ═══ W4 · THE CLOSE — conservative industry-lane framing: presence +
+       coverage here; production/consulting money questions route to the lanes
+       that own those offers. ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy
+       (staging-only until read; see consts). -->
+  <section class="mx-auto max-w-3xl space-y-5 border-t border-hairline p-8 text-center">
+    <h2 class="text-2xl font-bold" data-reveal>{p.close.headline}</h2>
+    <p class="text-ink" data-reveal>{p.close.body}</p>
+    <a href={p.close.cta.href} class="btn" rel="noopener" data-reveal>{p.close.cta.label}</a>
+    <ul class="close-lanes" data-reveal>
+      {
+        p.close.lanes.map((lane) => (
+          <li>
+            <a href={href(lane.href)} class="link">
+              {lane.label} <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </Base>
 
 <style>
-  /* ── the wall's stage: wider than the prose rail, contained for cq units ── */
+  /* ── the shelf's stage: wider than the prose rail ── */
   .wall-rail {
     margin-inline: auto;
     width: min(100%, 1440px);
     padding-inline: 2rem;
   }
 
-  /* ── the wall. Simplified to a clean two-up card grid (the mosaic's mixed
-        form factors were for the many-tile gallery; the wall is now the real
-        engagements). Uniform 16:9 cinematic cards; one column on phones. The
-        logo/branded tile faces (Pebble, Amazing Aerial) are native 16:9, so a
-        16:9 card shows them WHOLE — no crop, every logo stays in frame. ── */
+  /* ── W2 · the MEME anchor panel: media beside copy, loop over poster ── */
+  .anchor-panel {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  @media (min-width: 860px) {
+    .anchor-panel {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+      padding: 2rem;
+    }
+  }
+  .anchor-media {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
+  }
+  .anchor-poster {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .anchor-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 500ms var(--ease-survey, ease);
+    pointer-events: none;
+  }
+  .anchor-media.is-playing .anchor-loop {
+    opacity: 1;
+  }
+  .anchor-growth {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+
+  /* ── W3 · the shelf proofs — the honest status lines, quiet mono ── */
+  .shelf-proofs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+
+  /* ── the coverage shelf: the wall's two-up 16:9 card grammar, kept ── */
   .wall {
     --wall-gap: 14px;
     display: grid;
@@ -312,8 +298,6 @@ const archive = WORK_ARCHIVE.map((a) => {
       grid-template-columns: 1fr;
     }
   }
-
-  /* ── a tile: media-first, chrome-quiet, life on hover ── */
   .wtile {
     position: relative;
     display: block;
@@ -323,62 +307,27 @@ const archive = WORK_ARCHIVE.map((a) => {
     background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
     isolation: isolate;
   }
-  /* FILTER HIDE — must be unlayered + higher specificity than `.wtile`
-     (Tailwind's `.hidden` is layered and loses to any unlayered scoped rule). */
-  .wtile.hidden {
-    display: none;
-  }
-  /* a newly-revealed tile fades + lifts in (JS adds .is-entering on show) */
-  @keyframes wtile-enter {
-    from {
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  .wtile.is-entering {
-    animation: wtile-enter 320ms var(--ease-survey, ease) both;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .wtile.is-entering {
-      animation: none;
-    }
-  }
   .wtile-media,
   .wtile-media picture,
   .wtile-media img,
-  .wtile-placeholder,
-  .wtile-loop {
+  .wtile-placeholder {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     margin: 0;
   }
-  .wtile-media img,
-  .wtile-loop {
+  .wtile-media img {
     object-fit: cover;
     transition: transform 900ms var(--ease-survey);
   }
-  .wtile-loop {
-    opacity: 0;
-    transition:
-      opacity 500ms var(--ease-survey),
-      transform 900ms var(--ease-survey);
-    pointer-events: none;
-  }
-  .wtile.is-looping .wtile-loop {
-    opacity: 1;
-  }
 
-  /* corner instruments: index + lane tag, always on, quiet */
-  .wtile-index,
-  .wtile-tag {
+  /* corner instrument: index, always on, quiet */
+  .wtile-index {
     position: absolute;
     z-index: 2;
+    top: 10px;
+    left: 12px;
     font-family: var(--font-mono);
     font-size: 0.62rem;
     letter-spacing: 0.18em;
@@ -386,18 +335,9 @@ const archive = WORK_ARCHIVE.map((a) => {
     color: rgba(238, 245, 250, 0.82);
     text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
   }
-  .wtile-index {
-    top: 10px;
-    left: 12px;
-  }
-  .wtile-tag {
-    top: 10px;
-    right: 12px;
-  }
 
-  /* the meta strip: attribution-first, verbatim strings. Hover-risen on fine
-     pointers, ALWAYS on where hover doesn't exist (touch) — honesty is not
-     a hover state. */
+  /* the meta strip: slate + title. Hover-risen on fine pointers, ALWAYS on
+     where hover doesn't exist (touch). */
   .wtile-meta {
     position: absolute;
     z-index: 2;
@@ -408,25 +348,21 @@ const archive = WORK_ARCHIVE.map((a) => {
     padding: 2rem 14px 12px;
     background: linear-gradient(to top, rgba(9, 12, 19, 0.86), rgba(9, 12, 19, 0.42) 60%, transparent);
   }
+  .wtile-slate {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(238, 245, 250, 0.66);
+  }
   .wtile-title {
     font-weight: 600;
     font-size: 0.95rem;
     color: #eef5fa;
     line-height: 1.25;
   }
-  .wtile-line {
-    font-size: 0.74rem;
-    color: rgba(238, 245, 250, 0.72);
-    line-height: 1.35;
-  }
-  .wtile-line--locked {
-    font-family: var(--font-mono);
-    letter-spacing: 0.02em;
-  }
-  /* the click-through: a bordered mono button, ALWAYS visible (not a hover
-     state — mobile has no hover), pinned bottom-right with its own backdrop so
-     it stays legible over any frame. Shared button grammar: 1px border, Space
-     Mono caps, arrow slides 6px on hover, accent hover. */
+  /* the click-through: bordered mono button, ALWAYS visible, pinned
+     bottom-right — the wall's shared button grammar. */
   .wtile-cta {
     position: absolute;
     z-index: 3;
@@ -457,9 +393,14 @@ const archive = WORK_ARCHIVE.map((a) => {
     display: inline-block;
     transition: transform var(--dur-hover, 160ms) var(--ease-swift);
   }
-  /* reserve the button's corner so the attribution line never runs under it */
+  /* reserve the button's corner so the title never runs under it */
   .wtile--link .wtile-meta {
     padding-right: 10.5rem;
+  }
+  @media (max-width: 640px) {
+    .wtile--link .wtile-meta {
+      padding-right: 9rem;
+    }
   }
   @media (hover: hover) and (pointer: fine) {
     .wtile:hover .wtile-cta,
@@ -472,18 +413,6 @@ const archive = WORK_ARCHIVE.map((a) => {
     .wtile:focus-visible .wtile-cta .arrow {
       transform: translateX(6px);
     }
-  }
-  @media (max-width: 640px) {
-    .wtile--link .wtile-meta {
-      padding-right: 9rem; /* reserve the pinned button's corner on narrow tiles */
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .wtile-cta .arrow {
-      transition: none;
-    }
-  }
-  @media (hover: hover) and (pointer: fine) {
     .wtile-meta {
       opacity: 0;
       transform: translateY(8px);
@@ -496,249 +425,58 @@ const archive = WORK_ARCHIVE.map((a) => {
       opacity: 1;
       transform: none;
     }
-    .wtile:hover .wtile-media img,
-    .wtile:hover .wtile-loop {
+    .wtile:hover .wtile-media img {
       transform: scale(1.045);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .wtile-media img,
-    .wtile-loop,
-    .wtile-meta {
+    .wtile-meta,
+    .wtile-cta .arrow {
       transition: none;
     }
-    .wtile:hover .wtile-media img,
-    .wtile:hover .wtile-loop {
+    .wtile:hover .wtile-media img {
       transform: none;
     }
   }
 
-  /* ── FROM THE ARCHIVE — a quieter, smaller band. Narrower rail than the wall,
-        muted media at rest (restored on hover), mono kicker. Older projects,
-        honestly labeled — not competing with the live work above. ── */
-  .archive-rail {
-    width: min(100%, 880px);
-    margin-top: 2.5rem;
-  }
-  .archive {
-    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
-    padding-top: 1.4rem;
-  }
-  .archive-kicker {
-    margin: 0 0 1rem;
-    letter-spacing: 0.28em;
-    color: color-mix(in srgb, var(--color-ink-muted, #8a9a96) 90%, transparent);
-  }
-  .archive-grid {
+  /* ── W4 · the close's lane pointers ── */
+  .close-lanes {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
     display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 640px) {
-    .archive-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  .atile {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 8px;
-    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
-    background: color-mix(in srgb, var(--color-surface, #171b22) 60%, transparent);
-    isolation: isolate;
-  }
-  .atile-media,
-  .atile-media picture,
-  .atile-media img,
-  .atile .wtile-placeholder {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-  }
-  .atile-media img {
-    object-fit: cover;
-    /* muted at rest — the archive is quieter than the live wall */
-    filter: saturate(0.82) brightness(0.82);
-    opacity: 0.92;
-    transition:
-      filter 400ms var(--ease-survey),
-      opacity 400ms var(--ease-survey),
-      transform 900ms var(--ease-survey);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .atile:hover .atile-media img {
-      filter: saturate(1) brightness(0.95);
-      opacity: 1;
-      transform: scale(1.03);
-    }
-  }
-  .atile-meta {
-    position: absolute;
-    z-index: 2;
-    inset-inline: 0;
-    bottom: 0;
-    display: grid;
-    gap: 3px;
-    padding: 1.6rem 12px 10px;
-    background: linear-gradient(to top, rgba(9, 12, 19, 0.9), rgba(9, 12, 19, 0.45) 62%, transparent);
-  }
-  .atile-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.6rem;
-  }
-  .atile-title {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #eef5fa;
-    line-height: 1.2;
-  }
-  .atile-date {
-    flex: none;
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.14em;
-    color: rgba(238, 245, 250, 0.6);
-  }
-  .atile-line {
-    font-size: 0.72rem;
-    line-height: 1.35;
-    color: rgba(238, 245, 250, 0.72);
-  }
-  .atile-sym {
-    color: var(--color-accent-deep, #1e8f8a);
-    margin-right: 0.3rem;
-  }
-
-  /* linked archive tiles (Gigs Go Green, Vybe) — the whole tile is the anchor,
-     so reset the link chrome and add the small "Read the story →" affordance in
-     the shared button grammar, a notch quieter than the wall's .wtile-cta. */
-  .atile--link {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-  }
-  .atile--link:focus-visible {
-    outline: 2px solid var(--color-accent, #38f8ec);
-    outline-offset: 2px;
-  }
-  .atile-cta {
-    justify-self: start;
-    margin-top: 0.55rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.7rem;
-    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-    border-radius: 3px;
-    background: color-mix(in srgb, #090c13 55%, transparent);
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #eef5fa;
-    text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
-    transition:
-      border-color var(--dur-hover, 160ms) var(--ease-swift),
-      color var(--dur-hover, 160ms) var(--ease-swift),
-      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
-  }
-  .atile-cta .arrow {
-    display: inline-block;
-    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .atile--link:hover .atile-cta,
-    .atile--link:focus-visible .atile-cta {
-      border-color: var(--color-accent, #38f8ec);
-      color: var(--color-accent, #38f8ec);
-      box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-    }
-    .atile--link:hover .atile-cta .arrow,
-    .atile--link:focus-visible .atile-cta .arrow {
-      transform: translateX(5px);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .atile-media img {
-      transition: none;
-    }
-    .atile:hover .atile-media img {
-      transform: none;
-    }
-    .atile-cta .arrow {
-      transition: none;
-    }
+    gap: 0.5rem;
+    font-size: 0.92rem;
   }
 </style>
 
 <script>
-  // Filter enhancement only — every tile starts visible (see file header).
-  // The toggle is a plain class flip: `.wtile.hidden { display:none }` is
-  // scoped + unlayered, so it actually removes the tile from the grid (Tailwind
-  // v4's layered `.hidden` alone could not). Survivors that stay get a quick
-  // fade-in for polish; no GSAP Flip reflow (its absolute-mode leave handling
-  // left hidden tiles stuck visible — correctness of the filter beats the
-  // animation, which added little for a handful of tiles).
-  const grid = document.querySelector<HTMLElement>("[data-work-grid]");
-  const bar = document.querySelector<HTMLElement>("[data-work-filters]");
-  const empty = document.querySelector<HTMLElement>("[data-work-empty]");
-  if (grid && bar) {
-    const cards = [...grid.querySelectorAll<HTMLElement>("[data-pillar]")];
-    const buttons = [...bar.querySelectorAll<HTMLButtonElement>("[data-filter]")];
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    function applyFilter(filter: string) {
-      let visibleCount = 0;
-      cards.forEach((card) => {
-        const wasHidden = card.classList.contains("hidden");
-        const show = filter === "all" || card.dataset.pillar === filter;
-        card.classList.toggle("hidden", !show);
-        // fade a newly-revealed tile in (fine pointers, motion allowed only)
-        if (show && wasHidden && !reduce) {
-          card.classList.remove("is-entering");
-          void card.offsetWidth; // restart the animation
-          card.classList.add("is-entering");
-        }
-        if (show) visibleCount++;
-      });
-      if (empty) empty.hidden = visibleCount > 0;
-    }
-
-    bar.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
-      if (!btn) return;
-      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-      applyFilter(btn.dataset.filter!);
-    });
-  }
-
-  // Hover-life: case tiles with a loop export play it on hover. The video
-  // mounts on FIRST pointerenter (preload="none" keeps the wall's initial
-  // load still-only), fades in over its poster, pauses on leave. Fine
-  // pointers only; never under reduced motion or Save-Data.
+  // MEME anchor ambient loop: plays only when motion is allowed and the panel
+  // is on-screen; the poster underneath is the permanent base layer (reduced-
+  // motion / no-JS / Save-Data / autoplay-refused all show the still). Mirrors
+  // /venture/meme.astro and /entertainment ch.03 — lazy src, IO-gated.
   (() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const video = document.querySelector<HTMLVideoElement>("[data-anchor-loop]");
+    const fig = video?.closest<HTMLElement>(".anchor-media");
+    if (!fig || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
-    if (reduce || !fine || conn?.saveData) return;
-    document.querySelectorAll<HTMLVideoElement>("[data-tile-loop]").forEach((video) => {
-      const tile = video.closest<HTMLElement>(".wtile");
-      if (!tile) return;
-      tile.addEventListener("pointerenter", () => {
-        if (!video.src) video.src = video.dataset.loopSrc!;
-        video.play().catch(() => {}); // autoplay refusal → the poster stands
-        tile.classList.add("is-looping");
-      });
-      tile.addEventListener("pointerleave", () => {
-        tile.classList.remove("is-looping");
-        if (!video.paused) video.pause();
-      });
-    });
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => fig.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {}); // refusal → poster stands
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(fig);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
   })();
 </script>
