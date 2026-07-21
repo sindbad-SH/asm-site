@@ -73,10 +73,14 @@ const collage = ["stage-team", "venue-wide", "workshop-slide", "boardroom", "rou
 // ── THE ARTICLE (all new sentences — see the approval note above) ──
 const ARTICLE = {
   slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
-  title: "Four startup workshops, on camera.",
+  // ROUND 5 (2026-07-21, operator NO-COUNT rule): a growing series is never
+  // numerized — "Four startup workshops" -> "A startup workshop series". The
+  // dated session index below stays (a fixed factual list, not a running
+  // total). ⚠ OPERATOR READ-APPROVAL REQUIRED — revised strings (staging-only).
+  title: "A startup workshop series, on camera.",
   paragraphs: [
     "KO Law is a business-law firm in Boulder and Denver, and part of what they do is teach — a startup workshop series that walks founders through the fundamentals of building a company.",
-    "Across 2026 we covered four of those sessions, on video and in photographs — from an early boardroom to a full room under stage lights.",
+    "We cover the series as it runs, on video and in photographs — from an early boardroom to a full room under stage lights.",
     "It's light, honest coverage: we show up, catch the session as it happens, and cut it into something that lasts.",
   ],
 };
@@ -122,7 +126,7 @@ const CTAS = [
 
 <Base
   title="KO Law startup workshops — a venture story"
-  description="Light, honest coverage of KO Law's 2026 startup workshop series — four sessions, on video and in photographs, from the boardroom to the stage."
+  description="Light, honest coverage of KO Law's startup workshop series — on video and in photographs, from the boardroom to the stage."
 >
   <main class="ko-story">
     <article class="ko-inner">
@@ -150,7 +154,7 @@ const CTAS = [
 
       {ARTICLE.paragraphs.map((para) => <p class="ko-para" data-reveal>{para}</p>)}
 
-      <ul class="ko-sessions" data-reveal aria-label="The four 2026 sessions we covered">
+      <ul class="ko-sessions" data-reveal aria-label="The sessions covered">
         {
           SESSIONS.map((s) => (
             <li class="ko-session">

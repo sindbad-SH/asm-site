@@ -1,0 +1,291 @@
+---
+/**
+ * /work/seriesfest — the SERIESFEST subpage (Round 5, 2026-07-21,
+ * operator-directed block→subpage pattern).
+ *
+ * The Industry Stories lane page (/work) now carries ONE compelling SeriesFest
+ * block; this page is the depth behind it. Three sections, each anchored to a
+ * published dispatch article (URLs unchanged — this page links OUT to them,
+ * never replaces them):
+ *   01 · The festival        → /venture/seriesfest-2026 + /venture/seriesfest-2025
+ *   02 · Fashion in Focus    → /venture/seriesfest-2026-fashion-in-focus
+ *   03 · Soul Power premiere → /venture/seriesfest-2026-soul-power
+ *
+ * ⚠ OPERATOR-CONFIRM (Round 5): the directive asked for "the solar-powered-
+ * event coverage angle" — NO solar-powered event exists anywhere in the
+ * SeriesFest materials (repo, articles, LinkedIn dispatches), and "Soul Power"
+ * is the near-homophone that DOES exist (the ABA premiere article + its full
+ * photo set). Built as the Soul Power premiere section; one word from the
+ * operator confirms or corrects the read.
+ *
+ * VOICE + RULES: company voice, TIMELESS (no "so far", nothing that ages) and
+ * NO-COUNT (editions referred to plurally — never "two editions", no year
+ * tallies; the dated dispatch slates are fixed event facts, not running
+ * totals). HONESTY: the only status claim is the SeriesFest LegendMark
+ * (tier `attended`), rendered verbatim up top — attendance ≠ affiliation, and
+ * no prose below upgrades it. Facts in the section bodies are drawn from the
+ * published dispatch articles only.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every prose string on this page is new
+ * visible copy (staging-only until read).
+ *
+ * Media: reuses the dispatch articles' EXISTING exports under
+ * public/media/venture/<story>/ — no new assets, existence-gated per frame.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const mediaRoot = join(process.cwd(), "public", "media", "venture");
+
+// Resolve a dispatch export's two-width avif+webp set (existence-gated).
+function shot(story: string, slug: string, alt: string) {
+  if (!existsSync(join(mediaRoot, story, `${slug}-900.webp`))) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/venture/${story}/${slug}-${w}.${ext}`;
+  return {
+    alt,
+    avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
+    webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
+    src: url(900, "webp"),
+  };
+}
+
+const hero = shot(
+  "seriesfest-2026",
+  "hero",
+  "SeriesFest Soirée main stage — two lit screens carry the branding over the speakers.",
+);
+
+// The three sections. Dispatch slates + titles are VERBATIM from the article
+// pages (fixed event facts); bodies are new company-voice copy drawn from
+// those articles' own published content.
+const SECTIONS = [
+  {
+    no: "01",
+    kicker: "The festival",
+    heading: "The main program",
+    body: "Screenings and first looks at the Sie FilmCenter, writers' panels, the Soirée gala, and the business of the craft — covered on the ground, edition after edition. Each edition gets its own dispatch: the rooms, the panels, and what the industry said out loud.",
+    photos: [
+      shot("seriesfest-2026", "soiree-room", "The Soirée room: the lit stage with the seated audience in front."),
+      shot("seriesfest-2026", "press-scrum", "The SeriesFest step-and-repeat wall with photographers and press gathered in front."),
+      shot("seriesfest-2025", "panel-stage", "A festival panel on stage before the SeriesFest backdrop."),
+    ],
+    dispatches: [
+      { slate: "SeriesFest · May 6–10, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story", href: "/venture/seriesfest-2026" },
+      { slate: "SeriesFest · Apr 30 – May 4, 2025 · Denver, CO", title: "SeriesFest 2025 — a venture story", href: "/venture/seriesfest-2025" },
+    ],
+  },
+  {
+    no: "02",
+    kicker: "The fashion focus",
+    heading: "Fashion in Focus",
+    body: "SeriesFest's fashion event reads costume design as narrative infrastructure — the character forged before a line of dialogue is spoken. An evening at The Cable Center in Denver: a runway show and costume installations, and an honoring of Emmy-winning costume designer Molly Rogers.",
+    photos: [
+      shot("seriesfest-2026-fashion-in-focus", "hero", "The SeriesFest-branded step-and-repeat backdrop at the Fashion in Focus event."),
+      shot("seriesfest-2026-fashion-in-focus", "garment-display", "A garment on display at the fashion event."),
+      shot("seriesfest-2026-fashion-in-focus", "panel-stage", "The panel on the Fashion in Focus stage."),
+    ],
+    dispatches: [
+      { slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story", href: "/venture/seriesfest-2026-fashion-in-focus" },
+    ],
+  },
+  {
+    no: "03",
+    kicker: "The premieres",
+    heading: "Soul Power, premiered",
+    body: "The special screenings around the season, covered from the house. At the Sie FilmCenter: the premiere of Soul Power — The Legend of the American Basketball Association, with the series' executive producers and ABA legends in the room, tracing how the league's entertainment instinct forced the NBA to evolve.",
+    photos: [
+      shot("seriesfest-2026-soul-power", "hero", "The Soul Power premiere at the Sie FilmCenter."),
+      shot("seriesfest-2026-soul-power", "screening", "The screening under way, the title on the big screen."),
+      shot("seriesfest-2026-soul-power", "backdrop-arrivals", "Arrivals at the SeriesFest-branded backdrop."),
+    ],
+    dispatches: [
+      { slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story", href: "/venture/seriesfest-2026-soul-power" },
+    ],
+  },
+].map((s) => ({ ...s, photos: s.photos.filter((ph): ph is NonNullable<typeof ph> => !!ph) }));
+
+const meta = {
+  title: "SeriesFest — Industry Stories | Coverage in Depth",
+  description:
+    "Adventure Storytelling Media's SeriesFest coverage in depth — the Denver festival's main program, the Fashion in Focus event, and the premieres around the season, each with its published dispatch.",
+};
+---
+
+<Base title={meta.title} description={meta.description}>
+  <main class="sfp">
+    <section class="sfp-head mx-auto max-w-3xl space-y-4 p-8">
+      <p><a href={`${base}/work`} class="link"><span class="arrow" aria-hidden="true">←</span> Industry Stories</a></p>
+      <p class="hud-label" data-reveal>SeriesFest · Denver, Colorado</p>
+      <h1 class="text-3xl font-bold" data-reveal>SeriesFest, in depth</h1>
+      <p class="text-ink" data-reveal>
+        Denver's episodic-storytelling festival — creators, audiences, and
+        industry sharing the same air. Adventure Storytelling Media covers it
+        edition after edition; the dispatches below are the record.
+      </p>
+      <!-- the honest framing, up top: tier `attended`, VERBATIM via LegendMark
+           — never paraphrased, never upgraded. -->
+      <div data-reveal>
+        <LegendMark proof={{ relationshipId: "seriesfest" }} />
+      </div>
+    </section>
+
+    {
+      hero && (
+        <section class="mx-auto max-w-5xl px-8 pb-4">
+          <figure class="sfp-hero" data-reveal>
+            <picture>
+              <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 64rem" />
+              <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 64rem" />
+              <img src={hero.src} alt={hero.alt} loading="eager" decoding="async" />
+            </picture>
+          </figure>
+        </section>
+      )
+    }
+
+    {
+      SECTIONS.map((s) => (
+        <section class="mx-auto max-w-5xl space-y-4 border-t border-hairline p-8">
+          <p class="hud-label" data-reveal>
+            {s.no} · {s.kicker}
+          </p>
+          <h2 class="text-2xl font-bold" data-reveal>{s.heading}</h2>
+          <p class="max-w-3xl text-ink" data-reveal>{s.body}</p>
+          {s.photos.length > 0 && (
+            <div class="sfp-grid" data-cols={s.photos.length}>
+              {s.photos.map((ph) => (
+                <figure class="sfp-photo" data-reveal data-reveal-stagger="60">
+                  <picture>
+                    <source type="image/avif" srcset={ph.avif} sizes="(min-width: 1024px) 30vw, 90vw" />
+                    <source type="image/webp" srcset={ph.webp} sizes="(min-width: 1024px) 30vw, 90vw" />
+                    <img src={ph.src} alt={ph.alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              ))}
+            </div>
+          )}
+          <ul class="sfp-dispatches">
+            {s.dispatches.map((d) => (
+              <li data-reveal>
+                <a class="sfp-dispatch" href={`${base}${d.href}`}>
+                  <span class="sfp-slate hud-label">{d.slate}</span>
+                  <span class="sfp-title">{d.title}</span>
+                  <span class="sfp-cta link" aria-hidden="true">
+                    Read the dispatch <span class="arrow">→</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+      <p><a href={`${base}/work`} class="link"><span class="arrow" aria-hidden="true">←</span> Back to Industry Stories</a></p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .sfp-hero {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .sfp-hero img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .sfp-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .sfp-grid[data-cols="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 700px) {
+    .sfp-grid,
+    .sfp-grid[data-cols="2"] {
+      grid-template-columns: 1fr;
+    }
+  }
+  .sfp-photo {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .sfp-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .sfp-photo:hover img {
+    transform: scale(1.03);
+  }
+
+  .sfp-dispatches {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .sfp-dispatch {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, #ffffff 2%, transparent);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift, ease),
+      background var(--dur-hover, 160ms) var(--ease-swift, ease);
+  }
+  .sfp-dispatch:hover,
+  .sfp-dispatch:focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 45%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .sfp-slate {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .sfp-title {
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: #eef5fa;
+  }
+  .sfp-cta {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-top: 0.15rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sfp-photo img,
+    .sfp-dispatch {
+      transition: none;
+    }
+    .sfp-photo:hover img {
+      transform: none;
+    }
+  }
+</style>

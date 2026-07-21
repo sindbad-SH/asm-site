@@ -9,18 +9,18 @@
  * wrapped in its own <section> so the globe's scroll-handoff retargets to
  * THIS section automatically (GlobeHero.astro targets `root.closest("section")`).
  *
- * Photo-first (§9.5): the gallery is the page's main surface — widened,
- * ready to grow to 20–40 real selects (S2). The ambient reel is now
- * optional/selective and sits below the gallery, not as the page opener.
+ * ROUND 5 (2026-07-21, operator consolidation): final order is
+ * hero/sales → THE TERRITORY (count-free, coverage places added) → THE FIELD
+ * teaser (the gallery wall moved to /adventure/field) → the Medieval Festival
+ * spread → FROM THE ARCHIVE (the lane's micro local stories) → close.
  */
 import Base from "../layouts/Base.astro";
 import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
-import HeroVideo from "../components/HeroVideo.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES, FORGE_SERVICES, RELATIONSHIP_BY_ID, SITE, WORK, WORK_ARCHIVE } from "../consts";
-import { TERRITORY, TERRITORY_TOTALS } from "../data/territory";
+import { PAGES, RELATIONSHIP_BY_ID, SITE, WORK, WORK_ARCHIVE, FORGE_SERVICES } from "../consts";
+import { TERRITORY } from "../data/territory";
 import { getCollection } from "astro:content";
 
 import { existsSync } from "node:fs";
@@ -66,6 +66,11 @@ const TERRITORY_CLUSTERS: Record<
   // so the two coincident clusters stack cleanly instead of colliding.
   Colorado: { lat: 40.0, lon: -105.3, labelDir: "up-right", sprayR: 6 }, // Boulder (N of NM → up)
   "New Mexico": { lat: 34.5, lon: -106.1, labelDir: "down-right", sprayR: 2 }, // Taos (S → down)
+  // Round 5 — California joins as a coverage territory (⚠ OPERATOR-CONFIRM,
+  // see territory.ts): LA sits well west of the CO/NM pair, so its callout
+  // opens down-LEFT — away from New Mexico's down-right label — and still
+  // lands ~10% inside the frame edge.
+  California: { lat: 34.05, lon: -118.24, labelDir: "down-left", sprayR: 2 }, // Los Angeles
   // The Alp pair coincides at world zoom, so their up/down callouts share an x —
   // a tighter spray keeps the two clouds from merging (they separate vertically)
   // and keeps Switzerland's dense 24-dot cloud inside the frame.
@@ -154,22 +159,15 @@ const TERRITORY_ARCS = [
   terrArc("Colorado", "Switzerland", 0, -13), // transatlantic bridge (bows north)
   terrArc("Switzerland", "Italy", 3.5, 7), // the short Alps hop (near-coincident pair)
   terrArc("Colorado", "New Mexico", -3, 0), // the home column (bows west)
+  terrArc("Colorado", "California", 0, -5), // the coast hop (Round 5 — bows north)
 ];
 const AA_HREF = p.aaFunnel.cta.href; // same operator portfolio URL as the gallery (P12.4b)
-const outingWord = (n: number) => (n === 1 ? "OUTING" : "OUTINGS");
+// Round 5 NO-COUNT rework: the kicker lists the territory NAMES (self-growing,
+// never a number) instead of the retired outings/territories counts.
+const TERRITORY_KICKER = territory.map((c) => c.label).join(" · ");
 
-// Ambient reel: SKIPPED by default (DIRECTION §2.3) — the on-disk loop
-// candidates were unverified content. The section renders only if a real reel
-// is dropped at public/media/adventure/reel-loop.mp4 (+ poster). No sources =
-// no section (not a placeholder box). Checked at build time (frontmatter runs
-// server-side); anchored to process.cwd() like Tableaux.astro.
-const reelDir = join(process.cwd(), "public", "media", "adventure");
-const reelHasLoop = existsSync(join(reelDir, "reel-loop.mp4"));
-const reelHasPoster = existsSync(join(reelDir, "reel-poster.avif"));
-const reelSources = reelHasLoop
-  ? [{ src: `${base}/media/adventure/reel-loop.mp4`, type: "video/mp4" }]
-  : [];
-const reelPoster = reelHasPoster ? `${base}/media/adventure/reel-poster.avif` : undefined;
+// Ambient reel + the floating gallery wall: MOVED to /adventure/field
+// (Round 5 block→subpage pattern). This page keeps a teaser only.
 
 /* ─────────────────────────────────────────────────────────────────────────
  * A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3, 2026-07-21).
@@ -211,23 +209,22 @@ const FESTIVAL_PHOTOS = [
 ].map((ph) => ({ ...ph, media: festPhoto(ph.slug) })).filter((ph) => ph.media);
 
 /* ─────────────────────────────────────────────────────────────────────────
- * A4c — FROM THE ARCHIVE (Round 4, 2026-07-21, operator-directed).
+ * A4c — FROM THE ARCHIVE (Round 4 band, Round 5 roster).
  *
- * Two tiles moved here off /entertainment's archive band: Nordic Daughter &
- * Something for Tomorrow, and The Art of Brazilian Living. Both read as
- * travel/coverage pieces ("was around here, filmed this") rather than
- * commissioned venture work, so they belong to this lane's record.
+ * The micro local stories not worth a full spread, kept modestly at the
+ * bottom of the lane. Round 5 (operator-directed): the band now holds The Art
+ * of Brazilian Living, Vybe (MOVED here from /entertainment — operator
+ * confirmed), Nordic Daughter, and Something for Tomorrow (the old combined
+ * diptych tile SPLIT in two; SfT has no exported tile media yet —
+ * ⚠ OPERATOR-CONFIRM, see consts).
  *
  * The lane assignment lives on the DATA (WORK_ARCHIVE[].lane) — this page
  * filters rather than hardcoding slugs, so the two pages can never drift apart
- * or double-render the same tile.
- *
- * Presented MODESTLY on purpose (operator: padding until stronger work
- * replaces them): a small tile grid below the gallery and the festival
- * feature, muted media at rest, no CTA, no inflated framing. The one honest
- * line per tile is the relationship's permittedPhrasing rendered VERBATIM —
- * exactly the contract the /entertainment band used. Media paths are UNCHANGED
- * (public/media/work/archive/<slug>.*) so nothing had to be re-exported.
+ * or double-render the same tile. Tiles are display-only EXCEPT where a light
+ * case page exists (item.href — Vybe): those render the "Read the story →"
+ * affordance, links only where content exists. The one honest line per tile is
+ * the relationship's permittedPhrasing rendered VERBATIM. Media paths are
+ * UNCHANGED (public/media/work/archive/<slug>.*).
  * ───────────────────────────────────────────────────────────────────────── */
 const archiveMediaRoot = join(process.cwd(), "public", "media");
 const archivePair = (relBase: string) => {
@@ -239,66 +236,42 @@ const archivePair = (relBase: string) => {
 const archive = WORK_ARCHIVE.filter((a) => a.lane === "adventure").map((a) => ({
   item: a,
   media: archivePair(`work/archive/${a.slug}`),
+  href: a.href ? `${base}${a.href}` : undefined,
   phrasing: RELATIONSHIP_BY_ID[a.relationshipId]?.permittedPhrasing ?? "",
 }));
 
-// Slug → gallery media map. Round 2 (R3): widths are orientation-aware —
-// landscape cards export 800/1400/2200 (3:2), vertical cards 800/1120/1600
-// (4:5). A responsive <picture> renders only when the exported set exists.
-const GALLERY_WIDTHS = {
+/* ─────────────────────────────────────────────────────────────────────────
+ * A3b — THE FIELD TEASER (Round 5, 2026-07-21, operator-directed).
+ *
+ * The floating-portraits gallery wall (P19) MOVED to /adventure/field; this
+ * page keeps ONE inviting block — copy from consts (⚠ flagged) plus a small
+ * strip of the wall's three lead frames as the visual invitation. Same data
+ * source (the fieldNotes collection), so the teaser can never drift from the
+ * wall it points at.
+ * ───────────────────────────────────────────────────────────────────────── */
+const TEASER_WIDTHS = {
   landscape: [800, 1400, 2200],
   vertical: [800, 1120, 1600],
 } as const;
 function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
   const g = join(process.cwd(), "public", "media", "adventure", "gallery");
   if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
-  const widths = GALLERY_WIDTHS[orientation];
+  const widths = TEASER_WIDTHS[orientation];
   return {
     avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
     webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
     src: `${base}/media/adventure/gallery/${slug}-800.webp`,
   };
 }
-
-/* ─────────────────────────────────────────────────────────────────────────
- * P12.6 — MICRO TRAVEL STORIES (data-driven).
- *
- * The gallery is now an EVER-EXPANDING set of micro-stories, one markdown file
- * per place under src/content/field-notes/ (the fieldNotes collection). A note
- * becomes a story here when it carries `photos`; the operator adds a place by
- * dropping a file. Same files power /field-notes (the chronological log), so
- * the collection is no longer empty (the build warning is gone).
- *
- * TILE BUDGET (distort-engine.ts ≤20 live-measure rule): each story renders ONE
- * distort tile — its LEAD photo, via Card's .map-inset. Secondary photos (if a
- * story ever ships 2–3) render as plain <picture> OUTSIDE any .map-inset, so
- * they never count as tiles. 10 stories = 10 tiles, well under the 20 that keep
- * the click-to-expand field note lag-free. If this ever nears 20, split the
- * wall into per-territory [data-distort-grid] blocks.
- * ───────────────────────────────────────────────────────────────────────── */
-const WALL_ORDER = [
-  "matterhorn-zermatt",
-  "bellagio",
-  "flatirons-chautauqua",
-  "crans-montana",
-  "castel-toblino",
-  "eldorado-springs",
-  "lac-de-tseuzier",
-  "varenna-lake-como",
-  "lugano",
-  "gornergrat-glacier",
-];
-const stories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
-  .filter((n) => n.data.photos && n.data.photos.length > 0)
-  .sort((a, b) => {
-    const ai = WALL_ORDER.indexOf(a.id);
-    const bi = WALL_ORDER.indexOf(b.id);
-    return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
-  });
-
-// Mono survey slate: YYYY.MM.DD from UTC parts (matches /field-notes).
-const fmtSlate = (d: Date) =>
-  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
+const TEASER_ORDER = ["matterhorn-zermatt", "bellagio", "flatirons-chautauqua"];
+const teaserStories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => TEASER_ORDER.includes(n.id) && n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => TEASER_ORDER.indexOf(a.id) - TEASER_ORDER.indexOf(b.id))
+  .map((story) => {
+    const lead = story.data.photos![0]!;
+    return { story, lead, media: galleryMedia(lead.slug, lead.orientation) };
+  })
+  .filter((t) => t.media);
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -375,16 +348,16 @@ const fmtSlate = (d: Date) =>
           aria-hidden. */}
       <figure class="terr" data-reveal aria-labelledby="terr-kicker">
         <figcaption id="terr-kicker" class="terr-kicker hud-label">
-          {/* P17 fix — the hardcoded "3 COUNTRIES" undercounted the map's own
-              four nodes (Colorado, New Mexico, Switzerland, Italy).
-              "TERRITORIES" is the section's own grammar AND stays honest
-              (CO + NM share a country); the count now comes from the data so
-              it can't drift again. */}
-          {TERRITORY_TOTALS.outings} OUTINGS · {TERRITORY_TOTALS.territories} TERRITORIES
+          {/* Round 5 NO-COUNT rework — the kicker names the territories
+              (derived from the data, self-growing) instead of the retired
+              outings/territories counts: a growing body of work is never
+              numerized. */}
+          {TERRITORY_KICKER}
         </figcaption>
         <p class="sr-only">
-          Where this work was shot, by number of outings. Expand a country to
-          list its locations; each links out to the licensing portfolio.
+          Where this work has been shot. Expand a territory to list its
+          locations; aerial-archive locations link out to the licensing
+          portfolio, coverage locations link to their story.
         </p>
         <div class="terr-field">
           {/* The shared coordinate frame: a 2:1 wrapper that reproduces the map
@@ -420,13 +393,11 @@ const fmtSlate = (d: Date) =>
                       class="terr-country"
                       aria-expanded="true"
                       aria-controls={`terr-locs-${c.slug}`}
-                      aria-label={`${c.country}, ${c.outings} outings across ${c.locations.length} locations`}
+                      aria-label={`${c.country} — expand to list its locations`}
                     >
                       <span class="terr-dot" aria-hidden="true" />
                       <span class="terr-leader" aria-hidden="true" />
-                      <span class="terr-country-label">
-                        {c.label} · {c.outings} {outingWord(c.outings)}
-                      </span>
+                      <span class="terr-country-label">{c.label}</span>
                     </button>
                   <ul class="terr-locations" id={`terr-locs-${c.slug}`}>
                     {c.locations.map((loc, i) => (
@@ -440,26 +411,31 @@ const fmtSlate = (d: Date) =>
                           class="terr-loc-node"
                           aria-expanded="false"
                           aria-controls={`terr-chip-${loc.slug}`}
-                          aria-label={`${loc.name}, ${loc.outings} ${loc.outings === 1 ? "outing" : "outings"}`}
+                          aria-label={loc.name}
                         >
                           <span class="terr-loc-dot" aria-hidden="true" />
-                          <span class="terr-loc-label" aria-hidden="true">
-                            {loc.name} · {loc.outings}
-                          </span>
+                          <span class="terr-loc-label" aria-hidden="true">{loc.name}</span>
                         </button>
+                        {/* Round 5 — count-free chip: name + the link that
+                            proves the place. Aerial-archive dots keep the
+                            licensing pointer; coverage dots link to their
+                            story page (see territory.ts, ⚠-flagged). */}
                         <span class="terr-chip" id={`terr-chip-${loc.slug}`} role="group">
                           <span class="terr-chip-name">{loc.name}</span>
-                          <span class="terr-chip-count hud-label">
-                            {loc.outings} {outingWord(loc.outings)}
-                          </span>
-                          <a
-                            class="terr-chip-link link"
-                            href={AA_HREF}
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            License this work <span class="arrow" aria-hidden="true">→</span>
-                          </a>
+                          {loc.kind === "coverage" && loc.href ? (
+                            <a class="terr-chip-link link" href={`${base}${loc.href}`}>
+                              {loc.linkLabel ?? "See the story"} <span class="arrow" aria-hidden="true">→</span>
+                            </a>
+                          ) : (
+                            <a
+                              class="terr-chip-link link"
+                              href={AA_HREF}
+                              target="_blank"
+                              rel="noopener"
+                            >
+                              License this work <span class="arrow" aria-hidden="true">→</span>
+                            </a>
+                          )}
                         </span>
                       </li>
                     ))}
@@ -473,163 +449,46 @@ const fmtSlate = (d: Date) =>
       </figure>
     </section>
 
-    <!-- A3 — Licensed vs Personal nesting -->
-    <section class="mx-auto max-w-3xl space-y-8 border-t border-hairline p-8">
-      <div class="panel space-y-2 p-5" data-reveal>
-        <h2 class="text-xl font-bold">{p.licensed.heading}</h2>
-        <p class="text-ink">{p.licensed.body}</p>
-        <LegendMark proof={p.licensed.proof} />
-      </div>
-      <div class="space-y-2" data-reveal>
-        <h2 class="text-xl font-bold">{p.personal.heading}</h2>
-        <p class="text-ink">{p.personal.body}</p>
-      </div>
-    </section>
-
-    {/* AA MID-BAND (P12.6) — the licensing weave appears mid-scroll, not only in
-        the bottom funnel. Logo + locked-phrasing line + portfolio button.
-        ⚠ OPERATOR READ-APPROVAL REQUIRED — one new sentence (staging-only until
-        read): the aa-band-line below. The kicker + button label are existing
-        approved copy. */}
-    <section class="border-t border-hairline p-8">
-      <div class="mx-auto max-w-5xl">
-        <div class="panel aa-band flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
-          <div class="flex items-center gap-4">
-            <img
-              src={`${base}/media/adventure/aa-logo.png`}
-              alt="Amazing Aerial Agency"
-              class="aa-funnel-logo shrink-0"
-              width="480"
-              height="158"
-              loading="lazy"
-              decoding="async"
-            />
-            <div class="space-y-1">
-              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
-              <p class="aa-band-line max-w-2xl text-sm text-ink">
-                The stills here are watermarked previews — license the
-                full-resolution frames through Amazing Aerial.
-              </p>
-              {/* Round 3 — the AA flagship moved here from the /work wall: the
-                  highlights reel now surfaces in this lane (its /work/
-                  amazing-aerial URL is unchanged). Link label reuses the
-                  tile's existing staged CTA copy ("See the highlights"). */}
-              <p>
-                <a href={`${base}/work/amazing-aerial`} class="link text-sm">
-                  See the highlights — our top shots with Amazing Aerial <span class="arrow" aria-hidden="true">→</span>
-                </a>
-              </p>
-            </div>
-          </div>
-          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
-            {p.aaFunnel.cta.label}
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- A4 — THE FLOATING GALLERY WALL (P19), the page's MAIN SURFACE
-         (§9.5 photo-first). Each place is a framed painting hung on the void:
-         a slim gallery frame + mat + drop shadow, drifting gently (CSS float,
-         desynced per painting; static under reduced motion / no-JS). The WHOLE
-         painting is a link into its spotlight — the "Super Mario 64 painting"
-         jump into the world. Data-driven from the fieldNotes collection; the
-         operator grows the wall by adding a markdown file.
-
-         The in-page field-note prose is GONE from /adventure (it now lives on
-         the spotlight pages). The license chip moved to the spotlight too, so
-         the wall reads as a clean salon hang, not a shop shelf — the mid-page
-         AA band + bottom funnel still carry the licensing weave.
-
-         Tile budget: each painting's frame is ONE .map-inset distort tile → 10
-         tiles, under the engine's ≤20 live-measure cap (distort-engine.ts). -->
-    <section class="border-t border-hairline p-8">
+    <!-- A3b — THE FIELD teaser (Round 5): the floating-portraits gallery
+         moved to /adventure/field (with the licensed/personal nesting and the
+         AA licensing weave); this page keeps ONE inviting block — travel
+         stories from the field, with the wall's three lead frames as the
+         invitation. Copy from consts (⚠ flagged, staging-only until read). -->
+    <section class="mx-auto max-w-5xl space-y-4 border-t border-hairline p-8">
       <hr class="flight-line mb-6" aria-hidden="true" />
-      <h2 class="mx-auto mb-6 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
-      <div class="painting-wall mx-auto max-w-5xl" data-distort-grid>
-        {
-          stories.map((story) => {
-            const photos = story.data.photos ?? [];
-            const lead = photos[0]!;
-            const isVertical = lead.orientation === "vertical";
-            const media = galleryMedia(lead.slug, lead.orientation);
-            const slate = `${fmtSlate(story.data.date)} · ${story.data.location}`;
-            const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw";
-            return (
-              <a
-                class={isVertical ? "painting painting--tall" : "painting"}
-                href={`${base}/field-notes/${story.id}`}
-                data-painting
-                data-reveal
-                aria-label={`${story.data.title} — ${story.data.location}`}
-              >
-                {/* Inner carries the frame + shadow + ambient float, so the
-                    reveal-entrance transform on the anchor and the float never
-                    fight over `transform`. */}
-                <div class="painting-inner">
-                  <figure class="painting-window map-inset">
-                    {media && (
-                      <picture>
-                        <source type="image/avif" srcset={media.avif} sizes={sizes} />
-                        <source type="image/webp" srcset={media.webp} sizes={sizes} />
-                        <img
-                          src={media.src}
-                          alt={lead.alt}
-                          class="block w-full"
-                          style={`aspect-ratio:${isVertical ? "4/5" : "3/2"};object-fit:cover`}
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </picture>
-                    )}
-                    {/* Hover affordance — the "jump into the painting" cue (fine
-                        pointers). ⚠ OPERATOR READ-APPROVAL REQUIRED — "Enter" is
-                        new label copy (staging-only until read). Styled mono
-                        directly (NOT .hud-label) so the distort engine's
-                        is-distorted label-lift can't override its centering. */}
-                    <span class="painting-enter" aria-hidden="true">
-                      Enter <span class="arrow">→</span>
-                    </span>
-                  </figure>
-                  <div class="painting-plate">
-                    <span class="painting-slate hud-label">{slate}</span>
-                    <span class="painting-title">{story.data.title}</span>
-                    {/* Persistent affordance for touch (no hover-only cues). */}
-                    <span class="painting-cta hud-label" aria-hidden="true">
-                      Enter <span class="arrow">→</span>
-                    </span>
-                  </div>
-                </div>
-              </a>
-            );
-          })
-        }
-      </div>
-      <!-- AA funnel outro (operator exclusivity handling): the gallery is a
-           teaser referral to the agency that licenses the full collection. -->
-      <div class="mx-auto mt-8 max-w-5xl">
-        <div class="panel aa-funnel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
-          <div class="flex items-center gap-4">
-            <img
-              src={`${base}/media/adventure/aa-logo.png`}
-              alt="Amazing Aerial Agency"
-              class="aa-funnel-logo shrink-0"
-              width="480"
-              height="158"
-              loading="lazy"
-              decoding="async"
-            />
-            <div class="space-y-1">
-              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
-              <h3 class="text-lg font-bold">{p.aaFunnel.heading}</h3>
-              <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
+      <p class="hud-label" data-reveal>{p.fieldTeaser.kicker}</p>
+      <h2 class="text-2xl font-bold" data-reveal>{p.fieldTeaser.heading}</h2>
+      <p class="max-w-3xl text-ink" data-reveal>{p.fieldTeaser.body}</p>
+      {
+        teaserStories.length > 0 && (
+          <a
+            class="field-teaser panel"
+            href={`${base}${p.fieldTeaser.cta.href}`}
+            aria-label={`${p.fieldTeaser.heading} — ${p.fieldTeaser.cta.label}`}
+            data-reveal
+          >
+            <div class="field-teaser-strip" aria-hidden="true">
+              {teaserStories.map(({ lead, media }) => (
+                <figure class="field-teaser-frame">
+                  <picture>
+                    <source type="image/avif" srcset={media!.avif} sizes="(min-width: 1024px) 30vw, 90vw" />
+                    <source type="image/webp" srcset={media!.webp} sizes="(min-width: 1024px) 30vw, 90vw" />
+                    <img src={media!.src} alt="" loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              ))}
             </div>
-          </div>
-          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
-            {p.aaFunnel.cta.label}
+            <span class="field-teaser-cta btn" aria-hidden="true">
+              {p.fieldTeaser.cta.label} <span class="arrow">→</span>
+            </span>
           </a>
-        </div>
-      </div>
+        )
+      }
+      {teaserStories.length === 0 && (
+        <p data-reveal>
+          <a href={`${base}${p.fieldTeaser.cta.href}`} class="btn">{p.fieldTeaser.cta.label}</a>
+        </p>
+      )}
     </section>
 
     <!-- A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3): the Knights of Mayhem
@@ -642,7 +501,7 @@ const fmtSlate = (d: Date) =>
          the only way it may be stated). -->
     {
       knights && (
-        <section class="border-t border-hairline p-8">
+        <section id="festival" class="border-t border-hairline p-8">
           <div class="mx-auto max-w-5xl space-y-4">
             <hr class="flight-line mb-6" aria-hidden="true" />
             <p class="hud-label" data-reveal>{p.festival.kicker}</p>
@@ -706,15 +565,13 @@ const fmtSlate = (d: Date) =>
       )
     }
 
-    <!-- A4c — FROM THE ARCHIVE (Round 4): the two coverage pieces moved off
-         /entertainment. Deliberately the QUIETEST band on the page — small
-         tiles, muted stills, one honest line each (the relationship's
-         permittedPhrasing, printed VERBATIM — the same contract the
-         /entertainment band used), no CTA and no case pages. It sits after the gallery
-         and the festival feature so it never competes with the lane's real
-         work. Uses the page's own section grammar (hairline rule + flight-line
-         divider + hud-label kicker) so it reads as part of /adventure, not a
-         transplanted block. -->
+    <!-- A4c — FROM THE ARCHIVE (Round 5 roster): the lane's bottom band of
+         micro local stories. Deliberately the QUIETEST band on the page —
+         small tiles, muted stills, one honest line each (the relationship's
+         permittedPhrasing, printed VERBATIM). Tiles link ONLY where a light
+         case page exists (Vybe); the rest are display-only. Uses the page's
+         own section grammar (hairline rule + flight-line divider + hud-label
+         kicker) so it reads as part of /adventure. -->
     {
       archive.length > 0 && (
         <section class="border-t border-hairline p-8">
@@ -724,58 +581,50 @@ const fmtSlate = (d: Date) =>
             <h2 class="text-2xl font-bold" data-reveal>{p.coverage.heading}</h2>
             <p class="max-w-3xl text-ink" data-reveal>{p.coverage.body}</p>
             <div class="arch-grid">
-              {archive.map(({ item, media: m, phrasing }) => (
-                <figure class="arch-tile" data-reveal data-reveal-stagger="60">
-                  <div class="arch-media" aria-hidden="true">
-                    {m && (
-                      <picture>
-                        {m.avif && <source type="image/avif" srcset={m.avif} />}
-                        <img src={m.webp ?? m.avif} alt="" loading="lazy" decoding="async" />
-                      </picture>
-                    )}
-                  </div>
-                  <figcaption class="arch-meta">
-                    <span class="arch-head">
-                      <span class="arch-title">{item.title}</span>
-                      <span class="arch-date hud-label">{item.date}</span>
-                    </span>
-                    <span class="arch-line">{phrasing}</span>
-                  </figcaption>
-                </figure>
-              ))}
+              {archive.map(({ item, media: m, href: ahref, phrasing }) => {
+                const Tag = ahref ? "a" : "figure";
+                return (
+                  <Tag
+                    class={`arch-tile${ahref ? " arch-tile--link" : ""}`}
+                    href={ahref}
+                    data-reveal
+                    data-reveal-stagger="60"
+                  >
+                    <div class="arch-media" aria-hidden="true">
+                      {m && (
+                        <picture>
+                          {m.avif && <source type="image/avif" srcset={m.avif} />}
+                          <img src={m.webp ?? m.avif} alt="" loading="lazy" decoding="async" />
+                        </picture>
+                      )}
+                    </div>
+                    <div class="arch-meta">
+                      <span class="arch-head">
+                        <span class="arch-title">{item.title}</span>
+                        <span class="arch-date hud-label">{item.date}</span>
+                      </span>
+                      <span class="arch-line">{phrasing}</span>
+                      {ahref && (
+                        <span class="arch-cta link" aria-hidden="true">
+                          Read the story <span class="arrow">→</span>
+                        </span>
+                      )}
+                    </div>
+                  </Tag>
+                );
+              })}
             </div>
           </div>
         </section>
       )
     }
 
-    <!-- Ambient reel — OPTIONAL / selective (§9.5 / DIRECTION §2.3). SKIPPED by
-         default: the only loop candidates on disk are unverified content, so
-         per DIRECTION the reel renders NOTHING (not a placeholder box) unless
-         real sources are supplied. To activate: set `reelSources` (+ poster)
-         below — the section returns with zero other markup change. -->
-    {
-      reelSources.length > 0 && (
-        <section class="border-t border-hairline p-8">
-          <HeroVideo
-            poster={reelPoster}
-            sources={reelSources}
-            placeholderLabel="AMBIENT REEL — muted ambient loop, ≤8s · 720p · ≤1.5MB AV1/H.264, poster ships first (§4)."
-            class="mx-auto max-w-5xl"
-          />
-        </section>
-      )
-    }
-
     <!-- A5 — P29: the close is this lane's OWN buyer action (production →
-         Calendly direct), not a consulting handoff. -->
+         Calendly direct), not a consulting handoff. The field-notes wayfinder
+         moved to /adventure/field with the gallery (Round 5). -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
       <p class="text-lg italic text-ink">{p.handoff.body}</p>
       <a href={href(p.handoff.cta.href)} class="btn" rel="noopener">{p.handoff.cta.label}</a>
-      <!-- P12.4d wayfinder — the field log lives off-nav for now (IA reserves
-           /field-notes); this quiet link is its only surface until it earns
-           a nav slot. -->
-      <p><a href={`${base}/field-notes`} class="link">Read the field notes →</a></p>
     </section>
   </div>
 
@@ -950,6 +799,93 @@ const fmtSlate = (d: Date) =>
     line-height: 1.4;
     color: var(--color-ink-muted, #8a9a96);
   }
+  /* Round 5 — linked archive tiles (a case page exists, e.g. Vybe): the same
+     quiet tile, plus the site's link affordance and a gentle lift on hover. */
+  .arch-tile--link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      transform 380ms var(--ease-survey, ease),
+      border-color 380ms ease;
+  }
+  .arch-tile--link:hover,
+  .arch-tile--link:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, #ffffff 26%, transparent);
+  }
+  .arch-tile--link:hover .arch-media img {
+    filter: saturate(1) brightness(0.95);
+  }
+  .arch-cta {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arch-tile--link {
+      transition: none;
+    }
+    .arch-tile--link:hover {
+      transform: none;
+    }
+  }
+
+  /* ── A3b · THE FIELD teaser (Round 5) — one inviting block: the wall's three
+     lead frames as a strip, the whole panel a single link into /adventure/field.
+     The strip dims slightly at rest and wakes on hover; the chamfered .btn kit
+     carries the call. ── */
+  .field-teaser {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .field-teaser-strip {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 640px) {
+    .field-teaser-strip {
+      grid-template-columns: 1fr;
+    }
+  }
+  .field-teaser-frame {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .field-teaser-frame img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    filter: saturate(0.92) brightness(0.92);
+    transition:
+      filter 500ms var(--ease-survey, ease),
+      transform 900ms var(--ease-survey, ease);
+  }
+  .field-teaser:hover .field-teaser-frame img,
+  .field-teaser:focus-visible .field-teaser-frame img {
+    filter: saturate(1) brightness(1);
+    transform: scale(1.03);
+  }
+  .field-teaser-cta {
+    justify-self: start;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .field-teaser-frame img {
+      transition: none;
+    }
+    .field-teaser:hover .field-teaser-frame img {
+      transform: none;
+    }
+  }
 </style>
 
 <script>
@@ -981,41 +917,8 @@ const fmtSlate = (d: Date) =>
     window.addEventListener("pagehide", () => io.disconnect(), { once: true });
   })();
 
-  // ── P19 — "jump into the painting" click transition ──────────────────────
-  // Progressive enhancement over a plain link. On a primary click of a painting
-  // we briefly zoom it toward the viewer, then navigate — the Super Mario 64
-  // dive into the world. Hard-degrades to INSTANT navigation: skipped entirely
-  // under reduced motion, on coarse/touch pointers, and for modifier / non-left
-  // clicks (so cmd/ctrl/middle-click still open a new tab). A safety timeout
-  // guarantees navigation even if the transitionend never fires.
-  (() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    if (reduce || !fine) return; // instant nav is the baseline everywhere else
-
-    document.addEventListener("click", (e) => {
-      const me = e as MouseEvent;
-      if (me.button !== 0 || me.metaKey || me.ctrlKey || me.shiftKey || me.altKey) return;
-      const painting = (e.target as HTMLElement).closest<HTMLAnchorElement>("a.painting[href]");
-      if (!painting || painting.classList.contains("is-entering")) return;
-      e.preventDefault();
-      const href = painting.href;
-      painting.classList.add("is-entering");
-      let done = false;
-      const go = () => {
-        if (done) return;
-        done = true;
-        window.location.assign(href);
-      };
-      painting.addEventListener("transitionend", go, { once: true });
-      window.setTimeout(go, 420); // fallback ceiling
-    });
-  })();
-
-  // NOTE: the paintings' ambient float is pure CSS (@keyframes painting-float on
-  // .painting-inner, desynced per painting, killed under reduced motion) — no JS
-  // engine, so it also breathes on mobile without a transform tug-of-war with
-  // the reveal-entrance transform on the anchor.
+  // ── P19 — the "jump into the painting" click transition moved to
+  // /adventure/field with the gallery wall (Round 5).
 
   // ── P12.4c — THE TERRITORY constellation interaction ─────────────────────
   // Pure progressive enhancement over the static (all-expanded) base. Under

@@ -507,17 +507,21 @@ export const RELATIONSHIPS: readonly Relationship[] = [
   /** Never: an embedded/ongoing body of work. */
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — new permittedPhrasing (staging-only
   // until read). P12-KO (2026-07-12): the operator confirmed the facts and
-  // lifted the "ko law" audit exclusion, so this relationship now names the
-  // firm + the four 2026 workshops it covers. Tier stays "informal" — it is
-  // early coverage, not an embedded/ongoing engagement. Firm verified from its
-  // own site (kofirm.com — a Boulder/Denver business-law firm; Ian Kuliasha,
-  // Partner). Renders on /venture/ko-law-workshops, the home proof band, and —
-  // as the linked story card — the venture rail on /entertainment.
+  // lifted the "ko law" audit exclusion, so this relationship names the firm
+  // and its workshop series. Tier stays "informal" — it is early coverage,
+  // not an embedded/ongoing engagement. Firm verified from its own site
+  // (kofirm.com — a Boulder/Denver business-law firm; Ian Kuliasha, Partner).
+  // Renders on /venture/ko-law-workshops, the home proof band, and — as the
+  // linked story card — the venture rail on /entertainment.
+  // ROUND 5 (2026-07-21, operator NO-COUNT rule): the phrasing drops the
+  // session count — a growing series is referred to plurally, never numerized.
+  // The dated session index on the article page stays (a fixed factual list,
+  // not a running total).
   {
     id: "workshop-coverage",
     name: "KO Law",
     tier: "informal",
-    permittedPhrasing: "KO Law's startup workshop series — coverage of four 2026 sessions",
+    permittedPhrasing: "coverage of KO Law's startup workshop series",
   },
   /** Never: a credentialed coverage role; never "at the table where the industry decides". */
   {
@@ -572,15 +576,25 @@ export const RELATIONSHIPS: readonly Relationship[] = [
   // invented. NO payment is asserted for any of these (operator direction:
   // "little gig-work things … do NOT mention pay").
   //
-  // Nordic Daughter & Something for Tomorrow — live-music coverage of two bands
-  // that share a member (Nordic Daughter: Nordic / folk, a Scandinavian-festival
+  // ROUND 5 (2026-07-21, operator-directed) — the combined "Nordic Daughter &
+  // Something for Tomorrow" entry SPLITS into two: the operator named them as
+  // separate archive tiles on /adventure. Facts unchanged from the original
+  // combined entry (Nordic Daughter: Nordic / folk, a Scandinavian-festival
   // set, Jun 2024; Something for Tomorrow: punk rock, a "Rickhouse" show, Jul
-  // 2024). Tier "informal" (early gig work, no pay claim). One combined tile.
+  // 2024; the two bands share a member). Tier "informal" for both (early gig
+  // work, no pay claim). ⚠ OPERATOR READ-APPROVAL REQUIRED — the two split
+  // phrasings are new strings (staging-only until read).
   {
     id: "nordic-daughter",
-    name: "Nordic Daughter & Something for Tomorrow",
+    name: "Nordic Daughter",
     tier: "informal",
-    permittedPhrasing: "live-music coverage for two bands with a shared member",
+    permittedPhrasing: "live-music coverage for Nordic Daughter",
+  },
+  {
+    id: "something-for-tomorrow",
+    name: "Something for Tomorrow",
+    tier: "informal",
+    permittedPhrasing: "live-music coverage for Something for Tomorrow",
   },
   // The Art of Brazilian Living — event coverage of a Brazilian music showcase
   // (a singer + samba dancers, outdoor stage; footage dated Jun 2025). Tier
@@ -767,32 +781,41 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     href: "/work/gigs-go-green",
     lane: "venture", // operator-named: STAYS on /entertainment
   },
-  // ⚠ OPERATOR READ-APPROVAL — Vybe was NOT named in the Round 4 split
-  // direction (which named Gigs Go Green + PNUMIX to stay and Nordic Daughter +
-  // Brazilian Living to move), so it HOLDS its existing home rather than being
-  // re-laned on a guess. It reads as venture/event work (a Denver arts + music
-  // collective), which is consistent with staying — but flagging it for a call.
+  // ROUND 5 (2026-07-21) — Vybe MOVES to /adventure's FROM THE ARCHIVE band,
+  // operator-CONFIRMED this round (the Round-4 hold is resolved). Its light
+  // case page stays at /work/vybe (URL unchanged); the adventure band renders
+  // the link where the venture band used to.
   {
     slug: "vybe",
     title: "Vybe",
     date: "2023–2024",
     relationshipId: "vybe",
     href: "/work/vybe",
-    lane: "venture",
+    lane: "adventure",
   },
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED — three new archive tiles (the `title` +
-  // `date` strings are new visible copy, staging-only). Tiles-only (no case
-  // pages), per operator. One-liners render verbatim from the RELATIONSHIPS
-  // above; dates read from the source files, never invented.
-  // Round 4 — these two MOVE to /adventure: both read as travel/coverage
-  // pieces ("was around here, filmed this") rather than commissioned venture
-  // work. They render there as a modest coverage band, deliberately smaller
-  // than the lane's own features — padding until stronger work replaces them.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — archive tiles (the `title` + `date`
+  // strings are new visible copy, staging-only). One-liners render verbatim
+  // from the RELATIONSHIPS above; dates read from the source files, never
+  // invented. Round 4 moved these to /adventure (travel/coverage pieces, not
+  // commissioned venture work); they render there as a modest bottom band.
+  // ROUND 5 — the combined Nordic Daughter tile SPLITS in two per operator
+  // (separate tiles for Nordic Daughter and "Something for Tomorrow").
+  // ⚠ OPERATOR-CONFIRM: Something for Tomorrow has no exported tile media yet
+  // (public/media/work/archive/something-for-tomorrow.* is absent) — the tile
+  // renders with an empty media slot until an export ships; facts (punk rock,
+  // a "Rickhouse" show, Jul 2024) come from the relationship entry above.
   {
     slug: "nordic-daughter",
-    title: "Nordic Daughter & Something for Tomorrow",
+    title: "Nordic Daughter",
     date: "2024",
     relationshipId: "nordic-daughter",
+    lane: "adventure",
+  },
+  {
+    slug: "something-for-tomorrow",
+    title: "Something for Tomorrow",
+    date: "2024",
+    relationshipId: "something-for-tomorrow",
     lane: "adventure",
   },
   {
@@ -1193,10 +1216,13 @@ export const PAGES = {
     },
     territory: {
       heading: "The territory",
-      // Authored positioning (COPY.md §5.1), grounded in the photos on the page:
-      // Alps (Italy + Switzerland) + Colorado's Front Range. Widened to cover
-      // the Colorado aerials now in the gallery.
-      body: "The work so far runs deepest through the Alps — Italy and Switzerland — and across Colorado's Front Range at home, shooting on the ground and from the air.",
+      // Authored positioning (COPY.md §5.1), grounded in the stories the site
+      // itself publishes: Alps (Italy + Switzerland), Colorado's Front Range,
+      // and the coverage rooms (Denver, Los Angeles). ROUND 5 (2026-07-21):
+      // rewritten TIMELESS ("so far" dropped) and count-free — the territory
+      // grows without the copy aging. ⚠ OPERATOR READ-APPROVAL REQUIRED — new
+      // sentence (staging-only until read).
+      body: "The work runs deepest through the Alps — Italy and Switzerland — and across Colorado's Front Range at home, shooting on the ground and from the air. Coverage reaches wherever the story is: festival rooms in Denver, market floors in Los Angeles. The map grows as the work does.",
     },
     // A3 — Licensed vs Personal nesting (Mark Clennon model).
     licensed: {
@@ -1211,6 +1237,29 @@ export const PAGES = {
     gallery: {
       heading: "The field",
       note: "Real stills replace these slots as footage arrives (BUILD-PLAN.md §5A S2).",
+    },
+    // A3b — THE FIELD teaser (Round 5, 2026-07-21, operator-directed): the
+    // floating-portraits gallery moved to its own subpage (/adventure/field);
+    // /adventure keeps ONE inviting block that hands off to it. ⚠ OPERATOR
+    // READ-APPROVAL REQUIRED — kicker/heading/body/cta are new visible copy
+    // (staging-only until read).
+    fieldTeaser: {
+      kicker: "Travel stories",
+      heading: "Stories from the field",
+      body: "Living portraits from the places the work goes — the Matterhorn at dusk, Lake Como from the water, the Flatirons at home. Each one opens into its own story.",
+      cta: { label: "Enter the field", href: "/adventure/field" },
+    },
+    // The /adventure/field subpage's own head copy (Round 5). ⚠ OPERATOR
+    // READ-APPROVAL REQUIRED — new visible copy (staging-only until read).
+    fieldPage: {
+      meta: {
+        title: "The Field — Travel Stories & Living Portraits | Adventure Stories",
+        description:
+          "The field gallery of Adventure Storytelling Media — living portraits and travel stories from the Alps, the Front Range, and wherever the work goes next.",
+      },
+      eyebrow: "Adventure Stories — The Field",
+      heading: "The field",
+      subline: "Every painting is a place the work has been. Step into one.",
     },
     // A4b — MEDIEVAL FESTIVAL IN LOVELAND (Round 3, 2026-07-21). The Knights of
     // Mayhem piece RE-LANED here from the /work wall (operator: "Knights of
@@ -1400,9 +1449,12 @@ export const PAGES = {
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy (staging-only).
     // Honest posture unchanged: works in + covers the industry; NO credentialed-
     // coverage claim, NO "at the table where the industry decides" claim.
+    // ROUND 5 (2026-07-21, TIMELESS pass): "is building in" dropped — the lane
+    // reads as present-state company fact, not a work-in-progress diary.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence (staging-only).
     intro: {
       heading: "The film and entertainment lane.",
-      body: "This is the terrain Adventure Storytelling Media is building in: an affiliation with MEME, a Colorado film nonprofit, and coverage from the festivals and markets where the industry actually does business — SeriesFest in Denver, the American Film Market in Los Angeles. Every relationship on this page is stated at exactly what it is. No logo walls, no borrowed credit.",
+      body: "This is Adventure Storytelling Media's film and entertainment terrain: an affiliation with MEME, a Colorado film nonprofit, and coverage from the festivals and markets where the industry actually does business — SeriesFest in Denver, the American Film Market in Los Angeles. Every relationship on this page is stated at exactly what it is. No logo walls, no borrowed credit.",
     },
     // W2 — MEME, the anchor of the lane (TOP BILLING, operator-directed:
     // "he's affiliated with the org, content will grow; future-facing").
@@ -1423,7 +1475,10 @@ export const PAGES = {
       heading: "MEME is where this lane starts.",
       proof: { relationshipId: "meme" } as ProofLine,
       body: "Makeshift Entertainment Media Education is a Colorado nonprofit building a stronger independent film community — education, workforce development, a way in for new talent. It's the most formal role I hold in the industry, and the affiliation this whole lane grows from.",
-      growth: "This is a young affiliation and the page is built to grow with it — as MEME workshops, productions, and the stories around them happen, they land here.",
+      // ROUND 5 (TIMELESS pass): "young affiliation" + "the page is built to
+      // grow" dropped — present-state mechanism only, no self-narration.
+      // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence (staging-only).
+      growth: "MEME's workshops, productions, and the stories around them land here as they happen.",
       ctas: [
         { label: "Read the full story", href: "/venture/meme" },
         { label: "About the organization", href: "https://www.meme.ngo" },
@@ -1440,16 +1495,33 @@ export const PAGES = {
     // than left as "the festivals and markets". The closing line makes room for
     // future additions without promising any: it describes how the shelf works,
     // not what will be on it.
+    // ROUND 5 (2026-07-21, operator-directed BLOCK→SUBPAGE pattern): the
+    // five-tile shelf COLLAPSES into ONE detailed SeriesFest block (→ its own
+    // subpage at /work/seriesfest, which links out to the four dispatch
+    // articles) plus the AFM block (stays a tile on /work — no subpage yet).
+    // TIMELESS + NO-COUNT: "Two rooms so far" / "The shelf fills" dropped;
+    // no edition counts anywhere. ⚠ OPERATOR READ-APPROVAL REQUIRED — the
+    // heading/intro rewrite and the seriesfest block copy are new visible
+    // strings (staging-only until read). The AFM tile's slate/title stay
+    // VERBATIM from its article page (fixed event dates, not aging copy).
     coverage: {
       heading: "Coverage from the rooms",
-      intro: "Two rooms so far: SeriesFest in Denver and the American Film Market in Los Angeles — attended, shot, written up, and published here. The shelf fills as the slate does.",
-      items: [
-        { href: "/venture/seriesfest-2026", slate: "SeriesFest · May 7–8, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story", relationshipId: "seriesfest" },
-        { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story", relationshipId: "seriesfest" },
-        { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story", relationshipId: "seriesfest" },
-        { href: "/venture/seriesfest-2025", slate: "SeriesFest · Apr 30 – May 4, 2025 · Denver, CO", title: "SeriesFest 2025 — a venture story", relationshipId: "seriesfest" },
-        { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story", relationshipId: "afm" },
-      ] as readonly { href: string; slate: string; title: string; relationshipId: string }[],
+      intro: "SeriesFest in Denver and the American Film Market in Los Angeles — attended, shot, written up, and published here.",
+      seriesfest: {
+        kicker: "SeriesFest · Denver, Colorado",
+        heading: "SeriesFest, in depth",
+        body: "Denver's episodic-storytelling festival, covered edition after edition — the main-stage program and premieres, the Fashion in Focus event, and the special screenings around the season. The full story has its own page: the rooms, the frames, and the dispatches from each event.",
+        cta: { label: "Enter the SeriesFest story", href: "/work/seriesfest" },
+        relationshipId: "seriesfest",
+        /** Tile face — reuses the flagship dispatch's existing hero export. */
+        heroSlug: "seriesfest-2026",
+      },
+      afm: {
+        href: "/venture/afm-2025",
+        slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
+        title: "American Film Market 2025 — a venture story",
+        relationshipId: "afm",
+      },
     },
     // W4 — the industry-lane close. CONSERVATIVE by design: this lane sells
     // presence + coverage; the production and consulting offers live on their
@@ -1479,11 +1551,16 @@ export const PAGES = {
         hook: "The work we do for PitchBoulder, start to finish.",
         context: {
           heading: "Who they are",
-          body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. Adventure Storytelling Media has been in that room for nearly three years, across dozens of weekly pitch events, watching the gap between what a founder says and what the room actually hears.",
+          // ROUND 5 (TIMELESS pass): "nearly three years, across dozens of
+          // weekly pitch events" dropped — durations and counts age; the
+          // standing fact doesn't. ⚠ OPERATOR READ-APPROVAL — revised sentence.
+          body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. Adventure Storytelling Media is in that room week after week, watching the gap between what a founder says and what the room actually hears.",
         },
         ask: {
           heading: "The ask",
-          body: "When PitchBoulder built their website, they needed one video that could stand for three years of weekly founder energy — something an investor or a founder could watch and instantly understand what the room feels like.",
+          // ROUND 5 (TIMELESS pass): "three years of" dropped — the ask reads
+          // as the standing fact it is. ⚠ OPERATOR READ-APPROVAL — revised.
+          body: "When PitchBoulder built their website, they needed one video that could stand for the room's weekly founder energy — something an investor or a founder could watch and instantly understand what the room feels like.",
         },
         work: {
           heading: "The work",
