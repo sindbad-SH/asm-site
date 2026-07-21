@@ -29,7 +29,8 @@
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES, WORK, FORGE_SERVICES, SAGA_STAGES, SITE } from "../consts";
+import YouTubeEmbed from "../components/YouTubeEmbed.astro";
+import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, FORGE_SERVICES, SAGA_STAGES, SITE } from "../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -60,6 +61,10 @@ const pair = (relBase: string) => {
 const pbPoster = pair("work/pitchboulder/hook-poster");
 const pbLoop = media("work/pitchboulder/loop.mp4"); // P21b — hover-video on the landscape video card
 // chapter 02 — the restored Shelby (WORK item; proof = pebble-beach room).
+// Round 3 lane call: the Pebble Beach piece is VENTURE — corporate/private-
+// client event coverage (a commissioned owner story shot at a business event),
+// not wild/travel capture — so this chapter is its one home; its /work tile
+// was retired with the old wall (case-page URL unchanged).
 // P13c — real stills replace the frame-grabs: on-set (crew filming the car,
 // the storytelling card) rides the wide card + hover-video; dawn-flare + heritage
 // fill the tall/small cards. All from the width-suffixed photos/ exports.
@@ -108,30 +113,37 @@ const pbPresenter = bust("work/pitchboulder/presenter-logo-1600", pair("work/pit
 const pbCrowd = bust("work/pitchboulder/coworking-crowd-1600", pair("work/pitchboulder/coworking-crowd-1600"));
 const pbTalk = bust("work/pitchboulder/coworking-presenter-1600", pair("work/pitchboulder/coworking-presenter-1600"));
 
-// P21b — chapter 03 (MEME) gains the org's own logo animatic as an AMBIENT
-// framed card (operator: "you can use the video I gave you"). It is the SAME
-// processed loop the /venture/meme article carries — reused here, existence-
-// gated + cache-busted. Poster-first (no-JS / reduced-motion / Save-Data land on
-// the still); the video fades in and plays ONLY while on-screen (the ambient-loop
-// script below, mirroring /venture/meme.astro's gating). The static AI brand PNG
-// the operator offered as a fallback is intentionally NOT added: it is the same
-// wordmark art this loop already animates, so a second still card would only
-// duplicate the loop (verdict recorded in the P21b report).
-const memeLoop = media("venture/meme/meme-loop.mp4")
-  ? {
-      mp4: `${base}/media/venture/meme/meme-loop.mp4${mtimeV("venture/meme/meme-loop.mp4")}`,
-      poster: bust("venture/meme/meme-poster", pair("venture/meme/meme-poster")),
-    }
-  : undefined;
+// Round 3 (2026-07-21) — the MEME chapter MOVED to /work (Industry Stories),
+// where it now has TOP BILLING as the anchor of that lane (operator-directed).
+// The memeLoop wiring left with it; /venture/meme (the article) is unchanged.
+
+// P29 (unchanged) — the PitchBoulder commercial's video id, the SAME embed the
+// case page carries (work/pitchboulder.astro; his live site's published id).
+// Round 3: the commercial now plays IN the PitchBoulder chapter — the operator
+// asked for the video component in this slot, not just the hover loop.
+const pbCommercialId = "n7k-Bwu3KIU";
 
 // the pebble-beach proof (with its owner-endorsement context) relocates from
 // the rooms list to chapter 02. P12-KO — workshop-coverage (KO Law) ALSO leaves
 // this list: it now has its own venture story + a linked rail card above, so the
 // card carries that proof instead of an unlinked line here (the same claim is
-// never rendered twice on this page).
+// never rendered twice on this page). Round 3 — seriesfest + afm ALSO leave:
+// their coverage tiles AND their verbatim status lines now live on /work
+// (Industry Stories), the lane that owns festival/market coverage.
 const pebbleRoom = p.rooms.items.find((r) => r.proof.relationshipId === "pebble-beach");
-const HANDLED_ELSEWHERE = new Set(["pebble-beach", "workshop-coverage"]);
+const HANDLED_ELSEWHERE = new Set(["pebble-beach", "workshop-coverage", "seriesfest", "afm"]);
 const otherRooms = p.rooms.items.filter((r) => !HANDLED_ELSEWHERE.has(r.proof.relationshipId));
+
+// Round 3 — the "from the archive" band, MOVED here from /work: early gig and
+// event coverage is venture-storytelling-natured, not film-industry work. Same
+// data (WORK_ARCHIVE) and honesty contract (verbatim permittedPhrasing only);
+// media stays at public/media/work/archive/<slug>.* (no asset churn).
+const archive = WORK_ARCHIVE.map((a) => ({
+  item: a,
+  media: pair(`work/archive/${a.slug}`),
+  href: a.href ? `${base}${a.href}` : undefined,
+  phrasing: RELATIONSHIP_BY_ID[a.relationshipId]?.permittedPhrasing ?? "",
+}));
 
 // scattered ghost letters are drawn FROM the page's own words (presentational
 // letterforms, not new copy): the hero scatters STORY.
@@ -140,20 +152,17 @@ const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories
 // P13c — the coverage index: editorial tiles to the published venture stories.
 // slate + title strings are COPIED VERBATIM from each article page's own
 // frontmatter/markup (already operator-flagged there) — reuse adds no new copy.
+// Round 3 (2026-07-21) — the SeriesFest (×4), AFM, and MEME cards MOVED to
+// /work (Industry Stories): festival/market coverage and the MEME affiliation
+// are film-industry-lane content under the final lane definitions. What stays
+// here is the corporate-storytelling coverage (KO Law) and the AA business
+// story. The article URLs themselves are unchanged.
 const coverage = [
-  { href: "/venture/seriesfest-2026", slate: "SeriesFest · May 7–8, 2026 · Denver, CO", title: "SeriesFest 2026 — a venture story" },
-  { href: "/venture/seriesfest-2025", slate: "SeriesFest · Apr 30 – May 4, 2025 · Denver, CO", title: "SeriesFest 2025 — a venture story" },
-  { href: "/venture/seriesfest-2026-fashion-in-focus", slate: "SeriesFest · Fashion in Focus · Mar 7, 2026 · Denver, CO", title: "SeriesFest 2026 · Fashion in Focus — a venture story" },
-  { href: "/venture/seriesfest-2026-soul-power", slate: "SeriesFest · Soul Power ABA Premiere · Feb 18, 2026 · Denver, CO", title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story" },
-  { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story" },
   // P12-KO — the KO Law workshops venture story. slate + title copied VERBATIM
   // from the article page's own ARTICLE block (already operator-flagged there;
   // reuse adds no new copy here). Card image resolves as venture/<slug>/hero-900.
   { href: "/venture/ko-law-workshops", slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026", title: "Four startup workshops, on camera." },
   { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes my aerials to market." },
-  // P14b — the MEME venture story (slate + title copied verbatim from the
-  // article page's own frontmatter; reuse adds no new copy here).
-  { href: "/venture/meme", slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION", title: "The most formal role I hold in this world." },
 ];
 
 // P12.6b — the STORY RAIL cards: the coverage stories PLUS the emerging film
@@ -188,14 +197,15 @@ const railCards = [...coverage, ...mfgCard].map((c) => {
 });
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.
-// P13c — meme ground removed (the S2 statement is now chapter 03); ch03 added.
+// Round 3 — ch03 (MEME) retired with its chapter (moved to /work); `archive`
+// added for the relocated from-the-archive band.
 const GROUNDS = {
   intro: "#101020",
   hire: "#12182b", // P29 — the E1b services/floors chapter
   ch01: "#191031",
   ch02: "#261118",
-  ch03: "#0e2230",
   rooms: "#10141f",
+  archive: "#12141c",
   handoff: "#0f1118",
 };
 ---
@@ -260,11 +270,12 @@ const GROUNDS = {
     </section>
 
     <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══
-         P13c — the old S2 MEME statement moved into chapter 03 below (no dup). -->
+         Round 3 — the MEME chapter moved to /work (Industry Stories); the two
+         venture chapters are the client work: PitchBoulder + the Shelby. -->
 
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch01} style={`--sec-ground:${GROUNDS.ch01}`}>
       <span class="im-index im-turn" aria-hidden="true">01</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
       <div class="im-chapter-stage">
         <div class="im-collage im-collage--pb" aria-hidden="true">
           {
@@ -338,6 +349,17 @@ const GROUNDS = {
           <div class="im-quote">
             <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
           </div>
+          {/* Round 3 — the commercial ITSELF, in the PitchBoulder slot
+              (operator: integrate the video component here). Same click-to-
+              load nocookie facade + video id as the case page; the hover loop
+              on the collage card above stays the ambient teaser. */}
+          <YouTubeEmbed
+            videoId={pbCommercialId}
+            title="The PitchBoulder commercial"
+            placeholderLabel="PITCHBOULDER COMMERCIAL — click-to-load embed."
+            poster={pbPoster ? (pbPoster.webp ?? pbPoster.avif) : undefined}
+            class="im-pb-embed"
+          />
           {/* P12.6b — the unmissable story CTA (operator: the old links were
               "so buried people just scroll past"). ⚠ OPERATOR READ-APPROVAL
               REQUIRED — new copy "Read the full story", staging-only until read. */}
@@ -351,7 +373,7 @@ const GROUNDS = {
 
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch02} style={`--sec-ground:${GROUNDS.ch02}`}>
       <span class="im-index im-turn" aria-hidden="true">02</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
       <div class="im-chapter-stage">
         <div class="im-collage im-collage--sh" aria-hidden="true">
           {
@@ -440,69 +462,11 @@ const GROUNDS = {
       </div>
     </section>
 
-    <!-- ═══ CHAPTER 03 · MEME — typographic (no collage); the S2 statement,
-         now numbered into the chapter sequence. Title lockup + tag + proof. ═══ -->
-    <section class="im-sec im-chapter im-chapter--type" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
-      <span class="im-index im-turn" aria-hidden="true">03</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
-      <div class="im-chapter-stage">
-        <div class="im-chapter-type">
-          <h2 class="im-title" data-reveal>
-            <span class="im-line">MEME</span>
-          </h2>
-          <!-- meme.body verbatim: "The role I hold most formally in this world." -->
-          <p class="im-turn im-tag" data-reveal>{p.meme.body}</p>
-        </div>
-        {
-          /* P21b — the org's own logo animatic joins this typographic chapter as
-             an AMBIENT framed card (operator: "you can use the video I gave you").
-             Poster-first (the still is the permanent base layer — no-JS / reduced-
-             motion / Save-Data all land here); the muted loop fades in over it and
-             plays ONLY while on-screen (the ambient-loop script below, gated like
-             /venture/meme.astro). No caption — it sits as the mark, in motion,
-             inside the composition; the typography above/below is untouched. */
-        }
-        {
-          memeLoop && (
-            <figure class="im-meme-loop" data-reveal>
-              <picture>
-                {memeLoop.poster?.avif && <source type="image/avif" srcset={memeLoop.poster.avif} />}
-                <img
-                  class="im-meme-loop-poster"
-                  src={memeLoop.poster?.webp ?? memeLoop.poster?.avif}
-                  alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground."
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-              <video
-                class="im-loop im-meme-loop-vid"
-                data-im-amb
-                data-loop-src={memeLoop.mp4}
-                muted
-                loop
-                playsinline
-                preload="none"
-                aria-hidden="true"
-              ></video>
-            </figure>
-          )
-        }
-        <div class="im-chapter-meta" data-reveal>
-          <LegendMark proof={p.meme.proof} />
-          {/* P12.6b — MEME gets the primary story CTA (→ its venture story) plus
-              a secondary text link out to the org. ⚠ OPERATOR READ-APPROVAL
-              REQUIRED — new copy "Read the full story", staging-only until read. */}
-          <a href={`${base}/venture/meme`} class="im-cta">
-            <span class="im-cta-label">Read the full story</span>
-            <span class="im-cta-arrow" aria-hidden="true">→</span>
-          </a>
-          <a href="https://www.meme.ngo" rel="noopener" target="_blank" class="link im-cta-secondary">
-            About the organization <span class="arrow" aria-hidden="true">→</span>
-          </a>
-        </div>
-      </div>
-    </section>
+    <!-- Round 3 — CHAPTER 03 (MEME) MOVED to /work (Industry Stories), where
+         it now anchors that lane with top billing (operator-directed: the
+         affiliation and its growing content belong to the film & entertainment
+         industry lane). Its ambient logo-loop treatment moved with it; the
+         /venture/meme article is unchanged. -->
 
     <!-- ═══ S4 · THE STORY RAIL — the venture stories as a user-driven carousel
          (operator's idea; no auto-rotate). Native overflow-x + scroll-snap works
@@ -517,10 +481,11 @@ const GROUNDS = {
         <span class="im-confetti" data-im-confetti style="--ci:3"></span>
       </div>
       {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (kicker + intro),
-          staging-only until read. */}
+          staging-only until read. Round 3: intro re-worded off "the industry"
+          (festival/market coverage moved to /work, the industry lane). */}
       <p class="hud-label im-kicker" data-reveal>More venture stories</p>
       <p class="im-turn im-rail-intro" data-reveal>
-        More of the industry I stay close to — each one marked at exactly what it is.
+        More of the rooms this work runs through — each one marked at exactly what it is.
       </p>
 
       <div class="im-rail-wrap">
@@ -555,21 +520,65 @@ const GROUNDS = {
         </ul>
       </div>
 
-      <!-- the honesty proofs that lived in the rooms list: seriesfest + afm
-           folded here as a compact list. (pebble-beach moved to chapter 02;
-           workshop-coverage / KO Law now has its own linked story card in the
-           rail above, so it left this list — the claim renders once, on the
-           card's article.) Verbatim permittedPhrasing via LegendMark. -->
-      <ul class="im-rail-proofs" aria-label="How close each relationship is">
-        {
-          otherRooms.map((room) => (
-            <li data-reveal data-reveal-stagger="70">
-              <LegendMark proof={room.proof} />
-            </li>
-          ))
-        }
-      </ul>
+      <!-- the honesty proofs that lived in the rooms list. Round 3: seriesfest
+           + afm moved to /work (their coverage lane) — today every remaining
+           room is handled elsewhere on this page, so the list renders only if
+           a future room joins. Verbatim permittedPhrasing via LegendMark. -->
+      {
+        otherRooms.length > 0 && (
+          <ul class="im-rail-proofs" aria-label="How close each relationship is">
+            {otherRooms.map((room) => (
+              <li data-reveal data-reveal-stagger="70">
+                <LegendMark proof={room.proof} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </section>
+
+    <!-- ═══ S4b · FROM THE ARCHIVE — moved here from /work (Round 3): the
+         early gig and event coverage rounds out THIS lane's record (venture
+         storytelling), quieter than the chapters. Each tile's one-liner is its
+         relationship's permittedPhrasing VERBATIM; GGG + Vybe keep their light
+         case pages (URLs unchanged). ═══ -->
+    {
+      archive.length > 0 && (
+        <section class="im-sec im-archive-sec" data-im-section data-ground={GROUNDS.archive} style={`--sec-ground:${GROUNDS.archive}`}>
+          <p class="hud-label im-kicker" data-reveal>From the archive</p>
+          <div class="im-archive-grid">
+            {archive.map(({ item, media: m, href: ahref, phrasing }) => {
+              const Tag = ahref ? "a" : "div";
+              return (
+                <Tag class={`im-atile${ahref ? " im-atile--link" : ""}`} href={ahref} data-reveal data-reveal-stagger="55">
+                  <figure class="im-atile-media" aria-hidden="true">
+                    {m ? (
+                      <picture>
+                        {m.avif && <source type="image/avif" srcset={m.avif} />}
+                        <img src={m.webp ?? m.avif} alt="" loading="lazy" decoding="async" />
+                      </picture>
+                    ) : (
+                      <span class="im-atile-ghost" />
+                    )}
+                  </figure>
+                  <span class="im-atile-head">
+                    <span class="im-atile-title">{item.title}</span>
+                    <span class="im-atile-date hud-label">{item.date}</span>
+                  </span>
+                  <span class="im-atile-line">{phrasing}</span>
+                  {ahref && (
+                    <span class="im-cta im-cta--sm im-atile-cta">
+                      <span class="im-cta-label">Read the story</span>
+                      <span class="im-cta-arrow" aria-hidden="true">→</span>
+                    </span>
+                  )}
+                </Tag>
+              );
+            })}
+          </div>
+        </section>
+      )
+    }
 
     <!-- ═══ S5 · HANDOFF — P29: closes on this lane's OWN buyer action
          (Calendly direct), not a consulting handoff. ═══ -->
@@ -896,30 +905,13 @@ const GROUNDS = {
     font-style: italic;
   }
 
-  /* ── P21b · chapter-03 (MEME) ambient logo loop — a framed 16:9 moment set
-     into the typographic chapter (title + tag above, proof + CTAs below). The
-     poster is the permanent base layer; the muted video reuses .im-loop and
-     fades in over it while on-screen. Mirrors /venture/meme.astro's framing so
-     the two pages read as one room. ── */
-  .im-meme-loop {
-    position: relative;
-    z-index: 2;
-    width: min(100%, 30rem);
-    margin: 2.4rem auto 0.4rem;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    border-radius: 10px;
-    overflow: hidden;
-    background: color-mix(in srgb, #ffffff 4%, transparent);
-    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
-  }
-  .im-meme-loop-poster {
-    display: block;
+  /* Round 3 — the chapter-03 (MEME) ambient-loop styles left with the chapter
+     (that treatment now lives on /work's MEME anchor panel). */
+
+  /* ── Round 3 · the commercial embed in the PitchBoulder chapter meta —
+     the case page's click-to-load facade, sized to the plate. ── */
+  .im-chapter-meta :global(.im-pb-embed) {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-  }
-  .im-meme-loop.is-playing .im-loop {
-    opacity: 1;
   }
 
   /* ── P12.6b · the shared "story CTA" — one bold, unmissable treatment used
@@ -1130,6 +1122,100 @@ const GROUNDS = {
     margin-top: 2rem;
   }
 
+  /* ── Round 3 · S4b FROM THE ARCHIVE — the quieter band moved from /work:
+     small tiles, muted media at rest (restored on hover), the rail's card
+     grammar a notch smaller. ── */
+  .im-archive-sec {
+    padding: 5rem clamp(1.5rem, 6vw, 8rem) 5.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 1.2rem;
+  }
+  .im-archive-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .im-atile {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, #ffffff 2%, transparent);
+    color: inherit;
+    text-decoration: none;
+  }
+  .im-atile--link {
+    cursor: pointer;
+    transition:
+      transform 380ms var(--ease-survey, ease),
+      border-color 380ms ease;
+  }
+  .im-atile--link:hover,
+  .im-atile--link:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, #ffffff 26%, transparent);
+  }
+  .im-atile-media {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 6px;
+    background: color-mix(in srgb, #ffffff 5%, transparent);
+  }
+  .im-atile-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* muted at rest — the archive is quieter than the chapters */
+    filter: saturate(0.82) brightness(0.85);
+    transition: filter 400ms var(--ease-survey, ease);
+  }
+  .im-atile--link:hover .im-atile-media img {
+    filter: saturate(1) brightness(0.98);
+  }
+  .im-atile-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .im-atile-title {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.25;
+    color: #eef5fa;
+  }
+  .im-atile-date {
+    flex: none;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, #e8f6f3 55%, transparent);
+  }
+  .im-atile-line {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, #eef1f6 72%, transparent);
+  }
+  .im-atile-cta {
+    pointer-events: none; /* decorative; the tile <a> owns the click */
+    margin-top: 0.2rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .im-atile--link,
+    .im-atile-media img {
+      transition: none;
+    }
+    .im-atile--link:hover {
+      transform: none;
+    }
+  }
+
   /* ── S5 handoff ── */
   .im-handoff {
     min-height: 60svh;
@@ -1302,35 +1388,8 @@ const GROUNDS = {
     });
   })();
 
-  // P21b MEME ambient loop: the chapter-03 logo animatic plays only when motion
-  // is allowed and the framed card is actually on-screen; the poster underneath
-  // is the permanent base layer (reduced-motion / no-JS / autoplay-refused all
-  // show the still). Mirrors /venture/meme.astro. Distinct hook (data-im-amb) so
-  // the collage hover-life script never grabs it; lazy src (preload="none") like
-  // the collage loops — the video mounts on first intersection.
-  (() => {
-    const fig = document.querySelector<HTMLElement>(".im-meme-loop");
-    const video = fig?.querySelector<HTMLVideoElement>("[data-im-amb]");
-    if (!fig || !video) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
-    if (conn?.saveData) return;
-    video.addEventListener("playing", () => fig.classList.add("is-playing"));
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          if (!video.src) video.src = video.dataset.loopSrc!;
-          video.play().catch(() => {}); // refusal → poster stands
-        } else if (!video.paused) {
-          video.pause();
-        }
-      },
-      { threshold: 0.25 },
-    );
-    io.observe(fig);
-    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
-  })();
+  // Round 3 — the P21b MEME ambient-loop script moved to /work with its
+  // chapter (the anchor panel there carries the same IO-gated treatment).
 
   // P12.6b story-rail: pointer-drag-to-scroll on fine pointers (desktop). Touch
   // devices use the browser's native swipe — this only enhances mouse/trackpad,
