@@ -1,0 +1,280 @@
+---
+/**
+ * /adventure/field — THE FIELD subpage (Round 5, 2026-07-21, operator-directed
+ * block→subpage pattern).
+ *
+ * The floating-portraits gallery wall (P19) MOVED here from /adventure, which
+ * now carries one inviting teaser block instead. This page is the full field:
+ * the licensed/personal nesting, the AA licensing weave (mid-band + funnel),
+ * the painting wall of living portraits (each opens its /field-notes spotlight),
+ * and the optional ambient reel. Everything below is RELOCATED, not rewritten —
+ * markup, media gating, scripts, and honesty contracts are carried over from
+ * adventure.astro verbatim (the shared styles live in global.css). The only new
+ * visible copy is the page head (PAGES.adventure.fieldPage — ⚠ flagged in
+ * consts, staging-only until read).
+ *
+ * HONESTY (unchanged): the AA relationship renders only via LegendMark
+ * (verbatim permittedPhrasing); the gallery stills are watermarked previews and
+ * every licensing pointer goes out through the Amazing Aerial portfolio URL.
+ */
+import Base from "../../layouts/Base.astro";
+import DistortionLayer from "../../components/DistortionLayer.astro";
+import HeroVideo from "../../components/HeroVideo.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { getCollection } from "astro:content";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const p = PAGES.adventure;
+const fp = p.fieldPage;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Ambient reel — optional/selective (moved with the gallery; same contract:
+// renders NOTHING unless a real reel ships at public/media/adventure/).
+const reelDir = join(process.cwd(), "public", "media", "adventure");
+const reelSources = existsSync(join(reelDir, "reel-loop.mp4"))
+  ? [{ src: `${base}/media/adventure/reel-loop.mp4`, type: "video/mp4" }]
+  : [];
+const reelPoster = existsSync(join(reelDir, "reel-poster.avif"))
+  ? `${base}/media/adventure/reel-poster.avif`
+  : undefined;
+
+// Slug → gallery media map (carried over — orientation-aware widths, R3).
+const GALLERY_WIDTHS = {
+  landscape: [800, 1400, 2200],
+  vertical: [800, 1120, 1600],
+} as const;
+function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
+  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  const widths = GALLERY_WIDTHS[orientation];
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
+  };
+}
+
+// P12.6 — the micro travel stories (data-driven from the fieldNotes
+// collection; the operator grows the wall by adding a markdown file).
+const WALL_ORDER = [
+  "matterhorn-zermatt",
+  "bellagio",
+  "flatirons-chautauqua",
+  "crans-montana",
+  "castel-toblino",
+  "eldorado-springs",
+  "lac-de-tseuzier",
+  "varenna-lake-como",
+  "lugano",
+  "gornergrat-glacier",
+];
+const stories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => {
+    const ai = WALL_ORDER.indexOf(a.id);
+    const bi = WALL_ORDER.indexOf(b.id);
+    return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+  });
+
+// Mono survey slate: YYYY.MM.DD from UTC parts (matches /field-notes).
+const fmtSlate = (d: Date) =>
+  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
+---
+
+<Base title={fp.meta.title} description={fp.meta.description}>
+  <div data-lane="adventure">
+    <!-- head — the lane's eyebrow grammar; back link keeps the lane's spine. -->
+    <section class="mx-auto max-w-3xl space-y-4 p-8 text-center">
+      <p><a href={`${base}/adventure`} class="link"><span class="arrow" aria-hidden="true">←</span> Adventure Stories</a></p>
+      <p class="hud-label">{fp.eyebrow}</p>
+      <h1 class="text-3xl font-bold sm:text-5xl">{fp.heading}</h1>
+      <p class="mx-auto max-w-2xl text-lg text-ink">{fp.subline}</p>
+    </section>
+
+    <!-- Licensed vs Personal nesting (moved with the gallery it frames) -->
+    <section class="mx-auto max-w-3xl space-y-8 border-t border-hairline p-8">
+      <hr class="flight-line mb-6" aria-hidden="true" />
+      <div class="panel space-y-2 p-5" data-reveal>
+        <h2 class="text-xl font-bold">{p.licensed.heading}</h2>
+        <p class="text-ink">{p.licensed.body}</p>
+        <LegendMark proof={p.licensed.proof} />
+      </div>
+      <div class="space-y-2" data-reveal>
+        <h2 class="text-xl font-bold">{p.personal.heading}</h2>
+        <p class="text-ink">{p.personal.body}</p>
+      </div>
+    </section>
+
+    {/* AA MID-BAND (P12.6, relocated) — the licensing weave, mid-scroll. */}
+    <section class="border-t border-hairline p-8">
+      <div class="mx-auto max-w-5xl">
+        <div class="panel aa-band flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+          <div class="flex items-center gap-4">
+            <img
+              src={`${base}/media/adventure/aa-logo.png`}
+              alt="Amazing Aerial Agency"
+              class="aa-funnel-logo shrink-0"
+              width="480"
+              height="158"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="space-y-1">
+              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
+              <p class="aa-band-line max-w-2xl text-sm text-ink">
+                The stills here are watermarked previews — license the
+                full-resolution frames through Amazing Aerial.
+              </p>
+              <p>
+                <a href={`${base}/work/amazing-aerial`} class="link text-sm">
+                  See the highlights — our top shots with Amazing Aerial <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
+            {p.aaFunnel.cta.label}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE FLOATING GALLERY WALL (P19, relocated verbatim): each place is a
+         framed painting hung on the void; the whole painting is a link into
+         its spotlight. Tile budget: one .map-inset per painting, ≤20 total. -->
+    <section class="border-t border-hairline p-8">
+      <hr class="flight-line mb-6" aria-hidden="true" />
+      <h2 class="mx-auto mb-6 max-w-5xl text-2xl font-bold">{p.gallery.heading}</h2>
+      <div class="painting-wall mx-auto max-w-5xl" data-distort-grid>
+        {
+          stories.map((story) => {
+            const photos = story.data.photos ?? [];
+            const lead = photos[0]!;
+            const isVertical = lead.orientation === "vertical";
+            const media = galleryMedia(lead.slug, lead.orientation);
+            const slate = `${fmtSlate(story.data.date)} · ${story.data.location}`;
+            const sizes = "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw";
+            return (
+              <a
+                class={isVertical ? "painting painting--tall" : "painting"}
+                href={`${base}/field-notes/${story.id}`}
+                data-painting
+                data-reveal
+                aria-label={`${story.data.title} — ${story.data.location}`}
+              >
+                <div class="painting-inner">
+                  <figure class="painting-window map-inset">
+                    {media && (
+                      <picture>
+                        <source type="image/avif" srcset={media.avif} sizes={sizes} />
+                        <source type="image/webp" srcset={media.webp} sizes={sizes} />
+                        <img
+                          src={media.src}
+                          alt={lead.alt}
+                          class="block w-full"
+                          style={`aspect-ratio:${isVertical ? "4/5" : "3/2"};object-fit:cover`}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </picture>
+                    )}
+                    <span class="painting-enter" aria-hidden="true">
+                      Enter <span class="arrow">→</span>
+                    </span>
+                  </figure>
+                  <div class="painting-plate">
+                    <span class="painting-slate hud-label">{slate}</span>
+                    <span class="painting-title">{story.data.title}</span>
+                    <span class="painting-cta hud-label" aria-hidden="true">
+                      Enter <span class="arrow">→</span>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+      <!-- AA funnel outro (operator exclusivity handling, relocated) -->
+      <div class="mx-auto mt-8 max-w-5xl">
+        <div class="panel aa-funnel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+          <div class="flex items-center gap-4">
+            <img
+              src={`${base}/media/adventure/aa-logo.png`}
+              alt="Amazing Aerial Agency"
+              class="aa-funnel-logo shrink-0"
+              width="480"
+              height="158"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="space-y-1">
+              <p class="hud-label">Licensed through Amazing Aerial Agency</p>
+              <h3 class="text-lg font-bold">{p.aaFunnel.heading}</h3>
+              <p class="max-w-2xl text-sm text-ink">{p.aaFunnel.body}</p>
+            </div>
+          </div>
+          <a href={p.aaFunnel.cta.href} class="btn shrink-0" target="_blank" rel="noopener">
+            {p.aaFunnel.cta.label}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ambient reel — optional/selective (relocated; renders only when a real
+         reel ships at public/media/adventure/reel-loop.mp4). -->
+    {
+      reelSources.length > 0 && (
+        <section class="border-t border-hairline p-8">
+          <HeroVideo
+            poster={reelPoster}
+            sources={reelSources}
+            placeholderLabel="AMBIENT REEL — muted ambient loop, ≤8s · 720p · ≤1.5MB AV1/H.264, poster ships first (§4)."
+            class="mx-auto max-w-5xl"
+          />
+        </section>
+      )
+    }
+
+    <!-- close — back to the lane + the quiet field-log wayfinder (P12.4d). -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+      <p><a href={`${base}/field-notes`} class="link">Read the field notes →</a></p>
+      <p><a href={`${base}/adventure`} class="link"><span class="arrow" aria-hidden="true">←</span> Back to Adventure Stories</a></p>
+    </section>
+  </div>
+
+  <!-- §2e hover-distortion (feature-gated; CSS fallback is the default) -->
+  <DistortionLayer />
+</Base>
+
+<script>
+  // ── P19 — "jump into the painting" click transition (relocated verbatim
+  // from adventure.astro). Progressive enhancement over a plain link; hard-
+  // degrades to instant navigation under reduced motion / coarse pointers /
+  // modifier clicks. Safety timeout guarantees navigation.
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    if (reduce || !fine) return; // instant nav is the baseline everywhere else
+
+    document.addEventListener("click", (e) => {
+      const me = e as MouseEvent;
+      if (me.button !== 0 || me.metaKey || me.ctrlKey || me.shiftKey || me.altKey) return;
+      const painting = (e.target as HTMLElement).closest<HTMLAnchorElement>("a.painting[href]");
+      if (!painting || painting.classList.contains("is-entering")) return;
+      e.preventDefault();
+      const href = painting.href;
+      painting.classList.add("is-entering");
+      let done = false;
+      const go = () => {
+        if (done) return;
+        done = true;
+        window.location.assign(href);
+      };
+      painting.addEventListener("transitionend", go, { once: true });
+      window.setTimeout(go, 420); // fallback ceiling
+    });
+  })();
+</script>

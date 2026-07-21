@@ -71,18 +71,17 @@ const memeLoop = media("venture/meme/meme-loop.mp4")
     }
   : undefined;
 
-// Coverage shelf tiles — each resolves its article's hero export.
-const tiles = p.coverage.items.map((item, i) => {
-  const slug = item.href.replace(/^\/venture\//, "");
-  return {
-    ...item,
-    index: String(i + 1).padStart(2, "0"),
-    img: bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`)),
-  };
-});
-// The shelf states each event relationship ONCE (verbatim phrasing), not per
-// tile — SeriesFest and AFM share the same honest line.
-const shelfProofIds = [...new Set(p.coverage.items.map((i) => i.relationshipId))];
+// ROUND 5 (block→subpage): the five-tile shelf collapsed into ONE SeriesFest
+// feature block (→ /work/seriesfest) + the AFM tile. Media resolves from the
+// articles' existing hero exports — no new assets.
+const sf = p.coverage.seriesfest;
+const sfImg = bust(`venture/${sf.heroSlug}/hero-900`, pair(`venture/${sf.heroSlug}/hero-900`));
+const afm = p.coverage.afm;
+const afmSlug = afm.href.replace(/^\/venture\//, "");
+const afmImg = bust(`venture/${afmSlug}/hero-900`, pair(`venture/${afmSlug}/hero-900`));
+// The shelf states each event relationship ONCE (verbatim phrasing), never
+// upgraded per block — SeriesFest and AFM share the same honest line.
+const shelfProofIds = [...new Set([sf.relationshipId, afm.relationshipId])];
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -149,11 +148,13 @@ const shelfProofIds = [...new Set(p.coverage.items.map((i) => i.relationshipId))
     </div>
   </section>
 
-  <!-- ═══ W3 · THE COVERAGE SHELF — SeriesFest + American Film Market ═══
-       Tiles keep the wall's wtile grammar (16:9 cinematic cards, corner
-       instruments, always-visible CTA); slate/title strings verbatim from the
-       article pages. The honest status line renders ONCE per relationship
-       below the shelf heading — never upgraded per tile. -->
+  <!-- ═══ W3 · THE COVERAGE SHELF — Round 5 block→subpage pattern: ONE
+       compelling block per core story. SeriesFest collapses from four tiles
+       into one detailed feature block that clicks through to its own subpage
+       (/work/seriesfest); AFM stays a block on this page (no subpage yet —
+       its tile links to the published article, wtile grammar kept). The
+       honest status line renders ONCE per relationship below the shelf
+       heading — never upgraded per block. -->
   <section class="wall-rail py-8 border-t border-hairline">
     <div class="mx-auto mb-6 max-w-3xl space-y-3">
       <h2 class="text-2xl font-bold" data-reveal>{p.coverage.heading}</h2>
@@ -168,31 +169,53 @@ const shelfProofIds = [...new Set(p.coverage.items.map((i) => i.relationshipId))
         }
       </ul>
     </div>
-    <div class="wall">
-      {
-        tiles.map((tile) => (
-          <a class="wtile wtile--link" href={`${base}${tile.href}`} data-reveal data-reveal-stagger="50">
-            <figure class="wtile-media" aria-hidden="true">
-              {tile.img ? (
-                <picture>
-                  {tile.img.avif && <source type="image/avif" srcset={tile.img.avif} />}
-                  <img src={tile.img.webp ?? tile.img.avif} alt="" loading="lazy" decoding="async" />
-                </picture>
-              ) : (
-                <div class="wtile-placeholder placeholder" />
-              )}
-            </figure>
-            <span class="wtile-index">{tile.index}</span>
-            <figcaption class="wtile-meta">
-              <span class="wtile-slate">{tile.slate}</span>
-              <span class="wtile-title">{tile.title}</span>
-            </figcaption>
-            <span class="wtile-cta">
-              Read the story <span class="arrow" aria-hidden="true">→</span>
-            </span>
-          </a>
-        ))
-      }
+
+    <!-- The SeriesFest feature block — the MEME anchor's panel grammar
+         (media beside copy), one CTA into the subpage. -->
+    <div class="mx-auto mb-6 max-w-5xl">
+      <p class="hud-label mb-4" data-reveal>{sf.kicker}</p>
+      <div class="anchor-panel panel" data-reveal>
+        {
+          sfImg && (
+            <a class="sf-media" href={`${base}${sf.cta.href}`} aria-hidden="true" tabindex="-1">
+              <picture>
+                {sfImg.avif && <source type="image/avif" srcset={sfImg.avif} />}
+                <img class="sf-still" src={sfImg.webp ?? sfImg.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
+            </a>
+          )
+        }
+        <div class="anchor-copy space-y-4">
+          <h3 class="text-2xl font-bold">{sf.heading}</h3>
+          <p class="text-ink">{sf.body}</p>
+          <a href={`${base}${sf.cta.href}`} class="btn">{sf.cta.label}</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- The AFM block — one wtile, linking to the published article. -->
+    <div class="wall wall--single">
+      <a class="wtile wtile--link" href={`${base}${afm.href}`} data-reveal>
+        <figure class="wtile-media" aria-hidden="true">
+          {
+            afmImg ? (
+              <picture>
+                {afmImg.avif && <source type="image/avif" srcset={afmImg.avif} />}
+                <img src={afmImg.webp ?? afmImg.avif} alt="" loading="lazy" decoding="async" />
+              </picture>
+            ) : (
+              <div class="wtile-placeholder placeholder" />
+            )
+          }
+        </figure>
+        <figcaption class="wtile-meta">
+          <span class="wtile-slate">{afm.slate}</span>
+          <span class="wtile-title">{afm.title}</span>
+        </figcaption>
+        <span class="wtile-cta">
+          Read the story <span class="arrow" aria-hidden="true">→</span>
+        </span>
+      </a>
     </div>
   </section>
 
@@ -296,6 +319,46 @@ const shelfProofIds = [...new Set(p.coverage.items.map((i) => i.relationshipId))
   @media (max-width: 640px) {
     .wall {
       grid-template-columns: 1fr;
+    }
+  }
+  /* Round 5 — the AFM block rides alone: one card at half the rail width so
+     it reads as a block, not a lonely grid cell. */
+  .wall--single {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  /* ── Round 5 · the SeriesFest feature block media — the anchor panel's
+     framed-media treatment, still-only (the subpage carries the depth). ── */
+  .sf-media {
+    position: relative;
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
+  }
+  .sf-still {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 900ms var(--ease-survey, ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sf-media:hover .sf-still {
+      transform: scale(1.035);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sf-still {
+      transition: none;
+    }
+    .sf-media:hover .sf-still {
+      transform: none;
     }
   }
   .wtile {

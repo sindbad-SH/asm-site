@@ -35,6 +35,13 @@
  * This is DATA only — no positions, colors, or markup. The constellation
  * geometry (cluster centers, the sunflower spray of location dots) is computed
  * in adventure.astro so this file stays a clean, typed inventory.
+ *
+ * ROUND 5 (2026-07-21, operator-directed NO-COUNT rule): the territory
+ * treatment renders NO numbers anywhere — outing counts stay in this file as
+ * provenance + sort weights only. The map also now carries COVERAGE places
+ * (kind: "coverage") sourced from the site's own published stories, each
+ * ⚠ OPERATOR-CONFIRM flagged at its entry. The inventory totals in the note
+ * above describe the AA-archive rows only and are historical provenance.
  */
 
 export interface TerritoryLocation {
@@ -42,6 +49,18 @@ export interface TerritoryLocation {
   name: string;
   /** Number of distinct dated outings that hit this place. */
   outings: number;
+  /**
+   * Round 5 (2026-07-21) — what kind of work seats this dot:
+   *   "aerial"   (default) — the AA archive; its chip links to the licensing
+   *              portfolio ("License this work →").
+   *   "coverage" — event/story coverage shot at this place; its chip links to
+   *              the story that proves it (href/linkLabel below).
+   */
+  kind?: "aerial" | "coverage";
+  /** Coverage chips only: the internal story route that proves this place. */
+  href?: string;
+  /** Coverage chips only: the chip link label (e.g. "See the coverage"). */
+  linkLabel?: string;
 }
 
 export interface TerritoryCountry {
@@ -63,7 +82,20 @@ export const TERRITORY: readonly TerritoryCountry[] = [
     // 12 places. Boulder (4), Lake County (3) and Boulder County (3) are the
     // repeat-visit anchors; the rest are single outings. Boulder vs. Boulder
     // County and Ouray vs. Ouray County are distinct folders, kept distinct.
+    //
+    // Round 5 (2026-07-21) — TWO COVERAGE PLACES join the Colorado cluster,
+    // sourced from the site's own published coverage (never invented):
+    //   · Denver — SeriesFest coverage (/work/seriesfest; the venture dispatch
+    //     pages carry the frames). ⚠ OPERATOR-CONFIRM: surfacing Denver as a
+    //     territory dot is a new presentation of an existing claim.
+    //   · Loveland — the Colorado Medieval Festival feature on /adventure.
+    //     ⚠ OPERATOR-CONFIRM: same — existing story, new dot.
+    // Their `outings` value is a sort weight only — Round 5 renders NO counts
+    // anywhere in the territory treatment (no-count rule: growing bodies of
+    // work are never numerized).
     locations: [
+      { name: "Denver", outings: 1, kind: "coverage", href: "/work/seriesfest", linkLabel: "See the coverage" },
+      { name: "Loveland", outings: 1, kind: "coverage", href: "/adventure#festival", linkLabel: "See the story" },
       { name: "Boulder", outings: 4 },
       { name: "Lake County", outings: 3 },
       { name: "Boulder County", outings: 3 },
@@ -145,6 +177,20 @@ export const TERRITORY: readonly TerritoryCountry[] = [
     // A single December 2022 outing — Taos County. Kept honest and separate
     // from Colorado rather than absorbed into it.
     locations: [{ name: "Taos County", outings: 1 }],
+  },
+  {
+    // Round 5 (2026-07-21) — CALIFORNIA joins the map as a COVERAGE territory:
+    // the American Film Market coverage in Los Angeles is already published on
+    // this site (/venture/afm-2025; the photo index files it under Los Angeles,
+    // CA). ⚠ OPERATOR-CONFIRM: new territory dot — the underlying claim is
+    // existing site copy, but surfacing California on the map is new.
+    // `outings: 1` is a sort weight only; no counts render (no-count rule).
+    country: "California",
+    label: "CALIFORNIA",
+    outings: 1,
+    locations: [
+      { name: "Los Angeles", outings: 1, kind: "coverage", href: "/venture/afm-2025", linkLabel: "See the coverage" },
+    ],
   },
 ];
 
