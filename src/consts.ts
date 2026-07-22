@@ -1278,6 +1278,68 @@ export const PAGES = {
       heading: "A medieval festival in Loveland",
       body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. We covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
     },
+    // M1 — STEEL & DUST (2026-07-22, operator-directed "magazine light"
+    // direction): the festival block's FULL STORY subpage at
+    // /adventure/steel-and-dust — the first Field Notes magazine story and the
+    // template for future marquee coverage pieces. Cover treatment derived
+    // from the operator-reviewed Claude Design prototypes (project 4a21b809:
+    // recentered cover + telemetry annotations + editorial spread), rebuilt
+    // native to the site's grammar.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new visible
+    // copy (staging-only until read). Facts kept to what the footage shows +
+    // the WORK record: Colorado Medieval Festival, Loveland CO, June 2024,
+    // Knights of Mayhem full-contact joust, air + ground coverage, showcase
+    // edit delivered. No invented telemetry, counts, or read-times.
+    steelDust: {
+      meta: {
+        title: "Steel & Dust — the Colorado Medieval Festival from above",
+        description:
+          "Field Notes No. 01: full-contact jousting at the Colorado Medieval Festival in Loveland — the Knights of Mayhem, covered from the air and the ground.",
+      },
+      cover: {
+        masthead: "Field Notes",
+        credit: "Adventure Storytelling Media",
+        issue: "Field report · No. 01",
+        location: "Loveland, Colorado",
+        coords: "40.39° N · 105.07° W",
+        storyLabel: "The cover story",
+        titleA: "Steel",
+        titleB: "Dust",
+        deck: "A day inside Colorado's full-contact jousting circuit — where the Knights of Mayhem ride at each other for real.",
+        teasers: ["The lists from the air", "Steel on steel in the arena", "A field becomes a tournament ground"],
+        scrollCue: "Scroll for the field report",
+      },
+      byline: "Words & drone — Sindbad Horizon",
+      slate: "Colorado Medieval Festival · June 2024",
+      lede: "From the air, the lists are a straight brown scar between two walls of people. On the ground, that strip of dirt is barely wide enough for two horses and the collision between them.",
+      paragraphs: [
+        "One weekend each June, a field outside Loveland turns into a tournament ground. At first pass it reads like any renaissance fair — tents, banners, turkey legs. Then the Knights of Mayhem take the lists, and the whole thing stops being costume.",
+        "They joust full-contact: real lances, real armor, riders who hit the dirt hard enough that the crowd goes quiet before it cheers. We flew the lane between passes and worked the rails on foot, and cut the troupe's showcase piece from both.",
+      ],
+      pullQuote: "Then the Knights of Mayhem take the lists, and the whole thing stops being costume.",
+      arena:
+        "Off the horses, the fighting closes to sword range. In a railed pen at the field's edge, armored fighters trade blows while a marshal stands by in yellow, staff ready between bouts. From above you can read the whole ritual at once — the square of rails, the ring of spectators, the two figures circling.",
+      pageant:
+        "Between passes the lane belongs to the procession — gowns and banners walking the same dirt the horses just tore up. That is the festival in one frame: half theater, half genuine hazard, and a story that only reads whole from above.",
+      captions: {
+        joustCharge: "A knight commits to the lane.",
+        joustRiders: "Two riders in the lists between passes.",
+        meleeArena: "The arena bout — the marshal's flag between fighters.",
+        lanePageant: "The procession walks the lists.",
+        fieldWide: "The tournament ground at full tilt — tents, lists, arena, and the crowd around the rails. June 2024.",
+        loop: "From the showcase edit — the joust from the air.",
+      },
+      fieldLog: {
+        heading: "Field log",
+        rows: [
+          { label: "Site", value: "Colorado Medieval Festival — Loveland, CO" },
+          { label: "Date", value: "June 2024" },
+          { label: "Discipline", value: "Full-contact joust · armored combat" },
+          { label: "Troupe", value: "Knights of Mayhem" },
+          { label: "Coverage", value: "Air + ground · showcase edit delivered" },
+        ],
+      },
+    },
     // A4c — FROM THE ARCHIVE (Round 4, 2026-07-21, operator-directed). Two
     // tiles moved off /entertainment's archive band because they read as
     // travel/coverage pieces, not commissioned venture work: Nordic Daughter &
