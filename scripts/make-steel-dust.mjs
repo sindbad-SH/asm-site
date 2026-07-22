@@ -67,6 +67,15 @@ const JOBS = [
     extract: null,
     widths: [900, 1600],
   },
+  // v3 (operator note 2026-07-22): the cover's right plate was too close to the
+  // cover photo (procession = the same lane, minus jousters). Replace it with a
+  // clean 1-on-1 armored duel — clearly distinct from the joust cover.
+  {
+    slug: "duel-pen",
+    src: join(SRC, "Sword Fights Vertical", "Tier 1 - Best", "Snapshot_20260713105134.jpg"),
+    extract: { left: 0, top: 300, width: 3200, height: 4000 },
+    widths: [800, 1120, 1600],
+  },
 ];
 
 await mkdir(OUT, { recursive: true });

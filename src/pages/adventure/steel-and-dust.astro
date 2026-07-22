@@ -31,7 +31,6 @@
  * operator reads it).
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES, WORK } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -180,7 +179,14 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
                 <img class="sd-poster" src={loopPoster} alt="" loading="lazy" decoding="async" />
                 <video class="sd-loop" data-sd-loop data-loop-src={loopSrc} muted loop playsinline preload="none" aria-hidden="true" />
               </div>
-              <figcaption class="sd-cap hud-label">{sd.captions.loop}</figcaption>
+              <figcaption class="sd-cap hud-label sd-cap-row">
+                <span>{sd.captions.loop}</span>
+                {sd.fullFilm.href && (
+                  <a class="sd-film-link link" href={sd.fullFilm.href} target="_blank" rel="noopener">
+                    {sd.fullFilm.label} <span class="arrow" aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </figcaption>
             </figure>
           </section>
         )
@@ -341,18 +347,37 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
         )
       }
 
-      <!-- honest sign-off: WORK-record grammar + the licensing mark -->
-      {
-        knights && (
-          <footer class="sd-col space-y-1 pt-8 pb-8">
-            <p class="sd-attrib">
-              For {knights.forOrg} · {knights.what}
-              {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
+      <!-- sign-off: the honest WORK-record line + the Amazing Aerial editorial
+           licensing band (operator rule 2026-07-22: logo + link wherever this
+           coverage's licensing is referenced). -->
+      <footer class="sd-col pt-8 pb-8">
+        {knights && (
+          <p class="sd-attrib">
+            For {knights.forOrg} · {knights.what}
+            {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
+          </p>
+        )}
+        <div class="sd-editorial panel" data-reveal>
+          <img
+            src={`${base}/media/adventure/aa-logo.png`}
+            alt="Amazing Aerial Agency"
+            class="sd-aa-logo"
+            width="480"
+            height="158"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="sd-editorial-body">
+            <p class="hud-label sd-accent">Licensed through Amazing Aerial Agency</p>
+            <p class="sd-editorial-note">{sd.editorial.note}</p>
+            <p>
+              <a class="link" href={sd.editorial.cta.href} target="_blank" rel="noopener">
+                {sd.editorial.cta.label} <span class="arrow" aria-hidden="true">↗</span>
+              </a>
             </p>
-            <LegendMark proof={{ relationshipId: "amazing-aerial" }} />
-          </footer>
-        )
-      }
+          </div>
+        </div>
+      </footer>
     </article>
 
     <!-- close — the lane's spine -->
@@ -820,6 +845,49 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     font-size: 0.72rem;
     letter-spacing: 0.06em;
     color: var(--color-ink-muted);
+    margin-bottom: 1.25rem;
+  }
+  /* caption + full-film link on one row */
+  .sd-cap-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .sd-film-link {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+  }
+  /* Amazing Aerial editorial-licensing band */
+  .sd-editorial {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.4rem 1.6rem;
+  }
+  @media (min-width: 620px) {
+    .sd-editorial {
+      flex-direction: row;
+      align-items: center;
+      gap: 1.6rem;
+    }
+  }
+  .sd-aa-logo {
+    flex: 0 0 auto;
+    width: clamp(150px, 32vw, 220px);
+    height: auto;
+  }
+  .sd-editorial-body {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .sd-editorial-note {
+    max-width: 54ch;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--color-ink);
   }
 </style>
 
