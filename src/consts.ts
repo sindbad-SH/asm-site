@@ -1286,10 +1286,16 @@ export const PAGES = {
     // recentered cover + telemetry annotations + editorial spread), rebuilt
     // native to the site's grammar.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new visible
-    // copy (staging-only until read). Facts kept to what the footage shows +
-    // the WORK record: Colorado Medieval Festival, Loveland CO, June 2024,
-    // Knights of Mayhem full-contact joust, air + ground coverage, showcase
-    // edit delivered. No invented telemetry, counts, or read-times.
+    // copy (staging-only until read). v2 (operator notes 2026-07-22): story
+    // journalism, not photo description; researched facts folded in. Sources:
+    // coloradocastle.com + colorado.com + tickettailor (festival: The Savage
+    // Woods, 1750 Savage Road, Loveland; annual June weekend — June 7-9 in
+    // 2024; run by The Savage Woods LLC, the outfit behind Loveland's seasonal
+    // haunted/holiday walks; bill = jousting + sword-fighting displays +
+    // medieval hamlet). knightsofmayhem.com + NatGeo/press (Knights of Mayhem:
+    // full-contact jousting troupe founded by Charlie Andrews, world-champion
+    // heavy-armor jouster; National Geographic series "Knights of Mayhem",
+    // 2011). No invented telemetry, counts, or read-times.
     steelDust: {
       meta: {
         title: "Steel & Dust — the Colorado Medieval Festival from above",
@@ -1305,34 +1311,43 @@ export const PAGES = {
         storyLabel: "The cover story",
         titleA: "Steel",
         titleB: "Dust",
-        deck: "A day inside Colorado's full-contact jousting circuit — where the Knights of Mayhem ride at each other for real.",
-        teasers: ["The lists from the air", "Steel on steel in the arena", "A field becomes a tournament ground"],
+        deck: "Once a year, a patch of woods outside Loveland stages the real thing — and the Knights of Mayhem ride at each other for keeps.",
+        teasers: ["Full-contact jousting", "Armored combat in the pen", "Three days at The Savage Woods"],
         scrollCue: "Scroll for the field report",
+        plates: [
+          { label: "Inside — the pen", slug: "arena-melee", alt: "Aerial view into the combat pen: downed armored fighters, the marshal crossing with the yellow flag, crowd at the fence" },
+          { label: "Inside — the procession", slug: "lane-pageant", alt: "Aerial view of the festival procession walking the jousting lane between the crowds" },
+        ],
       },
       byline: "Words & drone — Sindbad Horizon",
       slate: "Colorado Medieval Festival · June 2024",
-      lede: "From the air, the lists are a straight brown scar between two walls of people. On the ground, that strip of dirt is barely wide enough for two horses and the collision between them.",
+      lede: "There is a moment, early in a Knights of Mayhem pass, when a first-time crowd figures out what it is actually watching. Theater applauds on cue. This crowd gasps first.",
+      chapters: { lists: "Pass one — the lists", arena: "Pass two — the pen", grounds: "Pass three — the grounds" },
       paragraphs: [
-        "One weekend each June, a field outside Loveland turns into a tournament ground. At first pass it reads like any renaissance fair — tents, banners, turkey legs. Then the Knights of Mayhem take the lists, and the whole thing stops being costume.",
-        "They joust full-contact: real lances, real armor, riders who hit the dirt hard enough that the crowd goes quiet before it cheers. We flew the lane between passes and worked the rails on foot, and cut the troupe's showcase piece from both.",
+        "The Colorado Medieval Festival runs one June weekend a year at The Savage Woods, a family-run event ground in the trees off Savage Road — the same outfit that stages Loveland's haunted walks come fall. Most of the year it sits quiet. For three days it becomes a hamlet: merchant rows, music, banners, mead — and at the center of it, a dirt jousting list and a timber combat pen built for keeps.",
+        "The headliners are the Knights of Mayhem, the full-contact jousting troupe founded by Charlie Andrews — a world-champion heavy-armor jouster, and the man National Geographic built a series around in 2011. Their sport has no script: real lances, real armor, and passes that put a rider in the dirt when the hit lands square.",
       ],
-      pullQuote: "Then the Knights of Mayhem take the lists, and the whole thing stops being costume.",
+      afterVideo:
+        "We were there with the troupe — flying the lane between passes, working the rails on foot, and cutting their showcase piece from both. Every frame on this page comes from that coverage.",
+      pullQuote: "Their sport has no script — theater applauds on cue, but this crowd gasps first.",
       arena:
-        "Off the horses, the fighting closes to sword range. In a railed pen at the field's edge, armored fighters trade blows while a marshal stands by in yellow, staff ready between bouts. From above you can read the whole ritual at once — the square of rails, the ring of spectators, the two figures circling.",
+        "The joust shares the bill with armored ground combat. In the timber pen, fighters in full plate go at it with blunt steel until the marshal's yellow flag ends the bout. From directly overhead the sport reads plainly: fighters go down, get helped off the rails, and line right back up for the next round.",
       pageant:
-        "Between passes the lane belongs to the procession — gowns and banners walking the same dirt the horses just tore up. That is the festival in one frame: half theater, half genuine hazard, and a story that only reads whole from above.",
+        "And between the violence, the festival does what festivals do — the procession takes the lane, gowns and banners on the same dirt the horses just tore up. Half theater, half genuine hazard: Loveland's strangest June tradition, and its best one.",
       captions: {
-        joustCharge: "A knight commits to the lane.",
-        joustRiders: "Two riders in the lists between passes.",
-        meleeArena: "The arena bout — the marshal's flag between fighters.",
-        lanePageant: "The procession walks the lists.",
-        fieldWide: "The tournament ground at full tilt — tents, lists, arena, and the crowd around the rails. June 2024.",
-        loop: "From the showcase edit — the joust from the air.",
+        joustCharge: "First pass of the afternoon.",
+        joustRiders: "Resetting in the lists.",
+        meleeArena: "Yellow flag up — the only thing that ends a bout.",
+        arenaSails: "Team bouts under the shade sails, crowd three deep at the fence.",
+        lanePageant: "The procession takes the lane.",
+        fieldWide: "The Savage Woods at full tilt, June 2024.",
+        loop: "From the showcase edit we cut for the Knights of Mayhem.",
       },
       fieldLog: {
         heading: "Field log",
         rows: [
-          { label: "Site", value: "Colorado Medieval Festival — Loveland, CO" },
+          { label: "Site", value: "The Savage Woods — Loveland, CO" },
+          { label: "Event", value: "Colorado Medieval Festival (annual)" },
           { label: "Date", value: "June 2024" },
           { label: "Discipline", value: "Full-contact joust · armored combat" },
           { label: "Troupe", value: "Knights of Mayhem" },

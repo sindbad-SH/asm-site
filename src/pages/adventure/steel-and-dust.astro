@@ -1,29 +1,34 @@
 ---
 /**
- * /adventure/steel-and-dust — STEEL & DUST, Field Notes No. 01 (M1,
- * 2026-07-22, operator-directed "magazine light" direction).
+ * /adventure/steel-and-dust — STEEL & DUST, Field Notes No. 01 (M1 v2,
+ * 2026-07-22, operator notes applied).
  *
  * The festival block's FULL STORY subpage (Round-5 block→subpage pattern) and
  * the first magazine-grade coverage piece — the template for future marquee
- * stories (Pebble Beach, PitchBoulder). Two movements:
+ * stories. v2 changes, per the operator:
  *
- *   1. THE COVER — a framed 4:5 magazine cover built from the recentered
- *      two-knight charge (baked by scripts/make-steel-dust.mjs), FIELD NOTES
- *      masthead in the sky band, title + deck + teaser lines set INTO the
- *      photo. Derived from the operator-reviewed Claude Design prototypes
- *      (project 4a21b809), rebuilt native: Anton masthead, Fraunces title
- *      with the accent ampersand, mono annotations. Annotations are FACTUAL
- *      only (site name, town coordinates, date) — no invented telemetry.
+ *   COVER → A NEWSSTAND: the 4:5 cover was lonely on desktop, so it now
+ *   hangs center-stage with two smaller "inside this issue" plates tucked
+ *   behind its shoulders (pen melee · procession). Mobile keeps the single
+ *   cover; the plates reappear as a small strip below it.
  *
- *   2. THE FIELD REPORT — the editorial spread: standfirst, drop-cap lede,
- *      pull quote, photo bands with mono captions, the FIELD LOG slate, the
- *      showcase ambient loop (same IO-gated poster-first pattern as A4b),
- *      and the honest sign-off (WORK record grammar + LegendMark).
+ *   VIDEO MOVED UP: the story order is cover → open → SHOWCASE LOOP → the
+ *   rest. (Operator rule: in any story, the video is the first visual after
+ *   the opening text.)
  *
- * HONESTY: attribution composes from the WORK record (single source); the
- * aerial-licensing note renders ONLY via LegendMark (amazing-aerial's
- * verbatim permittedPhrasing). All visible copy lives in consts
- * (PAGES.adventure.steelDust — ⚠ staging-only until the operator reads it).
+ *   DE-BOXED SPREAD: chapter numerals ghosted behind the text column, a
+ *   full-bleed arena band, the pull quote overlapping the media above it,
+ *   an asymmetric two-up (staggered, unequal), and the pageant frame hung
+ *   at a slight tilt — editorial texture instead of stacked rectangles.
+ *
+ *   COPY = JOURNALISM: researched facts folded in (The Savage Woods,
+ *   Charlie Andrews / NatGeo 2011 — sources in consts) instead of prose
+ *   that re-describes the photos.
+ *
+ * HONESTY: attribution composes from the WORK record; the aerial-licensing
+ * note renders ONLY via LegendMark (verbatim permittedPhrasing). All visible
+ * copy lives in consts (PAGES.adventure.steelDust — ⚠ staging-only until the
+ * operator reads it).
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
@@ -54,8 +59,13 @@ const cover = photo("cover-charge", "vertical");
 const joustCharge = photo("joust-charge", "landscape");
 const joustRiders = photo("joust-riders", "landscape");
 const meleeArena = photo("melee-arena", "landscape");
+const meleeBrawl = photo("melee-brawl", "landscape");
+const arenaSails = photo("arena-sails", "landscape");
 const lanePageant = photo("lane-pageant", "vertical");
 const fieldWide = photo("field-wide", "landscape");
+const plates = sd.cover.plates
+  .map((p) => ({ ...p, media: photo(p.slug, "vertical") }))
+  .filter((p) => p.media);
 
 // Showcase ambient loop (shared asset with /adventure's A4b feature —
 // public/media/work/knights-of-mayhem/, poster-first, IO-gated).
@@ -70,131 +80,209 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
 
 <Base title={sd.meta.title} description={sd.meta.description}>
   <div data-lane="adventure">
-    <!-- ── MOVEMENT 1 · THE COVER ─────────────────────────────────────── -->
+    <!-- ── MOVEMENT 1 · THE NEWSSTAND ─────────────────────────────────── -->
     <section class="sd-stage" aria-label={`${sd.cover.masthead} — ${sd.meta.title}`}>
-      <div class="sd-cover" data-reveal>
+      <div class="sd-stand">
         {
-          cover && (
-            <picture>
-              <source type="image/avif" srcset={cover.avif} sizes="(min-width: 640px) 560px, 92vw" />
-              <source type="image/webp" srcset={cover.webp} sizes="(min-width: 640px) 560px, 92vw" />
-              <img
-                src={cover.src}
-                alt="Two armored knights charging each other down the jousting lists, crowds along both rails, the Front Range foothills behind"
-                class="sd-cover-img"
-                fetchpriority="high"
-                decoding="async"
-              />
-            </picture>
+          plates[0] && (
+            <figure class="sd-plate sd-plate--l" data-reveal aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset={plates[0].media!.avif} sizes="300px" />
+                <source type="image/webp" srcset={plates[0].media!.webp} sizes="300px" />
+                <img src={plates[0].media!.src} alt="" loading="lazy" decoding="async" />
+              </picture>
+              <figcaption class="hud-label">{plates[0].label}</figcaption>
+            </figure>
           )
         }
-        <div class="sd-scrim" aria-hidden="true"></div>
 
-        <!-- factual corner slates -->
-        <p class="sd-corner sd-corner--tl hud-label">{sd.cover.issue}</p>
-        <p class="sd-corner sd-corner--tr hud-label sd-accent">{sd.cover.location}</p>
+        <div class="sd-cover" data-reveal>
+          {
+            cover && (
+              <picture>
+                <source type="image/avif" srcset={cover.avif} sizes="(min-width: 640px) 600px, 92vw" />
+                <source type="image/webp" srcset={cover.webp} sizes="(min-width: 640px) 600px, 92vw" />
+                <img
+                  src={cover.src}
+                  alt="Two armored knights charging each other down the jousting lists, crowds along both rails, the Front Range foothills behind"
+                  class="sd-cover-img"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </picture>
+            )
+          }
+          <div class="sd-scrim" aria-hidden="true"></div>
 
-        <!-- masthead in the sky band -->
-        <header class="sd-masthead">
-          <p class="sd-masthead-word">{sd.cover.masthead}</p>
-          <p class="sd-masthead-credit hud-label">{sd.cover.credit}</p>
-        </header>
+          <!-- factual corner slates -->
+          <p class="sd-corner sd-corner--tl hud-label">{sd.cover.issue}</p>
+          <p class="sd-corner sd-corner--tr hud-label sd-accent">{sd.cover.location}</p>
 
-        <!-- coordinates spine — the surveyor's voice, factual -->
-        <p class="sd-coords hud-label" aria-hidden="true">{sd.cover.coords}</p>
+          <!-- masthead in the sky band -->
+          <header class="sd-masthead">
+            <p class="sd-masthead-word">{sd.cover.masthead}</p>
+            <p class="sd-masthead-credit hud-label">{sd.cover.credit}</p>
+          </header>
 
-        <!-- title block set into the dirt band -->
-        <div class="sd-titleblock">
-          <p class="hud-label sd-accent">{sd.cover.storyLabel}</p>
-          <h1 class="sd-title">
-            {sd.cover.titleA} <span class="sd-amp" aria-hidden="true">&amp;</span><span class="sr-only">and</span>
-            {sd.cover.titleB}
-          </h1>
-          <p class="sd-deck">{sd.cover.deck}</p>
-          <ul class="sd-teasers" role="list">
-            {sd.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
-          </ul>
+          <!-- coordinates spine — the surveyor's voice, factual -->
+          <p class="sd-coords hud-label" aria-hidden="true">{sd.cover.coords}</p>
+
+          <!-- title block set into the dirt band -->
+          <div class="sd-titleblock">
+            <p class="hud-label sd-accent">{sd.cover.storyLabel}</p>
+            <h1 class="sd-title">
+              {sd.cover.titleA} <span class="sd-amp" aria-hidden="true">&amp;</span><span class="sr-only">and</span>
+              {sd.cover.titleB}
+            </h1>
+            <p class="sd-deck">{sd.cover.deck}</p>
+            <ul class="sd-teasers" role="list">
+              {sd.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
+            </ul>
+          </div>
         </div>
+
+        {
+          plates[1] && (
+            <figure class="sd-plate sd-plate--r" data-reveal aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset={plates[1].media!.avif} sizes="300px" />
+                <source type="image/webp" srcset={plates[1].media!.webp} sizes="300px" />
+                <img src={plates[1].media!.src} alt="" loading="lazy" decoding="async" />
+              </picture>
+              <figcaption class="hud-label">{plates[1].label}</figcaption>
+            </figure>
+          )
+        }
       </div>
       <p class="sd-cue hud-label" aria-hidden="true">{sd.cover.scrollCue} ↓</p>
     </section>
 
     <!-- ── MOVEMENT 2 · THE FIELD REPORT ──────────────────────────────── -->
-    <article class="border-t border-hairline">
-      <!-- standfirst -->
-      <header class="mx-auto max-w-3xl space-y-3 p-8 pb-4">
+    <article class="border-t border-hairline sd-report">
+      <!-- standfirst + open -->
+      <header class="sd-col sd-chapter" data-chapter="01">
         <hr class="flight-line mb-6" aria-hidden="true" />
         <p class="hud-label" data-reveal>{sd.slate}</p>
         <p class="hud-label sd-accent" data-reveal>{sd.byline}</p>
         <p class="sd-lede" data-reveal>{sd.lede}</p>
       </header>
 
-      <div class="mx-auto max-w-3xl space-y-6 px-8 pb-8">
+      <div class="sd-col space-y-6">
         {sd.paragraphs.map((para) => <p class="text-lg text-ink" data-reveal>{para}</p>)}
       </div>
 
-      <!-- joust band: the two lists frames, magazine two-up -->
+      <!-- THE VIDEO — the first visual after the open (operator rule) -->
       {
-        (joustCharge || joustRiders) && (
-          <section class="mx-auto max-w-5xl px-8 pb-8">
-            <div class="sd-band">
-              {[
-                { m: joustCharge, alt: "Aerial view of a knight on a white horse charging down the jousting lane between festival crowds", cap: sd.captions.joustCharge },
-                { m: joustRiders, alt: "Two armored riders in the lists, the white horse in the foreground, crowds along both rails", cap: sd.captions.joustRiders },
-              ]
-                .filter((f) => f.m)
-                .map((f) => (
-                  <figure class="sd-photo" data-reveal data-reveal-stagger="60">
-                    <picture>
-                      <source type="image/avif" srcset={f.m!.avif} sizes="(min-width: 1024px) 45vw, 90vw" />
-                      <source type="image/webp" srcset={f.m!.webp} sizes="(min-width: 1024px) 45vw, 90vw" />
-                      <img src={f.m!.src} alt={f.alt} style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
-                    </picture>
-                    <figcaption class="sd-cap hud-label">{f.cap}</figcaption>
-                  </figure>
-                ))}
+        loopPoster && loopSrc && (
+          <section class="mx-auto max-w-5xl px-8 pt-8">
+            <figure class="sd-photo" data-reveal>
+              <div class="sd-video">
+                <img class="sd-poster" src={loopPoster} alt="" loading="lazy" decoding="async" />
+                <video class="sd-loop" data-sd-loop data-loop-src={loopSrc} muted loop playsinline preload="none" aria-hidden="true" />
+              </div>
+              <figcaption class="sd-cap hud-label">{sd.captions.loop}</figcaption>
+            </figure>
+          </section>
+        )
+      }
+      <div class="sd-col space-y-6 pt-8">
+        <p class="text-lg text-ink" data-reveal>{sd.afterVideo}</p>
+      </div>
+
+      <!-- PASS ONE — the lists: asymmetric, staggered two-up -->
+      <section class="mx-auto max-w-5xl px-8 pt-10 sd-chapter" data-chapter="01">
+        <p class="hud-label sd-accent sd-chapter-label" data-reveal>{sd.chapters.lists}</p>
+        {
+          (joustCharge || joustRiders) && (
+            <div class="sd-stagger">
+              {joustCharge && (
+                <figure class="sd-photo sd-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={joustCharge.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={joustCharge.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={joustCharge.src} alt="Aerial view of a knight on a white horse charging down the jousting lane between festival crowds" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="sd-cap hud-label">{sd.captions.joustCharge}</figcaption>
+                </figure>
+              )}
+              {joustRiders && (
+                <figure class="sd-photo sd-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={joustRiders.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={joustRiders.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={joustRiders.src} alt="Two armored riders in the lists, the white horse in the foreground, crowds along both rails" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="sd-cap hud-label">{sd.captions.joustRiders}</figcaption>
+                </figure>
+              )}
+            </div>
+          )
+        }
+      </section>
+
+      <!-- pull quote — overlaps the stagger above -->
+      <section class="sd-col sd-pull-wrap">
+        <blockquote class="sd-pull panel" data-reveal>{sd.pullQuote}</blockquote>
+      </section>
+
+      <!-- PASS TWO — the pen: prose, then a FULL-BLEED band -->
+      <section class="sd-col space-y-6 sd-chapter" data-chapter="02">
+        <p class="hud-label sd-accent sd-chapter-label" data-reveal>{sd.chapters.arena}</p>
+        <p class="text-lg text-ink" data-reveal>{sd.arena}</p>
+      </section>
+      {
+        arenaSails && (
+          <figure class="sd-bleed" data-reveal>
+            <picture>
+              <source type="image/avif" srcset={arenaSails.avif} sizes="100vw" />
+              <source type="image/webp" srcset={arenaSails.webp} sizes="100vw" />
+              <img
+                src={arenaSails.src}
+                alt="Aerial view of the timber combat pen under blue shade sails — armored team bouts mid-fight, spectators packed at the fence"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <figcaption class="sd-cap sd-bleed-cap hud-label">{sd.captions.arenaSails}</figcaption>
+          </figure>
+        )
+      }
+      {
+        (meleeArena || meleeBrawl) && (
+          <section class="mx-auto max-w-5xl px-8 pt-4">
+            <div class="sd-stagger sd-stagger--flip">
+              {meleeArena && (
+                <figure class="sd-photo sd-stagger-b" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={meleeArena.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={meleeArena.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={meleeArena.src} alt="Aerial view of two armored fighters squaring up in the wooden combat arena, a marshal in yellow between them" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="sd-cap hud-label">{sd.captions.meleeArena}</figcaption>
+                </figure>
+              )}
+              {meleeBrawl && (
+                <figure class="sd-photo sd-stagger-a" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={meleeBrawl.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={meleeBrawl.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={meleeBrawl.src} alt="Three simultaneous armored bouts at the corners of the combat arena, seen from above" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="sd-cap hud-label">Three bouts at once at the corners of the pen.</figcaption>
+                </figure>
+              )}
             </div>
           </section>
         )
       }
 
-      <!-- pull quote -->
-      <section class="mx-auto max-w-3xl px-8 pb-8">
-        <blockquote class="sd-pull" data-reveal>{sd.pullQuote}</blockquote>
-      </section>
-
-      <!-- arena movement: prose + full-width frame + FIELD LOG slate -->
-      <section class="mx-auto max-w-3xl space-y-6 px-8 pb-8">
-        <p class="text-lg text-ink" data-reveal>{sd.arena}</p>
-      </section>
-      {
-        meleeArena && (
-          <section class="mx-auto max-w-5xl px-8 pb-8">
-            <figure class="sd-photo" data-reveal>
-              <picture>
-                <source type="image/avif" srcset={meleeArena.avif} sizes="(min-width: 1280px) 1100px, 90vw" />
-                <source type="image/webp" srcset={meleeArena.webp} sizes="(min-width: 1280px) 1100px, 90vw" />
-                <img
-                  src={meleeArena.src}
-                  alt="Aerial view of two armored fighters squaring up in the wooden combat arena, a marshal in yellow between them, ringed by spectators"
-                  style="aspect-ratio:16/9;object-fit:cover"
-                  class="block w-full"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-              <figcaption class="sd-cap hud-label">{sd.captions.meleeArena}</figcaption>
-            </figure>
-          </section>
-        )
-      }
-
-      <!-- the pageant beat: vertical frame beside the field-log slate -->
-      <section class="mx-auto max-w-5xl px-8 pb-8">
+      <!-- PASS THREE — the grounds: tilted pageant frame beside prose + log -->
+      <section class="mx-auto max-w-5xl px-8 pt-10 sd-chapter" data-chapter="03">
+        <p class="hud-label sd-accent sd-chapter-label" data-reveal>{sd.chapters.grounds}</p>
         <div class="sd-duo">
           {
             lanePageant && (
-              <figure class="sd-photo" data-reveal>
+              <figure class="sd-photo sd-tilt" data-reveal>
                 <picture>
                   <source type="image/avif" srcset={lanePageant.avif} sizes="(min-width: 1024px) 40vw, 90vw" />
                   <source type="image/webp" srcset={lanePageant.webp} sizes="(min-width: 1024px) 40vw, 90vw" />
@@ -230,25 +318,10 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
         </div>
       </section>
 
-      <!-- the showcase loop — poster-first ambient figure (A4b pattern) -->
-      {
-        loopPoster && loopSrc && (
-          <section class="mx-auto max-w-5xl px-8 pb-8">
-            <figure class="sd-photo" data-reveal>
-              <div class="sd-video">
-                <img class="sd-poster" src={loopPoster} alt="" loading="lazy" decoding="async" />
-                <video class="sd-loop" data-sd-loop data-loop-src={loopSrc} muted loop playsinline preload="none" aria-hidden="true" />
-              </div>
-              <figcaption class="sd-cap hud-label">{sd.captions.loop}</figcaption>
-            </figure>
-          </section>
-        )
-      }
-
       <!-- closing beat: the whole field -->
       {
         fieldWide && (
-          <section class="mx-auto max-w-5xl px-8 pb-8">
+          <section class="mx-auto max-w-5xl px-8 pt-10">
             <figure class="sd-photo" data-reveal>
               <picture>
                 <source type="image/avif" srcset={fieldWide.avif} sizes="(min-width: 1280px) 1100px, 90vw" />
@@ -271,7 +344,7 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
       <!-- honest sign-off: WORK-record grammar + the licensing mark -->
       {
         knights && (
-          <footer class="mx-auto max-w-3xl space-y-1 px-8 pb-8">
+          <footer class="sd-col space-y-1 pt-8 pb-8">
             <p class="sd-attrib">
               For {knights.forOrg} · {knights.what}
               {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
@@ -291,10 +364,10 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
 </Base>
 
 <style>
-  /* ── THE COVER · a framed print object hung on the survey field ────────
-     The stage centers a 4:5 cover the way /adventure/field hangs paintings;
-     the cover itself speaks magazine: Anton masthead, Fraunces title, mono
-     slates. Accent stays SCARCE — location slate, story label, ampersand. */
+  /* ── THE NEWSSTAND · center cover + two tucked plates ──────────────────
+     Desktop: the plates hang behind the cover's shoulders, slightly rotated
+     — a rack of issues, not a lone box. Mobile: plates drop into a small
+     strip under the cover. Accent stays SCARCE. */
   .sd-stage {
     display: grid;
     justify-items: center;
@@ -302,17 +375,89 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     gap: 1.25rem;
     min-height: 100svh;
     padding: 5.5rem 1rem 2rem;
+    overflow-x: clip;
+  }
+  .sd-stand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
   .sd-cover {
     position: relative;
-    width: min(92vw, 560px);
+    z-index: 2;
+    width: min(92vw, 600px);
     aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: 10px;
     background: var(--color-elevated);
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
   }
-  /* corner crop marks — the print-proof voice, drawn not fabricated */
+  .sd-plate {
+    display: none;
+    margin: 0;
+  }
+  @media (min-width: 1024px) {
+    .sd-plate {
+      display: block;
+      position: relative;
+      z-index: 1;
+      width: clamp(200px, 22vw, 300px);
+      flex: 0 0 auto;
+    }
+    .sd-plate img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .sd-plate figcaption {
+      margin-top: 0.55rem;
+      font-size: 0.55rem;
+      text-align: center;
+    }
+    .sd-plate--l {
+      transform: rotate(-2.5deg) translateY(1.5rem);
+      margin-right: -2.25rem;
+    }
+    .sd-plate--r {
+      transform: rotate(2.5deg) translateY(1.5rem);
+      margin-left: -2.25rem;
+    }
+  }
+  /* mobile strip: plates return as a modest two-up under the cover */
+  @media (max-width: 1023px) {
+    .sd-stand {
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .sd-plate {
+      display: block;
+      width: calc(46% - 0.375rem);
+    }
+    .sd-plate img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .sd-plate figcaption {
+      margin-top: 0.4rem;
+      font-size: 0.52rem;
+      text-align: center;
+    }
+    .sd-plate--l {
+      order: 2;
+    }
+    .sd-plate--r {
+      order: 3;
+    }
+  }
+  /* corner crop marks — the print-proof voice */
   .sd-cover::before,
   .sd-cover::after {
     content: "";
@@ -389,7 +534,7 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
   }
   .sd-masthead-word {
     font-family: var(--font-display-condensed);
-    font-size: clamp(1.9rem, 8.5vw, 3.1rem);
+    font-size: clamp(1.9rem, 8.5vw, 3.3rem);
     line-height: 1;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -426,7 +571,7 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     font-family: var(--font-display);
     font-optical-sizing: auto;
     font-weight: 640;
-    font-size: clamp(2.6rem, 11vw, 4.2rem);
+    font-size: clamp(2.6rem, 11vw, 4.4rem);
     line-height: 0.98;
     color: #fff;
     letter-spacing: -0.01em;
@@ -437,7 +582,7 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     font-weight: 420;
   }
   .sd-deck {
-    max-width: 34ch;
+    max-width: 36ch;
     font-family: var(--font-display);
     font-style: italic;
     font-size: 0.95rem;
@@ -467,7 +612,48 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     color: var(--color-ink-muted);
   }
 
-  /* ── THE FIELD REPORT · editorial spread ─────────────────────────────── */
+  /* ── THE FIELD REPORT · de-boxed editorial spread ───────────────────── */
+  .sd-report {
+    overflow-x: clip; /* ghost numerals + bleeds stay contained */
+  }
+  .sd-col {
+    margin-inline: auto;
+    max-width: 48rem;
+    padding-inline: 2rem;
+  }
+  .sd-col.sd-chapter,
+  header.sd-chapter {
+    padding-top: 2rem;
+  }
+  /* chapter ghost numerals — oversized, behind the column (desktop only) */
+  .sd-chapter {
+    position: relative;
+  }
+  @media (min-width: 1180px) {
+    .sd-chapter::before {
+      content: attr(data-chapter);
+      position: absolute;
+      top: -0.2em;
+      right: -0.05em;
+      z-index: -1;
+      font-family: var(--font-display-condensed);
+      font-size: clamp(8rem, 18vw, 15rem);
+      line-height: 1;
+      color: color-mix(in srgb, var(--color-peak) 5%, transparent);
+      pointer-events: none;
+    }
+  }
+  .sd-chapter-label {
+    margin-bottom: 1rem;
+    letter-spacing: 0.3em;
+  }
+  header.sd-chapter {
+    margin-inline: auto;
+    max-width: 48rem;
+    padding: 2rem 2rem 1rem;
+    display: grid;
+    gap: 0.75rem;
+  }
   .sd-lede {
     font-family: var(--font-display);
     font-optical-sizing: auto;
@@ -485,38 +671,98 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
     padding-right: 0.12em;
     color: var(--color-accent);
   }
+  /* pull quote — a plate that overlaps the media above it */
+  .sd-pull-wrap {
+    position: relative;
+    z-index: 2;
+    margin-top: -1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .sd-pull-wrap {
+      margin-top: -3.25rem;
+    }
+  }
   .sd-pull {
-    border-left: 2px solid var(--color-accent-deep);
-    padding-left: 1.25rem;
+    padding: 1.4rem 1.6rem;
+    border-left: 2px solid var(--color-accent);
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 480;
-    font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
     line-height: 1.35;
     color: var(--color-peak);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
   }
-  .sd-band {
+  /* asymmetric stagger — unequal columns, offset baselines */
+  .sd-stagger {
     display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    grid-template-columns: 58fr 34fr;
+    align-items: start;
+  }
+  .sd-stagger--flip {
+    grid-template-columns: 34fr 58fr;
+  }
+  .sd-stagger-b {
+    margin-top: 3rem;
+  }
+  @media (max-width: 860px) {
+    .sd-stagger,
+    .sd-stagger--flip {
+      grid-template-columns: 1fr;
+    }
+    .sd-stagger-b {
+      margin-top: 0;
+      width: 82%;
+      justify-self: end;
+    }
   }
   .sd-duo {
     display: grid;
-    gap: 24px;
+    gap: 28px;
     grid-template-columns: 2fr 3fr;
     align-items: start;
   }
   @media (max-width: 760px) {
-    .sd-band,
     .sd-duo {
       grid-template-columns: 1fr;
     }
+  }
+  /* full-bleed band — breaks the page frame entirely */
+  .sd-bleed {
+    position: relative;
+    margin: 2rem 0 0;
+    width: 100%;
+  }
+  .sd-bleed img {
+    display: block;
+    width: 100%;
+    max-height: 76svh;
+    object-fit: cover;
+  }
+  .sd-bleed-cap {
+    position: absolute;
+    left: max(2rem, calc((100vw - 64rem) / 2));
+    bottom: 1rem;
+    margin: 0;
+    padding: 0.4rem 0.7rem;
+    background: color-mix(in srgb, var(--color-base) 72%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
   }
   .sd-photo {
     margin: 0;
   }
   .sd-photo img {
     border-radius: 8px;
+  }
+  /* the tilted evidence frame — dossier voice, kept subtle */
+  @media (min-width: 761px) {
+    .sd-tilt {
+      transform: rotate(-1.6deg);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+    }
   }
   .sd-cap {
     display: block;
