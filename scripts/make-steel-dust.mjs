@@ -52,6 +52,21 @@ const JOBS = [
     extract: null,
     widths: [900, 1600],
   },
+  // v2 (operator note: "mostly jousting — the story is the whole festival"):
+  // two armored-combat frames from the Tier-1 sword-fight exports.
+  {
+    slug: "arena-melee",
+    src: join(SRC, "Sword Fights Vertical", "Tier 1 - Best", "Snapshot_20260713101146.jpg"),
+    // 4:5 band centered on the downed fighters + marshal.
+    extract: { left: 0, top: 700, width: 3200, height: 4000 },
+    widths: [800, 1120, 1600],
+  },
+  {
+    slug: "arena-sails",
+    src: join(SRC, "Sword fights horizontal", "Tier 1 - Best", "Snapshot_20260713140110.jpg"),
+    extract: null,
+    widths: [900, 1600],
+  },
 ];
 
 await mkdir(OUT, { recursive: true });
