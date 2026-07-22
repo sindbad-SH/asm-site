@@ -1316,7 +1316,7 @@ export const PAGES = {
         scrollCue: "Scroll for the field report",
         plates: [
           { label: "Inside — the pen", slug: "arena-melee", alt: "Aerial view into the combat pen: downed armored fighters, the marshal crossing with the yellow flag, crowd at the fence" },
-          { label: "Inside — the procession", slug: "lane-pageant", alt: "Aerial view of the festival procession walking the jousting lane between the crowds" },
+          { label: "Inside — the duel", slug: "duel-pen", alt: "Aerial view of two armored fighters in single combat in the pen, swords raised, spectators packed along the rail" },
         ],
       },
       byline: "Words & drone — Sindbad Horizon",
@@ -1327,8 +1327,13 @@ export const PAGES = {
         "The Colorado Medieval Festival runs one June weekend a year at The Savage Woods, a family-run event ground in the trees off Savage Road — the same outfit that stages Loveland's haunted walks come fall. Most of the year it sits quiet. For three days it becomes a hamlet: merchant rows, music, banners, mead — and at the center of it, a dirt jousting list and a timber combat pen built for keeps.",
         "The headliners are the Knights of Mayhem, the full-contact jousting troupe founded by Charlie Andrews — a world-champion heavy-armor jouster, and the man National Geographic built a series around in 2011. Their sport has no script: real lances, real armor, and passes that put a rider in the dirt when the hit lands square.",
       ],
+      // Scene description bridging the film to the photos (operator note: no
+      // process/"we cut it" language — just what is happening).
       afterVideo:
-        "We were there with the troupe — flying the lane between passes, working the rails on foot, and cutting their showcase piece from both. Every frame on this page comes from that coverage.",
+        "A single pass takes seconds. A rider commits at the far end, the horse opens up, and the lists close to a blur — then the lances meet, and the crowd finds out together whether the hit landed.",
+      // Full film — gated: renders only when a real URL is supplied. ⚠ operator
+      // to provide the YouTube link (2026-07-22).
+      fullFilm: { label: "Watch the full film on YouTube", href: "" },
       pullQuote: "Their sport has no script — theater applauds on cue, but this crowd gasps first.",
       arena:
         "The joust shares the bill with armored ground combat. In the timber pen, fighters in full plate go at it with blunt steel until the marshal's yellow flag ends the bout. From directly overhead the sport reads plainly: fighters go down, get helped off the rails, and line right back up for the next round.",
@@ -1341,7 +1346,7 @@ export const PAGES = {
         arenaSails: "Team bouts under the shade sails, crowd three deep at the fence.",
         lanePageant: "The procession takes the lane.",
         fieldWide: "The Savage Woods at full tilt, June 2024.",
-        loop: "From the showcase edit we cut for the Knights of Mayhem.",
+        loop: "Three riders down the lists at once.",
       },
       fieldLog: {
         heading: "Field log",
@@ -1351,8 +1356,19 @@ export const PAGES = {
           { label: "Date", value: "June 2024" },
           { label: "Discipline", value: "Full-contact joust · armored combat" },
           { label: "Troupe", value: "Knights of Mayhem" },
-          { label: "Coverage", value: "Air + ground · showcase edit delivered" },
         ],
+      },
+      // The bottom sign-off band (operator rule 2026-07-22): wherever this
+      // coverage's licensing is referenced, use the Amazing Aerial logo + a
+      // link to his contributor page. This footage is registered EDITORIAL on
+      // AA — verbal consent to film/fly, no signed commercial release — so it
+      // is licensable for editorial use only. Copy states exactly that.
+      editorial: {
+        note: "Shot for editorial use. This coverage lives in the Adventure Storytelling Media portfolio on Amazing Aerial Agency, where it can be licensed for editorial stories.",
+        cta: {
+          label: "See more of this work at Amazing Aerial",
+          href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
+        },
       },
     },
     // A4c — FROM THE ARCHIVE (Round 4, 2026-07-21, operator-directed). Two
