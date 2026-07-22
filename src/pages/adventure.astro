@@ -507,6 +507,13 @@ const teaserStories = (await getCollection("fieldNotes", ({ data }) => !data.dra
             <p class="hud-label" data-reveal>{p.festival.kicker}</p>
             <h2 class="text-2xl font-bold" data-reveal>{p.festival.heading}</h2>
             <p class="max-w-3xl text-ink" data-reveal>{p.festival.body}</p>
+            {/* M1 (2026-07-22) — the block's full story, Round-5 block→subpage
+                pattern: Steel & Dust, Field Notes No. 01. */}
+            <p data-reveal>
+              <a href={`${base}/adventure/steel-and-dust`} class="link">
+                Read the full story — Steel &amp; Dust, Field Notes No. 01 <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
 
             {/* Feature loop — poster-first ambient figure (NOT HeroVideo: that
                 component is the fullscreen hero with a scroll cue; this is an

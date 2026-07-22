@@ -1,0 +1,608 @@
+---
+/**
+ * /adventure/steel-and-dust — STEEL & DUST, Field Notes No. 01 (M1,
+ * 2026-07-22, operator-directed "magazine light" direction).
+ *
+ * The festival block's FULL STORY subpage (Round-5 block→subpage pattern) and
+ * the first magazine-grade coverage piece — the template for future marquee
+ * stories (Pebble Beach, PitchBoulder). Two movements:
+ *
+ *   1. THE COVER — a framed 4:5 magazine cover built from the recentered
+ *      two-knight charge (baked by scripts/make-steel-dust.mjs), FIELD NOTES
+ *      masthead in the sky band, title + deck + teaser lines set INTO the
+ *      photo. Derived from the operator-reviewed Claude Design prototypes
+ *      (project 4a21b809), rebuilt native: Anton masthead, Fraunces title
+ *      with the accent ampersand, mono annotations. Annotations are FACTUAL
+ *      only (site name, town coordinates, date) — no invented telemetry.
+ *
+ *   2. THE FIELD REPORT — the editorial spread: standfirst, drop-cap lede,
+ *      pull quote, photo bands with mono captions, the FIELD LOG slate, the
+ *      showcase ambient loop (same IO-gated poster-first pattern as A4b),
+ *      and the honest sign-off (WORK record grammar + LegendMark).
+ *
+ * HONESTY: attribution composes from the WORK record (single source); the
+ * aerial-licensing note renders ONLY via LegendMark (amazing-aerial's
+ * verbatim permittedPhrasing). All visible copy lives in consts
+ * (PAGES.adventure.steelDust — ⚠ staging-only until the operator reads it).
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES, WORK } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const sd = PAGES.adventure.steelDust;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const knights = WORK.find((w) => w.slug === "knights-of-mayhem");
+
+// Baked festival media (make-festival-photos.mjs + make-steel-dust.mjs) —
+// existence-gated per file like every other baked set.
+const festDir = join(process.cwd(), "public", "media", "adventure", "festival");
+const WIDTHS = { landscape: [900, 1600], vertical: [800, 1120, 1600] } as const;
+function photo(slug: string, orientation: keyof typeof WIDTHS) {
+  const w0 = orientation === "vertical" ? 800 : 900;
+  if (!existsSync(join(festDir, `${slug}-${w0}.avif`))) return undefined;
+  const widths = WIDTHS[orientation];
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/festival/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/festival/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/festival/${slug}-${w0}.webp`,
+  };
+}
+const cover = photo("cover-charge", "vertical");
+const joustCharge = photo("joust-charge", "landscape");
+const joustRiders = photo("joust-riders", "landscape");
+const meleeArena = photo("melee-arena", "landscape");
+const lanePageant = photo("lane-pageant", "vertical");
+const fieldWide = photo("field-wide", "landscape");
+
+// Showcase ambient loop (shared asset with /adventure's A4b feature —
+// public/media/work/knights-of-mayhem/, poster-first, IO-gated).
+const loopDir = join(process.cwd(), "public", "media", "work", "knights-of-mayhem");
+const loopPoster = existsSync(join(loopDir, "poster.avif"))
+  ? `${base}/media/work/knights-of-mayhem/poster.avif`
+  : undefined;
+const loopSrc = existsSync(join(loopDir, "loop.mp4"))
+  ? `${base}/media/work/knights-of-mayhem/loop.mp4`
+  : undefined;
+---
+
+<Base title={sd.meta.title} description={sd.meta.description}>
+  <div data-lane="adventure">
+    <!-- ── MOVEMENT 1 · THE COVER ─────────────────────────────────────── -->
+    <section class="sd-stage" aria-label={`${sd.cover.masthead} — ${sd.meta.title}`}>
+      <div class="sd-cover" data-reveal>
+        {
+          cover && (
+            <picture>
+              <source type="image/avif" srcset={cover.avif} sizes="(min-width: 640px) 560px, 92vw" />
+              <source type="image/webp" srcset={cover.webp} sizes="(min-width: 640px) 560px, 92vw" />
+              <img
+                src={cover.src}
+                alt="Two armored knights charging each other down the jousting lists, crowds along both rails, the Front Range foothills behind"
+                class="sd-cover-img"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+          )
+        }
+        <div class="sd-scrim" aria-hidden="true"></div>
+
+        <!-- factual corner slates -->
+        <p class="sd-corner sd-corner--tl hud-label">{sd.cover.issue}</p>
+        <p class="sd-corner sd-corner--tr hud-label sd-accent">{sd.cover.location}</p>
+
+        <!-- masthead in the sky band -->
+        <header class="sd-masthead">
+          <p class="sd-masthead-word">{sd.cover.masthead}</p>
+          <p class="sd-masthead-credit hud-label">{sd.cover.credit}</p>
+        </header>
+
+        <!-- coordinates spine — the surveyor's voice, factual -->
+        <p class="sd-coords hud-label" aria-hidden="true">{sd.cover.coords}</p>
+
+        <!-- title block set into the dirt band -->
+        <div class="sd-titleblock">
+          <p class="hud-label sd-accent">{sd.cover.storyLabel}</p>
+          <h1 class="sd-title">
+            {sd.cover.titleA} <span class="sd-amp" aria-hidden="true">&amp;</span><span class="sr-only">and</span>
+            {sd.cover.titleB}
+          </h1>
+          <p class="sd-deck">{sd.cover.deck}</p>
+          <ul class="sd-teasers" role="list">
+            {sd.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
+          </ul>
+        </div>
+      </div>
+      <p class="sd-cue hud-label" aria-hidden="true">{sd.cover.scrollCue} ↓</p>
+    </section>
+
+    <!-- ── MOVEMENT 2 · THE FIELD REPORT ──────────────────────────────── -->
+    <article class="border-t border-hairline">
+      <!-- standfirst -->
+      <header class="mx-auto max-w-3xl space-y-3 p-8 pb-4">
+        <hr class="flight-line mb-6" aria-hidden="true" />
+        <p class="hud-label" data-reveal>{sd.slate}</p>
+        <p class="hud-label sd-accent" data-reveal>{sd.byline}</p>
+        <p class="sd-lede" data-reveal>{sd.lede}</p>
+      </header>
+
+      <div class="mx-auto max-w-3xl space-y-6 px-8 pb-8">
+        {sd.paragraphs.map((para) => <p class="text-lg text-ink" data-reveal>{para}</p>)}
+      </div>
+
+      <!-- joust band: the two lists frames, magazine two-up -->
+      {
+        (joustCharge || joustRiders) && (
+          <section class="mx-auto max-w-5xl px-8 pb-8">
+            <div class="sd-band">
+              {[
+                { m: joustCharge, alt: "Aerial view of a knight on a white horse charging down the jousting lane between festival crowds", cap: sd.captions.joustCharge },
+                { m: joustRiders, alt: "Two armored riders in the lists, the white horse in the foreground, crowds along both rails", cap: sd.captions.joustRiders },
+              ]
+                .filter((f) => f.m)
+                .map((f) => (
+                  <figure class="sd-photo" data-reveal data-reveal-stagger="60">
+                    <picture>
+                      <source type="image/avif" srcset={f.m!.avif} sizes="(min-width: 1024px) 45vw, 90vw" />
+                      <source type="image/webp" srcset={f.m!.webp} sizes="(min-width: 1024px) 45vw, 90vw" />
+                      <img src={f.m!.src} alt={f.alt} style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="sd-cap hud-label">{f.cap}</figcaption>
+                  </figure>
+                ))}
+            </div>
+          </section>
+        )
+      }
+
+      <!-- pull quote -->
+      <section class="mx-auto max-w-3xl px-8 pb-8">
+        <blockquote class="sd-pull" data-reveal>{sd.pullQuote}</blockquote>
+      </section>
+
+      <!-- arena movement: prose + full-width frame + FIELD LOG slate -->
+      <section class="mx-auto max-w-3xl space-y-6 px-8 pb-8">
+        <p class="text-lg text-ink" data-reveal>{sd.arena}</p>
+      </section>
+      {
+        meleeArena && (
+          <section class="mx-auto max-w-5xl px-8 pb-8">
+            <figure class="sd-photo" data-reveal>
+              <picture>
+                <source type="image/avif" srcset={meleeArena.avif} sizes="(min-width: 1280px) 1100px, 90vw" />
+                <source type="image/webp" srcset={meleeArena.webp} sizes="(min-width: 1280px) 1100px, 90vw" />
+                <img
+                  src={meleeArena.src}
+                  alt="Aerial view of two armored fighters squaring up in the wooden combat arena, a marshal in yellow between them, ringed by spectators"
+                  style="aspect-ratio:16/9;object-fit:cover"
+                  class="block w-full"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption class="sd-cap hud-label">{sd.captions.meleeArena}</figcaption>
+            </figure>
+          </section>
+        )
+      }
+
+      <!-- the pageant beat: vertical frame beside the field-log slate -->
+      <section class="mx-auto max-w-5xl px-8 pb-8">
+        <div class="sd-duo">
+          {
+            lanePageant && (
+              <figure class="sd-photo" data-reveal>
+                <picture>
+                  <source type="image/avif" srcset={lanePageant.avif} sizes="(min-width: 1024px) 40vw, 90vw" />
+                  <source type="image/webp" srcset={lanePageant.webp} sizes="(min-width: 1024px) 40vw, 90vw" />
+                  <img
+                    src={lanePageant.src}
+                    alt="Aerial view of the festival procession walking the jousting lane between the crowds"
+                    style="aspect-ratio:4/5;object-fit:cover"
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption class="sd-cap hud-label">{sd.captions.lanePageant}</figcaption>
+              </figure>
+            )
+          }
+          <div class="space-y-6">
+            <p class="text-lg text-ink" data-reveal>{sd.pageant}</p>
+            <div class="panel sd-log" data-reveal>
+              <p class="hud-label sd-accent">{sd.fieldLog.heading}</p>
+              <dl>
+                {
+                  sd.fieldLog.rows.map((row) => (
+                    <div class="sd-log-row">
+                      <dt class="hud-label">{row.label}</dt>
+                      <dd>{row.value}</dd>
+                    </div>
+                  ))
+                }
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- the showcase loop — poster-first ambient figure (A4b pattern) -->
+      {
+        loopPoster && loopSrc && (
+          <section class="mx-auto max-w-5xl px-8 pb-8">
+            <figure class="sd-photo" data-reveal>
+              <div class="sd-video">
+                <img class="sd-poster" src={loopPoster} alt="" loading="lazy" decoding="async" />
+                <video class="sd-loop" data-sd-loop data-loop-src={loopSrc} muted loop playsinline preload="none" aria-hidden="true" />
+              </div>
+              <figcaption class="sd-cap hud-label">{sd.captions.loop}</figcaption>
+            </figure>
+          </section>
+        )
+      }
+
+      <!-- closing beat: the whole field -->
+      {
+        fieldWide && (
+          <section class="mx-auto max-w-5xl px-8 pb-8">
+            <figure class="sd-photo" data-reveal>
+              <picture>
+                <source type="image/avif" srcset={fieldWide.avif} sizes="(min-width: 1280px) 1100px, 90vw" />
+                <source type="image/webp" srcset={fieldWide.webp} sizes="(min-width: 1280px) 1100px, 90vw" />
+                <img
+                  src={fieldWide.src}
+                  alt="Wide aerial view of the whole tournament ground — tents, the jousting lists, the combat arena, and the festival crowd"
+                  style="aspect-ratio:16/9;object-fit:cover"
+                  class="block w-full"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption class="sd-cap hud-label">{sd.captions.fieldWide}</figcaption>
+            </figure>
+          </section>
+        )
+      }
+
+      <!-- honest sign-off: WORK-record grammar + the licensing mark -->
+      {
+        knights && (
+          <footer class="mx-auto max-w-3xl space-y-1 px-8 pb-8">
+            <p class="sd-attrib">
+              For {knights.forOrg} · {knights.what}
+              {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
+            </p>
+            <LegendMark proof={{ relationshipId: "amazing-aerial" }} />
+          </footer>
+        )
+      }
+    </article>
+
+    <!-- close — the lane's spine -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+      <p><a href={`${base}/adventure/field`} class="link">More from the field →</a></p>
+      <p><a href={`${base}/adventure`} class="link"><span class="arrow" aria-hidden="true">←</span> Back to Adventure Stories</a></p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  /* ── THE COVER · a framed print object hung on the survey field ────────
+     The stage centers a 4:5 cover the way /adventure/field hangs paintings;
+     the cover itself speaks magazine: Anton masthead, Fraunces title, mono
+     slates. Accent stays SCARCE — location slate, story label, ampersand. */
+  .sd-stage {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 1.25rem;
+    min-height: 100svh;
+    padding: 5.5rem 1rem 2rem;
+  }
+  .sd-cover {
+    position: relative;
+    width: min(92vw, 560px);
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-elevated);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  }
+  /* corner crop marks — the print-proof voice, drawn not fabricated */
+  .sd-cover::before,
+  .sd-cover::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  .sd-cover::before {
+    top: 10px;
+    left: 10px;
+    border-top: 1px solid var(--color-accent-deep);
+    border-left: 1px solid var(--color-accent-deep);
+  }
+  .sd-cover::after {
+    bottom: 10px;
+    right: 10px;
+    border-bottom: 1px solid var(--color-accent-deep);
+    border-right: 1px solid var(--color-accent-deep);
+  }
+  .sd-cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* the slow settle — one breath, soft, never clipping (motion-gated) */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .sd-cover-img {
+      animation: sd-settle 2400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes sd-settle {
+      from {
+        transform: scale(1.045);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+  }
+  .sd-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.62) 0%, rgba(10, 13, 18, 0.18) 22%, transparent 38%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.86) 0%, rgba(10, 13, 18, 0.45) 26%, transparent 52%);
+  }
+  .sd-corner {
+    position: absolute;
+    top: 14px;
+    z-index: 2;
+    font-size: 0.58rem;
+  }
+  .sd-corner--tl {
+    left: 18px;
+  }
+  .sd-corner--tr {
+    right: 18px;
+  }
+  .sd-accent {
+    color: var(--color-accent);
+  }
+  .sd-masthead {
+    position: absolute;
+    top: 8.5%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+  }
+  .sd-masthead-word {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(1.9rem, 8.5vw, 3.1rem);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  }
+  .sd-masthead-credit {
+    margin-top: 0.45rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.34em;
+    color: color-mix(in srgb, #fff 72%, transparent);
+  }
+  .sd-coords {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    z-index: 2;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--color-accent-deep);
+  }
+  .sd-titleblock {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    z-index: 2;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .sd-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-size: clamp(2.6rem, 11vw, 4.2rem);
+    line-height: 0.98;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .sd-amp {
+    color: var(--color-accent);
+    font-style: italic;
+    font-weight: 420;
+  }
+  .sd-deck {
+    max-width: 34ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+  }
+  .sd-teasers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    margin-top: 0.2rem;
+    padding: 0;
+    list-style: none;
+  }
+  .sd-teasers li {
+    font-size: 0.55rem;
+    color: color-mix(in srgb, #fff 65%, transparent);
+  }
+  .sd-teasers li::before {
+    content: "◆ ";
+    color: var(--color-accent);
+    font-size: 0.5em;
+    vertical-align: 20%;
+  }
+  .sd-cue {
+    font-size: 0.58rem;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── THE FIELD REPORT · editorial spread ─────────────────────────────── */
+  .sd-lede {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 460;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.4;
+    color: var(--color-peak);
+  }
+  .sd-lede::first-letter {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 3.1em;
+    line-height: 0.82;
+    float: left;
+    padding-right: 0.12em;
+    color: var(--color-accent);
+  }
+  .sd-pull {
+    border-left: 2px solid var(--color-accent-deep);
+    padding-left: 1.25rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 480;
+    font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+    line-height: 1.35;
+    color: var(--color-peak);
+  }
+  .sd-band {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sd-duo {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 2fr 3fr;
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .sd-band,
+    .sd-duo {
+      grid-template-columns: 1fr;
+    }
+  }
+  .sd-photo {
+    margin: 0;
+  }
+  .sd-photo img {
+    border-radius: 8px;
+  }
+  .sd-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+  }
+  .sd-log {
+    padding: 1.1rem 1.25rem;
+  }
+  .sd-log dl {
+    margin-top: 0.6rem;
+  }
+  .sd-log-row {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0.75rem;
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .sd-log-row dt {
+    font-size: 0.56rem;
+    align-self: center;
+  }
+  .sd-log-row dd {
+    font-size: 0.9rem;
+    color: var(--color-ink);
+  }
+  .sd-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--color-elevated);
+  }
+  .sd-poster,
+  .sd-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sd-loop {
+    opacity: 0;
+    transition: opacity 500ms ease;
+    pointer-events: none;
+  }
+  .sd-video.is-playing .sd-loop {
+    opacity: 1;
+  }
+  .sd-attrib {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-muted);
+  }
+</style>
+
+<script>
+  // ── showcase ambient loop: plays only when motion is allowed and the
+  // figure is on-screen; the poster underneath is the permanent base layer
+  // (reduced-motion / no-JS / Save-Data / autoplay-refused all show the
+  // still). Same IO-gated pattern as /adventure's A4b feature. ──
+  (() => {
+    const video = document.querySelector<HTMLVideoElement>("[data-sd-loop]");
+    const box = video?.closest<HTMLElement>(".sd-video");
+    if (!box || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => box.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {}); // refusal → poster stands
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(box);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+</script>
