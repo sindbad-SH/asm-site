@@ -1,0 +1,385 @@
+---
+/**
+ * FieldCover.astro — the location magazine cover (M4, 2026-07-22).
+ *
+ * Generalizes the Steel & Dust cover treatment into a reusable, self-contained
+ * cover for every /field-notes location. Four VARIANTS give the set variety
+ * while a single FIELD NOTES masthead keeps it one cohesive series:
+ *
+ *   sky   — masthead in the top sky band, title set into the lower third
+ *           (the Steel & Dust grammar).
+ *   spine — masthead rotated up the left spine, an oversized title bleeding
+ *           off the bottom edge (film one-sheet).
+ *   band  — a solid ink band across the foot carries title + deck; masthead
+ *           small, top-left (editorial cover).
+ *   stamp — a circular FIELD NOTES seal + title top-left, survey marks (dossier).
+ *
+ * The lead photo fills the frame (4:5 for vertical leads, 3:2 for landscape).
+ * The Amazing Aerial licensing stitch (logo + "commercial & editorial
+ * licensing" → the operator's collection) rides the cover when licensed.
+ *
+ * HONESTY: every string is passed in from the note's own data (title, deck,
+ * location, territory, date). No coordinates are invented — the survey texture
+ * is territory/date only.
+ */
+interface Media {
+  avif: string;
+  webp: string;
+  src: string;
+}
+interface Props {
+  media?: Media;
+  fallback?: string;
+  orientation: "landscape" | "vertical";
+  alt: string;
+  title: string;
+  deck?: string;
+  location?: string;
+  territory?: string;
+  dateSlate?: string;
+  variant?: "sky" | "spine" | "band" | "stamp";
+  licensed?: boolean;
+  aaLogo?: string;
+  aaHref?: string;
+  class?: string;
+}
+const {
+  media,
+  fallback,
+  orientation,
+  alt,
+  title,
+  deck,
+  location,
+  territory,
+  dateSlate,
+  variant = "sky",
+  licensed = false,
+  aaLogo,
+  aaHref,
+  class: klass = "",
+} = Astro.props;
+
+const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(min-width: 1100px) 1000px, 94vw";
+---
+
+<figure class={`fcover fcover--${variant} fcover--${orientation} ${klass}`} data-reveal>
+  {
+    media ? (
+      <picture>
+        <source type="image/avif" srcset={media.avif} sizes={sizes} />
+        <source type="image/webp" srcset={media.webp} sizes={sizes} />
+        <img src={media.src} alt={alt} class="fcover-img" fetchpriority="high" decoding="async" />
+      </picture>
+    ) : (
+      fallback && <img src={fallback} alt={alt} class="fcover-img" fetchpriority="high" decoding="async" />
+    )
+  }
+  <span class="fcover-scrim" aria-hidden="true"></span>
+
+  {/* corner survey marks */}
+  <span class="fcover-mark fcover-mark--tl" aria-hidden="true"></span>
+  <span class="fcover-mark fcover-mark--br" aria-hidden="true"></span>
+
+  {/* masthead — placement varies by variant via CSS */}
+  <p class="fcover-masthead">
+    <span class="fcover-mast-word">Field Notes</span>
+    <span class="fcover-mast-credit hud-label">Adventure Storytelling Media</span>
+  </p>
+
+  {/* dossier seal (stamp variant only; hidden otherwise) */}
+  <span class="fcover-seal" aria-hidden="true">
+    <span class="fcover-seal-top">Field Notes</span>
+    <span class="fcover-seal-mid">{territory ?? "Field"}</span>
+    <span class="fcover-seal-bot">Adventure Storytelling</span>
+  </span>
+
+  {/* the title block */}
+  <div class="fcover-block">
+    <p class="fcover-kicker hud-label">
+      {/* location already carries the country (e.g. "Zermatt, Switzerland"),
+          so show the more specific location and only fall back to territory
+          when there is no location — no redundant repeat. */}
+      <span class="fcover-terr">{location ?? territory}</span>
+      {dateSlate && <span class="fcover-date"> · {dateSlate}</span>}
+    </p>
+    <h1 class="fcover-title">{title}</h1>
+    {deck && <p class="fcover-deck">{deck}</p>}
+  </div>
+
+  {/* Amazing Aerial licensing stitch */}
+  {
+    licensed && aaLogo && aaHref && (
+      <a class="fcover-aa" href={aaHref} target="_blank" rel="noopener" aria-label="Licensing through Amazing Aerial Agency">
+        <img src={aaLogo} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
+        <span class="fcover-aa-line hud-label">Commercial &amp; editorial licensing</span>
+      </a>
+    )
+  }
+</figure>
+
+<style>
+  .fcover {
+    position: relative;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-elevated);
+    box-shadow: 0 34px 90px -30px rgba(0, 0, 0, 0.7);
+  }
+  .fcover--vertical {
+    width: min(92vw, 620px);
+    aspect-ratio: 4 / 5;
+  }
+  .fcover--landscape {
+    width: min(94vw, 1000px);
+    aspect-ratio: 3 / 2;
+  }
+  .fcover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .fcover-img {
+      animation: fcover-settle 2400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes fcover-settle {
+      from {
+        transform: scale(1.045);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+  }
+  .fcover-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.6) 0%, rgba(10, 13, 18, 0.12) 24%, transparent 42%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.85) 0%, rgba(10, 13, 18, 0.4) 30%, transparent 58%);
+  }
+  .fcover > *:not(.fcover-img):not(.fcover-scrim) {
+    position: absolute;
+    z-index: 2;
+  }
+
+  /* corner marks */
+  .fcover-mark {
+    width: 20px;
+    height: 20px;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .fcover-mark--tl {
+    top: 12px;
+    left: 12px;
+    border-top: 1px solid var(--color-accent-deep);
+    border-left: 1px solid var(--color-accent-deep);
+  }
+  .fcover-mark--br {
+    bottom: 12px;
+    right: 12px;
+    border-bottom: 1px solid var(--color-accent-deep);
+    border-right: 1px solid var(--color-accent-deep);
+  }
+
+  /* masthead */
+  .fcover-masthead {
+    top: 7%;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+  .fcover-mast-word {
+    display: block;
+    font-family: var(--font-display-condensed);
+    font-size: clamp(1.7rem, 6vw, 3rem);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 22px rgba(0, 0, 0, 0.5);
+  }
+  .fcover-mast-credit {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.52rem;
+    letter-spacing: 0.32em;
+    color: color-mix(in srgb, #fff 70%, transparent);
+  }
+
+  /* title block (default: lower-left) */
+  .fcover-block {
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .fcover-kicker {
+    font-size: 0.6rem;
+    color: color-mix(in srgb, #fff 78%, transparent);
+  }
+  .fcover-terr {
+    color: var(--color-accent);
+  }
+  .fcover-date {
+    color: color-mix(in srgb, #fff 55%, transparent);
+  }
+  .fcover-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-size: clamp(2.1rem, 7vw, 3.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+  }
+  .fcover-deck {
+    max-width: 34ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--color-ink) 90%, transparent);
+  }
+
+  /* AA stitch (default: bottom-right) */
+  .fcover-aa {
+    right: 16px;
+    bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--color-base) 58%, transparent);
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+  }
+  .fcover-aa img {
+    width: auto;
+    height: 20px;
+  }
+  .fcover-aa-line {
+    font-size: 0.46rem;
+    letter-spacing: 0.16em;
+    color: color-mix(in srgb, #fff 78%, transparent);
+    max-width: 11ch;
+  }
+
+  /* seal (hidden unless stamp variant) */
+  .fcover-seal {
+    display: none;
+  }
+
+  /* ─────────────── VARIANT: spine ─────────────── */
+  .fcover--spine .fcover-masthead {
+    top: auto;
+    left: 14px;
+    right: auto;
+    bottom: 20px;
+    text-align: left;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+  .fcover--spine .fcover-mast-word {
+    font-size: clamp(1.1rem, 3.4vw, 1.7rem);
+    letter-spacing: 0.3em;
+  }
+  .fcover--spine .fcover-mast-credit {
+    margin: 0.4rem 0 0;
+    letter-spacing: 0.28em;
+  }
+  .fcover--spine .fcover-block {
+    left: 58px;
+    right: 12px;
+  }
+  .fcover--spine .fcover-title {
+    font-size: clamp(2.6rem, 11vw, 5rem);
+    letter-spacing: -0.02em;
+    margin-left: -0.04em;
+  }
+
+  /* ─────────────── VARIANT: band ─────────────── */
+  .fcover--band .fcover-masthead {
+    top: 16px;
+    left: 18px;
+    right: auto;
+    text-align: left;
+  }
+  .fcover--band .fcover-mast-word {
+    font-size: clamp(1.1rem, 3.2vw, 1.5rem);
+    letter-spacing: 0.2em;
+  }
+  .fcover--band .fcover-mast-credit {
+    letter-spacing: 0.22em;
+  }
+  .fcover--band .fcover-block {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.1rem 1.25rem 1.15rem;
+    background: linear-gradient(to top, rgba(10, 13, 18, 0.94), rgba(10, 13, 18, 0.72));
+    border-top: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+  .fcover--band .fcover-title {
+    text-shadow: none;
+  }
+
+  /* ─────────────── VARIANT: stamp ─────────────── */
+  .fcover--stamp .fcover-masthead {
+    display: none;
+  }
+  .fcover--stamp .fcover-block {
+    top: 18px;
+    left: 20px;
+    right: 20px;
+    bottom: auto;
+  }
+  .fcover--stamp .fcover-title {
+    font-size: clamp(1.9rem, 6vw, 3rem);
+  }
+  .fcover--stamp .fcover-deck {
+    color: color-mix(in srgb, #fff 84%, transparent);
+  }
+  .fcover--stamp .fcover-seal {
+    display: grid;
+    place-items: center;
+    gap: 0.05rem;
+    right: 18px;
+    bottom: 18px;
+    width: clamp(74px, 15vw, 104px);
+    height: clamp(74px, 15vw, 104px);
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+    background: color-mix(in srgb, var(--color-base) 40%, transparent);
+    backdrop-filter: blur(3px);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .fcover-seal-top,
+  .fcover-seal-bot {
+    font-family: var(--font-mono);
+    font-size: 0.4rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #fff 72%, transparent);
+  }
+  .fcover-seal-mid {
+    font-family: var(--font-display-condensed);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+  /* stamp puts AA bottom-left so it never collides with the seal */
+  .fcover--stamp .fcover-aa {
+    right: auto;
+    left: 16px;
+  }
+</style>
