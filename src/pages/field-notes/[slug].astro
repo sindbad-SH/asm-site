@@ -89,6 +89,11 @@ const leadMedia = lead ? galleryMedia(lead.slug, lead.orientation) : undefined;
 // place, if one has been baked to public/media/field-notes/<slug>/. Existence-
 // gated per note, poster-first + IO-gated (same contract as the story-page
 // showcase loop). Presented as a portrait "reel from the field" after the head.
+// M3 — deterministic per-page layout variety (operator: the location pages
+// all read the same). A tiny slug-derived seed flips which side the reel
+// hangs on and which side the first floating frame takes, so neighbouring
+// pages compose differently without any randomness at runtime.
+const seed = [...note.id].reduce((a, c) => a + c.charCodeAt(0), 0);
 const reelDir = join(process.cwd(), "public", "media", "field-notes", note.id);
 const reel = existsSync(join(reelDir, "loop.mp4"))
   ? {
@@ -210,7 +215,7 @@ const meta = {
           / Save-Data / autoplay-refused all hold the still. */}
       {
         reel && (
-          <figure class="spotlight-reel" data-reveal>
+          <figure class={`spotlight-reel ${seed % 2 ? "spotlight-reel--left" : ""}`} data-reveal>
             <div class="spotlight-reel-frame">
               {reel.poster && <img class="spotlight-reel-poster" src={reel.poster} alt="" loading="lazy" decoding="async" />}
               <video
@@ -238,7 +243,7 @@ const meta = {
       <div class={`spotlight-story ${bracketFloats.length ? "has-floats" : ""}`}>
         {bracketFloats.map(({ ph, m }, i) => (
           <figure
-            class={`spotlight-float ${i % 2 === 0 ? "is-right" : "is-left"} ${ph.orientation === "vertical" ? "is-tall" : ""}`}
+            class={`spotlight-float ${(i + seed) % 2 === 0 ? "is-right" : "is-left"} ${ph.orientation === "vertical" ? "is-tall" : ""}`}
             data-reveal
           >
             <div class="spotlight-float-frame">
@@ -611,12 +616,16 @@ const meta = {
     color: color-mix(in srgb, var(--color-peak) 52%, transparent);
   }
   @media (min-width: 880px) {
-    /* on desktop, hang the reel to the right of the opening prose so it doesn't
-       eat a full-width band — it floats beside the first paragraphs. */
+    /* on desktop, hang the reel beside the opening prose so it doesn't eat a
+       full-width band — side varies per page (M3 slug-seed). */
     .spotlight-reel {
       float: right;
       width: clamp(11rem, 22vw, 15rem);
       margin: 0.35rem 0 1.4rem 2.4rem;
+    }
+    .spotlight-reel--left {
+      float: left;
+      margin: 0.35rem 2.4rem 1.4rem 0;
     }
   }
 
