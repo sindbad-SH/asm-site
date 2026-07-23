@@ -24,6 +24,7 @@
  * plain link target, no motion required.
  */
 import Base from "../../layouts/Base.astro";
+import FieldCover from "../../components/FieldCover.astro";
 import { PAGES } from "../../consts";
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
@@ -94,6 +95,16 @@ const leadMedia = lead ? galleryMedia(lead.slug, lead.orientation) : undefined;
 // hangs on and which side the first floating frame takes, so neighbouring
 // pages compose differently without any randomness at runtime.
 const seed = [...note.id].reduce((a, c) => a + c.charCodeAt(0), 0);
+
+// M4 (2026-07-22) — the location MAGAZINE COVER. Each page opens with a
+// FieldCover (the Steel & Dust grammar, generalized); the variant is chosen by
+// the slug-seed so the set has variety under one FIELD NOTES masthead. The AA
+// licensing stitch (logo + collection link) rides the cover for licensed notes.
+const COVER_VARIANTS = ["sky", "spine", "band", "stamp"] as const;
+const coverVariant = COVER_VARIANTS[seed % COVER_VARIANTS.length];
+const aaLogo = `${base}/media/adventure/aa-logo.png`;
+const aaHref = PAGES.adventure.aaFunnel.cta.href;
+
 const reelDir = join(process.cwd(), "public", "media", "field-notes", note.id);
 const reel = existsSync(join(reelDir, "loop.mp4"))
   ? {
@@ -146,69 +157,37 @@ const meta = {
         <a class="link" href={`${base}/adventure`}>← All territories</a>
       </p>
 
-      {
-        leadMedia ? (
-          <figure class={`spotlight-hero ${lead!.orientation === "vertical" ? "spotlight-hero--tall" : ""}`} data-reveal aria-hidden="true">
-            <div class="spotlight-hero-frame">
-              <picture>
-                <source type="image/avif" srcset={leadMedia.avif} sizes={heroSizes} />
-                <source type="image/webp" srcset={leadMedia.webp} sizes={heroSizes} />
-                <img
-                  src={leadMedia.src}
-                  alt={lead!.alt}
-                  loading="eager"
-                  decoding="async"
-                  style={`aspect-ratio:${lead!.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
-                />
-              </picture>
-            </div>
-          </figure>
-        ) : (
-          note.data.cover && (
-            <figure class="spotlight-hero" data-reveal aria-hidden="true">
-              <div class="spotlight-hero-frame">
-                <img src={`${base}${note.data.cover}`} alt="" loading="eager" decoding="async" />
-              </div>
-            </figure>
-          )
-        )
-      }
+      {/* M4 — the location MAGAZINE COVER (FieldCover, Steel & Dust grammar).
+          Replaces the old plain hero frame + text header: the cover carries the
+          masthead, kicker, title, deck, and the AA licensing stitch. */}
+      <FieldCover
+        media={leadMedia}
+        fallback={note.data.cover ? `${base}${note.data.cover}` : undefined}
+        orientation={lead?.orientation ?? "landscape"}
+        alt={lead?.alt ?? note.data.title}
+        title={note.data.title}
+        deck={note.data.deck}
+        location={note.data.location}
+        territory={note.data.territory}
+        dateSlate={fmtDate(note.data.date)}
+        variant={coverVariant}
+        licensed={note.data.license}
+        aaLogo={aaLogo}
+        aaHref={aaHref}
+        class="spotlight-cover"
+      />
 
-      <header class="spotlight-head">
-        {/* M2 — the Field Notes masthead eyebrow: reads each location as an
-            issue of the same editorial series (magazine grammar). */}
-        <p class="hud-label spotlight-masthead" data-reveal>
-          <span class="spotlight-masthead-word">Field Notes</span>
-          <span class="spotlight-sep" aria-hidden="true">·</span>
-          <span>Adventure Storytelling Media</span>
-        </p>
-        <p class="hud-label spotlight-slate" data-reveal>
-          {note.data.territory && (
-            <>
-              <span class="spotlight-terr">{note.data.territory}</span>
-              <span class="spotlight-sep" aria-hidden="true">·</span>
-            </>
-          )}
-          <span>{fmtDate(note.data.date)}</span>
-          {note.data.location && (
-            <>
-              <span class="spotlight-sep" aria-hidden="true">·</span>
-              <span class="spotlight-loc">{note.data.location}</span>
-            </>
-          )}
-        </p>
-        <h1 class="spotlight-title" data-reveal>{note.data.title}</h1>
-        {note.data.deck && <p class="spotlight-deck" data-reveal>{note.data.deck}</p>}
-        {
-          note.data.tags && note.data.tags.length > 0 && (
+      {
+        note.data.tags && note.data.tags.length > 0 && (
+          <header class="spotlight-head">
             <ul class="spotlight-tags" data-reveal>
               {note.data.tags.map((tag) => (
                 <li class="hud-label spotlight-tag">{tag}</li>
               ))}
             </ul>
-          )
-        }
-      </header>
+          </header>
+        )
+      }
 
       {/* THE REEL — a portrait drone loop for this place (M2b), the first
           motion after the head. Poster-first + IO-gated: reduced-motion / no-JS
@@ -425,6 +404,11 @@ const meta = {
   }
   .spotlight-back--foot {
     margin: 2.25rem 0 0;
+  }
+
+  /* ── M4 — the magazine cover sits where the hero used to; give it air ── */
+  .spotlight-cover {
+    margin: 0 0 2.75rem;
   }
 
   /* ── hero: the lead frame, large, hung in a slim gallery frame ── */
