@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Castel Toblino, Trentino
+headline: Half island, half legend
 deck: A Renaissance castle on a reed-fringed spit in the Valle dei Laghi — half island, half legend.
 date: 2023-08-26
 location: Madruzzo, Trentino, Italy

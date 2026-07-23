@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Above Crans-Montana
+headline: The shelf that holds the light
 deck: A sun-struck shelf at roughly 1,500 metres, the Weisshorn holding the far side of the valley.
 date: 2023-08-11
 location: Crans-Montana, Valais, Switzerland

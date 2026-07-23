@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Gornergrat glacier panorama
+headline: The ice keeps its own time
 deck: The Gorner Glacier fills the valley below, ringed by twenty-nine peaks over four thousand metres.
 date: 2023-08-14
 location: Gornergrat, Zermatt, Switzerland

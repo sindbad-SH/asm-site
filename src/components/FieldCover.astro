@@ -33,6 +33,7 @@ interface Props {
   orientation: "landscape" | "vertical";
   alt: string;
   title: string;
+  headline?: string;
   deck?: string;
   location?: string;
   territory?: string;
@@ -49,6 +50,7 @@ const {
   orientation,
   alt,
   title,
+  headline,
   deck,
   location,
   territory,
@@ -60,6 +62,8 @@ const {
   class: klass = "",
 } = Astro.props;
 
+// The big line: an editorial headline when supplied, else the factual title.
+const bigLine = headline ?? title;
 const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(min-width: 1100px) 1000px, 94vw";
 ---
 
@@ -97,15 +101,26 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
   {/* the title block */}
   <div class="fcover-block">
     <p class="fcover-kicker hud-label">
-      {/* location already carries the country (e.g. "Zermatt, Switzerland"),
-          so show the more specific location and only fall back to territory
-          when there is no location — no redundant repeat. */}
+      {/* the editorial variant leads the kicker with a dash rule (the flagship
+          grammar). Location already carries the country, so no redundant
+          territory repeat. */}
+      {variant === "editorial" && <span class="fcover-rule" aria-hidden="true"></span>}
       <span class="fcover-terr">{location ?? territory}</span>
       {dateSlate && <span class="fcover-date"> · {dateSlate}</span>}
     </p>
-    <h1 class="fcover-title">{title}</h1>
+    <h1 class="fcover-title">{bigLine}</h1>
     {deck && <p class="fcover-deck">{deck}</p>}
   </div>
+
+  {/* editorial variant — folio + scroll cue at the foot (flagship grammar) */}
+  {
+    variant === "editorial" && (
+      <>
+        <p class="fcover-folio hud-label" aria-hidden="true">Field Notes{territory ? ` · ${territory}` : ""}</p>
+        <p class="fcover-cue hud-label" aria-hidden="true">Read the dispatch ↓</p>
+      </>
+    )
+  }
 
   {/* Amazing Aerial licensing stitch */}
   {
@@ -388,5 +403,87 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
   .fcover--stamp .fcover-aa {
     right: auto;
     left: 16px;
+  }
+
+  /* ─────────────── VARIANT: editorial (the flagship cinematic hero) ───────────────
+     Big Fraunces headline lower-left, a turquoise coordinate kicker led by a
+     dash rule, an italic deck, a folio + scroll cue at the foot. Derived from
+     the operator-reviewed Claude Design "Matterhorn hero" flagship. */
+  .fcover--editorial .fcover-masthead {
+    top: 22px;
+    left: 22px;
+    right: auto;
+    text-align: left;
+  }
+  .fcover--editorial .fcover-mast-word {
+    font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+    letter-spacing: 0.14em;
+  }
+  .fcover--editorial .fcover-mast-credit {
+    letter-spacing: 0.24em;
+  }
+  .fcover--editorial .fcover-block {
+    left: clamp(22px, 5vw, 56px);
+    right: clamp(22px, 5vw, 56px);
+    bottom: clamp(52px, 9vw, 82px);
+    gap: 0.9rem;
+  }
+  .fcover--editorial .fcover-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    color: var(--color-accent);
+  }
+  .fcover-rule {
+    display: inline-block;
+    width: clamp(24px, 4vw, 44px);
+    height: 1px;
+    background: var(--color-accent);
+  }
+  .fcover--editorial .fcover-date {
+    color: color-mix(in srgb, var(--color-accent) 62%, transparent);
+  }
+  .fcover--editorial .fcover-title {
+    max-width: 16ch;
+    font-weight: 600;
+    font-size: clamp(2.4rem, 8vw, 5.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+  }
+  .fcover--editorial .fcover-deck {
+    max-width: 40ch;
+    font-size: clamp(1rem, 1.9vw, 1.25rem);
+    color: color-mix(in srgb, #fff 90%, transparent);
+  }
+  .fcover-folio {
+    left: clamp(22px, 5vw, 56px);
+    bottom: 20px;
+    font-size: 0.56rem;
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #fff 60%, transparent);
+  }
+  .fcover-cue {
+    right: clamp(22px, 5vw, 56px);
+    bottom: 20px;
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
+  }
+  /* editorial keeps the AA stitch top-right so it clears the headline/folio */
+  .fcover--editorial .fcover-aa {
+    right: 20px;
+    bottom: auto;
+    top: 20px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .fcover--editorial .fcover-cue {
+      animation: fcover-cue 2.4s ease-in-out infinite;
+    }
+    @keyframes fcover-cue {
+      0%, 100% { transform: translateY(0); opacity: 0.85; }
+      50% { transform: translateY(3px); opacity: 1; }
+    }
   }
 </style>

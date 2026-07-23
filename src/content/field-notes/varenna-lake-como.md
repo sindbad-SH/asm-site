@@ -4,6 +4,7 @@
 #   eastern Lake Como shore above Varenna) — operator asked for "more from that
 #   region"; alt text is plain visual description and says "near Varenna".
 title: Lake Como, from Varenna
+headline: A village stacked on the deep
 deck: A fishing village stacked on rock, shot from the air above one of Europe's deepest lakes.
 date: 2023-08-20
 location: Varenna, Lake Como, Italy

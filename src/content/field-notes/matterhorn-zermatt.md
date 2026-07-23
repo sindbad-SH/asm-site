@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: The Matterhorn, from Zermatt
+headline: The mountain that measures everyone
 deck: Shot above a car-free village at 1,620 metres, beneath the 4,478-metre pyramid that closes the valley.
 date: 2023-08-14
 location: Zermatt, Switzerland

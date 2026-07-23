@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Lac de Tseuzier, Valais
+headline: The dam that started to move
 deck: A 156-metre arch wall pins a turquoise reservoir into a Valais rock cirque — one that once shifted underfoot.
 date: 2023-08-11
 location: Ayent, Valais, Switzerland
