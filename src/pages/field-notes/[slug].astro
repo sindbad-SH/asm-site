@@ -85,6 +85,20 @@ const photos = note.data.photos ?? [];
 const lead = photos[0];
 const leadMedia = lead ? galleryMedia(lead.slug, lead.orientation) : undefined;
 
+// M2b (2026-07-22) — the location REEL: a clean vertical drone loop for this
+// place, if one has been baked to public/media/field-notes/<slug>/. Existence-
+// gated per note, poster-first + IO-gated (same contract as the story-page
+// showcase loop). Presented as a portrait "reel from the field" after the head.
+const reelDir = join(process.cwd(), "public", "media", "field-notes", note.id);
+const reel = existsSync(join(reelDir, "loop.mp4"))
+  ? {
+      src: `${base}/media/field-notes/${note.id}/loop.mp4`,
+      poster: existsSync(join(reelDir, "poster.avif"))
+        ? `${base}/media/field-notes/${note.id}/poster.avif`
+        : undefined,
+    }
+  : undefined;
+
 // Supporting frames (the lead already headlines) → resolved to their export
 // sets once, dropping any whose files aren't on disk. They FLOAT around the
 // prose (P22): the first two bracket the story left/right, any beyond stagger
@@ -190,6 +204,30 @@ const meta = {
           )
         }
       </header>
+
+      {/* THE REEL — a portrait drone loop for this place (M2b), the first
+          motion after the head. Poster-first + IO-gated: reduced-motion / no-JS
+          / Save-Data / autoplay-refused all hold the still. */}
+      {
+        reel && (
+          <figure class="spotlight-reel" data-reveal>
+            <div class="spotlight-reel-frame">
+              {reel.poster && <img class="spotlight-reel-poster" src={reel.poster} alt="" loading="lazy" decoding="async" />}
+              <video
+                class="spotlight-reel-loop"
+                data-reel-loop
+                data-loop-src={reel.src}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+              />
+            </div>
+            <figcaption class="spotlight-reel-cap hud-label">From the field · {note.data.location ?? note.data.title}</figcaption>
+          </figure>
+        )
+      }
 
       {/* THE STORY — the operator's prose with the supporting frames FLOATING
           around it (P22). The first two bracket the reading column (one ragged
@@ -522,6 +560,64 @@ const meta = {
     border-left: 2px solid var(--color-accent-deep);
     color: color-mix(in srgb, var(--color-ink) 80%, transparent);
     font-style: italic;
+  }
+
+  /* ── the reel: a portrait drone loop, hung like a phone-shot field clip.
+        Slim gallery mat to match the frames, centered, capped narrow. ── */
+  .spotlight-reel {
+    margin: 2.75rem auto 0;
+    width: min(20rem, 78%);
+  }
+  .spotlight-reel-frame {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    border-radius: 4px;
+    padding: clamp(0.4rem, 0.9vw, 0.62rem);
+    background: linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--color-peak) 9%, var(--color-elevated)) 0%,
+      var(--color-elevated) 48%,
+      color-mix(in srgb, var(--color-base) 45%, var(--color-elevated)) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-peak) 15%, transparent);
+    box-shadow: 0 22px 50px -24px rgba(0, 0, 0, 0.64);
+  }
+  .spotlight-reel-poster,
+  .spotlight-reel-loop {
+    position: absolute;
+    inset: clamp(0.4rem, 0.9vw, 0.62rem);
+    width: auto;
+    height: auto;
+    inline-size: calc(100% - 2 * clamp(0.4rem, 0.9vw, 0.62rem));
+    block-size: calc(100% - 2 * clamp(0.4rem, 0.9vw, 0.62rem));
+    object-fit: cover;
+    border-radius: 1px;
+  }
+  .spotlight-reel-loop {
+    opacity: 0;
+    transition: opacity 500ms ease;
+    pointer-events: none;
+  }
+  .spotlight-reel-frame.is-playing .spotlight-reel-loop {
+    opacity: 1;
+  }
+  .spotlight-reel-cap {
+    display: block;
+    margin: 0.6rem 0 0;
+    text-align: center;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--color-peak) 52%, transparent);
+  }
+  @media (min-width: 880px) {
+    /* on desktop, hang the reel to the right of the opening prose so it doesn't
+       eat a full-width band — it floats beside the first paragraphs. */
+    .spotlight-reel {
+      float: right;
+      width: clamp(11rem, 22vw, 15rem);
+      margin: 0.35rem 0 1.4rem 2.4rem;
+    }
   }
 
   /* ── the story: prose with supporting frames floating around it ──
@@ -904,3 +1000,33 @@ const meta = {
     }
   }
 </style>
+
+<script>
+  // ── M2b — the location reel: poster-first, IO-gated autoplay of a muted
+  // portrait loop; the poster underneath is the permanent base layer (reduced-
+  // motion / no-JS / Save-Data / autoplay-refused all show the still). Same
+  // contract as the story-page showcase loop. Renders nothing when no reel. ──
+  (() => {
+    const video = document.querySelector<HTMLVideoElement>("[data-reel-loop]");
+    const box = video?.closest<HTMLElement>(".spotlight-reel-frame");
+    if (!box || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => box.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {}); // refusal → poster stands
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(box);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+</script>
