@@ -1331,9 +1331,9 @@ export const PAGES = {
       // process/"we cut it" language — just what is happening).
       afterVideo:
         "A single pass takes seconds. A rider commits at the far end, the horse opens up, and the lists close to a blur — then the lances meet, and the crowd finds out together whether the hit landed.",
-      // Full film — gated: renders only when a real URL is supplied. ⚠ operator
-      // to provide the YouTube link (2026-07-22).
-      fullFilm: { label: "Watch the full film on YouTube", href: "" },
+      // Full film — the Knights of Mayhem showcase on YouTube (operator-supplied
+      // 2026-07-22; tracking param stripped). Gated: renders only when set.
+      fullFilm: { label: "Watch the full film on YouTube", href: "https://youtu.be/2OMfPSibhvE" },
       pullQuote: "Their sport has no script — theater applauds on cue, but this crowd gasps first.",
       arena:
         "The joust shares the bill with armored ground combat. In the timber pen, fighters in full plate go at it with blunt steel until the marshal's yellow flag ends the bout. From directly overhead the sport reads plainly: fighters go down, get helped off the rails, and line right back up for the next round.",
