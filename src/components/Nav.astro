@@ -7,8 +7,25 @@
  * (the "you-are-here" signal). Forge the Saga owns the single CTA button.
  */
 import { NAV, SITE, PRIMARY_CTA } from "../consts";
+import { getCollection } from "astro:content";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// M2 (2026-07-22) — the Adventure Stories item gains a dropdown of the field
+// locations (each a Field Notes article). Built from the collection so it stays
+// in sync as the operator drops in new notes: non-draft notes that carry photos
+// (the located stories), newest-first, plus the field index at the top. The menu
+// is absolutely positioned (see styles) so it never widens the capped nav row.
+const fieldLocations = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map((n) => ({ label: n.data.title, href: `/field-notes/${n.id}` }));
+// The dropdown attaches to whichever nav item points at /adventure.
+const adventureSub = [
+  { label: "The Field — all locations", href: "/adventure/field" },
+  { label: "Steel & Dust — Field Notes No. 01", href: "/adventure/steel-and-dust" },
+  ...fieldLocations,
+];
 // The you-are-here marker compares this page's route against each NAV href.
 // Two prior-latent bugs fixed here: (1) use Astro.url (Astro.request.url is a
 // constant placeholder in a static build, so it never carried the page path);
@@ -42,8 +59,9 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
       {
         NAV.map((item) => {
           const isCurrent = path === item.href || path.startsWith(`${item.href}/`);
+          const sub = item.href === "/adventure" ? adventureSub : null;
           return (
-            <li class="nav-item">
+            <li class={`nav-item ${sub ? "nav-item--has-sub" : ""}`}>
               <a
                 href={`${base}${item.href}`}
                 aria-current={isCurrent ? "page" : undefined}
@@ -54,6 +72,27 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
                     world name so the nav decodes in seconds (NAV.buyer). */}
                 {item.buyer && <span class="nav-buyer">{item.buyer}</span>}
               </a>
+              {/* M2 — field-locations dropdown (absolutely positioned; reveals on
+                  hover / focus-within, so it never widens the capped nav row).
+                  Progressive enhancement over the plain link above. */}
+              {sub && (
+                <ul class="nav-sub" aria-label="Field locations">
+                  {sub.map((s) => {
+                    const here = path === s.href;
+                    return (
+                      <li>
+                        <a
+                          href={`${base}${s.href}`}
+                          aria-current={here ? "page" : undefined}
+                          class={`nav-sub-link ${here ? "is-here" : ""}`}
+                        >
+                          {s.label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </li>
           );
         })
@@ -86,6 +125,79 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
   .nav-item {
     display: flex;
     align-items: center;
+  }
+
+  /* M2 — Adventure Stories dropdown. The submenu is absolutely positioned so it
+     is out of flow and can never widen the capped one-row nav. Hidden at rest;
+     revealed on hover or when focus moves into the item (keyboard-reachable:
+     focusing the parent link reveals it, then Tab walks the list). CSS-only —
+     no JS, hard-degrades to the plain /adventure link. The inline nav itself is
+     only shown ≥1024px (MobileMenu owns narrower), so this is desktop-only. */
+  .nav-item--has-sub {
+    position: relative;
+  }
+  .nav-sub {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 60;
+    margin: 0;
+    padding: 0.4rem 0;
+    list-style: none;
+    min-width: 15rem;
+    background: color-mix(in srgb, var(--color-elevated) 96%, black);
+    border: 1px solid var(--color-hairline);
+    border-radius: 6px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition:
+      opacity 140ms ease,
+      transform 140ms ease,
+      visibility 0s linear 140ms;
+  }
+  .nav-item--has-sub:hover .nav-sub,
+  .nav-item--has-sub:focus-within .nav-sub {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s;
+  }
+  /* a hover bridge so the pointer can cross the gap without the menu closing */
+  .nav-item--has-sub::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 15rem;
+    height: 0.6rem;
+  }
+  .nav-sub-link {
+    display: block;
+    padding: 0.42rem 0.9rem;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    white-space: nowrap;
+    color: var(--color-ink-muted);
+    transition: color 140ms ease, background-color 140ms ease;
+  }
+  .nav-sub-link:hover,
+  .nav-sub-link:focus-visible {
+    color: var(--color-peak);
+    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  }
+  .nav-sub-link.is-here {
+    color: var(--color-accent);
+  }
+  /* first two entries (the index + the flagship story) get a hairline divider
+     from the location list below them */
+  .nav-sub > li:nth-child(2) {
+    border-bottom: 1px solid var(--color-hairline);
+    padding-bottom: 0.15rem;
+    margin-bottom: 0.15rem;
   }
   /* P29 — the buyer sub-line: tiny mono under the serif label, muted, never
      wrapping (each term is short by design). Inherits the accent on the

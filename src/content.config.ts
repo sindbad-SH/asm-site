@@ -43,6 +43,9 @@ const fieldNotes = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/field-notes" }),
   schema: z.object({
     title: z.string(),
+    // deck — optional one-line standfirst under the headline (magazine grammar,
+    // M2 2026-07-22). Renders as the article deck; absent on plainer notes.
+    deck: z.string().optional(),
     // `coerce` lets the operator write a bare `YYYY-MM-DD` string and still get
     // a real Date for sorting/formatting — no quotes-vs-no-quotes footguns.
     date: z.coerce.date(),

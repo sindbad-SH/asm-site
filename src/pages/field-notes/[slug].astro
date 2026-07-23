@@ -156,6 +156,13 @@ const meta = {
       }
 
       <header class="spotlight-head">
+        {/* M2 — the Field Notes masthead eyebrow: reads each location as an
+            issue of the same editorial series (magazine grammar). */}
+        <p class="hud-label spotlight-masthead" data-reveal>
+          <span class="spotlight-masthead-word">Field Notes</span>
+          <span class="spotlight-sep" aria-hidden="true">·</span>
+          <span>Adventure Storytelling Media</span>
+        </p>
         <p class="hud-label spotlight-slate" data-reveal>
           {note.data.territory && (
             <>
@@ -172,6 +179,7 @@ const meta = {
           )}
         </p>
         <h1 class="spotlight-title" data-reveal>{note.data.title}</h1>
+        {note.data.deck && <p class="spotlight-deck" data-reveal>{note.data.deck}</p>}
         {
           note.data.tags && note.data.tags.length > 0 && (
             <ul class="spotlight-tags" data-reveal>
@@ -276,6 +284,9 @@ const meta = {
                 </div>
 
                 <h2 class="spotlight-funnel-heading">{p.aaFunnel.heading}</h2>
+                {/* M2 — editorial-use framing (operator rule 2026-07-22): this
+                    coverage is registered for editorial licensing on AA. */}
+                <p class="hud-label spotlight-funnel-editorial">Available for editorial licensing</p>
                 <p class="spotlight-funnel-body">{p.aaFunnel.body}</p>
 
                 {/* Mini filmstrip — three tiny frames from THIS place, a "more of
@@ -403,6 +414,25 @@ const meta = {
     border-radius: 1px;
   }
 
+  /* ── Field Notes masthead eyebrow (M2) — the series signature above each
+        issue's slate. The wordmark in the condensed display face, small. ── */
+  .spotlight-masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-muted);
+    margin-bottom: 0.6rem;
+  }
+  .spotlight-masthead-word {
+    font-family: var(--font-display-condensed);
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-peak);
+  }
+
   /* ── survey slate + serif title ── */
   .spotlight-slate {
     display: flex;
@@ -410,6 +440,18 @@ const meta = {
     align-items: baseline;
     gap: 0.5rem;
     letter-spacing: 0.2em;
+  }
+  /* deck — the standfirst under the headline (magazine grammar) */
+  .spotlight-deck {
+    margin-top: 0.9rem;
+    max-width: 40ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-style: italic;
+    font-weight: 450;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--color-peak) 82%, transparent);
   }
   .spotlight-sep {
     opacity: 0.5;
@@ -450,6 +492,16 @@ const meta = {
   }
   .spotlight-prose :global(p) {
     margin: 0 0 1.35em;
+  }
+  /* drop cap on the opening paragraph (magazine grammar, M2) */
+  .spotlight-prose :global(p:first-of-type::first-letter) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 3.1em;
+    line-height: 0.82;
+    float: left;
+    padding: 0.02em 0.12em 0 0;
+    color: var(--color-accent);
   }
   .spotlight-prose :global(h2) {
     font-family: var(--font-display);
@@ -748,6 +800,11 @@ const meta = {
     font-size: clamp(1.5rem, 3vw, 2rem);
     line-height: 1.1;
     color: var(--color-peak);
+  }
+  .spotlight-funnel-editorial {
+    margin: 0;
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
   }
   .spotlight-funnel-body {
     max-width: 46ch;
