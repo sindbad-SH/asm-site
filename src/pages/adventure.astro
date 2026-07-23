@@ -534,14 +534,15 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
               </figure>
             ))
           }
-          {/* second Nesso angle — replaces the retired Ironton frame */}
-          <figure class="fb-cell fb-cell--tall">
+          {/* the Ironton waterfall closes the lower band (operator: one Nesso
+              is enough — keep the best, DJI_0129, and restore Ironton). */}
+          <figure class="fb-cell">
             <picture>
-              <source type="image/avif" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-b-${w}.avif ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
-              <source type="image/webp" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-b-${w}.webp ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
-              <img src={`${base}/media/adventure/fieldboard/nesso-b-700.webp`} alt="The Civera bridge and waterfall at Nesso on Lake Como, pastel houses climbing the gorge on both sides" loading="lazy" decoding="async" />
+              <source type="image/avif" srcset={[700, 1200].map((w) => `${base}/media/adventure/fieldboard/ironton-${w}.avif ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <source type="image/webp" srcset={[700, 1200].map((w) => `${base}/media/adventure/fieldboard/ironton-${w}.webp ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <img src={`${base}/media/adventure/fieldboard/ironton-700.webp`} alt="A waterfall dropping through cliffs above the Ironton forest, Colorado" loading="lazy" decoding="async" />
             </picture>
-            <figcaption class="fb-slate hud-label">Nesso · Orrido</figcaption>
+            <figcaption class="fb-slate hud-label">Ironton · Colorado</figcaption>
           </figure>
 
           <div class="fb-cell fb-cell--aa panel">
@@ -1021,16 +1022,17 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   @media (min-width: 860px) {
     .fb-grid {
       grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: clamp(7rem, 10.5vw, 9.5rem);
+      /* three uniform image rows + a short auto footer row for the AA band */
+      grid-template-rows: repeat(3, clamp(7rem, 10.5vw, 9rem)) auto;
     }
     .fb-cell:nth-child(1) { grid-area: 1 / 2 / 3 / 4; } /* hero — centered 2×2 */
     .fb-cell:nth-child(2) { grid-area: 1 / 1 / 3 / 2; } /* reel — left edge */
-    .fb-cell:nth-child(3) { grid-area: 1 / 4 / 3 / 5; } /* nesso-a — right edge */
-    .fb-cell:nth-child(4) { grid-area: 3 / 2 / 4 / 3; } /* ouray */
-    .fb-cell:nth-child(5) { grid-area: 3 / 3 / 4 / 4; } /* limmernsee */
-    .fb-cell:nth-child(6) { grid-area: 3 / 4 / 4 / 5; } /* trift */
-    .fb-cell:nth-child(7) { grid-area: 3 / 1 / 5 / 2; } /* nesso-b — lower-left */
-    .fb-cell:nth-child(8) { grid-area: 4 / 2 / 5 / 5; } /* AA chip — wide footer */
+    .fb-cell:nth-child(3) { grid-area: 1 / 4 / 3 / 5; } /* nesso — right edge */
+    .fb-cell:nth-child(4) { grid-area: 3 / 1 / 4 / 2; } /* ouray */
+    .fb-cell:nth-child(5) { grid-area: 3 / 2 / 4 / 3; } /* limmernsee */
+    .fb-cell:nth-child(6) { grid-area: 3 / 3 / 4 / 4; } /* trift */
+    .fb-cell:nth-child(7) { grid-area: 3 / 4 / 4 / 5; } /* ironton */
+    .fb-cell:nth-child(8) { grid-area: 4 / 1 / 5 / 5; } /* AA chip — full-width footer */
   }
   .fb-cell {
     position: relative;
@@ -1115,22 +1117,27 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   .fb-cell--reel.is-playing .fb-reel-loop {
     opacity: 1;
   }
-  /* the AA chip cell */
+  /* the AA chip — a full-width footer band: logo + licensing line in a row */
   .fb-cell--aa {
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 0.55rem;
-    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1.1rem;
+    padding: 0.9rem 1rem;
     text-align: center;
   }
   .fb-cell--aa img {
-    width: min(70%, 170px);
-    height: auto;
+    width: auto;
+    height: clamp(30px, 4.5vw, 42px);
     object-fit: contain;
   }
   .fb-cell--aa .hud-label {
-    font-size: 0.52rem;
+    font-size: 0.56rem;
+  }
+  /* the tilt/level animation shouldn't rotate the wide footer band */
+  .fb-cell--aa {
+    transform: none !important;
   }
   .fb-cta {
     margin-top: 0.25rem;
