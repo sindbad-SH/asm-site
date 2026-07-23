@@ -489,6 +489,18 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
         data-reveal
       >
         <div class="fb-grid">
+          {/* HERO — the graded Matterhorn widescreen (operator-supplied +
+              color-graded), 2x2, left. */}
+          <figure class="fb-cell fb-cell--hero">
+            <picture>
+              <source type="image/avif" srcset={[900, 1600].map((w) => `${base}/media/adventure/fieldboard/matterhorn-hero-${w}.avif ${w}w`).join(", ")} sizes="(min-width: 1024px) 48vw, 92vw" />
+              <source type="image/webp" srcset={[900, 1600].map((w) => `${base}/media/adventure/fieldboard/matterhorn-hero-${w}.webp ${w}w`).join(", ")} sizes="(min-width: 1024px) 48vw, 92vw" />
+              <img src={`${base}/media/adventure/fieldboard/matterhorn-hero-900.webp`} alt="The Matterhorn above the Zermatt valley, its pyramid summit under a wisp of cloud" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="fb-slate hud-label">Matterhorn · Zermatt</figcaption>
+          </figure>
+
+          {/* right shoulder: the live reel + a Nesso vertical bracket the hero */}
           {teaserReel && (
             <figure class="fb-cell fb-cell--reel">
               {teaserReel.poster && <img class="fb-reel-poster" src={teaserReel.poster} alt="" loading="lazy" decoding="async" />}
@@ -496,13 +508,21 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
               <figcaption class="fb-slate hud-label">Gornergrat · CH</figcaption>
             </figure>
           )}
+          <figure class="fb-cell fb-cell--tall">
+            <picture>
+              <source type="image/avif" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-a-${w}.avif ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <source type="image/webp" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-a-${w}.webp ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <img src={`${base}/media/adventure/fieldboard/nesso-a-700.webp`} alt="The village of Nesso on Lake Como, the Civera bridge over the gorge waterfall and a boat on the water below" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="fb-slate hud-label">Nesso · Lake Como</figcaption>
+          </figure>
+
+          {/* lower band: three landscape singles + the second Nesso vertical */}
           {
             [
-              { slug: "ouray", w: [900, 1600], cls: "fb-cell--hero", slate: "Ouray · Colorado", alt: "Aerial of Ouray, Colorado — the town grid boxed in by canyon walls" },
-              { slug: "ironton", w: [700, 1200], cls: "", slate: "Ironton · Colorado", alt: "A waterfall dropping through cliffs above the Ironton forest, Colorado" },
+              { slug: "ouray", w: [900, 1600], cls: "", slate: "Ouray · Colorado", alt: "Aerial of Ouray, Colorado — the town grid boxed in by canyon walls" },
               { slug: "limmernsee", w: [700, 1200], cls: "", slate: "Limmernsee · Glarus", alt: "Cloud pouring over a mountain gorge above the Limmernsee, Switzerland" },
               { slug: "trift", w: [700, 1200], cls: "", slate: "Trift Gorge · Bern", alt: "A glacial river threading the rock gorge below the Trift bridge, Switzerland" },
-              { slug: "nesso", w: [600, 1000], cls: "fb-cell--tall", slate: "Nesso · Lake Como", alt: "The village of Nesso climbing from the Lake Como shore" },
             ].map((c) => (
               <figure class={`fb-cell ${c.cls}`}>
                 <picture>
@@ -514,16 +534,16 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
               </figure>
             ))
           }
-          {teaserStories[0] && (
-            <figure class="fb-cell fb-cell--tall">
-              <picture>
-                <source type="image/avif" srcset={teaserStories[0].media!.avif} sizes="(min-width: 1024px) 18vw, 46vw" />
-                <source type="image/webp" srcset={teaserStories[0].media!.webp} sizes="(min-width: 1024px) 18vw, 46vw" />
-                <img src={teaserStories[0].media!.src} alt={teaserStories[0].lead.alt} loading="lazy" decoding="async" />
-              </picture>
-              <figcaption class="fb-slate hud-label">Matterhorn · Zermatt</figcaption>
-            </figure>
-          )}
+          {/* second Nesso angle — replaces the retired Ironton frame */}
+          <figure class="fb-cell fb-cell--tall">
+            <picture>
+              <source type="image/avif" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-b-${w}.avif ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <source type="image/webp" srcset={[700, 1120].map((w) => `${base}/media/adventure/fieldboard/nesso-b-${w}.webp ${w}w`).join(", ")} sizes="(min-width: 1024px) 24vw, 46vw" />
+              <img src={`${base}/media/adventure/fieldboard/nesso-b-700.webp`} alt="The Civera bridge and waterfall at Nesso on Lake Como, pastel houses climbing the gorge on both sides" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="fb-slate hud-label">Nesso · Orrido</figcaption>
+          </figure>
+
           <div class="fb-cell fb-cell--aa panel">
             <img src={`${base}/media/adventure/aa-logo.png`} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
             <p class="hud-label">Full collection · editorial licensing</p>
@@ -988,9 +1008,29 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     display: grid;
     width: 100%;
     gap: 12px;
-    grid-template-columns: repeat(4, 1fr);
+    /* mobile default: a simple 2-col flow (explicit placement kicks in ≥860px) */
+    grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: minmax(120px, auto);
-    grid-auto-flow: dense;
+  }
+  /* M3.1 — deliberate BALANCED placement (operator: balance the sides). A 4×4
+     board: the graded Matterhorn hero CENTERED at top, a tall cell on each
+     edge (reel left, Nesso right), a second Nesso anchoring the lower-left, the
+     three landscape singles across the middle, and a wide AA chip as the
+     footer. DOM order = hero, reel, nesso-a, ouray, limmernsee, trift, nesso-b,
+     aa. */
+  @media (min-width: 860px) {
+    .fb-grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: clamp(7rem, 10.5vw, 9.5rem);
+    }
+    .fb-cell:nth-child(1) { grid-area: 1 / 2 / 3 / 4; } /* hero — centered 2×2 */
+    .fb-cell:nth-child(2) { grid-area: 1 / 1 / 3 / 2; } /* reel — left edge */
+    .fb-cell:nth-child(3) { grid-area: 1 / 4 / 3 / 5; } /* nesso-a — right edge */
+    .fb-cell:nth-child(4) { grid-area: 3 / 2 / 4 / 3; } /* ouray */
+    .fb-cell:nth-child(5) { grid-area: 3 / 3 / 4 / 4; } /* limmernsee */
+    .fb-cell:nth-child(6) { grid-area: 3 / 4 / 4 / 5; } /* trift */
+    .fb-cell:nth-child(7) { grid-area: 3 / 1 / 5 / 2; } /* nesso-b — lower-left */
+    .fb-cell:nth-child(8) { grid-area: 4 / 2 / 5 / 5; } /* AA chip — wide footer */
   }
   .fb-cell {
     position: relative;
