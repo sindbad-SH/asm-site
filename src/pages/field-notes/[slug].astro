@@ -100,8 +100,11 @@ const seed = [...note.id].reduce((a, c) => a + c.charCodeAt(0), 0);
 // FieldCover (the Steel & Dust grammar, generalized); the variant is chosen by
 // the slug-seed so the set has variety under one FIELD NOTES masthead. The AA
 // licensing stitch (logo + collection link) rides the cover for licensed notes.
-const COVER_VARIANTS = ["sky", "spine", "band", "stamp"] as const;
-const coverVariant = COVER_VARIANTS[seed % COVER_VARIANTS.length];
+const COVER_VARIANTS = ["editorial", "sky", "spine", "band", "stamp"] as const;
+// Marquee locations get the flagship EDITORIAL hero (the one that direction was
+// designed for); the rest rotate by slug-seed for variety.
+const EDITORIAL_PINNED = new Set(["matterhorn-zermatt", "madonna-di-campiglio", "varenna-lake-como", "castel-toblino"]);
+const coverVariant = EDITORIAL_PINNED.has(note.id) ? "editorial" : COVER_VARIANTS[seed % COVER_VARIANTS.length];
 const aaLogo = `${base}/media/adventure/aa-logo.png`;
 const aaHref = PAGES.adventure.aaFunnel.cta.href;
 
@@ -166,6 +169,7 @@ const meta = {
         orientation={lead?.orientation ?? "landscape"}
         alt={lead?.alt ?? note.data.title}
         title={note.data.title}
+        headline={note.data.headline}
         deck={note.data.deck}
         location={note.data.location}
         territory={note.data.territory}

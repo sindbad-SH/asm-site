@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Lake Lugano at dusk
+headline: Switzerland, in Italian
 deck: Italian-speaking Switzerland at its most Mediterranean — a lake city between two peaks, its water shared with Italy.
 date: 2023-08-16
 location: Lugano, Ticino, Switzerland

@@ -43,6 +43,10 @@ const fieldNotes = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/field-notes" }),
   schema: z.object({
     title: z.string(),
+    // headline — optional BOLD editorial magazine headline for the cover (M5,
+    // 2026-07-22), distinct from the factual `title`. When present it's the big
+    // line on the FieldCover and `title`/location drop to the kicker.
+    headline: z.string().optional(),
     // deck — optional one-line standfirst under the headline (magazine grammar,
     // M2 2026-07-22). Renders as the article deck; absent on plainer notes.
     deck: z.string().optional(),

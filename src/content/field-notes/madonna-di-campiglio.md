@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — new location (M2b, 2026-07-22). Copy is research-expanded; sources logged in session. Photos + reel are stills/loop pulled from the operator's own drone footage of this outing. Staging-only until read.
 title: Madonna di Campiglio
+headline: The only dolomites west of the river
 deck: The only dolomite range west of the Adige, seen from a knife-edge ridge above the town.
 date: 2023-08-08
 location: Madonna di Campiglio, Trentino, Italy

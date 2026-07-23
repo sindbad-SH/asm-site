@@ -7,6 +7,7 @@
 #   framed as perspective/geometry + red-rock overlooks, NOT a flight over the
 #   protected area. Keep it that way.
 title: The Flatirons over Chautauqua
+headline: Three hundred million years, leaning
 deck: Five slabs of 300-million-year-old sandstone, tilted against the plains — Boulder's front yard.
 date: 2023-04-24
 location: Chautauqua, Boulder, Colorado

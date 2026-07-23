@@ -1,6 +1,7 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
 title: Bellagio, Lake Como
+headline: The point that divides the wind
 deck: A wooded promontory splits Lake Como into a Y, and Bellagio holds the point where the two arms part.
 date: 2023-08-20
 location: Bellagio, Lake Como, Italy
