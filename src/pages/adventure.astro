@@ -763,9 +763,14 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
             <p class="max-w-3xl text-ink" data-reveal>{p.postcards.body}</p>
             <div class="postcard-grid">
               {postcards.map((pc) => (
-                <article class="postcard-tile" data-reveal data-reveal-stagger="60">
+                <a
+                  class="postcard-tile"
+                  href={`${base}/postcards/${pc.slug}`}
+                  data-reveal
+                  data-reveal-stagger="60"
+                >
                   <div class="postcard-photos">
-                    {pc.photos.map((ph) =>
+                    {pc.photos.slice(0, 3).map((ph) =>
                       ph.media ? (
                         <figure class="postcard-photo">
                           <picture>
@@ -782,8 +787,11 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                     <span class="postcard-date hud-label">{pc.date}</span>
                   </div>
                   <p class="postcard-loc hud-label">{pc.location}</p>
-                  <p class="postcard-para">{pc.paragraph}</p>
-                </article>
+                  <p class="postcard-para">{pc.paragraphs[0]}</p>
+                  <span class="postcard-cta link" aria-hidden="true">
+                    Read the postcard <span class="arrow">→</span>
+                  </span>
+                </a>
               ))}
             </div>
           </div>
@@ -1092,6 +1100,30 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
     border-radius: 10px;
     background: color-mix(in srgb, #ffffff 2%, transparent);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur-hover, 180ms) var(--ease-swift, ease),
+      background var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .postcard-tile:hover,
+  .postcard-tile:focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent, #eef5fa) 35%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .postcard-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .postcard-cta .arrow {
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .postcard-tile:hover .postcard-cta .arrow,
+  .postcard-tile:focus-visible .postcard-cta .arrow {
+    transform: translateX(4px);
   }
   .postcard-photos {
     display: grid;
@@ -1137,6 +1169,10 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     font-size: 0.9rem;
     line-height: 1.5;
     color: color-mix(in srgb, #eef2f5 82%, transparent);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ── A3b · THE FIELD teaser (Round 5) — one inviting block: the wall's three

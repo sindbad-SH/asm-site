@@ -587,10 +587,16 @@ export const RELATIONSHIPS: readonly Relationship[] = [
   // Something for Tomorrow" entry SPLITS into two: the operator named them as
   // separate archive tiles on /adventure. Facts unchanged from the original
   // combined entry (Nordic Daughter: Nordic / folk, a Scandinavian-festival
-  // set, Jun 2024; Something for Tomorrow: punk rock, a "Rickhouse" show, Jul
-  // 2024; the two bands share a member). Tier "informal" for both (early gig
-  // work, no pay claim). ⚠ OPERATOR READ-APPROVAL REQUIRED — the two split
-  // phrasings are new strings (staging-only until read).
+  // set, Jun 2024; Something for Tomorrow: a "Rickhouse" show, Jul 2024; the
+  // two bands share a member). Tier "informal" for both (early gig work, no
+  // pay claim). ⚠ OPERATOR READ-APPROVAL REQUIRED — the two split phrasings
+  // are new strings (staging-only until read).
+  //
+  // POSTCARD2 (2026-07-27) — genre corrected "punk rock" → "hard rock":
+  // Something For Tomorrow is web-verified (nordicdaughter.com/bio; a
+  // jamsphere.com interview) as a real band — Jason Lycan (Nordic Daughter's
+  // guitarist) plays in both. Full correction + the ND/SfT footage split are
+  // in ADVENTURE-ARCHIVE-MINE.md §4 and SITE-COPY-DECK-publication-v1.md.
   {
     id: "nordic-daughter",
     name: "Nordic Daughter",
@@ -824,15 +830,18 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
   // commissioned venture work); they render there as a modest bottom band.
   // ROUND 5 — the combined Nordic Daughter tile SPLITS in two per operator
   // (separate tiles for Nordic Daughter and "Something for Tomorrow").
-  // ⚠ OPERATOR-CONFIRM: Something for Tomorrow has no exported tile media yet
-  // (public/media/work/archive/something-for-tomorrow.* is absent) — the tile
-  // renders with an empty media slot until an export ships; facts (punk rock,
-  // a "Rickhouse" show, Jul 2024) come from the relationship entry above.
+  // POSTCARD2 (2026-07-27) — all three now link to their own /postcards/[slug]
+  // detail page (filed this pass); genre note corrected from "punk rock" to
+  // "hard rock" (Something For Tomorrow is web-verified as Jason Lycan's
+  // — Nordic Daughter's guitarist — hard-rock side project; source:
+  // nordicdaughter.com/bio + a jamsphere.com interview, both quoted in
+  // SITE-COPY-DECK-publication-v1.md's POSTCARD2 section).
   {
     slug: "nordic-daughter",
     title: "Nordic Daughter",
     date: "2024",
     relationshipId: "nordic-daughter",
+    href: "/postcards/nordic-daughter",
     lane: "adventure",
   },
   {
@@ -840,6 +849,7 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     title: "Something for Tomorrow",
     date: "2024",
     relationshipId: "something-for-tomorrow",
+    href: "/postcards/something-for-tomorrow",
     lane: "adventure",
   },
   {
@@ -847,6 +857,7 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     title: "The Art of Brazilian Living",
     date: "2025",
     relationshipId: "brazilian-living",
+    href: "/postcards/brazilian-living",
     lane: "adventure",
   },
   {

@@ -1,0 +1,172 @@
+---
+/**
+ * /postcards/[slug] — POSTCARD2 (2026-07-27, publication-v1 branch).
+ *
+ * The detail page for a single "postcard" — the smallest story unit on the
+ * site (src/data/postcards.ts): one place, a short paragraph or two, a small
+ * gallery, a date. Deliberately LIGHT — a postcard, not a Field Notes
+ * dispatch (/field-notes/[slug]). No FieldCover magazine treatment, no
+ * Amazing Aerial licensing funnel (postcards are personal archive coverage,
+ * not the licensed aerial archive) — just the words and a few frames, with a
+ * back-link to /adventure.
+ *
+ * STATIC PATHS: one page per entry in POSTCARDS. No draft concept — every
+ * filed postcard is routable (the array itself is the honesty gate: nothing
+ * renders until it's actually filed, per postcards.ts's own header).
+ */
+import Base from "../../layouts/Base.astro";
+import { POSTCARDS } from "../../data/postcards";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const postcardMediaRoot = join(process.cwd(), "public", "media", "adventure", "postcards");
+function postcardPhoto(postcardSlug: string, photoSlug: string) {
+  const widths = [700, 1200];
+  const dir = join(postcardMediaRoot, postcardSlug);
+  if (!existsSync(join(dir, `${photoSlug}-${widths[0]}.avif`))) return undefined;
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${widths[0]}.webp`,
+  };
+}
+
+export async function getStaticPaths() {
+  return POSTCARDS.map((pc) => ({
+    params: { slug: pc.slug },
+    props: { pc },
+  }));
+}
+
+type Props = { pc: (typeof POSTCARDS)[number] };
+const { pc } = Astro.props;
+
+const photos = pc.photos.map((ph) => ({ ...ph, media: postcardPhoto(pc.slug, ph.slug) })).filter((ph) => ph.media);
+
+const meta = {
+  title: `${pc.title} — Postcard | Adventure Storytelling Media`,
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (meta description template,
+  // staging-only until read). Composed only from the postcard's own data.
+  description: `A postcard from the road — ${pc.title}, ${pc.location}.`,
+};
+
+const gallerySizes = "(min-width: 900px) 30vw, 45vw";
+---
+
+<Base title={meta.title} description={meta.description}>
+  <div data-lane="adventure">
+    <article class="pc-detail">
+      <p class="pc-back" data-reveal>
+        <a class="link" href={`${base}/adventure`}>← All postcards</a>
+      </p>
+
+      <header class="pc-head" data-reveal>
+        <p class="hud-label pc-kicker">Postcard · {pc.date}</p>
+        <h1 class="pc-title">{pc.title}</h1>
+        <p class="pc-loc hud-label">{pc.location}</p>
+      </header>
+
+      <div class="pc-prose" data-reveal>
+        {pc.paragraphs.map((graf) => <p>{graf}</p>)}
+      </div>
+
+      {
+        photos.length > 0 && (
+          <section class="pc-gallery" data-reveal aria-label={`Photos from ${pc.title}`}>
+            {photos.map(
+              (ph) =>
+                ph.media && (
+                  <figure class="pc-photo">
+                    <picture>
+                      <source type="image/avif" srcset={ph.media.avif} sizes={gallerySizes} />
+                      <source type="image/webp" srcset={ph.media.webp} sizes={gallerySizes} />
+                      <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
+                    </picture>
+                  </figure>
+                ),
+            )}
+          </section>
+        )
+      }
+
+      <footer class="pc-foot">
+        <p class="pc-back" data-reveal>
+          <a class="link" href={`${base}/adventure`}>← All postcards</a>
+        </p>
+      </footer>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .pc-detail {
+    max-width: 42rem;
+    margin-inline: auto;
+    padding: 6.5rem clamp(1.5rem, 6vw, 3rem) 6rem;
+  }
+  .pc-back {
+    margin: 0 0 1.75rem;
+  }
+  .pc-head {
+    margin-bottom: 1.75rem;
+  }
+  .pc-kicker {
+    margin: 0 0 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--color-adventure-warm, var(--color-accent));
+  }
+  .pc-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    line-height: 1.08;
+    color: var(--color-peak);
+  }
+  .pc-loc {
+    margin: 0.6rem 0 0;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--color-peak) 62%, transparent);
+  }
+  .pc-prose {
+    max-width: 38rem;
+    font-size: clamp(1.02rem, 1.4vw, 1.15rem);
+    line-height: 1.72;
+    color: color-mix(in srgb, var(--color-ink) 92%, transparent);
+  }
+  .pc-prose p {
+    margin: 0 0 1.2em;
+  }
+  .pc-prose p:last-child {
+    margin-bottom: 0;
+  }
+  .pc-gallery {
+    margin-top: 2.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+  .pc-photo {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .pc-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  .pc-foot {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .pc-foot .pc-back {
+    margin: 0;
+  }
+</style>

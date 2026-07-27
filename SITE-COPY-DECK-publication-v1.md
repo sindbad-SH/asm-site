@@ -21,7 +21,7 @@ individually.
 | Navigation (site-wide) | 1 |
 | Home (`/`) | 3 |
 | /about | 12 |
-| /adventure | 2 + 3 (PUB-E) + 8 (POSTCARD) |
+| /adventure | 2 + 3 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) |
 | /venture | 7 + 5 (PUB-E) |
 | /work (archive index) | 10 + 1 (PUB-E) |
 | /work/seriesfest | 1 |
@@ -31,7 +31,7 @@ individually.
 | /world | 3 |
 | Footer (site-wide) | 3 |
 | Base layout default (site-wide fallback) | 1 |
-| **Total** | **79 + 15 (PUB-E) + 8 (POSTCARD) = 102** |
+| **Total** | **79 + 15 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) = 118** |
 
 Plus: 1 data-classification flip (Vybe, /adventure ↔ /venture — no copy
 string changed) and ~20 structural href-only fixes (redirect-hop removal),
@@ -189,6 +189,80 @@ required; `adventure.astro`'s postcard tile template gained a
 `scripts/make-postcards.mjs` from frame-grabs of the two source clips (3
 photos per postcard, 700/1200w AVIF+WEBP, 4:5 crop) into
 `public/media/adventure/postcards/{valkyrie-dance,market-row}/`.
+
+### POSTCARD2 additions (2026-07-27, publication-v1 branch — "Postcards from
+the Road" v2 restructure + the Nordic Daughter / Something for Tomorrow
+band-coverage split)
+
+Every postcard is now a **clickable piece** — a small `/adventure` tile that
+links to its own detail page (`src/pages/postcards/[slug].astro`: title,
+date, location, the paragraph(s), a small gallery, a back-link). The
+`Postcard` type's `paragraph: string` field became `paragraphs: readonly
+string[]`; the first paragraph is the tile's teaser text.
+
+**Operator correction (overturns `ADVENTURE-ARCHIVE-MINE.md` §4):**
+"Something for Tomorrow" is a REAL band, not a mis-hearing of the disk
+folder name as the mining report concluded — it's Nordic Daughter guitarist
+Jason Lycan's hard-rock side project. Web-verified: nordicdaughter.com/bio
+("…including his Hard Rock band Something For Tomorrow") and a
+jamsphere.com interview ("Jason is practicing with his other band Something
+for Tomorrow, two nights a week"). The mining report's §4 now carries an
+⚠ OPERATOR CORRECTION block with this note.
+
+**The Nordic Daughter / Something for Tomorrow split:** every frame in
+`Nordic Daughter\Something for tomorrow\` (Rickhouse, Denver, 2024-07-07 —
+6 raw DJI drone masters, 3 edited cuts, 1 phone photo) was reviewed. The
+venue's own screen displays "Something For Tomorrow" throughout every stage
+shot — confirming that ALL performance footage in this folder is Something
+for Tomorrow, not Nordic Daughter. Per the operator's framing ("Nordic
+Daughter shots are from the AUDIENCE vantage"), the two postcards split
+along that line: Something for Tomorrow's postcard uses the confirmed stage
+frames; Nordic Daughter's postcard uses genuine crowd/audience frames from
+the same night, captioned as the room and crowd — never claiming any
+specific person in frame is a Nordic Daughter member (no face in the footage
+is identifiable as such). **UNSORTED: none** — no frame reviewed was
+ambiguous about which band's stage it showed.
+
+| Postcard | Field | New text | Flag |
+|---|---|---|---|
+| Scandinavian Midsummer Festival (merged Valkyrie Dance + Market Row) | title | **"Scandinavian Midsummer Festival"** | ⚠ |
+| | intro paragraph (new) | "I spent the closing day of the Scandinavian Midsummer Festival's first year in Golden wandering Parfet Park with a camera — a dance stage on one side of the grounds, a row of vendor tents on the other." | ⚠ |
+| | Valkyrie Dance paragraph | carried verbatim from the original postcard | ⚠ (reuse) |
+| | Market Row paragraph | carried verbatim from the original postcard | ⚠ (reuse) |
+| | closing line (new; paraphrases the operator-sanctioned line "Nordic Daughter was there — that's how I met them") | "Nordic Daughter played a set under one of the festival tents that same weekend — that's how I first met them." | ⚠ |
+| | added photo | "nd-set" — a Nordic-Daughter-at-the-festival frame (source: `Nordic Daughter\Scandinavian Festivle\Nordic Daughter Scandi Fest Par 1-Thumbnail.jpg`, an already-rendered export thumbnail; Nordic flags + festival tent + crowd visible confirm the setting) | ⚠ |
+| Nordic Daughter (new postcard) | title/date/location | "Nordic Daughter" · "2024-07-07" · "The Rickhouse, Denver, Colorado" | ⚠ |
+| | paragraphs | "Nordic Daughter's guitarist, Jason Lycan, also plays in the hard-rock band Something for Tomorrow — and on this July night at The Rickhouse in Denver, it was Something for Tomorrow's turn on stage. I shot the room from the crowd's side instead: people packed in close under green and red stage light, drinks in hand, watching from just past the monitors." / "From the side of the room the floor was full — tables in the back, a warehouse-sized crowd on a warehouse floor." | ⚠ |
+| | photos (2) | crowd/audience frames from the two raw DJI masters, described only as the room/crowd — no identity claims | ⚠ |
+| Something for Tomorrow (new postcard) | title/date/location | "Something for Tomorrow" · "2024-07-07" · "The Rickhouse, Denver, Colorado" | ⚠ |
+| | paragraphs | "Something for Tomorrow played The Rickhouse in Denver this July night — hard rock, full band, the venue's own screen running the band's name behind the drum riser. Jason Lycan, who also plays guitar in Nordic Daughter, led out front, long hair catching the stage light." / "Behind him: a bassist with a grey beard, a second guitarist, a drummer, and a keyboardist working a rig stacked with amps and monitors. The room ran blue, then red, then green as the set went on." | ⚠ |
+| | photos (3) | confirmed on-stage frames from the edited highlight cut ("Rickhouse 7-7-2024.mp4") | ⚠ |
+| The Art of Brazilian Living (new postcard) | title/date/location | "The Art of Brazilian Living" · "2025-06-22" · "Levitt Pavilion, Ruby Hill Park, Denver, Colorado" | ⚠ |
+| | venue ID (web-verified) | Levitt Pavilion's free concert series is "presented by Kaiser Permanente" — matches the Kaiser Permanente signage visible behind the stage in the source footage, plus the bowl-shaped lawn topology and skyline view on screen | ⚠ |
+| | paragraphs (4) | "This is Boulder Samba School's outdoor showcase from June 22, 2025, at Levitt Pavilion in Denver's Ruby Hill Park — a bowl-shaped lawn amphitheater with the city skyline behind the stage. I got there early enough to walk the grounds: a food truck, a jewelry tent, the hillside filling in with picnic blankets under a clear sky." / "On stage, a singer in a sequined green dress worked the mic in front of a full percussion line — congas, surdos, a drum kit — a Brazilian flag hanging off the scaffolding beside her." / "Three dancers came out in full feathered headdresses — gold, orange, and red — working the front of the stage together. Another dancer, in a shorter blue-feathered piece, had the space to herself, mid-stride, all motion." / "Later, a big circle formed on the pavement in front of a smaller stage — kids and adults both, working through steps together while a Brazilian flag flew from the barrier." | ⚠ |
+| | photos (5) | Aline on stage with the percussion line; three costumed dancers; a solo dancer mid-stride; the venue's bowl-shaped lawn; the community dance circle | ⚠ |
+
+**Honesty note — venue name, not festival name:** per the task's binding
+instruction, this postcard names the **venue** (Levitt Pavilion, web-verified
+above) but does NOT claim the event was "Colorado Brazil Fest" — Boulder
+Samba School's flagship Colorado Brazil Fest ran August 7–10, 2025
+(confirmed in `ADVENTURE-ARCHIVE-MINE.md` §2), which doesn't match this
+June 22, 2025 footage.
+
+**Structural / archive-index notes:** `WORK_ARCHIVE`'s three existing
+"From the archive" tiles (`nordic-daughter`, `something-for-tomorrow`,
+`brazilian-living`) each gained an `href` pointing at their new
+`/postcards/[slug]` page — they now render as links ("Read the story →")
+instead of plain unlinked tiles, reusing the same permitted phrasing
+already shipped (no new tile copy). A code comment there also corrected
+"punk rock" → "hard rock" for Something for Tomorrow's genre (see the
+web-verification above).
+
+**Build / verification:** `npm run build` passes (45 pages, honesty audit
+clean); all four `/postcards/[slug]` pages verified live on the dev server
+— text content, all photo counts (7/2/3/5), and back-links confirmed via
+`read_page`; zero broken image requests (all `200 OK`) and zero console
+errors.
 
 ---
 
