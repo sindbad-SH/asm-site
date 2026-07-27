@@ -764,13 +764,13 @@ export type ArchiveItem = {
   href?: string;
   /**
    * Round 4 (2026-07-21, operator-directed) — the archive band SPLITS across two
-   * lane pages instead of all sitting on /entertainment:
-   *   • "venture"   → /entertainment — gig/brand/event work for an organization.
+   * lane pages instead of all sitting in one place:
+   *   • "venture"   → /venture — gig/brand/event work for an organization.
    *   • "adventure" → /adventure — pieces that read as travel/coverage ("was
    *     around here, filmed this"), shown modestly as a small coverage band.
-   * One source of truth; each page filters this field. Vybe was not named in the
-   * split direction, so it HOLDS its existing home (venture) — see the ⚠ flag on
-   * the array below.
+   * One source of truth; each page filters this field. PUB-D (2026-07-27):
+   * Vybe is "adventure" per the operator's binding ruling that session — see
+   * the entry below.
    */
   lane: "venture" | "adventure";
 };
@@ -788,20 +788,19 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     href: "/work/gigs-go-green",
     lane: "venture", // operator-named: STAYS on /entertainment
   },
-  // PUB-A (2026-07-27) — Vybe MOVES BACK to venture per this session's
-  // operator ruling (ACTION-PLAN.md / the PUB-A directive's editorial sorting
-  // rule names Vybe explicitly as a VENTURE example: "the storyteller had
-  // access to the people building the thing"). This SUPERSEDES the Round-5
-  // 2026-07-21 adventure placement below (kept here as a comment for the
-  // record, not as a decision still in force). Case page stays at /work/vybe
-  // (URL unchanged); it now renders in /venture's "From the archive" band.
+  // PUB-D (2026-07-27) — Vybe MOVES BACK to adventure. Operator's BINDING
+  // ruling this session overrides the PUB-A note above (which cited a stale
+  // brief): the VYBE story belongs under Adventure Stories, not Venture. The
+  // Round-5 2026-07-21 adventure placement was correct after all. Case page
+  // stays at /work/vybe (URL unchanged); it now renders in /adventure's
+  // "From the archive" band, not on /venture's story rail.
   {
     slug: "vybe",
     title: "Vybe",
     date: "2023–2024",
     relationshipId: "vybe",
     href: "/work/vybe",
-    lane: "venture",
+    lane: "adventure",
   },
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — archive tiles (the `title` + `date`
   // strings are new visible copy, staging-only). One-liners render verbatim
@@ -1006,13 +1005,17 @@ export const PAGES = {
     // REQUIRED — new meta copy (staging-only until read).
     // PUB-A (2026-07-27) — the <title> is replaced with publication framing
     // per ACTION-PLAN.md (the site sells stories now, not production
-    // services). description is UNCHANGED — it's hero-adjacent copy, out of
-    // this structural pass's scope; flag it separately if it needs a pass.
+    // services). description was flagged as out-of-scope for that pass —
+    // PUB-D (2026-07-27) closes that flag: it carried "the StorySmith" as a
+    // byline (retired site-wide per the consistency sweep) and the old
+    // "corporate storytelling, and market research" services framing
+    // (retired with /entertainment). Rewritten to match the new <title> and
+    // /about's meta voice; no facts changed.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — new title (staging-only until read).
     meta: {
       title: `${SITE.name} — Adventure & Venture Stories from the Field`,
       description:
-        "Sindbad Horizon, the StorySmith — drone & aerial production, corporate storytelling, and market research from Boulder, Colorado. One operator, research to final cut, working worldwide.",
+        "Adventure Storytelling Media publishes two kinds of hard-won stories from Boulder, Colorado — Adventure Stories from the field, Venture Stories from the market. One storyteller, research to final cut, working worldwide.",
     },
     // H3 — three-pillar scroll tableaux, equal grammatical weight.
     tableaux: [

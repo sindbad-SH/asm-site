@@ -76,7 +76,7 @@ const ARTICLE = {
   ],
   ctas: [
     { label: "About the organization →", href: "https://www.meme.ngo", external: true },
-    { label: "See the venture lane →", href: `${base}/entertainment`, external: false },
+    { label: "See the venture lane →", href: `${base}/venture`, external: false },
   ],
 };
 ---
@@ -87,7 +87,7 @@ const ARTICLE = {
       {ghost.map((ch, i) => <span class="meme-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
     </div>
     <article class="meme-inner">
-      <a href={`${base}/entertainment`} class="link meme-back">← Venture</a>
+      <a href={`${base}/venture`} class="link meme-back">← Venture</a>
       <p class="hud-label meme-slate" data-reveal data-tableau-content>
         <span data-decode>{ARTICLE.slate}</span>
       </p>
@@ -132,7 +132,7 @@ const ARTICLE = {
           ))
         }
       </nav>
-      <a href={`${base}/entertainment`} class="link meme-back">← Venture</a>
+      <a href={`${base}/venture`} class="link meme-back">← Venture</a>
     </article>
   </main>
 </Base>

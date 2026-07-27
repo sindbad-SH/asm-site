@@ -45,7 +45,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // (2) build with PUBLISH_MFG=true. The env flag is a deliberate interlock so the
 // page can never ship without a conscious ledger update. NOT auto-decided here.
 const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
-if (!PUBLISH_MFG) return Astro.redirect(`${base}/entertainment`);
+if (!PUBLISH_MFG) return Astro.redirect(`${base}/venture`);
 
 // ghost letterforms — the page's own subject, scattered as a faint backdrop
 // (presentational; assembles under the engine, sits still with no-JS).
@@ -82,7 +82,7 @@ const ARTICLE = {
       {ghost.map((ch, i) => <span class="mfg-ghost" data-im-ghost style={`--gi:${i}`}>{ch}</span>)}
     </div>
     <article class="mfg-inner">
-      <a href={`${base}/entertainment`} class="link mfg-back">← Venture</a>
+      <a href={`${base}/venture`} class="link mfg-back">← Venture</a>
       <p class="hud-label mfg-slate" data-reveal data-tableau-content>
         <span data-decode>{ARTICLE.slate}</span>
       </p>
@@ -117,7 +117,7 @@ const ARTICLE = {
           ))
         }
       </nav>
-      <a href={`${base}/entertainment`} class="link mfg-back">← Venture</a>
+      <a href={`${base}/venture`} class="link mfg-back">← Venture</a>
     </article>
   </main>
 </Base>

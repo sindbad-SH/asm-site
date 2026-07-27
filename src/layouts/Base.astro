@@ -16,7 +16,11 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Adventure Storytelling Media — Sindbad Horizon, The StorySmith." } = Astro.props;
+// PUB-D (2026-07-27) — default description no longer uses "The StorySmith" as
+// a name/title byline (retired site-wide per the consistency sweep; only
+// used as JSON-LD alternateName below now). Currently the fallback for pages
+// that pass no description prop (e.g. 404.astro).
+const { title, description = "Adventure Storytelling Media — Adventure & Venture Stories from Boulder, Colorado." } = Astro.props;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // Absolute URLs for social scrapers (they don't resolve relative paths).
