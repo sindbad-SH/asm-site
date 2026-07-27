@@ -21,7 +21,7 @@ individually.
 | Navigation (site-wide) | 1 |
 | Home (`/`) | 3 |
 | /about | 12 |
-| /adventure | 2 + 3 (PUB-E) |
+| /adventure | 2 + 3 (PUB-E) + 8 (POSTCARD) |
 | /venture | 7 + 5 (PUB-E) |
 | /work (archive index) | 10 + 1 (PUB-E) |
 | /work/seriesfest | 1 |
@@ -31,7 +31,7 @@ individually.
 | /world | 3 |
 | Footer (site-wide) | 3 |
 | Base layout default (site-wide fallback) | 1 |
-| **Total** | **79 + 15 (PUB-E) = 94** |
+| **Total** | **79 + 15 (PUB-E) + 8 (POSTCARD) = 102** |
 
 Plus: 1 data-classification flip (Vybe, /adventure ↔ /venture — no copy
 string changed) and ~20 structural href-only fixes (redirect-hop removal),
@@ -142,6 +142,53 @@ entries"); the section on `/adventure` renders only when it's non-empty, so
 nothing above is currently visible on the live page. Expected future filers
 (named in that file's header, not invented here): VYBE/Boogie Lights, Nordic
 Daughter, Something Tomorrow, others TBD from archive mining.
+
+### POSTCARD additions (2026-07-27, publication-v1 branch — first two entries filed)
+
+Both from the verified **Scandinavian Midsummer Festival, Parfet Park,
+Golden, Colorado — June 14-16, 2024, the festival's first year in Golden**
+(per `ADVENTURE-ARCHIVE-MINE.md`). `POSTCARDS` is no longer empty; the
+Postcards section now renders live on `/adventure`. Every sentence below is
+new, first-person copy — flagged per binding voice rules (no invented facts
+beyond the verified festival name/venue/dates + what is visibly on screen).
+
+| Field | New text | Flag |
+|---|---|---|
+| Postcard 1 — title | **"Valkyrie Dance"** | ⚠ |
+| Postcard 1 — date | "2024-06-16" | ⚠ |
+| Postcard 1 — location | "Parfet Park, Golden, Colorado" | ⚠ |
+| Postcard 1 — paragraph | "I caught this one on the closing day of the Scandinavian Midsummer Festival's first year in Golden. A dance troupe in flowing black dresses, trailing teal fabric off their arms, worked through a slow, deliberate routine on a plywood stage in Parfet Park. A few of the dancers wore pale, ghost-white face paint. The crowd sat in folding chairs and on blankets right up to the stage edge, tents and Nordic flags at their backs." | ⚠ |
+| Postcard 2 — title | **"Market Row"** | ⚠ |
+| Postcard 2 — date | "2024-06-16" | ⚠ |
+| Postcard 2 — location | "Parfet Park, Golden, Colorado" | ⚠ |
+| Postcard 2 — paragraph | "I ducked through the vendor tents at the Scandinavian Midsummer Festival's first year in Golden. Tables were loaded with dragon figurines, engraved goblets, and jewelry trays, parasols hanging from the tent poles, a Danish flag catching the breeze overhead. Shoppers moved slow through the shade while the foothills rose right behind the last row of tents." | ⚠ |
+
+**Sourcing / honesty note (Postcard 2, "Market Row"):** the source clip on
+disk is titled `Chef Eric Mcbride (Scandinavian Festival Golden 2024).wfp`
+(a Filmora project — no rendered mp4 exists). The .wfp is a zip archive; it
+was unzipped and its `timeline.wesproj` parsed to recover the full edit's
+clip list (26 clips, ~9.5 minutes, all cut from two raw DJI source masters:
+`DJI_20240616110209_0237_D.MP4` and `DJI_20240616110607_0238_D.MP4`, both
+timestamped June 16, 2024). Every clip's midpoint was frame-grabbed and
+visually reviewed — the entire timeline is a walkthrough of the festival's
+vendor market (dragon figurines, engraved goblets, jewelry, parasol stalls,
+tents, the Golden foothills). **No chef, no cooking, and no one
+identifiable as "Eric Mcbride" appears in any sampled frame.** Per the
+task's binding instruction ("if a clip shows something different from its
+filename's implication, write what you SEE"), this postcard is titled and
+captioned for what is actually on screen — the project file's working title
+is not used or implied anywhere in the visible copy. ⚠ Flagging for the
+operator: confirm whether a genuine "Chef Eric Mcbride" segment exists
+elsewhere in the raw archive (out of scope for this pass) or whether the
+project title was simply a misnomer/placeholder.
+
+**Data / media notes:** `src/data/postcards.ts` gained a `location: string`
+field (not in PUB-E's original type) to carry the venue string the task
+required; `adventure.astro`'s postcard tile template gained a
+`.postcard-loc` line to render it. Stills baked by
+`scripts/make-postcards.mjs` from frame-grabs of the two source clips (3
+photos per postcard, 700/1200w AVIF+WEBP, 4:5 crop) into
+`public/media/adventure/postcards/{valkyrie-dance,market-row}/`.
 
 ---
 

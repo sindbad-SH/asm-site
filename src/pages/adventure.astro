@@ -781,6 +781,7 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                     <span class="postcard-title">{pc.title}</span>
                     <span class="postcard-date hud-label">{pc.date}</span>
                   </div>
+                  <p class="postcard-loc hud-label">{pc.location}</p>
                   <p class="postcard-para">{pc.paragraph}</p>
                 </article>
               ))}
@@ -1124,6 +1125,12 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     flex: none;
     font-size: 0.58rem;
     letter-spacing: 0.14em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .postcard-loc {
+    margin: -0.2rem 0 0;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
     color: var(--color-ink-muted, #8a9a96);
   }
   .postcard-para {
