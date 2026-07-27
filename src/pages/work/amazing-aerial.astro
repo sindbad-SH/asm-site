@@ -25,7 +25,6 @@ import { join } from "node:path";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const aa = PAGES.adventure.licensed; // the locked licensed-relationship block
-const AA_PORTFOLIO = PAGES.adventure.aaFunnel.cta.href;
 
 // ── still highlights: reuse the baked gallery exports, existence-gated ──
 const g = join(process.cwd(), "public", "media", "adventure", "gallery");
@@ -71,8 +70,14 @@ const clips = [
   clip("ironton", "The San Juans · Colorado", "Aerial of snow-capped San Juan peaks above a green pine valley in Colorado"),
 ].filter((x): x is NonNullable<typeof x> => !!x);
 
+// PUB-C (2026-07-27) — the reel's primary CTA now funnels through the
+// publication's single canonical licensing surface (/licensing) instead of
+// linking straight out to Amazing Aerial. /licensing carries the operator-
+// approved framing ("commercial & editorial licensing") and the correct
+// general-collection URL (his portfolio, never a per-photo deep link);
+// duplicating that link/copy here would risk drift, so this page defers to it.
 const CTAS = [
-  { label: "License the collection", href: AA_PORTFOLIO, external: true, primary: true },
+  { label: "Licensing", href: `${base}/licensing`, external: false, primary: true },
   { label: "The agency story", href: `${base}/venture/amazing-aerial`, external: false },
   { label: "Back to the work", href: `${base}/work`, external: false },
 ];

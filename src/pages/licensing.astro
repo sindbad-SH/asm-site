@@ -1,0 +1,182 @@
+---
+/**
+ * /licensing — PUB-C (2026-07-27), the publication's licensing surface.
+ * Short and factual, per the operator-approved content rules (binding —
+ * see COPY-DECK-C.md for every new sentence flagged for read-approval):
+ *
+ *   - Amazing Aerial: logo + link to the GENERAL collection page (his
+ *     portfolio there — https://www.amazingaerial.com/controller/portfolio/shorizon)
+ *     + the exact framing "commercial & editorial licensing". NEVER a
+ *     per-photo deep link (unlike /adventure's existing per-shot search-URL
+ *     funnel, which this page does not touch or replace).
+ *   - No invented stats ("10,000 images" etc.), no prices.
+ *   - A small, honest note that more licensing routes (prints, archive) are
+ *     coming — not a promise of a date.
+ *
+ * The AA logo asset + existence-gating pattern is reused from
+ * /venture/amazing-aerial.astro (the real AA mark, nominative editorial use,
+ * operator-authorized).
+ */
+import Base from "../layouts/Base.astro";
+import { SITE } from "../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// The general Amazing Aerial collection page — his portfolio, not a filtered
+// search or a per-photo deep link. Directive-locked; do not swap for the
+// per-search encoded URL used elsewhere on the site.
+const AA_COLLECTION = "https://www.amazingaerial.com/controller/portfolio/shorizon";
+
+const logoAbs = join(process.cwd(), "public", "media", "adventure", "aa-logo.png");
+const hasLogo = existsSync(logoAbs);
+const LOGO = `${base}/media/adventure/aa-logo.png`;
+---
+
+<Base
+  title="Licensing"
+  description="How to license Adventure Storytelling Media's aerial photography and footage, and who to contact for direct or custom enquiries."
+>
+  <main class="lic">
+    <article class="lic-inner">
+      <p class="hud-label lic-kicker" data-reveal>
+        <span data-decode>LICENSING</span>
+      </p>
+      <h1 class="lic-title" data-reveal>License the work.</h1>
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (staging-only until read; COPY-DECK-C.md). */}
+      <p class="lic-lead" data-reveal>
+        Adventure Storytelling Media's aerial photography and footage is represented and licensed
+        worldwide through Amazing Aerial Agency.
+      </p>
+
+      <section class="lic-block" data-reveal>
+        <div class="lic-aa-lockup">
+          {hasLogo && (
+            <img class="lic-logo" src={LOGO} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
+          )}
+        </div>
+        {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, exact locked framing "commercial & editorial licensing" (staging-only until read; COPY-DECK-C.md). */}
+        <p class="lic-body">
+          For commercial & editorial licensing of the aerial work, visit the collection on Amazing
+          Aerial — never a single photo, the whole represented body of work.
+        </p>
+        <a href={AA_COLLECTION} class="btn lic-cta" rel="noopener" target="_blank">
+          <span>Visit the collection at Amazing Aerial</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </section>
+
+      <section class="lic-block" data-reveal>
+        {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (staging-only until read; COPY-DECK-C.md). */}
+        <p class="lic-body">For direct or custom enquiries, contact us directly.</p>
+        <div class="lic-contact-row">
+          <a href={`${base}/contact`} class="btn-quiet lic-quiet-cta">
+            <span>Contact →</span>
+          </a>
+          <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+        </div>
+      </section>
+
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (staging-only until read; COPY-DECK-C.md). */}
+      <p class="lic-note" data-reveal>
+        More licensing routes — prints, the wider archive — are coming.
+      </p>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .lic {
+    background: #0e131c;
+    min-height: 100svh;
+  }
+  .lic-inner {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding: 7rem 2rem 6rem;
+    display: grid;
+    gap: 1.3rem;
+  }
+  .lic-kicker {
+    letter-spacing: 0.26em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+    margin: 0;
+  }
+  .lic-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3.2rem);
+    line-height: 1.12;
+    color: #f2f4f8;
+  }
+  .lic-lead {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+    max-width: 42rem;
+  }
+
+  .lic-block {
+    margin-top: 0.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    display: grid;
+    gap: 0.9rem;
+  }
+  .lic-aa-lockup {
+    display: flex;
+    align-items: center;
+  }
+  .lic-logo {
+    height: 2.2rem;
+    width: auto;
+    opacity: 0.95;
+  }
+  .lic-body {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+    max-width: 42rem;
+    margin: 0;
+  }
+  .lic-cta {
+    justify-self: start;
+  }
+  .lic-cta .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .lic-cta:hover .arrow {
+    transform: translateX(6px);
+  }
+  .lic-contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .lic-note {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, #d9f2ec 55%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lic-cta .arrow {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const mountDecodeLabels = () => import("../lib/decode-text").then(({ mountDecode }) => mountDecode(document));
+  if ("requestIdleCallback" in window) requestIdleCallback(mountDecodeLabels, { timeout: 3000 });
+  else setTimeout(mountDecodeLabels, 1500);
+</script>
