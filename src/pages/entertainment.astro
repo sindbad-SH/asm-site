@@ -1,0 +1,23 @@
+---
+/**
+ * /entertainment — RETIRED (PUB-A, 2026-07-27).
+ *
+ * Per ACTION-PLAN.md's publication restructure, the site runs two story
+ * columns — Adventure Stories and Venture Stories — not three. This route's
+ * content (the venture-story chapters: a restored Shelby at Pebble Beach,
+ * PitchBoulder, the story rail, "from the archive") moved to /venture, which
+ * is now the index of ALL venture stories (see src/pages/venture.astro; the
+ * retired "Industry Stories" lane at /work also refiles there).
+ *
+ * This file is a permanent redirect so the historical /entertainment URL
+ * still resolves — the retired page's full content is preserved in git
+ * history under src/pages/venture.astro (git-renamed from this path, so
+ * `git log --follow src/pages/venture.astro` shows it). Same static-redirect
+ * pattern already established in this codebase (see
+ * src/pages/venture/makeshift-film-group.astro's PUBLISH_MFG interlock) —
+ * `Astro.redirect` emits a working redirect page even under `output: "static"`,
+ * base-path-aware for both staging (/asm-site) and production (/) builds.
+ */
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+return Astro.redirect(`${base}/venture`);
+---

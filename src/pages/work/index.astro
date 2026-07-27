@@ -1,545 +1,122 @@
 ---
 /**
- * /work — "Industry Stories": the film & entertainment industry lane
- * (Round 3, 2026-07-21 — operator-directed lane redistribution).
+ * /work — PUB-A (2026-07-27): reframed as a simple "Archive / All Stories"
+ * index per ACTION-PLAN.md's publication restructure.
  *
- * WHAT THIS PAGE NOW IS: the lane he works in and covers — anchored by MEME
- * (top billing: the org he's affiliated with, where the content will grow),
- * then the SeriesFest + American Film Market coverage shelf, then a
- * conservative close that sells presence + coverage and points the
- * production/consulting money questions at the lanes that own them.
+ * WHAT THIS PAGE WAS: the "Industry Stories" lane (MEME top billing + a
+ * SeriesFest/AFM coverage shelf + a conservative close). That content is
+ * RETIRED as its own lane — MEME, the SeriesFest hub, and AFM now live in
+ * the story rail on /venture (the index of ALL venture stories). See the
+ * consts.ts comment above `PAGES.work` for what moved and why.
  *
- * WHAT LEFT (moved, never discarded — each piece lives in its true lane):
- *   • Shelby / Pebble Beach → /entertainment (it already carried the full
- *     chapter-02 feature + the Jack Bell testimonial; corporate event
- *     coverage for a private client = venture lane). Case page URL unchanged.
- *   • PitchBoulder → /entertainment (chapter 01 — its slot now carries the
- *     actual commercial embed, not just the hover loop). Case page unchanged.
- *   • Knights of Mayhem → /adventure (broadened into the "Medieval Festival
- *     in Loveland" feature block).
- *   • The AA flagship tile → /adventure (the AA bands there now link the
- *     highlights reel; /work/amazing-aerial URL unchanged).
- *   • The "from the archive" band → /entertainment (early gig/event coverage
- *     is venture-storytelling-natured, not film-industry work).
+ * WHAT THIS PAGE IS NOW: the URL stays alive (portfolio function preserved,
+ * per the directive) as a flat, honest directory into BOTH story columns —
+ * every individual story page on the site, one screen, no sales framing.
+ * Individual work/* and venture/* story pages are NOT moved or renamed;
+ * their URLs stay exactly as published. `PAGES.work.caseStudies` (used by
+ * work/pitchboulder.astro and work/shelby-pebble-beach.astro) is untouched.
  *
- * HONESTY (unchanged contract): every relationship claim renders through
- * LegendMark (verbatim permittedPhrasing); coverage tile slate/title strings
- * are copied verbatim from their article pages; prose never upgrades a status.
- * The MEME ambient loop mirrors /venture/meme.astro's poster-first gating.
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every visible string on this page is
+ * new (staging-only until read); logged in COPY-DECK-A.md. Link labels that
+ * are copied VERBATIM from their own destination page are noted inline.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
-import { PAGES } from "../../consts";
-import { existsSync, statSync } from "node:fs";
-import { join } from "node:path";
 
-const p = PAGES.work;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-// build-time media gating (repo convention): a tile only renders media that
-// shipped. Coverage tiles reuse each article's own hero-900 export.
-const mediaRoot = join(process.cwd(), "public", "media");
-const media = (rel: string) => (existsSync(join(mediaRoot, ...rel.split("/"))) ? `${base}/media/${rel}` : undefined);
-const pair = (relBase: string) => {
-  const avif = media(`${relBase}.avif`);
-  const webp = media(`${relBase}.webp`);
-  return avif || webp ? { avif, webp } : undefined;
-};
-const mtimeV = (rel: string) => {
-  try {
-    return `?v=${Math.round(statSync(join(mediaRoot, ...rel.split("/"))).mtimeMs).toString(36)}`;
-  } catch {
-    return "";
-  }
-};
-const bust = (relBase: string, pr: ReturnType<typeof pair>) =>
-  pr
-    ? {
-        avif: pr.avif ? pr.avif + mtimeV(`${relBase}.avif`) : undefined,
-        webp: pr.webp ? pr.webp + mtimeV(`${relBase}.webp`) : undefined,
-      }
-    : undefined;
+// Same HELD-FROM-PUBLISH interlock as /venture and
+// /venture/makeshift-film-group.astro — the tile only appears once that page
+// is actually live, so this index never links to a page that bounces back.
+const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
 
-// MEME anchor media — the org's own logo animatic, SAME processed loop the
-// /venture/meme article and /entertainment ch.03 carry (reused, existence-
-// gated, poster-first). No new asset.
-const memeLoop = media("venture/meme/meme-loop.mp4")
-  ? {
-      mp4: `${base}/media/venture/meme/meme-loop.mp4${mtimeV("venture/meme/meme-loop.mp4")}`,
-      poster: bust("venture/meme/meme-poster", pair("venture/meme/meme-poster")),
-    }
-  : undefined;
+const ADVENTURE_LINKS = [
+  { label: "Adventure Stories — the index", href: "/adventure" },
+  // title copied VERBATIM from its own page.
+  { label: "Steel & Dust — Field Notes No. 01", href: "/adventure/steel-and-dust" },
+  { label: "The Field — every location, Field Notes dispatch stream", href: "/adventure/field" },
+  { label: "Top shots with Amazing Aerial — the highlights reel", href: "/work/amazing-aerial" },
+] as const;
 
-// ROUND 5 (block→subpage): the five-tile shelf collapsed into ONE SeriesFest
-// feature block (→ /work/seriesfest) + the AFM tile. Media resolves from the
-// articles' existing hero exports — no new assets.
-const sf = p.coverage.seriesfest;
-const sfImg = bust(`venture/${sf.heroSlug}/hero-900`, pair(`venture/${sf.heroSlug}/hero-900`));
-const afm = p.coverage.afm;
-const afmSlug = afm.href.replace(/^\/venture\//, "");
-const afmImg = bust(`venture/${afmSlug}/hero-900`, pair(`venture/${afmSlug}/hero-900`));
-// The shelf states each event relationship ONCE (verbatim phrasing), never
-// upgraded per block — SeriesFest and AFM share the same honest line.
-const shelfProofIds = [...new Set([sf.relationshipId, afm.relationshipId])];
+const VENTURE_LINKS = [
+  { label: "Venture Stories — the index", href: "/venture" },
+  // title copied VERBATIM from its own page.
+  { label: "A restored Shelby at Pebble Beach", href: "/work/shelby-pebble-beach" },
+  { label: "PitchBoulder — coverage, recaps & the commercial", href: "/work/pitchboulder" },
+  { label: "SeriesFest, in depth", href: "/work/seriesfest" },
+  { label: "American Film Market 2025 — a venture story", href: "/venture/afm-2025" },
+  { label: "MEME — a venture story", href: "/venture/meme" },
+  { label: "A startup workshop series, on camera — KO Law", href: "/venture/ko-law-workshops" },
+  { label: "The agency that takes our aerials to market — Amazing Aerial", href: "/venture/amazing-aerial" },
+  { label: "Gigs Go Green", href: "/work/gigs-go-green" },
+  { label: "Vybe", href: "/work/vybe" },
+  ...(PUBLISH_MFG ? [{ label: "A film venture, taking shape — Makeshift Film Group", href: "/venture/makeshift-film-group" }] : []),
+] as const;
 ---
 
-<Base title={p.meta.title} description={p.meta.description}>
+<Base
+  title="Archive — All Stories | Adventure Storytelling Media"
+  description="Every story published by Adventure Storytelling Media, indexed in one place — Adventure Stories and Venture Stories, together."
+>
   <section class="mx-auto max-w-3xl space-y-4 p-8">
-    <!-- Lane pairing: same eyebrow grammar as /adventure and /entertainment. -->
-    <p class="hud-label" data-reveal>{p.eyebrow}</p>
-    <h1 class="text-3xl font-bold" data-reveal>{p.intro.heading}</h1>
-    <p class="text-ink" data-reveal>{p.intro.body}</p>
+    <p class="hud-label" data-reveal>Archive</p>
+    <h1 class="text-3xl font-bold sm:text-5xl" data-reveal>All stories.</h1>
+    <p class="text-lg text-ink" data-reveal>
+      Every story on the site, in one place — sorted into the two columns it's told across.
+    </p>
   </section>
 
-  <!-- ═══ W2 · MEME — TOP BILLING (the anchor of the lane) ═══
-       ⚠ OPERATOR READ-APPROVAL REQUIRED — heading/body/growth copy is new
-       (staging-only until read; see consts). The status claim renders ONLY
-       via LegendMark, verbatim. -->
-  <section class="mx-auto max-w-5xl border-t border-hairline p-8">
-    <p class="hud-label mb-4" data-reveal>{p.meme.kicker}</p>
-    <div class="anchor-panel panel" data-reveal>
-      {
-        memeLoop && (
-          <figure class="anchor-media" aria-hidden="true">
-            <picture>
-              {memeLoop.poster?.avif && <source type="image/avif" srcset={memeLoop.poster.avif} />}
-              <img
-                class="anchor-poster"
-                src={memeLoop.poster?.webp ?? memeLoop.poster?.avif}
-                alt=""
-                loading="lazy"
-                decoding="async"
-              />
-            </picture>
-            <video
-              class="anchor-loop"
-              data-anchor-loop
-              data-loop-src={memeLoop.mp4}
-              muted
-              loop
-              playsinline
-              preload="none"
-            ></video>
-          </figure>
-        )
-      }
-      <div class="anchor-copy space-y-4">
-        <h2 class="text-2xl font-bold">{p.meme.heading}</h2>
-        <LegendMark proof={p.meme.proof} />
-        <p class="text-ink">{p.meme.body}</p>
-        <p class="anchor-growth">{p.meme.growth}</p>
-        <div class="flex flex-wrap items-center gap-4">
-          {
-            p.meme.ctas.map((cta, i) =>
-              i === 0 ? (
-                <a href={href(cta.href)} class="btn">
-                  {cta.label}
-                </a>
-              ) : (
-                <a href={cta.href} class="link" target="_blank" rel="noopener">
-                  {cta.label} <span class="arrow" aria-hidden="true">→</span>
-                </a>
-              ),
-            )
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ W3 · THE COVERAGE SHELF — Round 5 block→subpage pattern: ONE
-       compelling block per core story. SeriesFest collapses from four tiles
-       into one detailed feature block that clicks through to its own subpage
-       (/work/seriesfest); AFM stays a block on this page (no subpage yet —
-       its tile links to the published article, wtile grammar kept). The
-       honest status line renders ONCE per relationship below the shelf
-       heading — never upgraded per block. -->
-  <section class="wall-rail py-8 border-t border-hairline">
-    <div class="mx-auto mb-6 max-w-3xl space-y-3">
-      <h2 class="text-2xl font-bold" data-reveal>{p.coverage.heading}</h2>
-      <p class="text-ink" data-reveal>{p.coverage.intro}</p>
-      <ul class="shelf-proofs" aria-label="How close each relationship is">
+  <section class="archive-grid mx-auto max-w-5xl border-t border-hairline p-8">
+    <div class="archive-col" data-reveal>
+      <h2 class="text-2xl font-bold">Adventure Stories</h2>
+      <ul class="archive-list">
         {
-          shelfProofIds.map((id) => (
-            <li data-reveal>
-              <LegendMark proof={{ relationshipId: id }} />
+          ADVENTURE_LINKS.map((l) => (
+            <li>
+              <a href={`${base}${l.href}`} class="link">
+                {l.label}
+              </a>
             </li>
           ))
         }
       </ul>
     </div>
-
-    <!-- The SeriesFest feature block — the MEME anchor's panel grammar
-         (media beside copy), one CTA into the subpage. -->
-    <div class="mx-auto mb-6 max-w-5xl">
-      <p class="hud-label mb-4" data-reveal>{sf.kicker}</p>
-      <div class="anchor-panel panel" data-reveal>
+    <div class="archive-col" data-reveal>
+      <h2 class="text-2xl font-bold">Venture Stories</h2>
+      <ul class="archive-list">
         {
-          sfImg && (
-            <a class="sf-media" href={`${base}${sf.cta.href}`} aria-hidden="true" tabindex="-1">
-              <picture>
-                {sfImg.avif && <source type="image/avif" srcset={sfImg.avif} />}
-                <img class="sf-still" src={sfImg.webp ?? sfImg.avif} alt="" loading="lazy" decoding="async" />
-              </picture>
-            </a>
-          )
+          VENTURE_LINKS.map((l) => (
+            <li>
+              <a href={`${base}${l.href}`} class="link">
+                {l.label}
+              </a>
+            </li>
+          ))
         }
-        <div class="anchor-copy space-y-4">
-          <h3 class="text-2xl font-bold">{sf.heading}</h3>
-          <p class="text-ink">{sf.body}</p>
-          <a href={`${base}${sf.cta.href}`} class="btn">{sf.cta.label}</a>
-        </div>
-      </div>
+      </ul>
     </div>
-
-    <!-- The AFM block — one wtile, linking to the published article. -->
-    <div class="wall wall--single">
-      <a class="wtile wtile--link" href={`${base}${afm.href}`} data-reveal>
-        <figure class="wtile-media" aria-hidden="true">
-          {
-            afmImg ? (
-              <picture>
-                {afmImg.avif && <source type="image/avif" srcset={afmImg.avif} />}
-                <img src={afmImg.webp ?? afmImg.avif} alt="" loading="lazy" decoding="async" />
-              </picture>
-            ) : (
-              <div class="wtile-placeholder placeholder" />
-            )
-          }
-        </figure>
-        <figcaption class="wtile-meta">
-          <span class="wtile-slate">{afm.slate}</span>
-          <span class="wtile-title">{afm.title}</span>
-        </figcaption>
-        <span class="wtile-cta">
-          Read the story <span class="arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-    </div>
-  </section>
-
-  <!-- ═══ W4 · THE CLOSE — conservative industry-lane framing: presence +
-       coverage here; production/consulting money questions route to the lanes
-       that own those offers. ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy
-       (staging-only until read; see consts). -->
-  <section class="mx-auto max-w-3xl space-y-5 border-t border-hairline p-8 text-center">
-    <h2 class="text-2xl font-bold" data-reveal>{p.close.headline}</h2>
-    <p class="text-ink" data-reveal>{p.close.body}</p>
-    <a href={p.close.cta.href} class="btn" rel="noopener" data-reveal>{p.close.cta.label}</a>
-    <ul class="close-lanes" data-reveal>
-      {
-        p.close.lanes.map((lane) => (
-          <li>
-            <a href={href(lane.href)} class="link">
-              {lane.label} <span class="arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
   </section>
 </Base>
 
 <style>
-  /* ── the shelf's stage: wider than the prose rail ── */
-  .wall-rail {
-    margin-inline: auto;
-    width: min(100%, 1440px);
-    padding-inline: 2rem;
-  }
-
-  /* ── W2 · the MEME anchor panel: media beside copy, loop over poster ── */
-  .anchor-panel {
+  .archive-grid {
     display: grid;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: 2.5rem;
   }
-  @media (min-width: 860px) {
-    .anchor-panel {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      align-items: center;
-      padding: 2rem;
+  @media (min-width: 768px) {
+    .archive-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
-  .anchor-media {
-    position: relative;
-    margin: 0;
-    overflow: hidden;
-    border-radius: 10px;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    background: color-mix(in srgb, #ffffff 4%, transparent);
-    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
+  .archive-col {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
   }
-  .anchor-poster {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-  }
-  .anchor-loop {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 500ms var(--ease-survey, ease);
-    pointer-events: none;
-  }
-  .anchor-media.is-playing .anchor-loop {
-    opacity: 1;
-  }
-  .anchor-growth {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.06em;
-    line-height: 1.5;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-
-  /* ── W3 · the shelf proofs — the honest status lines, quiet mono ── */
-  .shelf-proofs {
+  .archive-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.35rem;
-    font-size: 0.85rem;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-
-  /* ── the coverage shelf: the wall's two-up 16:9 card grammar, kept ── */
-  .wall {
-    --wall-gap: 14px;
-    display: grid;
-    gap: var(--wall-gap);
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 640px) {
-    .wall {
-      grid-template-columns: 1fr;
-    }
-  }
-  /* Round 5 — the AFM block rides alone: one card at half the rail width so
-     it reads as a block, not a lonely grid cell. */
-  .wall--single {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 720px;
-    margin-inline: auto;
-  }
-
-  /* ── Round 5 · the SeriesFest feature block media — the anchor panel's
-     framed-media treatment, still-only (the subpage carries the depth). ── */
-  .sf-media {
-    position: relative;
-    display: block;
-    margin: 0;
-    overflow: hidden;
-    border-radius: 10px;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    background: color-mix(in srgb, #ffffff 4%, transparent);
-    box-shadow: 0 0 34px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 38%, transparent);
-  }
-  .sf-still {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    transition: transform 900ms var(--ease-survey, ease);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .sf-media:hover .sf-still {
-      transform: scale(1.035);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sf-still {
-      transition: none;
-    }
-    .sf-media:hover .sf-still {
-      transform: none;
-    }
-  }
-  .wtile {
-    position: relative;
-    display: block;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
-    isolation: isolate;
-  }
-  .wtile-media,
-  .wtile-media picture,
-  .wtile-media img,
-  .wtile-placeholder {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-  }
-  .wtile-media img {
-    object-fit: cover;
-    transition: transform 900ms var(--ease-survey);
-  }
-
-  /* corner instrument: index, always on, quiet */
-  .wtile-index {
-    position: absolute;
-    z-index: 2;
-    top: 10px;
-    left: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(238, 245, 250, 0.82);
-    text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
-  }
-
-  /* the meta strip: slate + title. Hover-risen on fine pointers, ALWAYS on
-     where hover doesn't exist (touch). */
-  .wtile-meta {
-    position: absolute;
-    z-index: 2;
-    inset-inline: 0;
-    bottom: 0;
-    display: grid;
-    gap: 2px;
-    padding: 2rem 14px 12px;
-    background: linear-gradient(to top, rgba(9, 12, 19, 0.86), rgba(9, 12, 19, 0.42) 60%, transparent);
-  }
-  .wtile-slate {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(238, 245, 250, 0.66);
-  }
-  .wtile-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #eef5fa;
-    line-height: 1.25;
-  }
-  /* the click-through: bordered mono button, ALWAYS visible, pinned
-     bottom-right — the wall's shared button grammar. */
-  .wtile-cta {
-    position: absolute;
-    z-index: 3;
-    right: 12px;
-    bottom: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 44px;
-    padding: 0.55rem 0.9rem;
-    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
-    border-radius: 3px;
-    background: color-mix(in srgb, #090c13 74%, transparent);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #eef5fa;
-    text-shadow: 0 1px 6px rgba(6, 10, 18, 0.6);
-    transition:
-      border-color var(--dur-hover, 160ms) var(--ease-swift),
-      color var(--dur-hover, 160ms) var(--ease-swift),
-      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
-  }
-  .wtile-cta .arrow {
-    display: inline-block;
-    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
-  }
-  /* reserve the button's corner so the title never runs under it */
-  .wtile--link .wtile-meta {
-    padding-right: 10.5rem;
-  }
-  @media (max-width: 640px) {
-    .wtile--link .wtile-meta {
-      padding-right: 9rem;
-    }
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .wtile:hover .wtile-cta,
-    .wtile:focus-visible .wtile-cta {
-      border-color: var(--color-accent, #38f8ec);
-      color: var(--color-accent, #38f8ec);
-      box-shadow: 0 0 20px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
-    }
-    .wtile:hover .wtile-cta .arrow,
-    .wtile:focus-visible .wtile-cta .arrow {
-      transform: translateX(6px);
-    }
-    .wtile-meta {
-      opacity: 0;
-      transform: translateY(8px);
-      transition:
-        opacity 380ms var(--ease-survey),
-        transform 380ms var(--ease-survey);
-    }
-    .wtile:hover .wtile-meta,
-    .wtile:focus-visible .wtile-meta {
-      opacity: 1;
-      transform: none;
-    }
-    .wtile:hover .wtile-media img {
-      transform: scale(1.045);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .wtile-media img,
-    .wtile-meta,
-    .wtile-cta .arrow {
-      transition: none;
-    }
-    .wtile:hover .wtile-media img {
-      transform: none;
-    }
-  }
-
-  /* ── W4 · the close's lane pointers ── */
-  .close-lanes {
-    list-style: none;
-    margin: 0.5rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: 0.5rem;
-    font-size: 0.92rem;
+    gap: 0.65rem;
   }
 </style>
-
-<script>
-  // MEME anchor ambient loop: plays only when motion is allowed and the panel
-  // is on-screen; the poster underneath is the permanent base layer (reduced-
-  // motion / no-JS / Save-Data / autoplay-refused all show the still). Mirrors
-  // /venture/meme.astro and /entertainment ch.03 — lazy src, IO-gated.
-  (() => {
-    const video = document.querySelector<HTMLVideoElement>("[data-anchor-loop]");
-    const fig = video?.closest<HTMLElement>(".anchor-media");
-    if (!fig || !video) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
-    if (conn?.saveData) return;
-    video.addEventListener("playing", () => fig.classList.add("is-playing"));
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          if (!video.src) video.src = video.dataset.loopSrc!;
-          video.play().catch(() => {}); // refusal → poster stands
-        } else if (!video.paused) {
-          video.pause();
-        }
-      },
-      { threshold: 0.25 },
-    );
-    io.observe(fig);
-    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
-  })();
-</script>

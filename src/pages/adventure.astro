@@ -19,7 +19,7 @@ import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES, RELATIONSHIP_BY_ID, SITE, WORK, WORK_ARCHIVE, FORGE_SERVICES } from "../consts";
+import { PAGES, RELATIONSHIP_BY_ID, WORK, WORK_ARCHIVE } from "../consts";
 import { TERRITORY } from "../data/territory";
 import { getCollection } from "astro:content";
 
@@ -30,9 +30,20 @@ const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
-// P29 — the day rate is the aerial service's EXISTING staged floor (FORGE_SERVICES
-// 06), rendered verbatim — single-sourced, never restated as a new number.
-const aerialSvc = FORGE_SERVICES.find((s) => s.no === "06")!;
+
+// PUB-A (2026-07-27) — the field-notes DISPATCH STREAM: every published note,
+// newest first, surfaced directly on this index page (per ACTION-PLAN.md —
+// "story index framing, not services"). Same source + filter as Nav.astro's
+// dropdown (non-draft notes that carry photos), so the two can never drift.
+const dispatchStream = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map((n) => ({
+    id: n.id,
+    title: n.data.title,
+    date: n.data.date,
+  }));
+const dispatchDateFmt = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 
 /* ─────────────────────────────────────────────────────────────────────────
  * "THE TERRITORY" constellation geometry — now SEATED ON THE WORLD MAP.
@@ -304,34 +315,34 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       <GlobeHero />
     </section>
 
-    <!-- A1b — HIRE THE OPERATOR (P29 money-now): the production-services
-         block, ABOVE the gallery and the AA licensing funnel — the buyer who
-         wants to hire the pilot gets a rate, the compliance answer, and a
-         direct booking link before any licensing referral. The day rate is
-         FORGE_SERVICES 06 verbatim ($2,500/day — repriced P30 against the
-         verified $1.5k–$4k commercial band); trust lines are SITE.trust
-         (P30 copy rules in consts.ts). -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-      <hr class="flight-line mb-6" aria-hidden="true" />
-      <p class="hud-label" data-reveal>{p.hire.kicker}</p>
-      <h2 class="text-2xl font-bold" data-reveal>{p.hire.heading}</h2>
-      <p class="text-ink" data-reveal>{p.hire.body}</p>
-      <div class="panel hire-panel space-y-4 p-6" data-reveal>
-        <p class="hire-price">
-          <span class="hire-amt">{aerialSvc.price}</span>
-          <span class="hire-scope">{p.hire.priceNote}</span>
-        </p>
-        <ul class="hire-trust">
-          <li>{SITE.trust.drone}</li>
-          <li>{SITE.trust.travel}</li>
-          <li>{SITE.trust.response} · {SITE.trust.base}</li>
-        </ul>
-        <div class="flex flex-wrap items-center gap-4">
-          <a href={p.hire.cta.href} class="btn" rel="noopener">{p.hire.cta.label}</a>
-          <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
-        </div>
-      </div>
-    </section>
+    <!-- PUB-A (2026-07-27) — A1b "Hire the operator" (day rate, compliance
+         line, direct booking CTA) REMOVED: this is now a story index, not a
+         services pillar (no service offerings on this site, per
+         ACTION-PLAN.md). Replaced with THE DISPATCH STREAM — every published
+         Field Notes entry, newest first, so the index itself is a feed of
+         real stories rather than a rate card.
+         ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new
+         copy (staging-only until read; see COPY-DECK-A.md). -->
+    {
+      dispatchStream.length > 0 && (
+        <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
+          <hr class="flight-line mb-6" aria-hidden="true" />
+          <p class="hud-label" data-reveal>Field Notes · dispatch stream</p>
+          <h2 class="text-2xl font-bold" data-reveal>Every dispatch from the field.</h2>
+          <ol class="dispatch-list">
+            {dispatchStream.map((d, i) => (
+              <li class="dispatch-row" data-reveal data-reveal-stagger="40">
+                <a href={`${base}/field-notes/${d.id}`} class="dispatch-link">
+                  <span class="dispatch-no hud-label" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span class="dispatch-title">{d.title}</span>
+                  <span class="dispatch-date hud-label">{dispatchDateFmt.format(d.date)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
 
     <!-- A2 — the territory -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
@@ -721,45 +732,46 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 </Base>
 
 <style>
-  /* ── P29 · A1b hire-the-operator panel — the day rate in the display serif
-     (same price grammar as the forge cards), honest scope note beside it, and
-     the compliance/logistics answers as a quiet mono list. ── */
-  .hire-price {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-  .hire-amt {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(1.7rem, 3vw, 2.3rem);
-    line-height: 1;
-    font-variant-numeric: lining-nums tabular-nums;
-    color: var(--color-accent, #38f8ec);
-  }
-  .hire-scope {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-  .hire-trust {
+  /* ── PUB-A · the dispatch stream — a plain numbered list of every Field
+     Notes entry, replacing the retired hire-the-operator panel. Space Mono
+     index + date, serif title, hairline row dividers; the whole row is the
+     link (matches the site's .signpost-link affordance on home). ── */
+  .dispatch-list {
     list-style: none;
-    margin: 0;
+    margin: 0.5rem 0 0;
     padding: 0;
     display: grid;
-    gap: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  }
+  .dispatch-row {
+    border-top: 1px solid var(--color-hairline);
+  }
+  .dispatch-row:last-child {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .dispatch-link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0.1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .dispatch-link:hover,
+  .dispatch-link:focus-visible {
+    color: var(--color-accent, #38f8ec);
+  }
+  .dispatch-no {
+    flex: none;
     color: var(--color-ink-muted, #8a9a96);
   }
-  .hire-trust li::before {
-    content: "—";
-    margin-right: 0.5rem;
-    color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  .dispatch-title {
+    flex: 1 1 auto;
+    font-size: 1.02rem;
+  }
+  .dispatch-date {
+    flex: none;
+    color: var(--color-ink-muted, #8a9a96);
   }
 
   /* ── A4b · the festival TEASER (M1 v3): a mini magazine cover beside the

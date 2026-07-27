@@ -1195,17 +1195,9 @@ export const PAGES = {
       subline:
         "Expedition and adventure coverage — photo and film — from the places that are hardest to reach.",
     },
-    // A1b — HIRE THE OPERATOR: the production-services block, above the
-    // gallery and the AA licensing funnel. The day rate is REUSED verbatim
-    // from the aerial service floor (FORGE_SERVICES 06) — single-sourced, not
-    // a new number. Trust lines come from SITE.trust (see its ⚠ flags).
-    hire: {
-      kicker: "Production services",
-      heading: "Hire the operator",
-      body: "Aerial and ground cinematography for productions, brands, tourism, and film — the same eye that shoots these expeditions, on your call sheet. One operator, fast on his feet, gear that travels.",
-      priceNote: "— a floor, not a quote; scoped per shoot.",
-      cta: { label: "Book a call", href: SITE.bookACall },
-    },
+    // PUB-A (2026-07-27) — A1b "Hire the operator" (services + day rate +
+    // booking CTA) REMOVED here: adventure.astro is a story index now, not a
+    // services pillar. Field removed rather than left orphaned.
     territory: {
       heading: "The territory",
       // Authored positioning (COPY.md §5.1), grounded in the stories the site
