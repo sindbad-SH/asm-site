@@ -51,6 +51,18 @@ const VENTURE_LINKS = [
   { label: "Vybe", href: "/work/vybe" },
   ...(PUBLISH_MFG ? [{ label: "A film venture, taking shape — Makeshift Film Group", href: "/venture/makeshift-film-group" }] : []),
 ] as const;
+
+// PUB-E (2026-07-27, Directive PUB-E) — Gigs Go Green + PNUMIX were REMOVED
+// from /venture's index (operator ruling: "commercials are not stories");
+// per the directive, "Their pages stay live and listed in /work archive
+// only." Gigs Go Green already had a case page and is listed above
+// (VENTURE_LINKS). PNUMIX has NO case page (WORK_ARCHIVE never set an
+// `href` for it — it was a display-only tile from the start), so it's
+// listed here as a plain text record rather than a link — nothing to link
+// to. `href` is optional; unset entries render as plain text.
+const VENTURE_ARCHIVE_LINKS: readonly { label: string; href?: string }[] = [
+  { label: "PNUMIX — Paranormal Palace (2024)" },
+] as const;
 ---
 
 <Base
@@ -92,6 +104,19 @@ const VENTURE_LINKS = [
             </li>
           ))
         }
+        {
+          VENTURE_ARCHIVE_LINKS.map((l) =>
+            l.href ? (
+              <li>
+                <a href={`${base}${l.href}`} class="link">
+                  {l.label}
+                </a>
+              </li>
+            ) : (
+              <li class="archive-list-text">{l.label}</li>
+            ),
+          )
+        }
       </ul>
     </div>
   </section>
@@ -118,5 +143,8 @@ const VENTURE_LINKS = [
     padding: 0;
     display: grid;
     gap: 0.65rem;
+  }
+  .archive-list-text {
+    color: var(--color-ink-muted, #8a9a96);
   }
 </style>

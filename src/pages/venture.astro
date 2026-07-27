@@ -42,7 +42,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
 import YouTubeEmbed from "../components/YouTubeEmbed.astro";
-import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID } from "../consts";
+import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_COLLECTIONS } from "../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -79,6 +79,11 @@ const pbLoop = media("work/pitchboulder/loop.mp4"); // P21b — hover-video on t
 // (no new export — reused, not re-cut): engine (an engine-bay DETAIL, hands at
 // work) + lawn (an elevated CROWD/CONTEXT frame — the Cobra, period-dressed
 // spectators, and the coastline). Five frames now, chosen to not repeat an angle.
+// PUB-E (2026-07-27, Directive PUB-E) — Pebble Beach stays FEATURE-ONLY.
+// Per the operator's own rule, a named collection needs at least two
+// stories; Pebble Beach is the only story in the "high craft" / luxury-event
+// space right now, so it does NOT get a VENTURE_COLLECTIONS entry. A "High
+// Craft / Luxury Events" collection is planned once a second story joins it.
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
 const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
@@ -119,9 +124,30 @@ const pbPresenter = bust("work/pitchboulder/presenter-logo-1600", pair("work/pit
 const pbCrowd = bust("work/pitchboulder/coworking-crowd-1600", pair("work/pitchboulder/coworking-crowd-1600"));
 const pbTalk = bust("work/pitchboulder/coworking-presenter-1600", pair("work/pitchboulder/coworking-presenter-1600"));
 
-// Round 3 (2026-07-21) — the MEME chapter MOVED to /work (Industry Stories),
-// where it now has TOP BILLING as the anchor of that lane (operator-directed).
-// The memeLoop wiring left with it; /venture/meme (the article) is unchanged.
+// PUB-E (2026-07-27, Directive PUB-E) — MEME REJOINS /venture as the THIRD
+// FEATURE (chapter 03), reusing meme.astro's already-verified copy/quotes
+// (PAGES.entertainment.meme.body, the LOCKED "meme" LegendMark proof, and
+// the SAME operator-produced logo-loop asset that page plays) — no new claim
+// about MEME is made here; this is a structural placement only. There is no
+// event photography for MEME yet, so unlike the collage chapters this one
+// centers its own animated mark instead of a photo collage — the same
+// treatment /venture/meme itself uses (see that file's `.meme-loop-wrap`).
+const memeLoopDir = join(process.cwd(), "public", "media", "venture", "meme");
+const memeLv = (file: string) => {
+  try {
+    return `?v=${Math.round(statSync(join(memeLoopDir, file)).mtimeMs).toString(36)}`;
+  } catch {
+    return "";
+  }
+};
+const memeLoop = existsSync(join(memeLoopDir, "meme-loop.mp4"))
+  ? {
+      mp4: `${base}/media/venture/meme/meme-loop.mp4${memeLv("meme-loop.mp4")}`,
+      posterAvif: `${base}/media/venture/meme/meme-poster.avif${memeLv("meme-poster.avif")}`,
+      posterWebp: `${base}/media/venture/meme/meme-poster.webp${memeLv("meme-poster.webp")}`,
+    }
+  : undefined;
+const memeData = PAGES.entertainment.meme; // heading "MEME" + body, both already-approved copy — reused verbatim
 
 // P29 (unchanged) — the PitchBoulder commercial's video id, the SAME embed the
 // case page carries (work/pitchboulder.astro; his live site's published id).
@@ -149,7 +175,13 @@ const otherRooms = p.rooms.items.filter((r) => !HANDLED_ELSEWHERE.has(r.proof.re
 // Brazilian Living moved to /adventure's coverage band — they read as travel/
 // coverage pieces, not commissioned venture work. The lane lives on the DATA
 // (WORK_ARCHIVE[].lane), so neither page hardcodes a slug list.
-const archive = WORK_ARCHIVE.filter((a) => a.lane === "venture").map((a) => ({
+// PUB-E (2026-07-27) — Gigs Go Green + PNUMIX carry `hideFromLaneIndex: true`
+// in consts now (operator ruling: "commercials are not stories") — filtering
+// it out here removes them from this band entirely; both stay listed on
+// /work (see work/index.astro). No other venture-lane archive item exists
+// today, so this band currently renders nothing on /venture — the guard
+// below (`archive.length > 0`) already handles that safely.
+const archive = WORK_ARCHIVE.filter((a) => a.lane === "venture" && !a.hideFromLaneIndex).map((a) => ({
   item: a,
   media: pair(`work/archive/${a.slug}`),
   href: a.href ? `${base}${a.href}` : undefined,
@@ -160,41 +192,25 @@ const archive = WORK_ARCHIVE.filter((a) => a.lane === "venture").map((a) => ({
 // letterforms, not new copy): the hero scatters STORY.
 const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories"
 
-// P13c — the coverage index: editorial tiles to the published venture stories.
-// slate + title strings are COPIED VERBATIM from each article page's own
-// frontmatter/markup (already operator-flagged there) — reuse adds no new copy.
-// PUB-A (2026-07-27) — MEME, the SeriesFest hub, and AFM REJOIN this rail:
-// the retired "Industry Stories" lane (/work) refiles under Venture Stories
-// per the publication restructure. `mediaSlug` lets a card point its hero
-// image at a path that doesn't match its own href (the SeriesFest hub lives
-// at /work/seriesfest but its tile reuses the seriesfest-2026 dispatch's
-// existing hero export — no new asset).
-const coverage: { href: string; slate: string; title: string; mediaSlug?: string }[] = [
-  // MEME — was /work's top-billed anchor; slate/title copied VERBATIM from
-  // that page's own copy (PAGES.work formerly carried it; strings preserved).
-  { href: "/venture/meme", slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION", title: "MEME is where this lane starts." },
-  // SeriesFest — the multi-edition hub at /work/seriesfest (unowned, URL
-  // unchanged); this tile is a new entry point into it, not a rebuild of it.
-  { href: "/work/seriesfest", slate: "SeriesFest · Denver, Colorado", title: "SeriesFest, in depth.", mediaSlug: "seriesfest-2026" },
-  // AFM — slate/title copied VERBATIM from its article page.
-  { href: "/venture/afm-2025", slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA", title: "American Film Market 2025 — a venture story" },
-  // P12-KO — the KO Law workshops venture story. slate + title copied VERBATIM
-  // from the article page's own ARTICLE block (already operator-flagged there;
-  // reuse adds no new copy here). Card image resolves as venture/<slug>/hero-900.
-  // ROUND 5 (NO-COUNT rule): title tracks the article's revised count-free
-  // title verbatim ("A startup workshop series, on camera.").
-  { href: "/venture/ko-law-workshops", slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026", title: "A startup workshop series, on camera." },
-  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes our aerials to market." },
-];
-
-// P12.6b — the STORY RAIL cards: the coverage stories PLUS the emerging film
-// venture, as one user-driven horizontal carousel (operator's idea — no
-// auto-rotate). Each card resolves its own hero frame; the conceptual cards
-// (amazing-aerial, MEME, and the film venture) have no event export, so they
-// render as ghost-letter cards in the chapter-03 typographic style.
+// PUB-E (2026-07-27, Directive PUB-E) — the old single "more venture
+// stories" rail SPLITS into TWO NAMED COLLECTIONS (VENTURE_COLLECTIONS, in
+// consts — the operator's grouped story sections) plus a slim, ungrouped
+// PARTNER RAIL that keeps its prior "more venture stories" framing. slate +
+// title strings inside each collection are copied VERBATIM from each story's
+// own destination page (already operator-flagged there — reuse adds no new
+// copy); only the collection names + intros (in consts) and this rail's own
+// kicker/intro are new sentences.
+//
+// Amazing Aerial stays here, ungrouped — per the directive, "the venture
+// rail (partner story upgrade planned later)", not yet folded into either
+// named collection. The held-from-publish film-venture card (unchanged from
+// its prior placement, same HELD-FROM-PUBLISH interlock) rides alongside it:
+// the directive doesn't name it into Collection A or B, so it stays where it
+// already was rather than being reassigned without operator direction.
 const railGhosts: Record<string, string> = {
   "amazing-aerial": "AERIAL",
   meme: "MEME",
+  pitchboulder: "PITCH",
   "makeshift-film-group": "MAKESHIFT",
 };
 // The film-venture card mirrors its page's HELD-FROM-PUBLISH interlock (see
@@ -213,14 +229,23 @@ const mfgCard = PUBLISH_MFG
       { href: "/venture/makeshift-film-group", slate: "MAKESHIFT", title: "A film venture, taking shape." },
     ]
   : [];
-const railCards = [...coverage, ...mfgCard].map((c) => {
+const partnerRail: { href: string; slate: string; title: string; mediaSlug?: string }[] = [
+  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes our aerials to market." },
+  ...mfgCard,
+];
+function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?: string }) {
   // PUB-A — a card's media slug is `mediaSlug` when set (a /work/* href, or
   // any href that shouldn't drive its own media path), else derived from a
   // /venture/<slug> href exactly as before.
-  const slug = "mediaSlug" in c && c.mediaSlug ? c.mediaSlug : c.href.replace(/^\/venture\//, "");
+  const slug = c.mediaSlug ? c.mediaSlug : c.href.replace(/^\/venture\//, "");
   const ghostKey = c.href.replace(/^\/(venture|work)\//, "");
   return { ...c, slug, img: bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`)), ghost: railGhosts[ghostKey] };
-});
+}
+const collectionCards = VENTURE_COLLECTIONS.map((coll) => ({
+  ...coll,
+  cards: coll.stories.map(toRailCard),
+}));
+const partnerCards = partnerRail.map(toRailCard);
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.
 // PUB-A — `hire` retired with the E1b services chapter; `archive` stays for
@@ -229,7 +254,12 @@ const GROUNDS = {
   intro: "#101020",
   ch01: "#191031",
   ch02: "#261118",
-  rooms: "#10141f",
+  // PUB-E — ch03 (MEME, the third feature) reuses meme.astro's own ground
+  // color, so the feature chapter and the standalone article read as one room.
+  ch03: "#0e2230",
+  collectionA: "#10141f",
+  collectionB: "#161129",
+  rooms: "#12141c",
   archive: "#12141c",
   handoff: "#0f1118",
 };
@@ -277,7 +307,7 @@ const GROUNDS = {
          reduced-motion / Save-Data / autoplay-refusal all leave the still. -->
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch02} style={`--sec-ground:${GROUNDS.ch02}`}>
       <span class="im-index im-turn" aria-hidden="true">01</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
         <div class="im-collage im-collage--sh" aria-hidden="true">
           {
@@ -368,7 +398,7 @@ const GROUNDS = {
 
     <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch01} style={`--sec-ground:${GROUNDS.ch01}`}>
       <span class="im-index im-turn" aria-hidden="true">02</span>
-      <span class="im-index im-index--of im-turn" aria-hidden="true">/02</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
       <div class="im-chapter-stage">
         <div class="im-collage im-collage--pb" aria-hidden="true">
           {
@@ -464,27 +494,121 @@ const GROUNDS = {
       </div>
     </section>
 
-    <!-- Round 3 — CHAPTER 03 (MEME) MOVED to /work (Industry Stories), where
-         it now anchors that lane with top billing (operator-directed: the
-         affiliation and its growing content belong to the film & entertainment
-         industry lane). Its ambient logo-loop treatment moved with it; the
-         /venture/meme article is unchanged. -->
-
-    <!-- ═══ S4 · THE STORY RAIL — the venture stories as a user-driven carousel
-         (operator's idea; no auto-rotate). Native overflow-x + scroll-snap works
-         with ZERO JS (native swipe on touch); a pointer-drag enhancement and a
-         "drag →" affordance layer on top for fine pointers. Replaces the retired
-         "rooms" list + coverage grid — the same stories, one honest rail. ═══ -->
-    <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
-      <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
-        <span class="im-confetti" data-im-confetti style="--ci:0"></span>
-        <span class="im-confetti" data-im-confetti style="--ci:1"></span>
-        <span class="im-confetti" data-im-confetti style="--ci:2"></span>
-        <span class="im-confetti" data-im-confetti style="--ci:3"></span>
+    <!-- PUB-E (2026-07-27, Directive PUB-E) — CHAPTER 03 · MEME, the third
+         feature slot. Structure only: reuses meme.astro's own copy (heading +
+         body + LOCKED LegendMark proof) and its ambient logo-loop asset — no
+         new claim about MEME. No collage (no event photography exists yet for
+         this relationship), so the chapter centers the animated mark instead,
+         the same treatment the standalone article uses. -->
+    <section class="im-sec im-chapter im-chapter--solo" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
+      <span class="im-index im-turn" aria-hidden="true">03</span>
+      <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
+      <div class="im-chapter-stage im-chapter-stage--solo">
+        <div class="im-chapter-type">
+          <h2 class="im-title" data-reveal>
+            <span class="im-line">MEME</span>
+          </h2>
+          <p class="im-turn im-tag" data-reveal>{memeData.body}</p>
+        </div>
+        <div class="im-chapter-meta" data-reveal>
+          <LegendMark proof={memeData.proof} />
+          {
+            memeLoop && (
+              <figure class="im-meme-loop" data-meme-loop-wrap>
+                <picture>
+                  <source type="image/avif" srcset={memeLoop.posterAvif} />
+                  <img src={memeLoop.posterWebp} alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground." loading="lazy" decoding="async" />
+                </picture>
+                <video
+                  class="im-meme-loop-vid"
+                  data-meme-loop
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                  poster={memeLoop.posterWebp}
+                  aria-hidden="true"
+                >
+                  <source src={memeLoop.mp4} type="video/mp4" />
+                </video>
+              </figure>
+            )
+          }
+          <a href={`${base}/venture/meme`} class="im-cta">
+            <span class="im-cta-label">Read the full story</span>
+            <span class="im-cta-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
       </div>
-      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (kicker + intro),
-          staging-only until read. Round 3: intro re-worded off "the industry"
-          (festival/market coverage moved to /work, the industry lane). */}
+    </section>
+
+    <!-- ═══ S4 · THE COLLECTIONS — PUB-E (2026-07-27, Directive PUB-E): the
+         old single "more venture stories" rail SPLITS into two NAMED,
+         operator-directed collections, each a grouped story section (still
+         the same user-driven carousel grammar — native overflow-x +
+         scroll-snap, zero-JS baseline, pointer-drag enhancement). A
+         collection can carry a story that's ALSO a feature above
+         (PitchBoulder leads Collection A) — the directive is explicit that's
+         allowed. ═══ -->
+    {
+      collectionCards.map((coll, ci) => (
+        <section class="im-sec im-rail-sec" data-im-section data-ground={ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB} style={`--sec-ground:${ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB}`}>
+          {ci === 0 && (
+            <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
+              <span class="im-confetti" data-im-confetti style="--ci:0"></span>
+              <span class="im-confetti" data-im-confetti style="--ci:1"></span>
+              <span class="im-confetti" data-im-confetti style="--ci:2"></span>
+              <span class="im-confetti" data-im-confetti style="--ci:3"></span>
+            </div>
+          )}
+          {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — collection name is a
+              PLACEHOLDER (operator to confirm/rename) and the intro is new
+              copy; both come from VENTURE_COLLECTIONS in consts.ts, staging-
+              only until read. */}
+          <p class="hud-label im-kicker" data-reveal>Collection · {coll.name}</p>
+          <p class="im-turn im-rail-intro" data-reveal>{coll.intro}</p>
+
+          <div class="im-rail-wrap">
+            <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
+            <ul class="im-rail" data-im-rail>
+              {
+                coll.cards.map((c) => (
+                  <li class="im-rail-card">
+                    <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
+                      <span class="im-rail-media">
+                        {c.img ? (
+                          <picture>
+                            {c.img.avif && <source srcset={c.img.avif} type="image/avif" />}
+                            <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" />
+                          </picture>
+                        ) : (
+                          <span class="im-rail-ghost">{c.ghost ?? ""}</span>
+                        )}
+                      </span>
+                      <span class="im-rail-slate hud-label">{c.slate}</span>
+                      <span class="im-rail-title im-turn">{c.title}</span>
+                      <span class="im-cta im-cta--sm im-rail-cta">
+                        <span class="im-cta-label">Read the story</span>
+                        <span class="im-cta-arrow" aria-hidden="true">→</span>
+                      </span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </section>
+      ))
+    }
+
+    <!-- ═══ S4c · THE VENTURE RAIL — the ungrouped partner rail (Amazing
+         Aerial + the held-from-publish film-venture card). PUB-E: Amazing
+         Aerial "stays on the venture rail (partner story upgrade planned
+         later)" per the directive — deliberately not folded into either named
+         collection above. ═══ -->
+    <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/intro carried over
+          unchanged from the prior single-rail copy, staging-only until read. */}
       <p class="hud-label im-kicker" data-reveal>More venture stories</p>
       <p class="im-turn im-rail-intro" data-reveal>
         More of the rooms this work runs through — each one marked at exactly what it is.
@@ -494,7 +618,7 @@ const GROUNDS = {
         <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
         <ul class="im-rail" data-im-rail>
           {
-            railCards.map((c) => (
+            partnerCards.map((c) => (
               <li class="im-rail-card">
                 <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
                   <span class="im-rail-media">
@@ -522,10 +646,10 @@ const GROUNDS = {
         </ul>
       </div>
 
-      <!-- the honesty proofs that lived in the rooms list. Round 3: seriesfest
-           + afm moved to /work (their coverage lane) — today every remaining
-           room is handled elsewhere on this page, so the list renders only if
-           a future room joins. Verbatim permittedPhrasing via LegendMark. -->
+      <!-- the honesty proofs that lived in the rooms list. Every remaining
+           room is handled elsewhere on this page today, so the list renders
+           only if a future room joins. Verbatim permittedPhrasing via
+           LegendMark. -->
       {
         otherRooms.length > 0 && (
           <ul class="im-rail-proofs" aria-label="How close each relationship is">
@@ -838,6 +962,47 @@ const GROUNDS = {
      the case page's click-to-load facade, sized to the plate. ── */
   .im-chapter-meta :global(.im-pb-embed) {
     width: 100%;
+  }
+
+  /* ── PUB-E · chapter 03 (MEME) — no collage, so the stage just centers its
+     type + meta column (same grid as every other chapter, minus the absolute
+     collage layer). The ambient logo loop mirrors meme.astro's own
+     .meme-loop-wrap: poster-first, video fades in once JS confirms motion +
+     on-screen. ── */
+  .im-chapter-stage--solo {
+    max-width: 46rem;
+  }
+  .im-meme-loop {
+    position: relative;
+    margin: 0;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+    box-shadow: 0 0 32px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent);
+  }
+  .im-meme-loop img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .im-meme-loop-vid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-survey, ease);
+  }
+  .im-meme-loop.is-playing .im-meme-loop-vid {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .im-meme-loop-vid {
+      transition: none;
+    }
   }
 
   /* ── P12.6b · the shared "story CTA" — one bold, unmissable treatment used
@@ -1314,8 +1479,30 @@ const GROUNDS = {
     });
   })();
 
-  // Round 3 — the P21b MEME ambient-loop script moved to /work with its
-  // chapter (the anchor panel there carries the same IO-gated treatment).
+  // PUB-E — chapter 03 (MEME) ambient logo loop: poster-first, plays only
+  // when motion is allowed and the figure is actually on-screen. Ported
+  // verbatim from /venture/meme's own script (same asset, same contract).
+  (() => {
+    const wrap = document.querySelector<HTMLElement>("[data-meme-loop-wrap]");
+    const video = wrap?.querySelector<HTMLVideoElement>("[data-meme-loop]");
+    if (!wrap || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+
+    video.addEventListener("playing", () => wrap.classList.add("is-playing"));
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) video.play().catch(() => {}); // refusal → poster stands
+        else video.pause();
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(wrap);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
 
   // ROUND 5 — VIDEO-LED chapter covers: the two lead collage cards (Shelby
   // on-set, PitchBoulder video card) play their loop AUTOMATICALLY while the

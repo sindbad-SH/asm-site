@@ -1,10 +1,11 @@
 # SITE COPY DECK — publication-v1 (merged, for operator read-approval)
 
 Merges COPY-DECK-A.md (PUB-A, structure), COPY-DECK-B.md (PUB-B, the three
-narrative pages), COPY-DECK-C.md (PUB-C, monetization weave), and the copy
-fixed directly by PUB-D (this final QA pass). Organized **by page**, not by
-agent, so this is the one document to read end to end. Source decks stay on
-disk unchanged.
+narrative pages), COPY-DECK-C.md (PUB-C, monetization weave), the copy fixed
+directly by PUB-D (final QA pass), and the collections-architecture copy
+added by PUB-E (2026-07-27, this pass). Organized **by page**, not by agent,
+so this is the one document to read end to end. Source decks stay on disk
+unchanged.
 
 Every row is one new or changed visible sentence, flagged ⚠ **OPERATOR
 READ-APPROVAL REQUIRED** — nothing here has shipped to production
@@ -20,22 +21,23 @@ individually.
 | Navigation (site-wide) | 1 |
 | Home (`/`) | 3 |
 | /about | 12 |
-| /adventure | 2 |
-| /venture | 7 |
-| /work (archive index) | 10 |
+| /adventure | 2 + 3 (PUB-E) |
+| /venture | 7 + 5 (PUB-E) |
+| /work (archive index) | 10 + 1 (PUB-E) |
 | /work/seriesfest | 1 |
-| /forge-the-saga | 17 |
+| /forge-the-saga | 17 + 6 (PUB-E) |
 | /contact | 12 |
 | /licensing | 7 |
 | /world | 3 |
 | Footer (site-wide) | 3 |
 | Base layout default (site-wide fallback) | 1 |
-| **Total** | **79** |
+| **Total** | **79 + 15 (PUB-E) = 94** |
 
 Plus: 1 data-classification flip (Vybe, /adventure ↔ /venture — no copy
 string changed) and ~20 structural href-only fixes (redirect-hop removal),
 neither counted above per the no-new-sentence convention. Full list under
-each page's **Structural notes**.
+each page's **Structural notes**. PUB-E adds one more: a `hideFromLaneIndex`
+data flip on Gigs Go Green + PNUMIX (see /venture's PUB-E structural notes).
 
 **Awaiting operator confirm (not a PUB-D change — flagging only):**
 `src/content/field-notes/flatirons-chautauqua.md` still carries date
@@ -121,6 +123,26 @@ dropped from this page (stays live on the Home teaser, untouched).
 - **Vybe reclassified `venture` → `adventure`** in `WORK_ARCHIVE` (`src/consts.ts`). Binding operator ruling this session: the Vybe story belongs under Adventure Stories. This supersedes PUB-A's placement (which had cited a stale brief). No copy string changed — title "Vybe", date "2023–2024", and the phrasing "event coverage for Vybe" are identical; only which page's "From the archive" band renders it changes. Verified live: Vybe now appears on `/adventure`, not `/venture`.
 - `world.astro` NAV comment corrected `/entertainment` → `/venture` (comment only, not rendered).
 
+### PUB-E additions (2026-07-27, Directive PUB-E — collections architecture)
+
+Two additions this pass — a code-level data shape only, plus its section
+label copy (the section itself does not render yet):
+
+| Old line | New line | Flag |
+|---|---|---|
+| — (new, code-level only) | **"Postcards"** kicker | ⚠ |
+| — (new, code-level only) | **"Postcards from the road"** heading | ⚠ |
+| — (new, code-level only) | **"The smallest stories — one place, one paragraph, a few frames. Filed as they happen."** body | ⚠ |
+
+**Structural / data notes (PUB-E):** a new `POSTCARDS` data array
+(`src/data/postcards.ts`) defines the shape for adventure MICRO stories
+(title, one paragraph, 2–3 photos, a date) — smaller than a Field Notes
+dispatch. It ships **empty**, per the directive ("do NOT render invented
+entries"); the section on `/adventure` renders only when it's non-empty, so
+nothing above is currently visible on the live page. Expected future filers
+(named in that file's header, not invented here): VYBE/Boogie Lights, Nordic
+Daughter, Something Tomorrow, others TBD from archive mining.
+
 ---
 
 ## /venture (`src/pages/venture.astro`, renamed from `entertainment.astro`) — PUB-A
@@ -141,6 +163,30 @@ chapters, story rail, "from the archive") carries over unchanged except:
 **Structural / data notes (PUB-D):**
 - **Vybe no longer renders here** — see the /adventure section above; the reclassification removes Vybe from `/venture`'s "From the archive" band. Verified live.
 - 9 article back-links (`ko-law-workshops`, `afm-2025`, `amazing-aerial`, `seriesfest-2025`, `seriesfest-2026`, `seriesfest-2026-fashion-in-focus`, `seriesfest-2026-soul-power`, `meme`, `makeshift-film-group` — 18 links total, 2 per page) repointed from `${base}/entertainment` to `${base}/venture` — kills the extra redirect hop, no label text changed ("← Venture" unchanged).
+
+### PUB-E additions (2026-07-27, Directive PUB-E — collections architecture)
+
+**Structure now:** three features (Pebble Beach — chapter 01, PitchBoulder —
+chapter 02, MEME — chapter 03, new this pass), then two named collections,
+then the ungrouped partner rail, then the (now-empty) "from the archive"
+band, then the closing handoff.
+
+| Old line | New line | Flag |
+|---|---|---|
+| — (new feature chapter) | **MEME**, chapter 03 — heading "MEME" + body "The role I hold most formally in this world." + CTA "Read the full story", all reused **verbatim** from `PAGES.entertainment.meme` (no new MEME copy authored, per the directive) | not flagged (reuse only) |
+| — (new collection name, PLACEHOLDER) | **"Founders & Pitch Rooms"** — Collection A's name; operator to confirm or rename | ⚠ |
+| — (new sentence) | Collection A intro: **"Where founders take the stage — the pitch nights we cover, and the workshop series that gets them ready for one."** | ⚠ |
+| — (new collection name, PLACEHOLDER) | **"The Film Industry"** — Collection B's name; alternate suggestion to weigh: **"The Screen Trade"** | ⚠ |
+| — (new sentence) | Collection B intro: **"The industry side of the venture lane — the organization, the festival, and the market we keep a pulse on."** | ⚠ |
+| — (new label) | **"Collection ·"** kicker prefix (renders as "Collection · Founders & Pitch Rooms" / "Collection · The Film Industry") | ⚠ |
+
+**Structural / data notes (PUB-E):**
+- **Collection A** ("Founders & Pitch Rooms"): PitchBoulder + KO Law workshop series. PitchBoulder is also a feature (chapter 02) — the directive is explicit a collection may carry a story that's also featured.
+- **Collection B** ("The Film Industry"): MEME + the SeriesFest hub (`/work/seriesfest`, which itself indexes every SeriesFest edition — main program, Fashion in Focus, the Soul Power premiere) + American Film Market.
+- **Pebble Beach stays FEATURE-ONLY** — no collection. Per the operator's own rule (a named collection needs ≥2 stories) and Pebble Beach being the only story in that space today, it does not get one. Code comment in `venture.astro` (above the `shelby` lookup) notes a "High Craft / Luxury Events" collection is planned once a second story joins it.
+- **Amazing Aerial stays on the ungrouped partner rail** ("More venture stories," unchanged kicker/intro), per the directive ("partner story upgrade planned later") — not folded into either named collection. The held-from-publish film-venture card rides alongside it, unchanged from its prior placement (the directive doesn't name it into A or B).
+- **Gigs Go Green + PNUMIX removed from `/venture`'s "from the archive" band entirely** (operator ruling: "commercials are not stories"). Implemented as a new `hideFromLaneIndex: true` flag on both `WORK_ARCHIVE` entries (`src/consts.ts`) — their `lane` classification is untouched, only the lane-index render is suppressed. Both case pages stay live; both stay listed on `/work` (Gigs Go Green as a link, PNUMIX as plain text — it never had a case page, see `/work`'s PUB-E note below). Verified live: the "from the archive" section no longer renders on `/venture` at all (it was the only two items in it).
+- `VENTURE_COLLECTIONS` (new export, `src/consts.ts`) is the single source for both collections' story lists; `slate`/`title` strings inside them are copied verbatim from each story's own destination page (already flagged there) — only the collection names + intros above are new sentences.
 
 ---
 
@@ -168,6 +214,19 @@ destination page's own title (no new claim, reuse only) — not flagged.
 removed from `consts.ts` (not reused, not left orphaned); `caseStudies`
 (read by `work/pitchboulder.astro`, `work/shelby-pebble-beach.astro`) is
 untouched.
+
+### PUB-E additions (2026-07-27, Directive PUB-E — collections architecture)
+
+| Old line | New line | Flag |
+|---|---|---|
+| — (new list entry) | **"PNUMIX — Paranormal Palace (2024)"** — plain text, not a link (no case page exists for PNUMIX; title/date read from `WORK_ARCHIVE`, not invented) | ⚠ |
+
+**Structural notes (PUB-E):** Gigs Go Green + PNUMIX were removed from
+`/venture`'s index this pass (see that page's PUB-E notes) — per the
+directive, "their pages stay live and listed in /work archive only." Gigs Go
+Green already had a link here (unchanged). PNUMIX did not — it's now added
+as a `VENTURE_ARCHIVE_LINKS` entry, rendered as plain text since it has no
+`href` (no case page ever existed for it).
 
 ---
 
@@ -215,6 +274,34 @@ stages, **no prices, no booking CTA anywhere**.
 them; the stale in-code comment claiming otherwise (referencing the retired
 `entertainment.astro`) is cosmetic only, no live "from $" string renders
 anywhere (confirmed against the built `dist/` output — zero matches).
+
+### PUB-E additions (2026-07-27, Directive PUB-E — collections architecture)
+
+A new "Where the stories go" directory section, added at the bottom of the
+page (below the existing close section) — the site's channels, kept
+restrained (a plain list, no icons/cards).
+
+| Old line | New line | Flag |
+|---|---|---|
+| — (new section) | Heading: **"Where the stories go"** | ⚠ |
+| — (new sentence) | Body: **"The publication lives in a few places besides this page — new dispatches, the licensed aerial archive, and a quieter sense of how the whole operation runs."** | ⚠ |
+| — (new label) | Channel: **"Newsletter"** → `/contact#follow` | ⚠ |
+| — (new label) | Channel: **"YouTube"** → the confirmed channel URL already in `SITE.socials` | ⚠ |
+| — (new label) | Channel: **"Instagram"** → the confirmed handle already in `SITE.socials` | ⚠ |
+| — (new label) | Channel: **"The licensed aerial archive"** → `/licensing` | ⚠ |
+
+**Structural notes (PUB-E):** every href resolves from a value already live
+in `consts.ts` or a real shipped route — nothing invented. The directive
+asked for YouTube/Instagram/TikTok/LinkedIn "using the SOCIALS/consts URLs
+already in the repo — verify they exist in consts; do not invent handles."
+Verified: `SITE.socials` only carries `youtube` + `instagram` — TikTok and
+LinkedIn are both explicitly commented out in `consts.ts` (TikTok: "name may
+change," unconfirmed; LinkedIn: "no ASM company page could be verified").
+Per that verification instruction, this directory lists only the two
+confirmed channels — TikTok and LinkedIn are deliberately omitted rather
+than invented. Flagging for the operator: if either channel is now
+confirmed, add it to `SITE.socials` and it will appear here automatically
+(`PAGES.forge.directory.channels` reads straight from that object).
 
 ---
 

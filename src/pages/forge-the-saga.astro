@@ -46,6 +46,10 @@ import { PAGES, SAGA_STAGES } from "../consts";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// PUB-E — the directory (T6) mixes internal routes (/contact#follow,
+// /licensing) with external social URLs (SITE.socials); only prefix the base
+// path onto internal ones.
+const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
 // The five stages, editorial framing: names/subs/deliverables come from
 // SAGA_STAGES (single source, unchanged); the `body` copy is new, written
@@ -156,6 +160,29 @@ const temper = (i: number) =>
             ))
           }
         </p>
+      </div>
+    </section>
+
+    <!-- ═══ T6 · WHERE THE STORIES GO — PUB-E (2026-07-27, Directive PUB-E):
+         a quiet channel directory closing the method page. Every href below
+         resolves from SITE.socials / the /contact#follow anchor / the live
+         /licensing page (PAGES.forge.directory in consts.ts) — nothing
+         invented. Restrained by design: a plain list, no icons, no cards. ═══ -->
+    <section class="fg-sec fg-directory">
+      <div class="fg-directory-inner">
+        <h2 class="fg-h2" data-reveal>{p.directory.heading}</h2>
+        <p class="fg-body" data-reveal>{p.directory.body}</p>
+        <ul class="fg-directory-list" data-reveal>
+          {
+            p.directory.channels.map((c) => (
+              <li>
+                <a href={href(c.href)} class="fg-pill--quiet" rel={c.href.startsWith("http") ? "noopener" : undefined} target={c.href.startsWith("http") ? "_blank" : undefined}>
+                  {c.label} <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </section>
   </main>
@@ -513,6 +540,27 @@ const temper = (i: number) =>
   }
   .fg-headline--close {
     max-width: 18ch;
+  }
+
+  /* ── T6 where the stories go — a plain, quiet channel list closing the
+     page. Deliberately restrained: no icons, no cards, just links. ── */
+  .fg-directory {
+    border-top: 1px solid var(--fg-hair);
+  }
+  .fg-directory-inner {
+    max-width: 64rem;
+    margin-inline: auto;
+    padding: 3.5rem clamp(1.5rem, 6vw, 4rem) 5rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .fg-directory-list {
+    list-style: none;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 2rem;
   }
 
   /* ── small screens ── */

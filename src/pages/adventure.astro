@@ -21,6 +21,7 @@ import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
 import { PAGES, RELATIONSHIP_BY_ID, WORK, WORK_ARCHIVE } from "../consts";
 import { TERRITORY } from "../data/territory";
+import { POSTCARDS } from "../data/postcards";
 import { getCollection } from "astro:content";
 
 import { existsSync } from "node:fs";
@@ -250,6 +251,34 @@ const archive = WORK_ARCHIVE.filter((a) => a.lane === "adventure").map((a) => ({
   media: archivePair(`work/archive/${a.slug}`),
   href: a.href ? `${base}${a.href}` : undefined,
   phrasing: RELATIONSHIP_BY_ID[a.relationshipId]?.permittedPhrasing ?? "",
+}));
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * A4d — POSTCARDS (PUB-E, 2026-07-27, Directive PUB-E "collections
+ * architecture"). A structured placeholder for MICRO stories — smaller and
+ * lighter than a Field Notes dispatch: one title, one short paragraph, 2–3
+ * photos, a date. The data shape lives in src/data/postcards.ts and ships
+ * EMPTY on purpose — this pass builds the code path, not the content, per
+ * the directive ("do NOT render invented entries"). The section below
+ * renders ONLY when POSTCARDS is non-empty, so an empty array is a safe,
+ * honest no-op. Expected filers (VYBE/Boogie Lights, Nordic Daughter,
+ * Something Tomorrow, others TBD from archive mining) are named in that
+ * file's header, not here — this page only renders what's actually filed.
+ * ───────────────────────────────────────────────────────────────────────── */
+const postcardMediaRoot = join(process.cwd(), "public", "media", "adventure", "postcards");
+function postcardPhoto(postcardSlug: string, photoSlug: string) {
+  const widths = [700, 1200];
+  const dir = join(postcardMediaRoot, postcardSlug);
+  if (!existsSync(join(dir, `${photoSlug}-${widths[0]}.avif`))) return undefined;
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${widths[0]}.webp`,
+  };
+}
+const postcards = POSTCARDS.map((pc) => ({
+  ...pc,
+  photos: pc.photos.map((ph) => ({ ...ph, media: postcardPhoto(pc.slug, ph.slug) })),
 }));
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -718,6 +747,49 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       )
     }
 
+    <!-- A4d — POSTCARDS (PUB-E, 2026-07-27): a structured placeholder for
+         MICRO stories, smaller and lighter than a Field Notes dispatch. Renders
+         ONLY when src/data/postcards.ts is non-empty — it ships empty this
+         pass, so this section is currently a no-op (see that file's header for
+         the expected filers: VYBE/Boogie Lights, Nordic Daughter, Something
+         Tomorrow, others TBD from archive mining). -->
+    {
+      postcards.length > 0 && (
+        <section class="border-t border-hairline p-8">
+          <div class="mx-auto max-w-5xl space-y-3">
+            <hr class="flight-line mb-6" aria-hidden="true" />
+            <p class="hud-label" data-reveal>{p.postcards.kicker}</p>
+            <h2 class="text-2xl font-bold" data-reveal>{p.postcards.heading}</h2>
+            <p class="max-w-3xl text-ink" data-reveal>{p.postcards.body}</p>
+            <div class="postcard-grid">
+              {postcards.map((pc) => (
+                <article class="postcard-tile" data-reveal data-reveal-stagger="60">
+                  <div class="postcard-photos">
+                    {pc.photos.map((ph) =>
+                      ph.media ? (
+                        <figure class="postcard-photo">
+                          <picture>
+                            <source type="image/avif" srcset={ph.media.avif} sizes="(min-width: 900px) 20vw, 45vw" />
+                            <source type="image/webp" srcset={ph.media.webp} sizes="(min-width: 900px) 20vw, 45vw" />
+                            <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
+                          </picture>
+                        </figure>
+                      ) : null,
+                    )}
+                  </div>
+                  <div class="postcard-meta">
+                    <span class="postcard-title">{pc.title}</span>
+                    <span class="postcard-date hud-label">{pc.date}</span>
+                  </div>
+                  <p class="postcard-para">{pc.paragraph}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
     <!-- A5 — P29: the close is this lane's OWN buyer action (production →
          Calendly direct), not a consulting handoff. The field-notes wayfinder
          moved to /adventure/field with the gallery (Round 5). -->
@@ -1000,6 +1072,64 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     .arch-tile--link:hover {
       transform: none;
     }
+  }
+
+  /* ── A4d · POSTCARDS (PUB-E) — micro-story tiles: a small photo strip (2–3
+     frames), a title/date row, one short paragraph. Same quiet register as
+     the archive band above; renders only when data exists. ── */
+  .postcard-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    margin-top: 0.6rem;
+  }
+  .postcard-tile {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, #ffffff 2%, transparent);
+  }
+  .postcard-photos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .postcard-photo {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .postcard-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  .postcard-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .postcard-title {
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: #eef5fa;
+  }
+  .postcard-date {
+    flex: none;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .postcard-para {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #eef2f5 82%, transparent);
   }
 
   /* ── A3b · THE FIELD teaser (Round 5) — one inviting block: the wall's three

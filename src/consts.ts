@@ -773,6 +773,16 @@ export type ArchiveItem = {
    * the entry below.
    */
   lane: "venture" | "adventure";
+  /**
+   * PUB-E (2026-07-27, operator ruling: "commercials are not stories") — when
+   * true, the item is REMOVED from its lane's index page entirely (the "from
+   * the archive" band), even though `lane` still records its true
+   * classification. The item's own case page (if any) stays live; it stays
+   * listed on /work (the flat archive directory) only. Set on Gigs Go Green
+   * and PNUMIX below — both are commercial/promotional deliverables, not
+   * stories, per the operator's directive.
+   */
+  hideFromLaneIndex?: boolean;
 };
 
 export const WORK_ARCHIVE: readonly ArchiveItem[] = [
@@ -787,6 +797,11 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     relationshipId: "gigs-go-green",
     href: "/work/gigs-go-green",
     lane: "venture", // operator-named: STAYS on /entertainment
+    // PUB-E (2026-07-27) — REMOVED from the /venture index band (operator
+    // ruling: "commercials are not stories"). The case page stays live at
+    // /work/gigs-go-green and stays listed on /work (the flat archive
+    // directory) — only the venture-lane index tile is hidden.
+    hideFromLaneIndex: true,
   },
   // PUB-D (2026-07-27) — Vybe MOVES BACK to adventure. Operator's BINDING
   // ruling this session overrides the PUB-A note above (which cited a stale
@@ -840,6 +855,95 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     date: "2024",
     relationshipId: "pnumix",
     lane: "venture", // operator-named: STAYS on /entertainment
+    // PUB-E (2026-07-27) — REMOVED from the /venture index band (operator
+    // ruling: "commercials are not stories"). PNUMIX has no case page
+    // (`href` was never set — display-only tile from the start), so it
+    // stays recorded here and listed on /work (the flat archive directory)
+    // as text only.
+    hideFromLaneIndex: true,
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// VENTURE_COLLECTIONS — PUB-E (2026-07-27, Directive PUB-E "collections
+// architecture"). Below /venture's three features (Pebble Beach / PitchBoulder
+// / MEME), the operator wants TWO NAMED collections — grouped story sections
+// that each collect their stories, including stories that are ALSO featured
+// elsewhere on the page (PitchBoulder leads Collection A even though it's
+// also a feature chapter). `slate` + `title` strings below are copied
+// VERBATIM from each story's own destination page (already flagged there —
+// reuse adds no new copy); only the collection `name` and `intro` are new
+// sentences on this page.
+//
+// NAMES ARE PLACEHOLDERS — operator to confirm or rename:
+//   • Collection A: "Founders & Pitch Rooms" — the operator's own working
+//     name from the directive.
+//   • Collection B: "The Film Industry" — the operator's own working name;
+//     he offered "The Screen Trade" as an alternate to consider.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — collection names + intro lines are new
+// copy (staging-only until read); logged in SITE-COPY-DECK-publication-v1.md.
+//
+// Amazing Aerial deliberately does NOT join either collection — per the
+// directive it "stays on the venture rail (partner story upgrade planned
+// later)". Pebble Beach also does not get a collection: the operator's own
+// rule is a named collection needs >= 2 stories, and Pebble Beach is the
+// only story in its space (see the "High Craft / Luxury Events" comment on
+// its feature chapter in venture.astro) — so it stays feature-only.
+// ---------------------------------------------------------------------------
+
+export type CollectionStory = { href: string; slate: string; title: string; mediaSlug?: string };
+
+export type VentureCollection = {
+  id: string;
+  /** ⚠ Placeholder — operator to confirm or rename. */
+  name: string;
+  /** ⚠ New sentence — operator read-approval required. */
+  intro: string;
+  stories: readonly CollectionStory[];
+};
+
+export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
+  {
+    id: "founders-pitch-rooms",
+    name: "Founders & Pitch Rooms",
+    intro:
+      "Where founders take the stage — the pitch nights we cover, and the workshop series that gets them ready for one.",
+    stories: [
+      {
+        href: "/work/pitchboulder",
+        slate: "PITCHBOULDER · BOULDER, COLORADO",
+        title: "PitchBoulder — coverage, recaps & the commercial",
+      },
+      {
+        href: "/venture/ko-law-workshops",
+        slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
+        title: "A startup workshop series, on camera.",
+      },
+    ],
+  },
+  {
+    id: "film-industry",
+    name: "The Film Industry",
+    intro:
+      "The industry side of the venture lane — the organization, the festival, and the market we keep a pulse on.",
+    stories: [
+      {
+        href: "/venture/meme",
+        slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION",
+        title: "MEME is where this lane starts.",
+      },
+      {
+        href: "/work/seriesfest",
+        slate: "SeriesFest · Denver, Colorado",
+        title: "SeriesFest, in depth.",
+        mediaSlug: "seriesfest-2026",
+      },
+      {
+        href: "/venture/afm-2025",
+        slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
+        title: "American Film Market 2025 — a venture story",
+      },
+    ],
   },
 ] as const;
 
@@ -1180,6 +1284,29 @@ export const PAGES = {
         { label: "Get in touch", href: "/contact" },
       ] as readonly Cta[],
     },
+    // F7 — "Where the stories go" (PUB-E, 2026-07-27, Directive PUB-E): a
+    // quiet channel directory at the bottom of the method page — where the
+    // stories go to be followed, plus a quiet sense of how the operation
+    // runs deep. Every link below resolves from a value already live in
+    // consts (SITE.socials / the /contact#follow anchor / the /licensing
+    // page) or a real route already shipped — nothing invented. The
+    // operator's own social roster only confirms YouTube + Instagram
+    // (SITE.socials above); TikTok and LinkedIn are commented out there
+    // (unconfirmed handle / no verified company page) and are deliberately
+    // NOT listed here — a directory that names an unconfirmed channel would
+    // be a bigger honesty risk than a short list.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+    // (staging-only until read).
+    directory: {
+      heading: "Where the stories go",
+      body: "The publication lives in a few places besides this page — new dispatches, the licensed aerial archive, and a quieter sense of how the whole operation runs.",
+      channels: [
+        { label: "Newsletter", href: "/contact#follow" },
+        { label: "YouTube", href: SITE.socials.youtube },
+        { label: "Instagram", href: SITE.socials.instagram },
+        { label: "The licensed aerial archive", href: "/licensing" },
+      ] as readonly Cta[],
+    },
   },
 
   // ---- ADVENTURE (§1.3) — P29: now ALSO the adventure-production SALES page
@@ -1372,6 +1499,16 @@ export const PAGES = {
       kicker: "From the archive",
       heading: "Filmed along the way",
       body: "Earlier live-music and festival coverage, picked up while passing through. Small pieces, kept here for the record.",
+    },
+    // A4d — POSTCARDS (PUB-E, 2026-07-27): heading copy for the structured
+    // micro-story placeholder (src/data/postcards.ts). The section itself
+    // renders only when that array is non-empty — this heading just labels
+    // it for whenever the first postcard is filed.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (staging-only until read).
+    postcards: {
+      kicker: "Postcards",
+      heading: "Postcards from the road",
+      body: "The smallest stories — one place, one paragraph, a few frames. Filed as they happen.",
     },
     // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
     // are watermarked previews; the gallery is a referral to the agency that
