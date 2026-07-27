@@ -1,32 +1,39 @@
 ---
 /**
- * /forge-the-saga — P29 "THE CONSULTANT PAGE" (operator-directed, 2026-07-20,
- * money-now restructure over the P12.x services repackage).
+ * /forge-the-saga — PUB-B (2026-07-27) "THE METHOD PAGE", per ACTION-PLAN.md's
+ * publication restructure (Directive PUB-B). This is a copy+framing surgery
+ * over the prior P29 consulting-sales page, not a redesign: the visual system
+ * (ember hero, temper rail, node ticks, the S-finale) survives intact.
  *
- * The page now sells CONSULTING: he's the odd case who does BOTH production
- * and market research, and Forge the Saga is for buyers who want everything.
- * It leads with a starting consultant rate (P30: $250/hr — mid-band of the
- * verified 2025-26 $200–$500/hr fractional-creative/strategy range) and sells
- * three MOCK PACKAGES cut from the existing five-stage
- * method (FORGE_PACKAGES; SAGA_STAGES stays the source of stage names), plus
- * the two ongoing/focused services kept verbatim from FORGE_SERVICES
- * (Standing Forge + Story Intensive). Pure-production deliverables moved to
- * their own lanes (/adventure day rate, /entertainment corporate floors) and
- * this page links out to both. Every CTA goes straight to Calendly.
+ * WHAT CHANGED: the page no longer sells anything. The three priced mock
+ * packages + two ongoing services are GONE; in their place, the five stages
+ * (SAGA_STAGES — Story Scouting → Mapping → Forging → Testing → Assessing)
+ * render as ASM's editorial method: how a story gets made before it's
+ * published, and why research comes first. No prices, no "from $X", no
+ * booking CTA anywhere on the page. It closes on one quiet line: this same
+ * method is available to clients through the founder, linking to /about and
+ * /contact — the only trace of "hire me" left on the page.
  *
- * SIGNATURE (evolved, not multiplied): the temper line lives on as ONE
- * continuous vertical rail down the services column — a heat→aqua gradient
- * hairline threading both classes, with a node tick beside every card in that
- * card's own temper color. It's painted in pure CSS (spans the column's real
- * height automatically), so it's always fully drawn with nothing to fail open
- * on — no fragile per-station coordinate math. The hero keeps its living
- * ember field + forge glow, and the closing section keeps the S-finale (the
- * cooled line drawing into the brand mark). Motion is reveal staggers only.
+ * SAGA_STAGES stays the single source of each stage's name/sub/deliverable
+ * (unchanged — other pages still price off it); its `price`/`process`/
+ * `bestFor` fields are sales language written for other contexts and are
+ * deliberately NOT reused here. FORGE_SERVICES / FORGE_PACKAGES /
+ * FORGE_CONSULT_RATE are untouched in consts.ts (adventure.astro +
+ * entertainment.astro still price off FORGE_SERVICES) but are no longer
+ * imported here.
  *
- * HONESTY: services copy is NEW (⚠ operator read-approval, flagged in consts).
- * whoFor / proof / pricing.note / cta are KEPT. The Aerial card renders the
- * VERBATIM Ledger phrasing "Aerial work licensed through Amazing Aerial
- * Agency" from FORGE_SERVICES[].note. Echo Panel STAYS SHELVED.
+ * SIGNATURE (kept): the temper line still lives as ONE continuous vertical
+ * rail down the method column — a heat→aqua gradient hairline with a node
+ * tick beside every stage card in that card's own temper color, drawn in CSS
+ * so it's always fully drawn with nothing to fail open on. The hero keeps
+ * its living ember field + forge glow; the closing section keeps the
+ * S-finale (the cooled line drawing into the brand mark). Motion is reveal
+ * staggers only.
+ *
+ * HONESTY: every sentence is NEW copy for this page (⚠ operator
+ * read-approval, flagged in consts and logged in COPY-DECK-B.md). The proof
+ * section's relationship claim renders unchanged through LegendMark/
+ * Testimonial — verbatim permittedPhrasing, never composed.
  *
  * Fallbacks: no-JS / reduced motion → the whole page reads cold. The rail is
  * CSS-only (always drawn); reveals fail open via the engine's watchdog; the
@@ -35,40 +42,22 @@
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
-import { PAGES, SAGA_STAGES, FORGE_SERVICES, FORGE_PACKAGES, FORGE_CONSULT_RATE, SITE } from "../consts";
+import { PAGES, SAGA_STAGES } from "../consts";
 
 const p = PAGES.forge;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-// P29 — CTA hrefs may now be external (Calendly direct); only prefix the base
-// on internal routes.
-const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-// P29 (money-now restructure): the page sells CONSULTING — three mock packages
-// cut from the five-stage method (FORGE_PACKAGES), plus the two ongoing/
-// focused services reused verbatim from FORGE_SERVICES (Standing Forge 02 +
-// Story Intensive 03). Pure-production deliverables moved to their lanes.
-const packages = FORGE_PACKAGES;
-const ongoing = FORGE_SERVICES.filter((s) => s.no === "02" || s.no === "03");
-const total = packages.length + ongoing.length;
+// The five stages, editorial framing: names/subs/deliverables come from
+// SAGA_STAGES (single source, unchanged); the `body` copy is new, written
+// for this page — no prices, no per-stage "bestFor" sales framing.
+const stages = SAGA_STAGES.map((stage, i) => ({ ...stage, body: p.method.stages[i].body }));
+const total = stages.length;
 
-// Each card's temper color — the v1 thermal progression across ALL cards,
-// hot working end (first package) → set aqua end (last ongoing card). Keyed
-// by the card's global position in the column so the rail and ticks agree.
+// Each card's temper color — the same hot-working-end → set-aqua-end thermal
+// progression the page has always used, now spanning the five stages instead
+// of packages+ongoing cards.
 const temper = (i: number) =>
   `color-mix(in srgb, var(--color-forge-heat, #ff9d45) ${Math.round((1 - i / (total - 1)) * 100)}%, var(--color-accent, #38f8ec))`;
-
-// PRICE TYPOGRAPHY split (operator: "make the pricing bigger + a nicer font").
-// This is a purely TYPOGRAPHIC split — NOT a copy edit. The three captured
-// parts concatenate back to the exact source string (pre + amt + unit ===
-// svc.price, byte-for-byte), so the operator's read-approved price strings are
-// untouched; we only let Fraunces carry the dollar numerals while "Starts at"
-// and "/ mo" · "/ day" stay as small Space Mono labels around them.
-const priceParts = (price: string) => {
-  // P29 — the package floors read "from $X" (lowercase), the kept services
-  // still read "Starts at $X"; both split the same way.
-  const m = price.match(/^((?:Starts at|from)\s+)?(\$[\d,]+)(\s*\/\s*\S+)?$/);
-  return m ? { pre: m[1] ?? "", amt: m[2], unit: m[3] ?? "" } : { pre: "", amt: price, unit: "" };
-};
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -83,27 +72,16 @@ const priceParts = (price: string) => {
         </p>
         <h1 class="fg-headline" data-reveal>{p.hero.headline}</h1>
         <p class="fg-sub" data-reveal>{p.hero.subline}</p>
-        {/* P29 — the starting consultant rate, right in the hero. P30: $250/hr,
-            mid-band of the verified $200–$500/hr fractional-creative range. */}
-        <p class="fg-rate" data-reveal>
-          <span class="fg-rate-lead">{p.hero.rateLine}</span>
-          <span class="fg-rate-amt">{FORGE_CONSULT_RATE}</span>
-          <span class="fg-rate-note">{p.hero.rateNote}</span>
-        </p>
-        <a href={href(p.hero.cta.href)} class="btn fg-cta" data-reveal rel="noopener">
-          <span>{p.hero.cta.label}</span>
-          <span class="arrow" aria-hidden="true">→</span>
-        </a>
       </div>
     </section>
 
-    <!-- ═══ T2 · WHO IT'S FOR — three ember chips before the anvil ═══ -->
+    <!-- ═══ T2 · WHY RESEARCH COMES FIRST — the editorial thesis ═══ -->
     <section class="fg-sec fg-who">
-      <h2 class="fg-h2" data-reveal>{p.whoFor.heading}</h2>
-      <p class="fg-body" data-reveal>{p.whoFor.body}</p>
+      <h2 class="fg-h2" data-reveal>{p.researchFirst.heading}</h2>
+      <p class="fg-body" data-reveal>{p.researchFirst.body}</p>
       <ul class="fg-chips">
         {
-          p.whoFor.items.map((item, i) => (
+          p.researchFirst.items.map((item, i) => (
             <li class="fg-chip" data-reveal data-reveal-stagger="90" style={`--chip-heat:${temper(Math.min(i, total - 1))}`}>
               <span class="fg-chip-no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               {item}
@@ -113,128 +91,31 @@ const priceParts = (price: string) => {
       </ul>
     </section>
 
-    <!-- ═══ T2b · BOTH HALVES — the weird-case positioning (P29): production
-         AND market research, one operator; each half's lane linked with its
-         own pricing so a single-half buyer self-routes. ═══ -->
-    <section class="fg-sec fg-halves">
-      <h2 class="fg-h2" data-reveal>{p.bothHalves.heading}</h2>
-      <p class="fg-body" data-reveal>{p.bothHalves.body}</p>
-      <div class="fg-halves-lanes">
-        {
-          p.bothHalves.lanes.map((lane) => (
-            <a href={`${base}${lane.href}`} class="fg-lane" data-reveal data-reveal-stagger="80">
-              <span>{lane.label}</span>
-              <span class="arrow" aria-hidden="true">→</span>
-            </a>
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- ═══ T3 · THE PACKAGES — two classes, one temper rail (P29) ═══ -->
+    <!-- ═══ T3 · THE FIVE STAGES — the method itself, one temper rail ═══ -->
     <section class="fg-sec fg-services" data-fg-services>
-      <h2 class="fg-h2 fg-services-head" data-reveal>{p.classes.heading}</h2>
+      <h2 class="fg-h2 fg-services-head" data-reveal>{p.method.heading}</h2>
 
       <div class="fg-services-inner">
         <span class="fg-rail" aria-hidden="true"></span>
 
-        <!-- PACKAGES — three cuts of the five-stage method (FORGE_PACKAGES).
-             P30 repriced against 2025-26 market benchmarks (citations at the
-             const); every floor renders with "scoped per project" framing. -->
-        <div class="fg-class fg-class--engage">
-          <header class="fg-class-head" data-reveal>
-            <span class="hud-label fg-class-label">{p.classes.engagements.label}</span>
-            <p class="fg-class-tag">{p.classes.engagements.tagline}</p>
-            <span class="fg-class-rule" aria-hidden="true"></span>
-          </header>
+        <div class="fg-class">
           <ol class="fg-cards">
             {
-              packages.map((pkg, i) => {
-                const pp = priceParts(pkg.price);
-                return (
+              stages.map((stage, i) => (
                 <li class="fg-svc" style={`--heat:${temper(i)}`}>
                   <article class="fg-card" data-reveal data-reveal-stagger="80">
                     <header class="fg-card-head">
-                      <h3 class="fg-name">{pkg.name}</h3>
-                      {/* one line, tags adjacent — no whitespace text nodes, so
-                          the rendered text stays byte-identical to pkg.price */}
-                      <p class="fg-price">{pp.pre && <span class="fg-price-lead">{pp.pre}</span>}<span class="fg-price-amt">{pp.amt}</span>{pp.unit && <span class="fg-price-unit">{pp.unit}</span>}</p>
-                      <p class="fg-price-scope">scoped per project</p>
+                      <h3 class="fg-name">{stage.name}</h3>
+                      <p class="fg-stage-sub">{stage.sub}</p>
                     </header>
-                    <p class="fg-blurb">{pkg.blurb}</p>
-                    <div class="fg-strip">
-                      <p class="hud-label fg-strip-label">
-                        {pkg.flagship ? p.flagshipStrip.label : "Stages covered"}
-                      </p>
-                      <span class="fg-strip-line" aria-hidden="true"></span>
-                      <ol class="fg-strip-stages">
-                        {pkg.stageIdx.map((si) => (
-                          <li class="fg-strip-stage">{SAGA_STAGES[si].name}</li>
-                        ))}
-                      </ol>
-                      {pkg.flagship && <p class="fg-strip-note">{p.flagshipStrip.note}</p>}
-                    </div>
-                    <p class="fg-ledger">Best if: {pkg.bestFor}</p>
+                    <p class="fg-blurb">{stage.body}</p>
+                    <p class="fg-ledger">Produces: {stage.deliverable}</p>
                   </article>
                 </li>
-                );
-              })
+              ))
             }
           </ol>
         </div>
-
-        <!-- ONGOING & FOCUSED — the retainer + the intensive, reused verbatim
-             from FORGE_SERVICES (their researched staging floors unchanged). -->
-        <div class="fg-class fg-class--deliver">
-          <header class="fg-class-head" data-reveal>
-            <span class="hud-label fg-class-label">{p.classes.deliverables.label}</span>
-            <p class="fg-class-tag">{p.classes.deliverables.tagline}</p>
-            <span class="fg-class-rule" aria-hidden="true"></span>
-          </header>
-          <ol class="fg-cards fg-cards--grid">
-            {
-              ongoing.map((svc, i) => {
-                const pp = priceParts(svc.price);
-                return (
-                <li class="fg-svc" style={`--heat:${temper(packages.length + i)}`}>
-                  <article class="fg-card" data-reveal data-reveal-stagger="80">
-                    <header class="fg-card-head">
-                      <h3 class="fg-name">{svc.name}</h3>
-                      {/* one line, tags adjacent — no whitespace text nodes, so
-                          the rendered text stays byte-identical to svc.price */}
-                      <p class="fg-price">{pp.pre && <span class="fg-price-lead">{pp.pre}</span>}<span class="fg-price-amt">{pp.amt}</span>{pp.unit && <span class="fg-price-unit">{pp.unit}</span>}</p>
-                    </header>
-                    <p class="fg-blurb">{svc.blurb}</p>
-                    {svc.note && <p class="fg-ledger">{svc.note}</p>}
-                  </article>
-                </li>
-                );
-              })
-            }
-          </ol>
-        </div>
-      </div>
-
-      <!-- P29 — production-only buyers exit to their lane (each lane carries
-           its own floor); nobody gets sold consulting they didn't come for. -->
-      <div class="fg-lanenote" data-reveal>
-        <h3 class="fg-h3">{p.laneNote.heading}</h3>
-        <p class="fg-note">{p.laneNote.body}</p>
-        <p class="fg-lanenote-links">
-          {
-            p.bothHalves.lanes.map((lane) => (
-              <a href={`${base}${lane.href}`} class="fg-pill--quiet">
-                {lane.label} <span aria-hidden="true">→</span>
-              </a>
-            ))
-          }
-        </p>
-      </div>
-
-      <div class="fg-pricing" data-reveal>
-        <h3 class="fg-h3">{p.pricing.heading}</h3>
-        <p class="fg-body">{p.pricing.body}</p>
-        <p class="fg-note">{p.pricing.note}</p>
       </div>
     </section>
 
@@ -251,7 +132,8 @@ const priceParts = (price: string) => {
       <p class="fg-note" data-reveal>{p.proof.note}</p>
     </section>
 
-    <!-- ═══ T5 · THE SAGA — the cooled line becomes the mark ═══ -->
+    <!-- ═══ T5 · THE SAGA — the cooled line becomes the mark, now a quiet
+         hand-off to the founder instead of a sales close ═══ -->
     <section class="fg-sec fg-saga" data-fg-saga>
       <svg class="fg-s" viewBox="0 0 400 800" fill="none" aria-hidden="true">
         <path
@@ -263,15 +145,16 @@ const priceParts = (price: string) => {
           stroke-linecap="round"></path>
       </svg>
       <div class="fg-saga-inner">
-        <h2 class="fg-headline fg-headline--close" data-reveal>{p.cta.headline}</h2>
-        <p class="fg-sub" data-reveal>{p.cta.body}</p>
-        <a href={href(p.cta.cta.href)} class="btn fg-cta" data-reveal rel="noopener">
-          <span>{p.cta.cta.label}</span>
-          <span class="arrow" aria-hidden="true">→</span>
-        </a>
-        <!-- P29 — logistics answered beside the CTA (SITE.trust, ⚠ flags in consts) -->
-        <p class="fg-trustline" data-reveal>
-          {SITE.trust.response} · {SITE.trust.base} · {SITE.trust.travel}
+        <h2 class="fg-headline fg-headline--close" data-reveal>{p.close.headline}</h2>
+        <p class="fg-sub" data-reveal>{p.close.body}</p>
+        <p class="fg-quiet-links" data-reveal>
+          {
+            p.close.links.map((link) => (
+              <a href={`${base}${link.href}`} class="fg-pill--quiet">
+                {link.label} <span aria-hidden="true">→</span>
+              </a>
+            ))
+          }
         </p>
       </div>
     </section>
@@ -296,7 +179,7 @@ const priceParts = (price: string) => {
   /* ── T1 the smithy ── */
   .fg-hero {
     position: relative;
-    min-height: 84svh;
+    min-height: 68svh;
     display: grid;
     align-content: center;
     overflow: clip;
@@ -365,115 +248,7 @@ const priceParts = (price: string) => {
     max-width: 52ch;
   }
 
-  /* ── P29 · the starting consultant rate in the hero — Fraunces numerals in
-     the card-price grammar, framed by small mono labels. ── */
-  .fg-rate {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .fg-rate-lead,
-  .fg-rate-note {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    color: color-mix(in srgb, #f6f2ec 68%, transparent);
-  }
-  .fg-rate-amt {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(1.5rem, 2.6vw, 2rem);
-    line-height: 1;
-    font-variant-numeric: lining-nums tabular-nums;
-    color: color-mix(in srgb, var(--color-forge-heat, #ff9d45) 80%, #fff);
-  }
-
-  /* ── P29 · T2b both halves — two lane cards in the glass grammar ── */
-  .fg-halves {
-    max-width: 64rem;
-    margin-inline: auto;
-    padding: 3.5rem clamp(1.5rem, 6vw, 4rem) 0.5rem;
-    display: grid;
-    gap: 1rem;
-  }
-  .fg-halves-lanes {
-    display: grid;
-    gap: 0.8rem;
-    margin-top: 0.4rem;
-  }
-  @media (min-width: 720px) {
-    .fg-halves-lanes {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  .fg-lane {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-    min-height: 44px;
-    padding: 1rem 1.2rem;
-    background: var(--fg-glass);
-    border: 1px solid var(--fg-hair);
-    border-radius: 8px;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #f0ece6;
-    text-decoration: none;
-    transition:
-      border-color var(--dur-hover, 160ms) var(--ease-swift, ease-out),
-      color var(--dur-hover, 160ms) var(--ease-swift, ease-out);
-  }
-  .fg-lane .arrow {
-    color: var(--color-accent, #38f8ec);
-    transition: transform var(--dur-hover, 160ms) var(--ease-swift, ease-out);
-  }
-  .fg-lane:hover,
-  .fg-lane:focus-visible {
-    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-    color: var(--color-accent, #38f8ec);
-  }
-  .fg-lane:hover .arrow,
-  .fg-lane:focus-visible .arrow {
-    transform: translateX(6px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .fg-lane,
-    .fg-lane .arrow {
-      transition: none;
-    }
-    .fg-lane:hover .arrow {
-      transform: none;
-    }
-  }
-
-  /* ── the CTA: the site's button grammar (1px accent border, mono caps, ≥44px)
-     with the shared 6px arrow slide. Warm-tinted at rest so it reads on the
-     ember ground; goes full accent on hover. ── */
-  .fg-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-height: 44px;
-    padding: 0.7rem 1.4rem;
-    color: #f6f2ec;
-  }
-  .fg-cta .arrow {
-    display: inline-block;
-    transition: transform var(--dur-hover, 160ms) var(--ease-swift, ease-out);
-  }
-  .fg-cta:hover .arrow,
-  .fg-cta:focus-visible .arrow {
-    transform: translateX(6px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .fg-cta .arrow {
-      transition: none;
-    }
-  }
+  /* ── quiet links (proof "see the work" + the closing hand-off) ── */
   .fg-pill--quiet {
     display: inline-block;
     font-family: var(--font-mono);
@@ -485,6 +260,11 @@ const priceParts = (price: string) => {
   }
   .fg-pill--quiet:hover {
     color: color-mix(in srgb, var(--color-accent, #38f8ec) 80%, #fff);
+  }
+  .fg-quiet-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.8rem;
   }
 
   /* ── shared type ── */
@@ -499,12 +279,6 @@ const priceParts = (price: string) => {
     font-style: italic;
     font-weight: 520;
   }
-  .fg-h3 {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: #f0ece6;
-  }
   .fg-body {
     font-family: var(--font-sans);
     font-size: clamp(1rem, 1.3vw, 1.15rem);
@@ -518,7 +292,7 @@ const priceParts = (price: string) => {
     max-width: 60ch;
   }
 
-  /* ── T2 who it's for ── */
+  /* ── T2 why research comes first ── */
   .fg-who {
     max-width: 64rem;
     margin-inline: auto;
@@ -555,7 +329,7 @@ const priceParts = (price: string) => {
     color: var(--chip-heat);
   }
 
-  /* ── T3 the services ── */
+  /* ── T3 the five stages ── */
   .fg-services {
     max-width: 74rem;
     margin-inline: auto;
@@ -564,8 +338,8 @@ const priceParts = (price: string) => {
   .fg-services-head {
     margin-bottom: 2.2rem;
   }
-  /* the inner holds the temper rail + both classes; the rail hugs its left
-     gutter and spans the whole services column automatically. */
+  /* the inner holds the temper rail + the stage list; the rail hugs its left
+     gutter and spans the whole column automatically. */
   .fg-services-inner {
     position: relative;
     padding-left: clamp(1.4rem, 3vw, 2.4rem);
@@ -587,7 +361,7 @@ const priceParts = (price: string) => {
     );
     opacity: 0.9;
     /* the rail DRAWS with scroll: JS scrubs --rail-progress (0→1) as the
-       services column passes through the viewport, and this clip reveals the
+       stage column passes through the viewport, and this clip reveals the
        gutter line from the top down. Default 1 = fully drawn — no-JS and
        reduced motion (the script bails before it ever sets the var) both get
        the complete rail, so it can never fail invisible. */
@@ -598,60 +372,12 @@ const priceParts = (price: string) => {
     display: grid;
     gap: 1.1rem;
   }
-  .fg-class-head {
-    display: grid;
-    gap: 0.35rem;
-  }
-  .fg-class-label {
-    letter-spacing: 0.24em;
-    color: color-mix(in srgb, #f0ece6 66%, transparent);
-  }
-  .fg-class-tag {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
-    line-height: 1.35;
-    color: color-mix(in srgb, #f0ece6 88%, transparent);
-    max-width: 44ch;
-  }
-  /* class-header temper hairline — a heat→aqua rule that DRAWS in (scaleX) as
-     the header reveals, echoing the gutter rail. Fail-open convention: fully
-     drawn by default; hidden only while JS is live AND the header hasn't
-     revealed yet (the reveal engine's 4s watchdog guarantees .is-revealed
-     lands, so it can't stay collapsed). */
-  .fg-class-rule {
-    display: block;
-    height: 2px;
-    margin-top: 0.5rem;
-    width: min(52%, 15rem);
-    border-radius: 2px;
-    transform-origin: left;
-    background: linear-gradient(
-      to right,
-      var(--color-forge-heat, #ff9d45),
-      var(--color-accent, #38f8ec)
-    );
-  }
-  html.js .fg-class-head[data-reveal]:not(.is-revealed) .fg-class-rule {
-    transform: scaleX(0);
-  }
-  html.js .fg-class-head.is-revealed .fg-class-rule {
-    transform: scaleX(1);
-    transition: transform 900ms var(--ease-survey, ease-out);
-  }
   .fg-cards {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
     gap: 1.1rem;
-  }
-  /* deliverables read as a scannable grid of floors; engagements stay full
-     width so the flagship + its strip have room to breathe. */
-  @media (min-width: 720px) {
-    .fg-cards--grid {
-      grid-template-columns: 1fr 1fr;
-    }
   }
   .fg-svc {
     position: relative;
@@ -708,11 +434,9 @@ const priceParts = (price: string) => {
     /* each card sits in its own heat: a faint inset edge in station color */
     box-shadow: inset 3px 0 0 var(--heat);
   }
-  /* index numbers dropped (operator) — the head is now just name over price,
-     stacked, so nothing looks amputated where 01–06 used to sit. */
   .fg-card-head {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.3rem;
   }
   .fg-name {
     font-family: var(--font-sans);
@@ -721,38 +445,12 @@ const priceParts = (price: string) => {
     line-height: 1.2;
     color: #f4f0ea;
   }
-  /* PRICE — the strongest thing on the card after the name (operator: bigger,
-     nicer face). The dollar amount is set in the display serif (Fraunces) at
-     large size with its handsome lining numerals; "Starts at" rides above as a
-     small mono kicker and "/ mo" · "/ day" trails inline as a small mono unit. */
-  .fg-price {
-    display: block;
-    color: var(--heat);
-  }
-  .fg-price-lead {
-    display: block;
+  .fg-stage-sub {
     font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: color-mix(in srgb, #f0ece6 52%, transparent);
-    margin-bottom: 0.2rem;
-  }
-  .fg-price-amt {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(2rem, 3.4vw, 2.55rem);
-    line-height: 1;
-    letter-spacing: -0.01em;
-    font-variant-numeric: lining-nums tabular-nums;
     color: var(--heat);
-  }
-  .fg-price-unit {
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
-    color: color-mix(in srgb, #f0ece6 62%, transparent);
-    white-space: nowrap;
   }
   .fg-blurb {
     font-size: 0.97rem;
@@ -766,101 +464,6 @@ const priceParts = (price: string) => {
     color: color-mix(in srgb, #f0ece6 55%, transparent);
     padding-top: 0.2rem;
     border-top: 1px solid var(--fg-hair);
-  }
-
-  /* the demoted method — a quiet, names-only strip inside the flagship card */
-  .fg-strip {
-    margin-top: 0.3rem;
-    padding-top: 0.95rem;
-    border-top: 1px solid var(--fg-hair);
-    display: grid;
-    gap: 0.5rem;
-  }
-  /* the five-stage strip's connecting line — the same subtle scaleX draw-in,
-     keyed to the flagship card's reveal (fail-open by the same rule). */
-  .fg-strip-line {
-    display: block;
-    height: 1px;
-    width: 100%;
-    transform-origin: left;
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-forge-heat, #ff9d45) 60%, transparent),
-      color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent),
-      transparent
-    );
-  }
-  html.js .fg-card[data-reveal]:not(.is-revealed) .fg-strip-line {
-    transform: scaleX(0);
-  }
-  html.js .fg-card.is-revealed .fg-strip-line {
-    transform: scaleX(1);
-    transition: transform 1100ms var(--ease-survey, ease-out) 120ms;
-  }
-  .fg-strip-label {
-    letter-spacing: 0.18em;
-    color: color-mix(in srgb, #f0ece6 55%, transparent);
-  }
-  .fg-strip-stages {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.55rem;
-  }
-  .fg-strip-stage {
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.04em;
-    color: color-mix(in srgb, #f0ece6 78%, transparent);
-  }
-  .fg-strip-stage:not(:last-child)::after {
-    content: "→";
-    margin-left: 0.55rem;
-    color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-  }
-  .fg-strip-note {
-    font-size: 0.86rem;
-    line-height: 1.45;
-    color: color-mix(in srgb, #f0ece6 60%, transparent);
-  }
-
-  /* P29 — honest per-card scope framing under the package price */
-  .fg-price-scope {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, #f0ece6 48%, transparent);
-  }
-
-  /* P29 — the production-only exit row */
-  .fg-lanenote {
-    margin-top: 2.6rem;
-    display: grid;
-    gap: 0.45rem;
-  }
-  .fg-lanenote-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.8rem;
-    margin-top: 0.2rem;
-  }
-
-  /* P29 — logistics line under the closing CTA */
-  .fg-trustline {
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, #f0ece6 55%, transparent);
-  }
-
-  .fg-pricing {
-    margin-top: 3rem;
-    display: grid;
-    gap: 0.55rem;
   }
 
   /* ── T4 proof ── */
@@ -882,7 +485,7 @@ const priceParts = (price: string) => {
 
   /* ── T5 the saga (the S finale) ── */
   .fg-saga {
-    min-height: 78svh;
+    min-height: 60svh;
     display: grid;
     align-content: center;
     padding: 5rem clamp(1.5rem, 6vw, 4rem);
@@ -922,14 +525,8 @@ const priceParts = (price: string) => {
 
   /* ── reduced motion: the scroll animatics are enhancement only. The rail JS
      bails before it ever sets --rail-progress (rail stays fully drawn), ticks
-     never get .is-lit. The two CSS draw-in lines are force-revealed by the
-     engine, so pin them to their final state with no transition/animation. ── */
+     never get .is-lit. ── */
   @media (prefers-reduced-motion: reduce) {
-    html.js .fg-class-head.is-revealed .fg-class-rule,
-    html.js .fg-card.is-revealed .fg-strip-line {
-      transform: scaleX(1);
-      transition: none;
-    }
     .fg-svc.is-lit::before {
       animation: none;
     }
@@ -937,7 +534,7 @@ const priceParts = (price: string) => {
 </style>
 
 <script>
-  // P12.x enhancement — everything below rides over a page that is already
+  // Enhancement only — everything below rides over a page that is already
   // fully forged (and fully readable) without JS. The temper rail renders fully
   // drawn in CSS by default; the enhancements here are the hero ember field, the
   // S-finale draw, and the scroll-scrubbed rail draw + node-tick ignition.
@@ -959,7 +556,7 @@ const priceParts = (price: string) => {
     if (lenis) lenis.on("scroll", () => ScrollTrigger.update());
 
     // ── the finale S: draws as the saga section arrives (the home page's
-    // #talk gesture, completing the arc: forged services → the mark) ──
+    // #talk gesture, completing the arc: the method → the mark) ──
     const sPath = document.querySelector<SVGPathElement>("[data-fg-s]");
     const saga = document.querySelector<HTMLElement>("[data-fg-saga]");
     if (sPath && saga) {
@@ -978,15 +575,14 @@ const priceParts = (price: string) => {
 
     // ── the temper rail DRAWS with scroll (operator: "I still like the lines
     // that move"). One scrubbed --rail-progress (0→1) grows the gutter gradient
-    // down the services column as it passes the viewport; each card's node tick
+    // down the stage column as it passes the viewport; each card's node tick
     // ignites once as the drawing tip reaches it. Fail-open: on any error the
     // rail is restored to fully drawn — it can never be left half-painted. ──
     const services = document.querySelector<HTMLElement>("[data-fg-services]");
     const railBox = services?.querySelector<HTMLElement>(".fg-services-inner");
     if (services && railBox) {
       try {
-        // scrub over the rail's OWN box (not the section, which trails a pricing
-        // footer below the rail) so progress maps tightly to the drawn line
+        // scrub over the rail's OWN box so progress maps tightly to the drawn line
         gsap.fromTo(
           railBox,
           { "--rail-progress": 0 },
