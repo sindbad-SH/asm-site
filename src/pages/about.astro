@@ -1,30 +1,42 @@
 ---
 /**
- * /about — P8 (V1-UPGRADE-PLAN): rebuilt to the irinamoi.com/about grammar,
- * the operator's chosen reference for this page. Her grammar, his voice:
+ * /about — PUB-B (2026-07-27): rebuilt as THE FOUNDER / MASTHEAD PAGE per
+ * ACTION-PLAN.md's publication restructure (Directive PUB-B). The irinamoi.com
+ * grammar from P8 is KEPT (this is copy+framing surgery, not a redesign):
  *
  *   - scattered ghost letterforms naming the page (A B O U T up top,
  *     B O U L D E R at the close — both drawn from the page's own words)
- *   - a calm SINGLE ground color (her burgundy → our deep survey teal-void;
- *     the about page holds still while the rest of the site travels)
+ *   - a calm SINGLE ground color (deep survey teal-void; the about page
+ *     holds still while the rest of the site travels)
  *   - staggered editorial columns of serif ITALIC narrative, arriving as
- *     you scroll — her three-column bio ballet with his StorySmith arc
- *   - the circle motif: her decorative dots become HIS PORTRAIT in a big
- *     circle (the operator asked for his photo, "vibed by him") + quiet
- *     brand-tone confetti dots
- *   - her "Recognitions" slot inverted honestly: his recognition section
- *     IS the honesty ledger — the trust statement + the real LegendKey
+ *     you scroll
+ *   - the circle motif: his portrait in a big circle + quiet brand-tone
+ *     confetti dots
+ *   - the "Recognitions" slot IS the honesty ledger — now a short list of
+ *     real, site-verified proof points (rendered via LegendMark, verbatim
+ *     permittedPhrasing) instead of a single abstract trust sentence
  *
- * HONESTY: every sentence verbatim from consts (narrative, legendLine,
- * socials rows). The develop effect on the portrait (grayscale→color) and
- * the decode on the location line are KEPT from the previous page — they
- * were operator-approved moves. Personal socials remain staging-gated per
- * COPY.md §6 (production needs Sindbad's confirmation — unchanged rule).
+ * WHAT CHANGED (PUB-B): this is now the ONE place services exist online, as
+ * one quiet paragraph (ACTION-PLAN.md addendum) — no pricing, no packages.
+ * "The StorySmith" is retired as a byline/title on this page (SITE.persona
+ * stays in consts for other pages that still use it); the byline is simply
+ * "Sindbad Horizon", with "Founder, Adventure Storytelling Media" as the
+ * credential line. First person throughout — the standing VOICE exception.
+ *
+ * HONESTY: every sentence verbatim from consts (opener, narrative, columns,
+ * legendLine, services, socials rows). Proof points render through
+ * <LegendMark> so every relationship claim is the site's verbatim
+ * permittedPhrasing — never composed prose. The develop effect on the
+ * portrait (grayscale→color) and the decode on the location line are KEPT
+ * from the previous page — they were operator-approved moves. Personal
+ * socials remain staging-gated per COPY.md §6 (production needs Sindbad's
+ * confirmation — unchanged rule).
  *
  * Fallbacks: no-JS/reduced-motion → letters at rest, columns visible,
  * portrait full-color, static ground. Motion is enhancement only.
  */
 import Base from "../layouts/Base.astro";
+import LegendMark from "../components/LegendMark.astro";
 import { PAGES, SITE } from "../consts";
 
 const p = PAGES.about;
@@ -41,8 +53,6 @@ const personalSocials = [
 // ghost letters, drawn from the page's own words (presentational letterforms)
 const aboutGhost = ["A", "B", "O", "U", "T"];
 const closeGhost = ["B", "O", "U", "L", "D", "E", "R"];
-
-const [opener, ...restNarrative] = p.narrative;
 ---
 
 <Base title={p.meta.title} description={p.meta.description}>
@@ -61,7 +71,7 @@ const [opener, ...restNarrative] = p.narrative;
               <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
               <img
                 src={`${base}/media/about/portrait.webp`}
-                alt="Sindbad Horizon, The StorySmith"
+                alt="Sindbad Horizon, founder of Adventure Storytelling Media"
                 width="1600"
                 height="2000"
                 loading="eager"
@@ -70,14 +80,14 @@ const [opener, ...restNarrative] = p.narrative;
             </picture>
           </figure>
           <h1 class="ab-name" data-reveal>
-            {p.bio.name} <span class="ab-name-sep">—</span> {p.bio.persona}
+            {p.bio.name} <span class="ab-name-sep">—</span> {p.bio.role}
           </h1>
           <p class="hud-label ab-loc" data-reveal data-tableau-content>
             <span data-decode>{p.bio.location}</span>
           </p>
         </div>
         <div class="ab-col ab-col--opener">
-          <p class="ab-opener" data-reveal>{opener}</p>
+          <p class="ab-opener" data-reveal>{p.opener}</p>
         </div>
         <div class="ab-col ab-col--reach" data-reveal>
           <a class="ab-mail" href={`mailto:${SITE.email}`}>{SITE.email}</a>
@@ -99,14 +109,14 @@ const [opener, ...restNarrative] = p.narrative;
       </div>
     </section>
 
-    <!-- ═══ S2 · the narrative — staggered italic columns ═══ -->
+    <!-- ═══ S2 · the narrative — why ASM exists, staggered italic columns ═══ -->
     <section class="ab-sec ab-story">
       <span class="ab-confetti" data-ab-confetti style="--ci:0" aria-hidden="true"></span>
       <span class="ab-confetti ab-confetti--b" data-ab-confetti style="--ci:1" aria-hidden="true"></span>
       <span class="ab-confetti ab-confetti--c" data-ab-confetti style="--ci:2" aria-hidden="true"></span>
       <div class="ab-story-grid">
         {
-          restNarrative.map((paragraph, i) => (
+          p.narrative.map((paragraph, i) => (
             <p class={`ab-para ab-para--${i}`} data-reveal data-reveal-stagger="120">
               {paragraph}
             </p>
@@ -115,11 +125,46 @@ const [opener, ...restNarrative] = p.narrative;
       </div>
     </section>
 
-    <!-- ═══ S3 · her "Recognitions" slot, inverted honestly: the ledger ═══
-         P23 — the visible tier-key panel is retired site-wide; the trust
-         statement (legendLine) now stands on its own as the recognition. -->
+    <!-- ═══ S2b · the two columns — the vantage rule, PUB-B ═══ -->
+    <section class="ab-sec ab-columns">
+      <div class="ab-columns-grid">
+        {
+          p.columns.map((col) => (
+            <div class="ab-column" data-reveal data-reveal-stagger="100">
+              <p class="hud-label ab-column-kicker">{col.heading}</p>
+              <p class="ab-column-body">{col.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ═══ S3 · her "Recognitions" slot, inverted honestly: the ledger, now
+         with real proof points — PUB-B (2026-07-27). Each renders through
+         LegendMark, printing RELATIONSHIP_BY_ID's verbatim permittedPhrasing;
+         this page states no relationship status in its own prose. ═══ -->
     <section class="ab-sec ab-ledger">
       <p class="ab-ledger-line" data-reveal>{p.legendLine}</p>
+      <ul class="ab-proof" data-reveal>
+        {
+          p.proof.map((proof) => (
+            <li class="ab-proof-item">
+              <LegendMark proof={proof} />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- ═══ S3b · the quiet services line — PUB-B (2026-07-27). The ONE place
+         services exist on the whole site (ACTION-PLAN.md addendum): one
+         understated paragraph, no pricing, no packages. ═══ -->
+    <section class="ab-sec ab-services">
+      <p class="hud-label ab-services-kicker" data-reveal>{p.services.heading}</p>
+      <p class="ab-services-body" data-reveal>
+        {p.services.body}{" "}
+        <a href={`${base}${p.services.link.href}`} class="link">{p.services.link.label}</a>.
+      </p>
     </section>
 
     <!-- ═══ S4 · the close — home base, scattered ═══ -->
@@ -303,7 +348,32 @@ const [opener, ...restNarrative] = p.narrative;
     top: 30%;
   }
 
-  /* ── S3 the ledger as recognition ── */
+  /* ── S2b the two columns — the vantage rule (PUB-B) ── */
+  .ab-columns {
+    padding: 1rem clamp(1.5rem, 6vw, 7rem) 5rem;
+  }
+  .ab-columns-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 5vw, 5rem);
+    max-width: 82rem;
+    margin-inline: auto;
+  }
+  .ab-column-kicker {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 70%, transparent);
+    margin-bottom: 0.7rem;
+  }
+  .ab-column-body {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, #eef2f4 88%, transparent);
+  }
+
+  /* ── S3 the ledger as recognition, now real proof points (PUB-B) ── */
   .ab-ledger {
     padding: 6rem clamp(1.5rem, 6vw, 7rem);
     display: grid;
@@ -318,6 +388,45 @@ const [opener, ...restNarrative] = p.narrative;
   }
   .ab-key {
     max-width: 40rem;
+  }
+  .ab-proof {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+  .ab-proof-item :global(.legend-mark) {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, #eef2f4 78%, transparent);
+  }
+  .ab-proof-item :global(.legend-mark .name) {
+    color: #eef2f4;
+  }
+
+  /* ── S3b the quiet services line (PUB-B) — understated on purpose ── */
+  .ab-services {
+    padding: 0 clamp(1.5rem, 6vw, 7rem) 5rem;
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+    text-align: center;
+  }
+  .ab-services-kicker {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 60%, transparent);
+  }
+  .ab-services-body {
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+    line-height: 1.6;
+    max-width: 44ch;
+    color: color-mix(in srgb, #eef2f4 75%, transparent);
   }
 
   /* ── S4 close ── */
@@ -339,7 +448,8 @@ const [opener, ...restNarrative] = p.narrative;
   /* ── small screens: single column, rhythm relaxes ── */
   @media (max-width: 860px) {
     .ab-head-grid,
-    .ab-story-grid {
+    .ab-story-grid,
+    .ab-columns-grid {
       grid-template-columns: 1fr;
     }
     .ab-col--opener,

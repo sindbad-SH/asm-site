@@ -1,12 +1,10 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
-# ⚠ VERIFY DATE — Eldorado Springs sits in Boulder County; the archive's Boulder
-#   County outings are 2023-03-02, 2023-05-23, 2023-06-01 (territory.ts /
-#   AA-MEDIA-INVENTORY). This slate uses 2023-05-23; confirm the capture date.
+# Date confirmed by operator 2026-07-24: shot 2026-07-03.
 title: Eldorado Springs canyon
 headline: A thousand ways up the rock
 deck: Nine miles south of Boulder — two red sandstone walls, a cold creek, and a thousand routes up the rock.
-date: 2023-05-23
+date: 2026-07-03
 location: Eldorado Springs, Colorado
 territory: Colorado
 tags:

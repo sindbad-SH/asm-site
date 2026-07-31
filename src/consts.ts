@@ -95,31 +95,30 @@ export const SITE = {
 // call-to-action; nav position doesn't change that.
 // ---------------------------------------------------------------------------
 
-// P12.6b — operator direction (2026-07-12): the three credibility lanes read
-// as investment terms on their own ("Venture" especially). Appending "Stories"
-// disambiguates them as the storytelling lanes they are. Labels ONLY changed;
-// hrefs unchanged. (Forge the Saga / About / Contact keep their labels.)
-// P29 (money-now restructure, 2026-07-20) — BUYER-LANGUAGE PAIRING: every
-// world-name keeps its label but gains a plain buyer term (`buyer`), rendered
-// as a small sub-line in the nav/menus and an em-dash pairing in the footer,
-// so a producer/CMO decodes each lane within seconds. Labels + hrefs unchanged.
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — the buyer sub-labels are new visible copy
-// (staging-only until read).
+// PUB-A (2026-07-27) — PUBLICATION RESTRUCTURE (ACTION-PLAN.md): the site is
+// now a publication with TWO story columns, not three. "Industry Stories" is
+// retired — its content (MEME, SeriesFest, AFM) refiles under Venture Stories
+// (see /venture, now the index of ALL venture stories). "Forge the Saga"
+// drops out of primary nav per the addendum ("no personal website needed" /
+// no sales pillar in primary nav) — it survives as a page, footer-linked,
+// PUB-B's to rework. The buyer-language sub-labels (P29) were service-
+// flavored ("Corporate storytelling & market research", "Drone & aerial
+// production") and are dropped with them — this is a publication, not a
+// services menu. Nav caps at 4: the two story columns + About + Contact.
 export type NavItem = { label: string; href: string; buyer?: string };
 export const NAV: readonly NavItem[] = [
-  { label: "Adventure Stories", buyer: "Drone & aerial production", href: "/adventure" },
-  { label: "Venture Stories", buyer: "Corporate storytelling & research", href: "/entertainment" },
-  // P30 (round 2, 2026-07-20) — third lane UNIFIED as "Industry Stories" (the
-  // entertainment-industry lane; /world already used this name — in the
-  // entertainment world "the industry" means film, which is exactly the read).
-  // URL stays /work (labels unify; routes don't churn).
-  { label: "Industry Stories", buyer: "Film & entertainment industry", href: "/work" },
-  { label: "Forge the Saga", buyer: "Consulting — research + production", href: "/forge-the-saga" },
+  { label: "Adventure Stories", href: "/adventure" },
+  { label: "Venture Stories", href: "/venture" },
   { label: "About", href: "/about" },
-  { label: "Contact", buyer: "Book a call", href: "/contact" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
-export const PRIMARY_CTA = { label: "Forge your saga", href: "/forge-the-saga" } as const;
+// PUB-A (2026-07-27) — the header/hero CTA no longer sells a consulting
+// engagement; it invites readers to follow the publication. PUB-C is building
+// the newsletter-capture UI that will live at this anchor (FollowTheStories
+// component); `/contact#follow` is the safe target until that's wired in.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — new label (staging-only until read).
+export const PRIMARY_CTA = { label: "Follow the Stories", href: "/contact#follow" } as const;
 
 // ---------------------------------------------------------------------------
 // PILLARS — one storyteller, three terrains. Equal grammatical weight in copy
@@ -160,7 +159,13 @@ export const PILLARS: readonly Pillar[] = [
     name: "Venture",
     terrain: "the industry",
     role: "credibility",
-    href: "/entertainment",
+    // PUB-A (2026-07-27) — repointed to /venture (retired /entertainment).
+    // `id`/`terrain` intentionally UNCHANGED: both are internal keys the media
+    // layer system depends on (Tableaux.astro derives public/media/home/<slug>
+    // paths + LAYER_SETS from `terrain`; consts.ts's PAGES.entertainment key
+    // is read by PAGES.entertainment.handoff below) — renaming either would
+    // either 404 real production art or require touching unowned pages.
+    href: "/venture",
     handoff:
       "The rooms this work keeps a pulse on are the same rooms your story eventually has to survive.",
   },
@@ -197,7 +202,9 @@ export const COPY = {
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible labels (staging-only).
   paths: [
     { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
-    { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
+    // PUB-A (2026-07-27) — href repointed from the retired /entertainment
+    // route to /venture (the new venture-stories index); label unchanged.
+    { label: "Corporate storytelling & market research — Venture Stories", href: "/venture" },
     { label: "Both, end to end — Forge the Saga", href: "/forge-the-saga" },
   ],
 } as const;
@@ -580,10 +587,16 @@ export const RELATIONSHIPS: readonly Relationship[] = [
   // Something for Tomorrow" entry SPLITS into two: the operator named them as
   // separate archive tiles on /adventure. Facts unchanged from the original
   // combined entry (Nordic Daughter: Nordic / folk, a Scandinavian-festival
-  // set, Jun 2024; Something for Tomorrow: punk rock, a "Rickhouse" show, Jul
-  // 2024; the two bands share a member). Tier "informal" for both (early gig
-  // work, no pay claim). ⚠ OPERATOR READ-APPROVAL REQUIRED — the two split
-  // phrasings are new strings (staging-only until read).
+  // set, Jun 2024; Something for Tomorrow: a "Rickhouse" show, Jul 2024; the
+  // two bands share a member). Tier "informal" for both (early gig work, no
+  // pay claim). ⚠ OPERATOR READ-APPROVAL REQUIRED — the two split phrasings
+  // are new strings (staging-only until read).
+  //
+  // POSTCARD2 (2026-07-27) — genre corrected "punk rock" → "hard rock":
+  // Something For Tomorrow is web-verified (nordicdaughter.com/bio; a
+  // jamsphere.com interview) as a real band — Jason Lycan (Nordic Daughter's
+  // guitarist) plays in both. Full correction + the ND/SfT footage split are
+  // in ADVENTURE-ARCHIVE-MINE.md §4 and SITE-COPY-DECK-publication-v1.md.
   {
     id: "nordic-daughter",
     name: "Nordic Daughter",
@@ -757,15 +770,25 @@ export type ArchiveItem = {
   href?: string;
   /**
    * Round 4 (2026-07-21, operator-directed) — the archive band SPLITS across two
-   * lane pages instead of all sitting on /entertainment:
-   *   • "venture"   → /entertainment — gig/brand/event work for an organization.
+   * lane pages instead of all sitting in one place:
+   *   • "venture"   → /venture — gig/brand/event work for an organization.
    *   • "adventure" → /adventure — pieces that read as travel/coverage ("was
    *     around here, filmed this"), shown modestly as a small coverage band.
-   * One source of truth; each page filters this field. Vybe was not named in the
-   * split direction, so it HOLDS its existing home (venture) — see the ⚠ flag on
-   * the array below.
+   * One source of truth; each page filters this field. PUB-D (2026-07-27):
+   * Vybe is "adventure" per the operator's binding ruling that session — see
+   * the entry below.
    */
   lane: "venture" | "adventure";
+  /**
+   * PUB-E (2026-07-27, operator ruling: "commercials are not stories") — when
+   * true, the item is REMOVED from its lane's index page entirely (the "from
+   * the archive" band), even though `lane` still records its true
+   * classification. The item's own case page (if any) stays live; it stays
+   * listed on /work (the flat archive directory) only. Set on Gigs Go Green
+   * and PNUMIX below — both are commercial/promotional deliverables, not
+   * stories, per the operator's directive.
+   */
+  hideFromLaneIndex?: boolean;
 };
 
 export const WORK_ARCHIVE: readonly ArchiveItem[] = [
@@ -780,11 +803,18 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     relationshipId: "gigs-go-green",
     href: "/work/gigs-go-green",
     lane: "venture", // operator-named: STAYS on /entertainment
+    // PUB-E (2026-07-27) — REMOVED from the /venture index band (operator
+    // ruling: "commercials are not stories"). The case page stays live at
+    // /work/gigs-go-green and stays listed on /work (the flat archive
+    // directory) — only the venture-lane index tile is hidden.
+    hideFromLaneIndex: true,
   },
-  // ROUND 5 (2026-07-21) — Vybe MOVES to /adventure's FROM THE ARCHIVE band,
-  // operator-CONFIRMED this round (the Round-4 hold is resolved). Its light
-  // case page stays at /work/vybe (URL unchanged); the adventure band renders
-  // the link where the venture band used to.
+  // PUB-D (2026-07-27) — Vybe MOVES BACK to adventure. Operator's BINDING
+  // ruling this session overrides the PUB-A note above (which cited a stale
+  // brief): the VYBE story belongs under Adventure Stories, not Venture. The
+  // Round-5 2026-07-21 adventure placement was correct after all. Case page
+  // stays at /work/vybe (URL unchanged); it now renders in /adventure's
+  // "From the archive" band, not on /venture's story rail.
   {
     slug: "vybe",
     title: "Vybe",
@@ -800,15 +830,18 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
   // commissioned venture work); they render there as a modest bottom band.
   // ROUND 5 — the combined Nordic Daughter tile SPLITS in two per operator
   // (separate tiles for Nordic Daughter and "Something for Tomorrow").
-  // ⚠ OPERATOR-CONFIRM: Something for Tomorrow has no exported tile media yet
-  // (public/media/work/archive/something-for-tomorrow.* is absent) — the tile
-  // renders with an empty media slot until an export ships; facts (punk rock,
-  // a "Rickhouse" show, Jul 2024) come from the relationship entry above.
+  // POSTCARD2 (2026-07-27) — all three now link to their own /postcards/[slug]
+  // detail page (filed this pass); genre note corrected from "punk rock" to
+  // "hard rock" (Something For Tomorrow is web-verified as Jason Lycan's
+  // — Nordic Daughter's guitarist — hard-rock side project; source:
+  // nordicdaughter.com/bio + a jamsphere.com interview, both quoted in
+  // SITE-COPY-DECK-publication-v1.md's POSTCARD2 section).
   {
     slug: "nordic-daughter",
     title: "Nordic Daughter",
     date: "2024",
     relationshipId: "nordic-daughter",
+    href: "/postcards/nordic-daughter",
     lane: "adventure",
   },
   {
@@ -816,6 +849,7 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     title: "Something for Tomorrow",
     date: "2024",
     relationshipId: "something-for-tomorrow",
+    href: "/postcards/something-for-tomorrow",
     lane: "adventure",
   },
   {
@@ -823,6 +857,7 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     title: "The Art of Brazilian Living",
     date: "2025",
     relationshipId: "brazilian-living",
+    href: "/postcards/brazilian-living",
     lane: "adventure",
   },
   {
@@ -831,6 +866,95 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
     date: "2024",
     relationshipId: "pnumix",
     lane: "venture", // operator-named: STAYS on /entertainment
+    // PUB-E (2026-07-27) — REMOVED from the /venture index band (operator
+    // ruling: "commercials are not stories"). PNUMIX has no case page
+    // (`href` was never set — display-only tile from the start), so it
+    // stays recorded here and listed on /work (the flat archive directory)
+    // as text only.
+    hideFromLaneIndex: true,
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// VENTURE_COLLECTIONS — PUB-E (2026-07-27, Directive PUB-E "collections
+// architecture"). Below /venture's three features (Pebble Beach / PitchBoulder
+// / MEME), the operator wants TWO NAMED collections — grouped story sections
+// that each collect their stories, including stories that are ALSO featured
+// elsewhere on the page (PitchBoulder leads Collection A even though it's
+// also a feature chapter). `slate` + `title` strings below are copied
+// VERBATIM from each story's own destination page (already flagged there —
+// reuse adds no new copy); only the collection `name` and `intro` are new
+// sentences on this page.
+//
+// NAMES ARE PLACEHOLDERS — operator to confirm or rename:
+//   • Collection A: "Founders & Pitch Rooms" — the operator's own working
+//     name from the directive.
+//   • Collection B: "The Film Industry" — the operator's own working name;
+//     he offered "The Screen Trade" as an alternate to consider.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — collection names + intro lines are new
+// copy (staging-only until read); logged in SITE-COPY-DECK-publication-v1.md.
+//
+// Amazing Aerial deliberately does NOT join either collection — per the
+// directive it "stays on the venture rail (partner story upgrade planned
+// later)". Pebble Beach also does not get a collection: the operator's own
+// rule is a named collection needs >= 2 stories, and Pebble Beach is the
+// only story in its space (see the "High Craft / Luxury Events" comment on
+// its feature chapter in venture.astro) — so it stays feature-only.
+// ---------------------------------------------------------------------------
+
+export type CollectionStory = { href: string; slate: string; title: string; mediaSlug?: string };
+
+export type VentureCollection = {
+  id: string;
+  /** ⚠ Placeholder — operator to confirm or rename. */
+  name: string;
+  /** ⚠ New sentence — operator read-approval required. */
+  intro: string;
+  stories: readonly CollectionStory[];
+};
+
+export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
+  {
+    id: "founders-pitch-rooms",
+    name: "Founders & Pitch Rooms",
+    intro:
+      "Where founders take the stage — the pitch nights we cover, and the workshop series that gets them ready for one.",
+    stories: [
+      {
+        href: "/work/pitchboulder",
+        slate: "PITCHBOULDER · BOULDER, COLORADO",
+        title: "PitchBoulder — coverage, recaps & the commercial",
+      },
+      {
+        href: "/venture/ko-law-workshops",
+        slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
+        title: "A startup workshop series, on camera.",
+      },
+    ],
+  },
+  {
+    id: "film-industry",
+    name: "The Film Industry",
+    intro:
+      "The industry side of the venture lane — the organization, the festival, and the market we keep a pulse on.",
+    stories: [
+      {
+        href: "/venture/meme",
+        slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION",
+        title: "MEME is where this lane starts.",
+      },
+      {
+        href: "/work/seriesfest",
+        slate: "SeriesFest · Denver, Colorado",
+        title: "SeriesFest, in depth.",
+        mediaSlug: "seriesfest-2026",
+      },
+      {
+        href: "/venture/afm-2025",
+        slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
+        title: "American Film Market 2025 — a venture story",
+      },
+    ],
   },
 ] as const;
 
@@ -994,10 +1118,19 @@ export const PAGES = {
     // P29 buyer-language pairing — persona kept, plain buyer terms added so
     // search snippets and tabs decode instantly. ⚠ OPERATOR READ-APPROVAL
     // REQUIRED — new meta copy (staging-only until read).
+    // PUB-A (2026-07-27) — the <title> is replaced with publication framing
+    // per ACTION-PLAN.md (the site sells stories now, not production
+    // services). description was flagged as out-of-scope for that pass —
+    // PUB-D (2026-07-27) closes that flag: it carried "the StorySmith" as a
+    // byline (retired site-wide per the consistency sweep) and the old
+    // "corporate storytelling, and market research" services framing
+    // (retired with /entertainment). Rewritten to match the new <title> and
+    // /about's meta voice; no facts changed.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new title (staging-only until read).
     meta: {
-      title: `${SITE.name} — Drone & Aerial Production, Corporate Storytelling & Market Research | Boulder, CO`,
+      title: `${SITE.name} — Adventure & Venture Stories from the Field`,
       description:
-        "Sindbad Horizon, the StorySmith — drone & aerial production, corporate storytelling, and market research from Boulder, Colorado. One operator, research to final cut, working worldwide.",
+        "Adventure Storytelling Media publishes two kinds of hard-won stories from Boulder, Colorado — Adventure Stories from the field, Venture Stories from the market. One storyteller, research to final cut, working worldwide.",
     },
     // H3 — three-pillar scroll tableaux, equal grammatical weight.
     tableaux: [
@@ -1020,9 +1153,11 @@ export const PAGES = {
         headline: "We keep a pulse on the rooms your story has to survive.",
         body: "We stay close to how the industry moves — the board work, the coverage, the festivals and markets — and we are honest about exactly how close each relationship is.",
         proof: { relationshipId: "meme" },
-        // Round 3 — the industry tableau now points at ITS lane: /work is
-        // Industry Stories (MEME + festival/market coverage live there).
-        link: { label: "The network", href: "/work" },
+        // PUB-A (2026-07-27) — Industry Stories is retired; MEME + festival/
+        // market coverage now live on /venture (the venture-stories index).
+        // href repointed only — terrain/headline/body/proof untouched (media-
+        // layer keys + hero copy are out of this restructure's scope).
+        link: { label: "The network", href: "/venture" },
       },
     ] as readonly TableauChapter[],
     // H4 — proof band. P29 INVERSION (operator-directed): lead with the
@@ -1070,86 +1205,66 @@ export const PAGES = {
     },
   },
 
-  // ---- FORGE THE SAGA (§1.2) — primary lane, REPACKAGED as services. --------
-  // P12.x: was a numbered "secret sauce" process; now it sells the SERVICES you
-  // hire a StorySmith for, in two classes (Engagements / Deliverables) drawn
-  // from FORGE_SERVICES above. The five-stage method demotes to a names-only
-  // strip inside the flagship engagement.
-  //
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED — hero (kicker/headline/subline), both
-  // class taglines, flagshipStrip, and the pricing.body are ALL new copy for
-  // staging. whoFor, pretestShelved, proof, pricing.note, and cta are KEPT.
-  // P29 (money-now restructure, 2026-07-20): this is now the CONSULTING page.
-  // Positioning per operator: he's the odd case who does BOTH production and
-  // market research; Forge the Saga is for buyers who want everything. It sells
-  // a starting consultant rate + three mock packages cut from the five-stage
-  // method. Pure-production offers point out to their own lanes.
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, subline, rateLine, bothHalves,
-  // packagesIntro, ongoingIntro, and laneNote are NEW copy (staging-only).
+  // ---- FORGE THE SAGA (§1.2) — PUB-B (2026-07-27): rebuilt as THE METHOD
+  // PAGE per ACTION-PLAN.md's publication restructure. This page no longer
+  // sells anything — no prices, no packages, no booking CTA. It presents the
+  // five stages (SAGA_STAGES stays the single source of stage name/sub/
+  // deliverable — its `price`/`process`/`bestFor` fields are sales language
+  // for OTHER pages that still price them and are deliberately NOT reused
+  // here) as ASM's editorial method: how a story gets made before it's
+  // published, and why research comes first. Ends with one quiet line
+  // pointing to the founder (about/contact) — the only trace of "hire me" on
+  // this page. FORGE_SERVICES / FORGE_PACKAGES / FORGE_CONSULT_RATE are left
+  // untouched in consts (adventure.astro + entertainment.astro still price
+  // off FORGE_SERVICES) but are no longer imported or rendered here.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+  // (staging-only until read). Logged in COPY-DECK-B.md.
   forge: {
     meta: {
-      title: "Forge the Saga — Story Consulting: Market Research + Production, One Operator",
+      title: "The Method — How Stories Get Made | Adventure Storytelling Media",
       description:
-        "Hire the consultant who does both halves: market research and story strategy, plus the production to prove it on screen. Starting rate, packages built on a five-stage method, and a direct booking link.",
+        "Five stages, research first: how every Adventure Storytelling Media story gets scouted, mapped, forged, tested, and assessed — the same method available to clients through the founder.",
     },
-    // F1 — belief hero, pivoted to the StorySmith definition move.
+    // F1 — hero. No rate, no booking CTA.
     hero: {
-      kicker: "The StorySmith · Story Consulting",
-      headline: "A smith forges steel. A StorySmith forges the saga.",
+      kicker: "The method",
+      headline: "How the stories get made.",
       subline:
-        "Most shops sell you production or market research. Adventure Storytelling Media is the odd case that does both — we research what your market actually hears, then produce the story that lands. Forge the Saga is for buyers who want everything: one consultant, research to final cut.",
-      // P30 — FORGE_CONSULT_RATE ($250/hr, mid-band of the verified $200–$500/hr
-      // fractional-creative range) renders beside this framing; always
-      // "scoped per project", never a fixed quote.
-      rateLine: "Consulting",
-      rateNote: "— scoped per project; package floors below.",
-      cta: { label: "Book a call", href: SITE.bookACall },
+        "Every story published here — adventure or venture — moves through the same five stages before we call it finished. Research comes first, every time.",
     },
-    // F2 — who it's for.
-    whoFor: {
-      heading: "Who it's for",
-      body: "Founders at the edge of a launch, a raise, or a real ad spend — when the story finally has to carry weight, and guessing gets expensive.",
+    // F2 — why research comes first (replaces the old buyer-qualification
+    // "who it's for" section with the editorial thesis).
+    researchFirst: {
+      heading: "Research comes first",
+      body: "It's tempting to skip straight to shooting — the camera is the fun part. But a story only works if it reaches the people it's for, and that means finding out who they are and what they already believe before a single frame is cut. The stages below are how we hold ourselves to that, on every story we publish.",
       items: [
-        "You're about to launch, and the messaging still isn't sharp.",
-        "You're raising, and the pitch has to land in a single meeting.",
-        "You're about to spend on ads, and you want to know the story works first.",
+        "Who the story is actually for — not just who we hope is watching.",
+        "What's already been said, so we're not repeating it.",
+        "Where the real stakes are, before a camera comes out.",
       ] as readonly string[],
     },
-    // F2b — P29: the both-halves positioning move. The weird-case pitch, plus
-    // pointers to the two lanes that now carry their own production pricing.
-    bothHalves: {
-      heading: "Both halves of the job",
-      body: "Production people don't usually do research. Research people don't usually shoot. We do both — which is why the testing stages here run on real footage, not decks. If you only need one half, it has its own page and its own floor:",
-      lanes: [
-        { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
-        { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
-      ] as readonly Cta[],
-    },
-    // F3 — P29: the consulting packages (FORGE_PACKAGES) + the ongoing class
-    // (Standing Forge + Story Intensive, reused verbatim from FORGE_SERVICES).
-    classes: {
-      heading: "The packages",
-      engagements: {
-        label: "Packages",
-        tagline: "Three cuts of the five-stage method — pick how much of the arc you want us to carry.",
-      },
-      deliverables: {
-        label: "Ongoing & focused",
-        tagline: "When it isn't a one-arc project: a standing retainer, or one sharp session.",
-      },
-    },
-    // F3c — pointer row under the packages: production-only buyers exit to
-    // their lane instead of being sold consulting.
-    laneNote: {
-      heading: "Just need production?",
-      body: "Straight production is priced on its own pages — no consulting required.",
-    },
-    // F3b — the DEMOTED method: the five stage NAMES only (from SAGA_STAGES),
-    // shown as a quiet strip inside the flagship engagement. No per-stage
-    // prices, no how-to — the arc survives as a shape, not a price list.
-    flagshipStrip: {
-      label: "How the flagship runs",
-      note: "Five stages, one ordered arc — raw research to a tested narrative.",
+    // F3 — the five stages themselves, editorial framing. `body` here is new
+    // copy written for THIS page; names/subs/deliverables are pulled from
+    // SAGA_STAGES by index (single source, unchanged) — no prices rendered.
+    method: {
+      heading: "The five stages",
+      stages: [
+        {
+          body: "Before anything else, we find out who a story is actually for — the language they use, what they already believe, what's missing from what's already been published. It becomes a Field Notes brief: the ground truth the rest of the work stands on.",
+        },
+        {
+          body: "Raw research becomes a shape — who the story is for, what arc actually moves them, and what that looks like once it's built. This is where a pile of notes turns into a plan.",
+        },
+        {
+          body: "The plan becomes real: the shoot, the edit, the actual film or photographs. Everything is built to be tested, not just published — a first draft with the discipline of a final cut.",
+        },
+        {
+          body: "The story meets a real audience before it meets everyone — a small one first, honestly, so we find out what's landing and what isn't while there's still time to fix it.",
+        },
+        {
+          body: "We read what actually happened — what held attention, where people dropped off — and decide what changes before the story goes out wide, or what the next one should do differently.",
+        },
+      ] as readonly { body: string }[],
     },
     // F4 — pretest. LAUNCHES AS VARIANT B (OD-2): no standalone section; the
     // pretest idea already lives honestly inside SAGA_STAGES[3] ("curated human
@@ -1161,7 +1276,7 @@ export const PAGES = {
       heading: "Before your story meets investors, it meets the panel.",
       body: "Echo Panel is an AI investor-pitch pretest tool built in-house — your pitch gets stress-tested before it costs you a real meeting.",
     },
-    // F5 — proof.
+    // F5 — proof: the method actually produces delivered work.
     proof: {
       heading: "Proof",
       anchor: { relationshipId: "pitchboulder" } as ProofLine,
@@ -1169,21 +1284,39 @@ export const PAGES = {
       // Delivered-work cards — services actually delivered for real people,
       // each labeled at exact status (WORK[].engagement, [confirm] until set).
       deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
-      note: "No second consulting testimonial at launch. Everything shown is work actually delivered, labeled paid or unpaid as it truly was.",
+      note: "No second testimonial at launch. Everything shown is work actually delivered, labeled paid or unpaid as it truly was.",
     },
-    // F6 — pricing. Every package shows its own floor; this is the honest note
-    // about what the floors mean. ⚠ OPERATOR READ-APPROVAL REQUIRED — body
-    // updated for the packages framing (staging-only); note: KEPT verbatim.
-    pricing: {
-      heading: "On pricing",
-      body: "Every number here is a floor, not a quote — packages are scoped per project, and hourly consulting starts where the rate above says it does. Tell us what you're building and we'll tell you what it actually takes.",
-      note: "Every price is a starting point — the shape of the work sets the rest.",
+    // F6 — close. No CTA button, no trustline — one quiet line to the founder.
+    close: {
+      headline: "The same method, off the page.",
+      body: "This same method is available to clients — the research, the production, the testing — through the founder, Sindbad Horizon.",
+      links: [
+        { label: "About the founder", href: "/about" },
+        { label: "Get in touch", href: "/contact" },
+      ] as readonly Cta[],
     },
-    // F7 — CTA. P29: straight to the booking link (no /contact hop).
-    cta: {
-      headline: COPY.anchors.noPressure,
-      body: "Tell us where the story isn't landing. If Forge the Saga is a fit, we'll map it. If it isn't, we'll say so.",
-      cta: { label: "Book a call", href: SITE.bookACall },
+    // F7 — "Where the stories go" (PUB-E, 2026-07-27, Directive PUB-E): a
+    // quiet channel directory at the bottom of the method page — where the
+    // stories go to be followed, plus a quiet sense of how the operation
+    // runs deep. Every link below resolves from a value already live in
+    // consts (SITE.socials / the /contact#follow anchor / the /licensing
+    // page) or a real route already shipped — nothing invented. The
+    // operator's own social roster only confirms YouTube + Instagram
+    // (SITE.socials above); TikTok and LinkedIn are commented out there
+    // (unconfirmed handle / no verified company page) and are deliberately
+    // NOT listed here — a directory that names an unconfirmed channel would
+    // be a bigger honesty risk than a short list.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+    // (staging-only until read).
+    directory: {
+      heading: "Where the stories go",
+      body: "The publication lives in a few places besides this page — new dispatches, the licensed aerial archive, and a quieter sense of how the whole operation runs.",
+      channels: [
+        { label: "Newsletter", href: "/contact#follow" },
+        { label: "YouTube", href: SITE.socials.youtube },
+        { label: "Instagram", href: SITE.socials.instagram },
+        { label: "The licensed aerial archive", href: "/licensing" },
+      ] as readonly Cta[],
     },
   },
 
@@ -1203,17 +1336,9 @@ export const PAGES = {
       subline:
         "Expedition and adventure coverage — photo and film — from the places that are hardest to reach.",
     },
-    // A1b — HIRE THE OPERATOR: the production-services block, above the
-    // gallery and the AA licensing funnel. The day rate is REUSED verbatim
-    // from the aerial service floor (FORGE_SERVICES 06) — single-sourced, not
-    // a new number. Trust lines come from SITE.trust (see its ⚠ flags).
-    hire: {
-      kicker: "Production services",
-      heading: "Hire the operator",
-      body: "Aerial and ground cinematography for productions, brands, tourism, and film — the same eye that shoots these expeditions, on your call sheet. One operator, fast on his feet, gear that travels.",
-      priceNote: "— a floor, not a quote; scoped per shoot.",
-      cta: { label: "Book a call", href: SITE.bookACall },
-    },
+    // PUB-A (2026-07-27) — A1b "Hire the operator" (services + day rate +
+    // booking CTA) REMOVED here: adventure.astro is a story index now, not a
+    // services pillar. Field removed rather than left orphaned.
     territory: {
       heading: "The territory",
       // Authored positioning (COPY.md §5.1), grounded in the stories the site
@@ -1386,6 +1511,16 @@ export const PAGES = {
       heading: "Filmed along the way",
       body: "Earlier live-music and festival coverage, picked up while passing through. Small pieces, kept here for the record.",
     },
+    // A4d — POSTCARDS (PUB-E, 2026-07-27): heading copy for the structured
+    // micro-story placeholder (src/data/postcards.ts). The section itself
+    // renders only when that array is non-empty — this heading just labels
+    // it for whenever the first postcard is filed.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (staging-only until read).
+    postcards: {
+      kicker: "Postcards",
+      heading: "Postcards from the road",
+      body: "The smallest stories — one place, one paragraph, a few frames. Filed as they happen.",
+    },
     // AA funnel outro (operator exclusivity handling): the Colorado teaser stills
     // are watermarked previews; the gallery is a referral to the agency that
     // licenses the full collection. Points directly at the operator's AA
@@ -1408,27 +1543,32 @@ export const PAGES = {
     },
   },
 
-  // ---- ENTERTAINMENT (§1.4) — credibility lane, now "VENTURE" (P12.3). ------
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED (staging-only until then): the lane was
-  // renamed Film & TV → Venture per his 2026-07-08 direction ("the venture in
-  // adventure" — business stories). NEW SENTENCES in this block, listed for his
-  // verbatim review:
-  //   1. meta.title  2. meta.description  3. hero.headline  4. hero.subline
-  // Every relationship claim below (MEME/PitchBoulder/rooms) is UNCHANGED.
-  // P29 (money-now restructure): now ALSO the corporate-storytelling SALES
-  // page (largely market research + story advisory): samples + its own
-  // pricing + booking. ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, eyebrow, and
-  // the services block are NEW copy (staging-only until read).
+  // ---- ENTERTAINMENT (§1.4) — internal key for VENTURE STORIES, the index of
+  // ALL venture stories (PUB-A, 2026-07-27; ACTION-PLAN.md restructure). Now
+  // rendered at /venture (src/pages/venture.astro; the retired /entertainment
+  // route redirects there) as a STORY INDEX, not a services pillar — the E1b
+  // "Hire this lane" services/floors block is REMOVED (this is a publication;
+  // no service offerings on this site per the addendum). The internal key
+  // stays `entertainment` deliberately: `rooms` and `meme` below are read
+  // VERBATIM by six unowned venture/*.astro article pages
+  // (afm-2025/ko-law-workshops/meme/seriesfest-*) via
+  // `PAGES.entertainment.rooms.items.find(...)` / `.meme` — renaming the key
+  // or restructuring those two fields would break those pages' builds. Only
+  // meta/hero/handoff (consumed solely by venture.astro) are touched here.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta.title/hero.eyebrow/handoff.cta
+  // are revised copy (staging-only until read); everything else below is
+  // UNCHANGED from the prior /entertainment page.
   entertainment: {
     meta: {
-      title: "Venture Stories — Corporate Storytelling & Market Research",
+      title: "Venture Stories — Adventure Storytelling Media",
       description:
         "Corporate storytelling with a research spine: event & conference coverage, brand-story films, and market research that tells you what your audience actually hears. Floors and direct booking.",
     },
     // E1 — the pun IS the headline; the subline makes it land honestly.
-    // P29: eyebrow carries the buyer pairing.
     hero: {
-      eyebrow: "Venture Stories — Corporate Storytelling & Market Research",
+      // PUB-A — eyebrow drops the buyer-service pairing ("Corporate
+      // Storytelling & Market Research"); the page no longer sells that.
+      eyebrow: "Venture Stories",
       headline: "The venture in adventure.",
       // Round 3 (2026-07-21) — subline re-worded off "the industry" and the
       // festivals: the film-industry material (MEME, SeriesFest, AFM) moved to
@@ -1437,36 +1577,6 @@ export const PAGES = {
       // REQUIRED — new sentence (staging-only until read).
       subline:
         "We tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Real client work, real coverage — each stated at exactly what it is.",
-    },
-    // E1b — HIRE THIS LANE: the corporate-storytelling services + floors.
-    // Prices are REUSED verbatim from existing staged floors — Event coverage
-    // + Brand-Story Film from FORGE_SERVICES (05/04), market research from the
-    // Story Scouting stage floor (SAGA_STAGES 01). Single-sourced, no new
-    // numbers. Every floor renders with "scoped per engagement" framing.
-    services: {
-      kicker: "Corporate storytelling — services & floors",
-      heading: "Hire this lane",
-      intro:
-        "Coverage, films, and research for companies that need their story to work — built by one operator who also tests what the market actually hears.",
-      items: [
-        {
-          name: "Event & Conference Coverage",
-          serviceNo: "05", // price pulled verbatim from FORGE_SERVICES
-          line: "Photo + film coverage of your conference, summit, or pitch night — recap plus same-week clips.",
-        },
-        {
-          name: "The Brand-Story Film",
-          serviceNo: "04",
-          line: "A two-to-four-minute film that anchors your homepage — scripted, shot, and cut by one person.",
-        },
-        {
-          name: "Market Research & Story Testing",
-          stageIdx: 0, // price pulled verbatim from SAGA_STAGES 01
-          line: "Who your audience actually is, the language they use, and what your competitors are missing.",
-        },
-      ] as readonly { name: string; line: string; serviceNo?: string; stageIdx?: number }[],
-      note: "Floors, not quotes — every engagement is scoped to the room.",
-      cta: { label: "Book a call", href: SITE.bookACall },
     },
     // E2 — MEME (the most formal role).
     meme: {
@@ -1506,131 +1616,30 @@ export const PAGES = {
         { proof: { relationshipId: "workshop-coverage" } as ProofLine },
       ] as readonly { proof: ProofLine; testimonialId?: string }[],
     },
-    // E5 — soft handoff. P29: this lane closes on its OWN buyer action
-    // (Calendly direct), not a consulting handoff.
+    // E5 — soft handoff. PUB-A (2026-07-27): the close no longer sells a
+    // booking CTA (no services pillar) — it invites the reader to follow the
+    // publication, the same action as the header/hero CTA (PRIMARY_CTA).
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised cta (staging-only).
     handoff: {
       body: PILLARS.find((p) => p.id === "entertainment")!.handoff,
-      cta: { label: "Book a call", href: SITE.bookACall },
+      cta: PRIMARY_CTA,
     },
   },
 
-  // ---- WORK (§1.5) — the INDUSTRY STORIES lane page + case-study template. --
-  // P30 (round 2, 2026-07-20) — lane UNIFIED as "Industry Stories" (film &
-  // entertainment industry; matches /world and the nav). URL stays /work.
-  // Round 3 (2026-07-21, operator-directed) — /work REBUILT as the film &
-  // entertainment INDUSTRY lane: MEME anchors it (top billing — the org he's
-  // affiliated with, where the content will grow), then the SeriesFest and
-  // American Film Market coverage. The old cross-lane wall redistributed to
-  // its true lanes (see the WORK record's comment). The page sells presence +
-  // coverage conservatively; production/consulting CTAs point to the lanes
-  // that own those offers.
+  // ---- WORK (§1.5) — case-study template ONLY (PUB-A, 2026-07-27). ---------
+  // "Industry Stories" (the old /work lane page: MEME top billing + the
+  // SeriesFest/AFM coverage shelf + the conservative close) is RETIRED per
+  // the publication restructure — that content refiles under /venture (the
+  // new index of ALL venture stories; see src/pages/venture.astro, which now
+  // carries MEME, the SeriesFest hub, and AFM in its story rail). /work is
+  // reframed as a simple "Archive / All Stories" index (src/pages/work/
+  // index.astro) that no longer reads from this object — it points into both
+  // story columns directly. The FORMER meta/eyebrow/intro/meme/coverage/close
+  // fields were REMOVED here (their copy is superseded, not reused) rather
+  // than left orphaned. `caseStudies` SURVIVES UNCHANGED — work/pitchboulder
+  // .astro and work/shelby-pebble-beach.astro (unowned individual story
+  // pages; URLs stay stable) still read it.
   work: {
-    // ⚠ OPERATOR READ-APPROVAL — new title/description/eyebrow copy,
-    // staging-only until read.
-    meta: {
-      title: "Industry Stories — Film & Entertainment Industry | Coverage & Roles",
-      description:
-        "Industry Stories — the film & entertainment industry lane of Adventure Storytelling Media: an affiliation with MEME, a Colorado film nonprofit, plus coverage from SeriesFest and the American Film Market. Every relationship stated at its true status. No logo walls, no borrowed credit.",
-    },
-    // Rendered as the hud-label eyebrow above the H1 — the same lane-pairing
-    // grammar as /adventure and /entertainment.
-    eyebrow: "Industry Stories — Film & Entertainment Industry",
-    // ROUND 4 REWRITE (2026-07-21, operator-directed): the previous intro was
-    // written for the older, broader page and no longer fit. This one states
-    // the lane plainly — the affiliation that anchors it, the two events it
-    // covers, and the honesty rule — in company voice.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy (staging-only).
-    // Honest posture unchanged: works in + covers the industry; NO credentialed-
-    // coverage claim, NO "at the table where the industry decides" claim.
-    // ROUND 5 (2026-07-21, TIMELESS pass): "is building in" dropped — the lane
-    // reads as present-state company fact, not a work-in-progress diary.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence (staging-only).
-    intro: {
-      heading: "The film and entertainment lane.",
-      body: "This is Adventure Storytelling Media's film and entertainment terrain: an affiliation with MEME, a Colorado film nonprofit, and coverage from the festivals and markets where the industry actually does business — SeriesFest in Denver, the American Film Market in Los Angeles. Every relationship on this page is stated at exactly what it is. No logo walls, no borrowed credit.",
-    },
-    // W2 — MEME, the anchor of the lane (TOP BILLING, operator-directed:
-    // "he's affiliated with the org, content will grow; future-facing").
-    // The status claim renders ONLY through LegendMark (verbatim
-    // permittedPhrasing); the body is authored framing, never a status claim.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading/body/growth are new visible
-    // copy (staging-only until read).
-    // ROUND 4 (2026-07-21) — MEME keeps TOP BILLING. The body is rewritten in
-    // company voice EXCEPT the one sentence that states his personal role:
-    // "the most formal role I hold in the industry" is the direct personal
-    // relationship being stated, which is the standing exception to the voice
-    // rule (see the VOICE governance note at the top of this file) — it stays
-    // first-person on purpose, matching the verbatim permittedPhrasing beside
-    // it. `growth` states the MECHANISM (as things happen, they land here) and
-    // deliberately promises no specific future output.
-    meme: {
-      kicker: "The anchor · MEME",
-      heading: "MEME is where this lane starts.",
-      proof: { relationshipId: "meme" } as ProofLine,
-      body: "Makeshift Entertainment Media Education is a Colorado nonprofit building a stronger independent film community — education, workforce development, a way in for new talent. It's the most formal role I hold in the industry, and the affiliation this whole lane grows from.",
-      // ROUND 5 (TIMELESS pass): "young affiliation" + "the page is built to
-      // grow" dropped — present-state mechanism only, no self-narration.
-      // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence (staging-only).
-      growth: "MEME's workshops, productions, and the stories around them land here as they happen.",
-      ctas: [
-        { label: "Read the full story", href: "/venture/meme" },
-        { label: "About the organization", href: "https://www.meme.ngo" },
-      ] as readonly Cta[],
-    },
-    // W3 — the coverage shelf: SeriesFest + American Film Market. Tiles link to
-    // the published coverage articles; slate + title strings are COPIED
-    // VERBATIM from each article page (already operator-flagged there — reuse
-    // adds no new copy). Each event's status renders via its relationship's
-    // verbatim permittedPhrasing on the shelf intro, never upgraded per-tile.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading + intro are new visible copy
-    // (staging-only until read).
-    // ROUND 4 (2026-07-21) — company voice, and the two events NAMED rather
-    // than left as "the festivals and markets". The closing line makes room for
-    // future additions without promising any: it describes how the shelf works,
-    // not what will be on it.
-    // ROUND 5 (2026-07-21, operator-directed BLOCK→SUBPAGE pattern): the
-    // five-tile shelf COLLAPSES into ONE detailed SeriesFest block (→ its own
-    // subpage at /work/seriesfest, which links out to the four dispatch
-    // articles) plus the AFM block (stays a tile on /work — no subpage yet).
-    // TIMELESS + NO-COUNT: "Two rooms so far" / "The shelf fills" dropped;
-    // no edition counts anywhere. ⚠ OPERATOR READ-APPROVAL REQUIRED — the
-    // heading/intro rewrite and the seriesfest block copy are new visible
-    // strings (staging-only until read). The AFM tile's slate/title stay
-    // VERBATIM from its article page (fixed event dates, not aging copy).
-    coverage: {
-      heading: "Coverage from the rooms",
-      intro: "SeriesFest in Denver and the American Film Market in Los Angeles — attended, shot, written up, and published here.",
-      seriesfest: {
-        kicker: "SeriesFest · Denver, Colorado",
-        heading: "SeriesFest, in depth",
-        body: "Denver's episodic-storytelling festival, covered edition after edition — the main-stage program and premieres, the Fashion in Focus event, and the special screenings around the season. The full story has its own page: the rooms, the frames, and the dispatches from each event.",
-        cta: { label: "Enter the SeriesFest story", href: "/work/seriesfest" },
-        relationshipId: "seriesfest",
-        /** Tile face — reuses the flagship dispatch's existing hero export. */
-        heroSlug: "seriesfest-2026",
-      },
-      afm: {
-        href: "/venture/afm-2025",
-        slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
-        title: "American Film Market 2025 — a venture story",
-        relationshipId: "afm",
-      },
-    },
-    // W4 — the industry-lane close. CONSERVATIVE by design: this lane sells
-    // presence + coverage; the production and consulting offers live on their
-    // own lanes and are pointed to, not restated here.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — headline/body/lane labels are new
-    // visible copy (staging-only until read).
-    close: {
-      headline: "Bringing a production to Colorado — or a story to a festival?",
-      body: "If you need coverage of an industry event, a set documented, or simply an operator who already knows these rooms — tell us what you're making.",
-      cta: { label: "Book a call", href: SITE.bookACall },
-      lanes: [
-        { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
-        { label: "Corporate storytelling & market research — Venture Stories", href: "/entertainment" },
-        { label: "Research + production, one consultant — Forge the Saga", href: "/forge-the-saga" },
-      ] as readonly Cta[],
-    },
     // Case-study copy (Immersive-Garden walkthrough). PitchBoulder ships first
     // and sets the template. Facts I can't verify are [confirm] (asset S3);
     // outcome carries NO invented metric.
@@ -1703,41 +1712,109 @@ export const PAGES = {
     },
   },
 
-  // ---- ABOUT (§1.6) — single-arc StorySmith narrative, first person. -------
+  // ---- ABOUT (§1.6) — PUB-B (2026-07-27): rebuilt as THE FOUNDER / MASTHEAD
+  // PAGE per ACTION-PLAN.md's publication restructure. This is the ONE place
+  // services exist online, as a quiet line — no pricing, no packages. First
+  // person throughout (the standing VOICE exception (a) above): he is
+  // genuinely speaking about himself here. NEVER "The StorySmith" as a byline
+  // or title (SITE.persona stays in consts for other pages' use — see the
+  // governance note there — but this page does not render it). Every
+  // relationship claim below is a ProofLine, rendered through <LegendMark>
+  // with its verbatim permittedPhrasing — this page adds no new relationship
+  // facts, only surfaces six already in RELATIONSHIPS.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+  // (staging-only until read). Logged in COPY-DECK-B.md.
   about: {
     meta: {
-      title: "About — Sindbad Horizon, the StorySmith",
+      title: "About — Sindbad Horizon, Founder",
       description:
-        "One craft — storytelling — told across the wild, the market, and the industry. Boulder is home base; the world is the territory.",
+        "Sindbad Horizon, founder of Adventure Storytelling Media, on why the publication covers two kinds of hard-won stories — the summit and the startup — from Boulder, Colorado.",
     },
     // Verifiable facts only (research-brief §1). Everything else is thesis.
     bio: {
       name: SITE.person,
-      persona: SITE.persona,
+      role: "Founder, Adventure Storytelling Media",
       location: SITE.location,
     },
+    // The opening line + why-ASM-exists thesis — paraphrased and tightened
+    // from the operator's own framing (2026-07-27 directive), his idea kept
+    // intact: adVENTURE contains venture on purpose.
+    opener:
+      "I'm Sindbad Horizon. I started Adventure Storytelling Media to tell two kinds of stories I've come to think are actually the same story.",
     narrative: [
-      "I'm Sindbad Horizon. People call me the StorySmith. I find the truest version of a story and forge it into something people feel.",
-      "I've learned to do that in three kinds of terrain. In the wild, the story is a place most cameras never reach. In the market, it's a founder's real advantage, buried under the wrong words. In the industry, it's a set of relationships — and the honesty to name each one for what it is.",
-      "They look like three different jobs. They're one craft. The same instinct that reads the line of a ridge reads the line of an argument.",
-      COPY.anchors.homeBase, // "Boulder is home base. The world is the territory."
+      "I've always loved the classic kind of adventure story — the mountain, the expedition, the wild place most people never reach. But somewhere along the way I noticed that a lot of the best adventure stories happening right now aren't on a summit. They're someone starting something. Building something. Taking the risk without knowing yet if it pays off.",
+      "The word gives it away before I do: the venture is right there inside adventure. So this publication tells both kinds of hard-won stories — the summit and the startup — because I think they deserve the same kind of attention. Sometimes they're the same story. That's usually when it gets interesting.",
     ] as readonly string[],
-    // The legend device turned into a trust statement (§1.6 close).
-    legendLine:
-      "And because trust is the whole point, I mark every relationship on this site at exactly what it is — official, delivered, informal, or simply a room I was in.",
+    // The two columns, one short paragraph each — the vantage rule.
+    columns: [
+      {
+        heading: "Adventure Stories",
+        body: "I go to the place and tell the story of arriving — the discoverer's vantage. Expeditions, wild places, the shot that only exists because someone got there first.",
+      },
+      {
+        heading: "Venture Stories",
+        body: "I go behind the scenes with the people building the thing — founders, teams, the unglamorous middle of starting something. Not arrival. The work of getting there.",
+      },
+    ] as readonly { heading: string; body: string }[],
+    // The honesty framing, now introducing real proof points instead of
+    // standing alone as an abstract statement.
+    legendLine: "None of it is borrowed. Every relationship below is real, stated at exactly what it is:",
+    // Real, site-verified proof points only — rendered via <LegendMark> so
+    // each prints its RELATIONSHIP_BY_ID verbatim permittedPhrasing. MEME
+    // renders here as a credential line, not a story.
+    proof: [
+      { relationshipId: "amazing-aerial" },
+      { relationshipId: "pitchboulder" },
+      { relationshipId: "seriesfest" },
+      { relationshipId: "afm" },
+      { relationshipId: "pebble-beach" },
+      { relationshipId: "meme" },
+    ] as readonly ProofLine[],
+    // THE QUIET SERVICES LINE — the only place services exist on the whole
+    // site (ACTION-PLAN.md addendum). No prices, no packages, no service list.
+    services: {
+      heading: "Working together",
+      body: "I also work directly with founders and organizations on positioning and brand films. If that's you, enquiries go through the contact page.",
+      link: { label: "Get in touch", href: "/contact" },
+    },
   },
 
-  // ---- CONTACT (§1.7) — conversion. ----------------------------------------
+  // ---- CONTACT (§1.7) — PUB-B (2026-07-27): rebuilt as PUBLICATION CONTACT
+  // per ACTION-PLAN.md. No longer a sales-funnel page — the inert lead form
+  // (gated on SITE.formEndpoint, never resolved) is retired in favor of one
+  // real email and three honest reasons to use it. The booking link survives
+  // only as a small, demoted line (SITE trust logistics still apply to it).
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+  // (staging-only until read). Logged in COPY-DECK-B.md.
   contact: {
-    // P29 buyer pairing (⚠ OPERATOR READ-APPROVAL — new title, staging-only).
     meta: {
-      title: "Contact — Book a Call",
+      title: "Contact — Adventure Storytelling Media",
       description:
-        "Tell us what you're building. No pitch, no pressure — book a call or send a note.",
+        "Story tips, licensing enquiries, or work with the founder directly — one email, one line to book a call.",
     },
-    headline: COPY.anchors.noPressure,
-    body: "Tell us what you're building. If Forge the Saga is a fit, we'll talk. If it isn't, we'll point you somewhere better.",
+    headline: "Have an adventure or venture worth telling?",
+    body: "Reach out for story tips, licensing enquiries, or to talk with the founder about brand and positioning work. One inbox, real replies.",
+    categories: [
+      {
+        label: "Story tips",
+        body: "Know an adventure or a venture we should be covering? Tell us about it.",
+      },
+      {
+        label: "Licensing",
+        body: "Interested in licensing footage or photography from the archive? Say what you need.",
+      },
+      {
+        label: "Work with the founder",
+        body: "Sindbad also works directly with founders and organizations on positioning and brand films.",
+      },
+    ] as readonly { label: string; body: string }[],
     email: SITE.email,
+    // The booking link, demoted to a small line beside the email — no longer
+    // the page's primary action.
+    bookNote: "Prefer to talk it through first?",
+    bookLabel: "Book a call",
+    // The follow/newsletter stub — PUB-C mounts the capture UI here.
+    followHeading: "Follow the stories",
     // Form endpoint, book-a-call, and socials resolve from SITE ([confirm]).
   },
 } as const;

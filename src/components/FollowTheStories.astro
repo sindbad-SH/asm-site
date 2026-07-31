@@ -1,0 +1,131 @@
+---
+/**
+ * FollowTheStories.astro — PUB-C (2026-07-27), the publication's email-capture
+ * block. Mounted sitewide in Footer.astro (compact variant) so every page
+ * carries a way to follow along, ahead of the quieter "Book a call" CTA.
+ *
+ * ⚠ PROVIDER TODO — the newsletter provider is UNDECIDED (operator's call).
+ * Built provider-agnostic on purpose. When the operator picks one, change
+ * ONLY these two lines:
+ *
+ *   1. NEWSLETTER_PROVIDER → "buttondown" | "mailchimp"
+ *   2. NEWSLETTER_ACTION   → the real form-submit URL:
+ *        - Buttondown: https://buttondown.email/api/emails/embed-subscribe/<username>
+ *          (name the email field "email" — already matches below)
+ *        - Mailchimp:  the <form action="..."> URL from Audience → Signup
+ *          forms → Embedded form (also swap the input's `name` to Mailchimp's
+ *          expected field, typically "EMAIL", if you go this route)
+ *
+ * DISABLED-STATE CONTRACT: until NEWSLETTER_PROVIDER is set, this form stays
+ * INERT — no `action`, submit disabled, button reads "Coming soon" instead of
+ * "Subscribe". Same honesty pattern as /contact's SITE.formEndpoint gate
+ * (never render a fake "thanks for subscribing" success state ahead of a
+ * real, live endpoint — a visitor who submits into a void and sees a success
+ * message anyway is a worse experience than an honest "not live yet").
+ */
+type Provider = "buttondown" | "mailchimp" | null;
+
+const NEWSLETTER_PROVIDER: Provider = null; // ← 1. set to "buttondown" | "mailchimp"
+const NEWSLETTER_ACTION: string | undefined = undefined; // ← 2. set to the real submit URL
+
+const ready = NEWSLETTER_PROVIDER !== null && !!NEWSLETTER_ACTION;
+
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+const fieldId = `fts-email${compact ? "-compact" : ""}`;
+---
+
+<div class={`fts${compact ? " fts--compact" : ""}`}>
+  <p class="hud-label fts-kicker">Follow the Stories</p>
+  {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new promise copy (staging-only until read). */}
+  <p class="fts-promise">One dispatch when there's a real story to tell — no noise, unsubscribe anytime.</p>
+
+  <form
+    class="fts-form"
+    method="post"
+    action={ready ? NEWSLETTER_ACTION : undefined}
+    data-fts-ready={ready ? "true" : "false"}
+  >
+    <label for={fieldId} class="sr-only">Email</label>
+    <input id={fieldId} name="email" type="email" required placeholder="you@email.com" class="fts-input" />
+    <button type="submit" disabled={!ready} class="btn fts-submit">
+      {ready ? "Subscribe" : "Coming soon"}
+    </button>
+  </form>
+  <!--
+    Disabled state (visible note): while NEWSLETTER_PROVIDER is null, the
+    button above is disabled and reads "Coming soon" (global .btn:disabled —
+    dims + pointer-events:none). This line makes the same honesty explicit in
+    prose so it never reads as a broken form. Once a provider is wired, this
+    paragraph should be removed along with the `!ready` guard around it.
+  -->
+  {
+    !ready && (
+      <p class="fts-note">Not live yet — check back soon, or follow along on socials in the meantime.</p>
+    )
+  }
+</div>
+
+<style>
+  .fts {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 26rem;
+  }
+  .fts-kicker {
+    margin: 0;
+    letter-spacing: 0.22em;
+  }
+  .fts-promise {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+    max-width: 32ch;
+  }
+  .fts-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+  }
+  .fts-input {
+    flex: 1 1 14rem;
+    min-height: 44px;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    color: var(--color-ink);
+    background: color-mix(in srgb, #ffffff 6%, transparent);
+    border: 1px solid var(--color-hairline, color-mix(in srgb, #ffffff 16%, transparent));
+    border-radius: 2px;
+    padding: 0.6rem 0.85rem;
+  }
+  .fts-input::placeholder {
+    color: color-mix(in srgb, var(--color-ink-muted) 85%, transparent);
+  }
+  .fts-input:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+  .fts-submit {
+    flex: 0 0 auto;
+  }
+  .fts-note {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-ink-muted) 85%, transparent);
+  }
+
+  /* compact — the footer mount: tighter stack, smaller promise line */
+  .fts--compact .fts-promise {
+    font-size: 0.85rem;
+  }
+  .fts--compact .fts-form {
+    max-width: 24rem;
+  }
+</style>

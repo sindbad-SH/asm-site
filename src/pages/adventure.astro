@@ -19,8 +19,9 @@ import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES, RELATIONSHIP_BY_ID, SITE, WORK, WORK_ARCHIVE, FORGE_SERVICES } from "../consts";
+import { PAGES, RELATIONSHIP_BY_ID, WORK, WORK_ARCHIVE } from "../consts";
 import { TERRITORY } from "../data/territory";
+import { POSTCARDS } from "../data/postcards";
 import { getCollection } from "astro:content";
 
 import { existsSync } from "node:fs";
@@ -30,9 +31,20 @@ const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
-// P29 — the day rate is the aerial service's EXISTING staged floor (FORGE_SERVICES
-// 06), rendered verbatim — single-sourced, never restated as a new number.
-const aerialSvc = FORGE_SERVICES.find((s) => s.no === "06")!;
+
+// PUB-A (2026-07-27) — the field-notes DISPATCH STREAM: every published note,
+// newest first, surfaced directly on this index page (per ACTION-PLAN.md —
+// "story index framing, not services"). Same source + filter as Nav.astro's
+// dropdown (non-draft notes that carry photos), so the two can never drift.
+const dispatchStream = (await getCollection("fieldNotes", ({ data }) => !data.draft))
+  .filter((n) => n.data.photos && n.data.photos.length > 0)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map((n) => ({
+    id: n.id,
+    title: n.data.title,
+    date: n.data.date,
+  }));
+const dispatchDateFmt = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 
 /* ─────────────────────────────────────────────────────────────────────────
  * "THE TERRITORY" constellation geometry — now SEATED ON THE WORLD MAP.
@@ -242,6 +254,34 @@ const archive = WORK_ARCHIVE.filter((a) => a.lane === "adventure").map((a) => ({
 }));
 
 /* ─────────────────────────────────────────────────────────────────────────
+ * A4d — POSTCARDS (PUB-E, 2026-07-27, Directive PUB-E "collections
+ * architecture"). A structured placeholder for MICRO stories — smaller and
+ * lighter than a Field Notes dispatch: one title, one short paragraph, 2–3
+ * photos, a date. The data shape lives in src/data/postcards.ts and ships
+ * EMPTY on purpose — this pass builds the code path, not the content, per
+ * the directive ("do NOT render invented entries"). The section below
+ * renders ONLY when POSTCARDS is non-empty, so an empty array is a safe,
+ * honest no-op. Expected filers (VYBE/Boogie Lights, Nordic Daughter,
+ * Something Tomorrow, others TBD from archive mining) are named in that
+ * file's header, not here — this page only renders what's actually filed.
+ * ───────────────────────────────────────────────────────────────────────── */
+const postcardMediaRoot = join(process.cwd(), "public", "media", "adventure", "postcards");
+function postcardPhoto(postcardSlug: string, photoSlug: string) {
+  const widths = [700, 1200];
+  const dir = join(postcardMediaRoot, postcardSlug);
+  if (!existsSync(join(dir, `${photoSlug}-${widths[0]}.avif`))) return undefined;
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/postcards/${postcardSlug}/${photoSlug}-${widths[0]}.webp`,
+  };
+}
+const postcards = POSTCARDS.map((pc) => ({
+  ...pc,
+  photos: pc.photos.map((ph) => ({ ...ph, media: postcardPhoto(pc.slug, ph.slug) })),
+}));
+
+/* ─────────────────────────────────────────────────────────────────────────
  * A3b — THE FIELD TEASER (Round 5, 2026-07-21, operator-directed).
  *
  * The floating-portraits gallery wall (P19) MOVED to /adventure/field; this
@@ -304,34 +344,34 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       <GlobeHero />
     </section>
 
-    <!-- A1b — HIRE THE OPERATOR (P29 money-now): the production-services
-         block, ABOVE the gallery and the AA licensing funnel — the buyer who
-         wants to hire the pilot gets a rate, the compliance answer, and a
-         direct booking link before any licensing referral. The day rate is
-         FORGE_SERVICES 06 verbatim ($2,500/day — repriced P30 against the
-         verified $1.5k–$4k commercial band); trust lines are SITE.trust
-         (P30 copy rules in consts.ts). -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-      <hr class="flight-line mb-6" aria-hidden="true" />
-      <p class="hud-label" data-reveal>{p.hire.kicker}</p>
-      <h2 class="text-2xl font-bold" data-reveal>{p.hire.heading}</h2>
-      <p class="text-ink" data-reveal>{p.hire.body}</p>
-      <div class="panel hire-panel space-y-4 p-6" data-reveal>
-        <p class="hire-price">
-          <span class="hire-amt">{aerialSvc.price}</span>
-          <span class="hire-scope">{p.hire.priceNote}</span>
-        </p>
-        <ul class="hire-trust">
-          <li>{SITE.trust.drone}</li>
-          <li>{SITE.trust.travel}</li>
-          <li>{SITE.trust.response} · {SITE.trust.base}</li>
-        </ul>
-        <div class="flex flex-wrap items-center gap-4">
-          <a href={p.hire.cta.href} class="btn" rel="noopener">{p.hire.cta.label}</a>
-          <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
-        </div>
-      </div>
-    </section>
+    <!-- PUB-A (2026-07-27) — A1b "Hire the operator" (day rate, compliance
+         line, direct booking CTA) REMOVED: this is now a story index, not a
+         services pillar (no service offerings on this site, per
+         ACTION-PLAN.md). Replaced with THE DISPATCH STREAM — every published
+         Field Notes entry, newest first, so the index itself is a feed of
+         real stories rather than a rate card.
+         ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new
+         copy (staging-only until read; see COPY-DECK-A.md). -->
+    {
+      dispatchStream.length > 0 && (
+        <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
+          <hr class="flight-line mb-6" aria-hidden="true" />
+          <p class="hud-label" data-reveal>Field Notes · dispatch stream</p>
+          <h2 class="text-2xl font-bold" data-reveal>Every dispatch from the field.</h2>
+          <ol class="dispatch-list">
+            {dispatchStream.map((d, i) => (
+              <li class="dispatch-row" data-reveal data-reveal-stagger="40">
+                <a href={`${base}/field-notes/${d.id}`} class="dispatch-link">
+                  <span class="dispatch-no hud-label" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span class="dispatch-title">{d.title}</span>
+                  <span class="dispatch-date hud-label">{dispatchDateFmt.format(d.date)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
 
     <!-- A2 — the territory -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
@@ -707,6 +747,58 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       )
     }
 
+    <!-- A4d — POSTCARDS (PUB-E, 2026-07-27): a structured placeholder for
+         MICRO stories, smaller and lighter than a Field Notes dispatch. Renders
+         ONLY when src/data/postcards.ts is non-empty — it ships empty this
+         pass, so this section is currently a no-op (see that file's header for
+         the expected filers: VYBE/Boogie Lights, Nordic Daughter, Something
+         Tomorrow, others TBD from archive mining). -->
+    {
+      postcards.length > 0 && (
+        <section class="border-t border-hairline p-8">
+          <div class="mx-auto max-w-5xl space-y-3">
+            <hr class="flight-line mb-6" aria-hidden="true" />
+            <p class="hud-label" data-reveal>{p.postcards.kicker}</p>
+            <h2 class="text-2xl font-bold" data-reveal>{p.postcards.heading}</h2>
+            <p class="max-w-3xl text-ink" data-reveal>{p.postcards.body}</p>
+            <div class="postcard-grid">
+              {postcards.map((pc) => (
+                <a
+                  class="postcard-tile"
+                  href={`${base}/postcards/${pc.slug}`}
+                  data-reveal
+                  data-reveal-stagger="60"
+                >
+                  <div class="postcard-photos">
+                    {pc.photos.slice(0, 3).map((ph) =>
+                      ph.media ? (
+                        <figure class="postcard-photo">
+                          <picture>
+                            <source type="image/avif" srcset={ph.media.avif} sizes="(min-width: 900px) 20vw, 45vw" />
+                            <source type="image/webp" srcset={ph.media.webp} sizes="(min-width: 900px) 20vw, 45vw" />
+                            <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
+                          </picture>
+                        </figure>
+                      ) : null,
+                    )}
+                  </div>
+                  <div class="postcard-meta">
+                    <span class="postcard-title">{pc.title}</span>
+                    <span class="postcard-date hud-label">{pc.date}</span>
+                  </div>
+                  <p class="postcard-loc hud-label">{pc.location}</p>
+                  <p class="postcard-para">{pc.paragraphs[0]}</p>
+                  <span class="postcard-cta link" aria-hidden="true">
+                    Read the postcard <span class="arrow">→</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
     <!-- A5 — P29: the close is this lane's OWN buyer action (production →
          Calendly direct), not a consulting handoff. The field-notes wayfinder
          moved to /adventure/field with the gallery (Round 5). -->
@@ -721,45 +813,46 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 </Base>
 
 <style>
-  /* ── P29 · A1b hire-the-operator panel — the day rate in the display serif
-     (same price grammar as the forge cards), honest scope note beside it, and
-     the compliance/logistics answers as a quiet mono list. ── */
-  .hire-price {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-  .hire-amt {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(1.7rem, 3vw, 2.3rem);
-    line-height: 1;
-    font-variant-numeric: lining-nums tabular-nums;
-    color: var(--color-accent, #38f8ec);
-  }
-  .hire-scope {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-  .hire-trust {
+  /* ── PUB-A · the dispatch stream — a plain numbered list of every Field
+     Notes entry, replacing the retired hire-the-operator panel. Space Mono
+     index + date, serif title, hairline row dividers; the whole row is the
+     link (matches the site's .signpost-link affordance on home). ── */
+  .dispatch-list {
     list-style: none;
-    margin: 0;
+    margin: 0.5rem 0 0;
     padding: 0;
     display: grid;
-    gap: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  }
+  .dispatch-row {
+    border-top: 1px solid var(--color-hairline);
+  }
+  .dispatch-row:last-child {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .dispatch-link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0.1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .dispatch-link:hover,
+  .dispatch-link:focus-visible {
+    color: var(--color-accent, #38f8ec);
+  }
+  .dispatch-no {
+    flex: none;
     color: var(--color-ink-muted, #8a9a96);
   }
-  .hire-trust li::before {
-    content: "—";
-    margin-right: 0.5rem;
-    color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  .dispatch-title {
+    flex: 1 1 auto;
+    font-size: 1.02rem;
+  }
+  .dispatch-date {
+    flex: none;
+    color: var(--color-ink-muted, #8a9a96);
   }
 
   /* ── A4b · the festival TEASER (M1 v3): a mini magazine cover beside the
@@ -988,6 +1081,98 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     .arch-tile--link:hover {
       transform: none;
     }
+  }
+
+  /* ── A4d · POSTCARDS (PUB-E) — micro-story tiles: a small photo strip (2–3
+     frames), a title/date row, one short paragraph. Same quiet register as
+     the archive band above; renders only when data exists. ── */
+  .postcard-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    margin-top: 0.6rem;
+  }
+  .postcard-tile {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, #ffffff 10%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, #ffffff 2%, transparent);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur-hover, 180ms) var(--ease-swift, ease),
+      background var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .postcard-tile:hover,
+  .postcard-tile:focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent, #eef5fa) 35%, transparent);
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .postcard-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .postcard-cta .arrow {
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .postcard-tile:hover .postcard-cta .arrow,
+  .postcard-tile:focus-visible .postcard-cta .arrow {
+    transform: translateX(4px);
+  }
+  .postcard-photos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .postcard-photo {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .postcard-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  .postcard-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .postcard-title {
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: #eef5fa;
+  }
+  .postcard-date {
+    flex: none;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .postcard-loc {
+    margin: -0.2rem 0 0;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+  .postcard-para {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #eef2f5 82%, transparent);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ── A3b · THE FIELD teaser (Round 5) — one inviting block: the wall's three
