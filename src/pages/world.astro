@@ -243,7 +243,7 @@ const asset = (p: string) => `${base}${p}`;
       import { mountScrollWorld } from "../lib/scroll-world-engine.js";
 
       const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-      const media = (p) => `${base}/media/world2/${p}`;
+      const media = (p: string) => `${base}/media/world2/${p}`;
 
       mountScrollWorld(document.getElementById("world"), {
         // The persistent top-left logo + top-center "Enter the site" button are

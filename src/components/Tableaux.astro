@@ -104,7 +104,7 @@ async function clusterShotsFor(slug: string) {
 }
 // A chapter's cluster is "live" when at least 2 of its shots exist (valley/lake/
 // ridge/peak/loop); else that chapter falls back to the classic layered scene.
-function clusterLiveFor(shots: ReturnType<typeof clusterShotsFor>) {
+function clusterLiveFor(shots: Awaited<ReturnType<typeof clusterShotsFor>>) {
   const n = [shots.peak, shots.valley, shots.lake, shots.ridge, shots.loop].filter(Boolean).length;
   return n >= 2;
 }

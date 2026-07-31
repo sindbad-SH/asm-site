@@ -586,7 +586,10 @@ export async function mountPortalScene(opts: PortalSceneOptions): Promise<Portal
     canvas.remove();
   };
 
-  canvas.addEventListener("webglcontextlost", (e) => {
+  // "webglcontextlost" isn't in lib.dom's addEventListener overload map, so
+  // the callback param needs an explicit type (Event covers preventDefault()
+  // — the only member used here; WebGLContextEvent adds nothing else).
+  canvas.addEventListener("webglcontextlost", (e: Event) => {
     e.preventDefault();
     dispose();
     onContextLost?.();

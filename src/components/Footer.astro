@@ -18,7 +18,11 @@ import { SITE } from "../consts";
 import FollowTheStories from "./FollowTheStories.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const socialEntries = Object.entries(SITE.socials);
+// Widened to string: SITE is `as const`, so without this every url here is
+// narrowed to the literal union of the two currently-real links, and the
+// "[confirm]" guard below (for whenever a social gets added un-verified,
+// same convention as CaseStudy.astro's isPending) becomes a type error.
+const socialEntries = Object.entries(SITE.socials) as [string, string][];
 
 // ⚠ OPERATOR READ-APPROVAL REQUIRED — footer-only nav restructure for the
 // publication pivot (staging-only until read; see COPY-DECK-C.md). Labels
