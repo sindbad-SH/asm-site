@@ -358,17 +358,23 @@ const asset = (p: string) => `${base}${p}`;
             cta: { primary: { label: "Forge your saga", href: base + "/forge-the-saga" } },
           },
         ],
-        // Transit clips slot here when the operator generates them (Plan B, or
-        // Plan A depart+reversed-arrival composites). Order: gateway→adventure,
-        // adventure→venture, venture→industry, industry→forge. The forge→gateway
-        // loop seam stays on the engine's wrap-fade.
-        // connectors: [
-        //   media("vid/v2-transit-gateway-adventure.mp4"),
-        //   media("vid/v2-transit-adventure-venture.mp4"),
-        //   media("vid/v2-transit-venture-industry.mp4"),
-        //   media("vid/v2-transit-industry-forge.mp4"),
-        // ],
-        connectors: [],   // stills scaffold — scenes crossfade directly for now
+        // Transit clips (operator-approved composites, 2026-07-31 — see
+        // E:\Adventure Storytelling Media Original\06 - Website\
+        // _WORLD-TRANSIT-CANDIDATES\_SELECTION.md for how each was built and
+        // its known limitations). Order: gateway→adventure, adventure→venture,
+        // venture→industry, industry→forge. The forge→gateway loop seam stays
+        // on the engine's wrap-fade.
+        // NOTE: these 4 clips add ~68s of flight (16.4+15.4+20.9+15.4s) on top
+        // of the 5 hold clips' own ~65s — autoFlightSeconds (40, above) was
+        // tuned before the transits existed and may want revisiting now that
+        // total flight is ~68s longer; left as-is for the operator to tune
+        // after seeing it live.
+        connectors: [
+          media("vid/v2-transit-gateway-adventure.mp4"),
+          media("vid/v2-transit-adventure-venture.mp4"),
+          media("vid/v2-transit-venture-industry.mp4"),
+          media("vid/v2-transit-industry-forge.mp4"),
+        ],
       });
     </script>
   </body>
