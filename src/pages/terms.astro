@@ -1,0 +1,87 @@
+---
+/**
+ * /terms — same contract as /privacy (Phase 7 grammar): plain language, first
+ * person, only claims that are true of this site. Linked from the footer next
+ * to Privacy, not the main nav. The clause that earns its keep: our photo and
+ * film work may not be reused or fed to AI training without a written license
+ * ("real drone, zero AI" cuts both ways).
+ */
+import Base from "../layouts/Base.astro";
+import { SITE } from "../consts";
+---
+
+<Base
+  title="Terms"
+  description="The terms for using this site. Short version: look freely, link freely, don't take the work."
+>
+  <section class="mx-auto max-w-2xl space-y-6 p-8">
+    <h1 class="text-3xl font-bold">Terms</h1>
+    <p class="text-ink">
+      Short version: look freely, share links freely — but the photography and film here is our
+      work, and it stays ours unless we license it to you.
+    </p>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">The work is the point</h2>
+      <p class="text-ink">
+        Everything on this site — photography, video, writing, design — is owned by Adventure
+        Storytelling Media (operated by Sindbad Horizon, Boulder, Colorado) or used with
+        permission. Publishing it here is not a license to reuse it. Don't download, copy,
+        republish, or use it commercially without written permission; don't strip credits or
+        watermarks; and don't use any of it to train machine-learning or generative-AI systems,
+        or include it in datasets built for that purpose. Licensing is available and the answer
+        is often yes — <a href={`mailto:${SITE.email}`} class="link">just ask</a>.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Services & pricing on this site</h2>
+      <p class="text-ink">
+        Service descriptions and prices here are information, not a binding offer. Actual
+        engagements run on a written agreement we both sign — and if that agreement says
+        something different from this page, the agreement wins.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Reasonable use</h2>
+      <p class="text-ink">
+        Don't use the site to break the law, don't try to break into it, don't scrape it at a
+        volume that hurts it for everyone else, and don't pretend to be us or to speak for us.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Links elsewhere</h2>
+      <p class="text-ink">
+        We link out to other sites and to our profiles on social platforms. Those destinations
+        run under their own terms and privacy policies, not ours.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">No warranty, limited liability</h2>
+      <p class="text-ink">
+        The site is provided "as is." We keep it accurate and running as best we can, but we
+        don't promise it's error-free, and nothing here is professional advice for your specific
+        situation. To the fullest extent the law allows, we're not liable for indirect or
+        consequential damages arising from use of this site; nothing in these terms limits
+        liability that can't lawfully be limited.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Housekeeping</h2>
+      <p class="text-ink">
+        These terms are governed by Colorado law, and disputes belong in Colorado courts. If we
+        update the terms, the date below changes with them; continuing to use the site means the
+        current version applies.
+      </p>
+    </div>
+
+    <p class="text-sm text-ink-muted">
+      Questions? <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+    </p>
+    <p class="text-sm text-ink-muted">Last updated July 28, 2026.</p>
+  </section>
+</Base>

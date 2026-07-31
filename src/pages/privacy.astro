@@ -59,8 +59,33 @@ import { SITE } from "../consts";
       </p>
     </div>
 
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Our publishing tool</h2>
+      <p class="text-ink">
+        We publish our own photography and film to our own social channels (YouTube, Instagram,
+        Facebook, TikTok, and similar) using a small self-hosted tool that runs on our own
+        computer. The platforms require us to say how that tool handles data, so: it stores the
+        login tokens for our own accounts locally, sends each post's content only to the platform
+        it's being published to, and collects no information about anyone else — no audience
+        data, no follower data, nothing. It has no users besides us, and we can revoke its access
+        at any time from each platform's settings. When a platform's API requires media to be
+        fetched from a public link, the file for that post is briefly hosted at a public URL and
+        can be removed after publishing.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-xl font-bold">Your data, your call</h2>
+      <p class="text-ink">
+        You can ask what we hold about you (for most people: at most an email thread), ask us to
+        correct it, or ask us to delete it. Email us and we will, unless a legal obligation
+        requires keeping it.
+      </p>
+    </div>
+
     <p class="text-sm text-ink-muted">
       Questions? <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
     </p>
+    <p class="text-sm text-ink-muted">Last updated July 28, 2026.</p>
   </section>
 </Base>
