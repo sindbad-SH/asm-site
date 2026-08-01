@@ -113,7 +113,9 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     sources={hookSources}
     placeholderLabel="HOOK MEDIA (§2c) — PitchBoulder commercial still or a short ambient loop (S3). Poster ships first."
   >
-    {hookLogo && <img src={hookLogo} alt={hookLogoAlt} class="case-hook-logo" loading="eager" decoding="async" />}
+    {/* The partner lockup rides HeroVideo's `corner` slot, not the content
+        column — see the note in HeroVideo.astro. */}
+    {hookLogo && <img slot="corner" src={hookLogo} alt={hookLogoAlt} class="case-hook-logo" loading="eager" decoding="async" />}
     <h1 class="text-4xl font-bold sm:text-6xl">{study.hook}</h1>
     {hookCredit && <p class="case-hook-credit hud-label">{hookCredit}</p>}
   </HeroVideo>

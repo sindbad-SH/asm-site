@@ -71,6 +71,14 @@ const hasVideo = sources.length > 0;
     <slot />
   </div>
 
+  {/* Optional corner slot — a direct child of .hero-video (position:relative),
+      so anything placed here anchors to the HERO's corner rather than to the
+      centred 48rem content column. Renders nothing when unused, so heroes that
+      don't fill it (adventure, shelby) are byte-identical. Added 2026-08-01 for
+      the PitchBoulder partner lockup, which measured 1.90:1 contrast in the
+      centred slot (swallowed by a projector screen) vs 16.5:1 in the corner. */}
+  <slot name="corner" />
+
   <span class="hero-video__cue hud-label" aria-hidden="true">
     <span>Scroll</span>
     <span class="chev">↓</span>

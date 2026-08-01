@@ -1419,14 +1419,29 @@
     color: var(--color-accent);
   }
 
-  /* Client logo beside the case hook (R3.2c) — ~120px, renders only when a real
-     asset is supplied per the PARTNER-LOGO RULE. */
+  /* Client logo in the case hook (R3.2c) — renders only when a real asset is
+     supplied per the PARTNER-LOGO RULE. 2026-08-01: moved from centred-above-
+     the-h1 into HeroVideo's `corner` slot. Measured on the PitchBoulder hero,
+     the centred slot landed the lockup on a projector screen at 1.90:1 mean
+     contrast and repeated the client name already set in the h1 20px below;
+     the bottom-left corner sits in the scrim's darkest band at 16.5:1. */
   .case-hook-logo {
+    position: absolute;
+    left: clamp(1.25rem, 3vw, 2.5rem);
+    bottom: clamp(1.25rem, 3vw, 2.5rem);
+    z-index: 2;
     display: block;
-    width: 120px;
+    width: clamp(150px, 13vw, 200px);
     height: auto;
-    margin: 0 auto 1rem;
     opacity: 0.95;
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+  }
+  /* the scroll cue is centred at the same height — keep them clear of each other */
+  @media (max-width: 560px) {
+    .case-hook-logo {
+      width: 132px;
+      bottom: 3.5rem;
+    }
   }
 
   .case-chapter {

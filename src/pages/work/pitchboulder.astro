@@ -27,38 +27,50 @@ const commercialVideoId = "n7k-Bwu3KIU";
  * scripts/make-pitchboulder-variety.mjs): the operator flagged the repeated
  * "top-down box-opening" fixed-camera frame — it was BOTH this page's hook
  * and /venture's chapter-card poster. Retired everywhere:
- *  - this hook is now `hook-podium` (his own Tier-1 web pick, 2026-05-06:
- *    a presenter at the Boulder Chamber podium beside the "Every Parent's
- *    Worst Fear" slide);
- *  - the context still is now `context-room` (the professionally edited
- *    Jan-28-2026 eye-level room-wide, per the archive's own _ABOUT.md);
  *  - /venture's hook-poster.avif was re-extracted in place from loop.mp4
  *    (frame n=120) so that card fronts a real frame of the loop it plays.
- * Old files existence-gated as fallbacks so a missing bake never breaks the
- * page. ⚠ OPERATOR READ-APPROVAL REQUIRED — the context caption, Ask-thumb
- * caption, and Work pull quote below are new visible copy (the pull quote is
- * a verbatim reprise of this page's own Context sentence); staging-only
- * until read.
+ * That pass also introduced `hook-podium` (2026-05-06) as the hook and
+ * `context-room` (2026-01-28) as the Context still. BOTH ARE NOW RETIRED and
+ * their files deleted — see the HERO v3 note below for why. Old bakes stay
+ * existence-gated as fallbacks so a missing file never breaks the page.
  *
- * LINKEDIN-VERIFIED (rider #2, READ-ONLY mining 2026-08-01): the hook
- * photo's presenter is Alana Arnold, MD, MBA pitching PEMPal — named in
- * Sindbad's OWN LinkedIn recap of that session ("PEMPal at PitchBoulder —
- * Boulder Startup Week... set up shop at the Boulder Chamber"), the same
- * session as the Leyden Space alumni update (photo set 2026-05-06, a
- * Wednesday, matches). The 2026-04-29 ask-thumb founder is NOT named in any
- * recap found, so that caption stays date-only — no name is invented.
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — the context caption, Ask-thumb caption,
+ * Work pull quote, hook credit, and Wednesday-Room copy are new visible copy;
+ * staging-only until read.
+ *
+ * LINKEDIN-VERIFIED (READ-ONLY mining 2026-08-01, dossier at
+ * C:\builds\asm\LINKEDIN-POSTS.md): the 2026-04-29 ask-thumb founder is NOT
+ * named in any recap on file, so that caption stays date-only — no name is
+ * invented. Same rule for the 2026-01-28 hero: no recap names that session's
+ * founders, so the credit states the room and the date only.
  */
 const pbMedia = (file: string) =>
   existsSync(join(process.cwd(), "public", "media", "work", "pitchboulder", file))
     ? `${base}/media/work/pitchboulder/${file}`
     : undefined;
-// Hook = Alana Arnold, MD, MBA pitching PEMPal at the Boulder Chamber
-// (Boulder Startup Week session, 2026-05-06 — see the LinkedIn-verified note).
-const hookPoster = pbMedia("hook-podium-1600.avif") ?? `${base}/media/work/pitchboulder/hook-poster.avif`;
-const contextImage = pbMedia("context-room-1600.webp") ?? `${base}/media/work/pitchboulder/context.avif`;
+/**
+ * HERO v3 (2026-08-01) — the operator rejected v2: "the one time we did it at
+ * the Boulder Chamber ... too much boulder chamber image plus you're choosing a
+ * close up shot of a presenter. The hero shot should be 1 of the shots that's
+ * capturing the whole room with a lot of people in it."
+ *
+ * v3 is DSC08301 (2026-01-28, Galvanize): ~30 people, all faces, the room reads
+ * full, and the only brand in frame is PitchBoulder's. Chosen over the wider
+ * 2026-06-17 candidate because that frame's slides put NOBILITY SPACE at 2.4x
+ * the size of the PitchBoulder mark — which would have repeated the exact
+ * failure being fixed. See scripts/make-pitchboulder-hero.mjs.
+ *
+ * Because the new hero is the 2026-01-28 room, two images that were the SAME
+ * moment had to move or the page would run one photograph three times:
+ *   - the Wednesday-Room bleed  room-wide  → room-full (2026-04-29)
+ *   - the Context still         context-room → context-followus (2026-05-20)
+ * The page now spans four sessions instead of leaning on one.
+ */
+const hookPoster = pbMedia("hook-room-1600.avif") ?? `${base}/media/work/pitchboulder/hook-poster.avif`;
+const contextImage = pbMedia("context-followus-1600.webp") ?? `${base}/media/work/pitchboulder/context.avif`;
 const contextAlt =
-  "The PitchBoulder room mid-session — presenters at the front, the audience around the tables.";
-const contextCaption = "The room at work — January 28, 2026 session.";
+  "The PitchBoulder room from the back — attendees at long tables, the host on the mic, and the session's “Follow Us!” slide with its QR codes on both projector screens.";
+const contextCaption = "The room, and the slide that closes every session — May 20, 2026.";
 const askThumbSrc = pbMedia("ask-thumb-900.webp");
 const askThumb = askThumbSrc
   ? {
@@ -99,7 +111,9 @@ const wrFollowUs = wrShot("followus-handoff");
 // archive, which had 98 .ARW files and only 5 ever exported. See
 // scripts/make-pitchboulder-wednesday-room-v2.mjs for the extraction method
 // and the selection notes.
-const wrRoomWide = wrShot("room-wide");
+// v3: the bleed moved off `room-wide` (2026-01-28) because that moment is now
+// the page hero — `room-full` is the 2026-04-29 room instead.
+const wrRoomWide = wrShot("room-full");
 const wrAfter = wrShot("after-the-pitch");
 const wrCloseSlide = wrShot("close-slide");
 
@@ -167,7 +181,7 @@ const LEDGER = [
     contextCaption={contextCaption}
     askThumb={askThumb}
     workPull={workPull}
-    hookCredit="On the wall: Alana Arnold, MD, MBA pitching PEMPal — Boulder Startup Week session, May 6, 2026"
+    hookCredit="The Wednesday room at Galvanize — January 28, 2026"
   />
 
   <section class="wr" aria-label="The Wednesday Room">
@@ -245,12 +259,12 @@ const LEDGER = [
             <source type="image/webp" srcset={wrRoomWide.webp} sizes="100vw" />
             <img
               src={wrRoomWide.src}
-              alt="The PitchBoulder room from the back of the long tables — roughly twenty-five attendees seated with laptops and notebooks, two presenters standing at the projector screen at the far right."
+              alt="The PitchBoulder room seen wide — attendees at long tables watching a founder present from the far right of the room."
               loading="lazy"
               decoding="async"
             />
           </picture>
-          <figcaption class="wr-cap wr-bleed-cap">A full room, 9:00 AM on a Wednesday — January 28, 2026.</figcaption>
+          <figcaption class="wr-bleed-cap wr-cap">A different Wednesday, the same shape — April 29, 2026.</figcaption>
         </figure>
       )
     }

@@ -27,3 +27,5 @@ Thumbs.db
 .chrome-lhci/
 .claude/
 _measure-results.json
+_wf-judge-out/
+_wf-hero-out/
