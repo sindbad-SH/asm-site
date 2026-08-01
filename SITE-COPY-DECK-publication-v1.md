@@ -21,7 +21,8 @@ individually.
 | Navigation (site-wide) | 1 |
 | Home (`/`) | 3 |
 | /about | 12 |
-| /adventure | 2 + 3 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) |
+| /adventure | 2 + 3 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) + 6 (2026-07-31 visual upgrade) |
+| /adventure/vybe (new page) | 14 (2026-07-31 visual upgrade) |
 | /venture | 7 + 5 (PUB-E) |
 | /work (archive index) | 10 + 1 (PUB-E) |
 | /work/seriesfest | 1 |
@@ -31,7 +32,7 @@ individually.
 | /world | 3 |
 | Footer (site-wide) | 3 |
 | Base layout default (site-wide fallback) | 1 |
-| **Total** | **79 + 15 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) = 118** |
+| **Total** | **79 + 15 (PUB-E) + 8 (POSTCARD) + 16 (POSTCARD2) + 20 (2026-07-31 visual upgrade) = 138** |
 
 Plus: 1 data-classification flip (Vybe, /adventure ↔ /venture — no copy
 string changed) and ~20 structural href-only fixes (redirect-hop removal),
@@ -394,6 +395,204 @@ renders between the Steel & Dust festival spread and Postcards, all 6 photos
 `200 OK`, zero console errors, and the old "From the Archive" content (plus
 the now-orphaned Nordic-Daughter/Something-for-Tomorrow/Brazilian-Living
 duplicate tiles) confirmed absent from the built HTML.
+
+---
+
+## 2026-07-31 — adventure-page visual upgrade (operator direct review)
+
+Operator set the medieval-festival spread as the quality bar for the whole
+page: "everything else must rise toward it at its appropriate scale." Four
+changes this pass, each detailed below — (1) the placeholder festival name
+fixed to the real, web-verified event name; (2) the VYBE section rebuilt a
+second time into an actual magazine-cover teaser + a new rich click-through
+page (the section shipped 2026-07-31 above was itself the *first* pass,
+flagged by the operator as still "bland — photos laid out in a couple");
+(3) two postcards merged per operator instruction, with a new structured
+cross-link; (4) a framing swap on the Something for Tomorrow postcard, plus
+a magazine-cover redesign of every postcard tile/detail page. Screenshots
+taken confirming all four render correctly (adventure.astro, the new
+/adventure/vybe page, and both affected /postcards/[slug] pages).
+
+### 1. The Colorado Medieval Festival — placeholder name fixed
+
+**The problem.** The festival teaser block on `/adventure` used a generic
+placeholder description instead of the event's real name — everywhere else
+on the site (the full `steel-and-dust` story page, its `consts.ts` `steelDust`
+copy block, `territory.ts`'s comment) already correctly said "Colorado
+Medieval Festival"; only this one teaser hadn't been updated to match.
+
+**Verification.** Already confirmed once in `ADVENTURE-ARCHIVE-MINE.md`
+(coloradocastle.com, colorado.com/loveland/events/history-heritage/
+colorado-medieval-festival, tickettailor.com/events/thesavagewoodsllc). Per
+this task's instruction, re-verified via a fresh web search 2026-07-31:
+event runs annually in June at The Savage Woods, 1750 Savage Road, Loveland,
+CO; Knights of Mayhem full-contact jousting, Colorado Wardens armored
+combat, live music, artisan vendors — matches the site's existing sourced
+copy exactly. Sources: coloradocastle.com, colorado.com, tickettailor.com,
+festivalnet.com, denver.kidsoutandabout.com.
+
+| Field (`consts.ts`, `PAGES.adventure.festival`) | Old line | New line | Flag |
+|---|---|---|---|
+| heading | "A medieval festival in Loveland" | **"The Colorado Medieval Festival"** | ⚠ |
+
+**Structural notes:** kicker ("Adventure story · Loveland, Colorado") and
+body paragraph were already generic/factual with no misnaming, so left
+unchanged. `territory.ts`'s Loveland location dot already correct (a place
+name, not the event name — no change needed).
+
+### 2. VYBE section v2 — magazine-cover teaser + new `/adventure/vybe` page
+
+**The problem.** The 2026-07-31 VYBE section documented just above this one
+(the section titled "VYBE section (2026-07-31)") was itself flagged by the
+operator on a second read as still falling short of the medieval-festival
+bar: "too bland — photos laid out in a couple." Explicit ask: a
+magazine-cover treatment in the `/adventure` section (matching the
+festival's cover-teaser grammar) AND a genuinely richer click-through page —
+not the plain `/work/vybe` case page.
+
+**What changed.** The six-photo uniform grid + 3-paragraph block on
+`/adventure` is replaced by a compact teaser matching A4b's `fest-teaser`
+pattern exactly: a mini cover (bespoke — no "Field Notes" masthead, since
+Vybe isn't a numbered Field Notes issue) + two supporting stills + one
+condensed paragraph + CTA. The CTA and footer link now point at a new page,
+`/adventure/vybe.astro` (not `/work/vybe`), built in the Steel & Dust
+editorial grammar (asymmetric photo staggers, a pull quote, a contained
+"bleed" band) at a lighter scale — two chapters (2023 festival / 2024 Boogie
+Lights), the existing `/work/vybe` golden-hour aerial clip reused as the
+first visual after the open, and nine photos total (up from six — three new
+frames from the same already-graded contact sheet).
+
+| Field | New text | Flag |
+|---|---|---|
+| `/adventure` teaser — cover title | **"Vybe"** | ⚠ |
+| `/adventure` teaser — cover deck | "Two nights with a Denver arts, music, and dance collective." | ⚠ |
+| `/adventure` teaser — condensed intro paragraph | "Vybe — short for Vibrate Your Best Energy — is a Denver arts, music, and dance collective I've known since 2023. I've covered two of their nights since — the 2023 outdoor festival beside a lake, and the 2024 Boogie Lights show — camera coverage only, nothing official." | ⚠ |
+| `/adventure/vybe` — cover kicker/title/deck | "Adventure story · coverage" / "In the room with Vybe." (reused) / "Two nights with a Denver arts, music, and dance collective — an outdoor festival by a lake, and a room full of Boogie Lights the following spring." | ⚠ |
+| `/adventure/vybe` — chapter labels + captions | "2023 — The festival" / "2024 — Boogie Lights" + ~10 photo/video captions (e.g. "The grounds, Sunday morning.", "Fire staff, Sunday afternoon.", "The Chillsbury Doughboys, from the balcony.") | ⚠ |
+| `/adventure/vybe` — sign-off | "The short version, on /work →" (→ `/work/vybe`) | ⚠ |
+
+**New assets** (three frames added to `scripts/make-vybe-section.mjs`, same
+already-culled/graded source set, `C:/builds/asm/SAMPLES/photos/vybe/`):
+
+| Slug | Source | What |
+|---|---|---|
+| `band-golden-flare` | `vybe-08_band-golden-flare.jpg` | Live band at golden hour, 2023 festival — "the best 'peak moment' band shot in the 2-day set" per the source contact sheet. No band name is verified anywhere in the source material, so the caption stays generic ("a band") — nothing invented. |
+| `fire-staff-spin` | `vybe-09_fire-staff-spin.jpg` | Fire-staff flow performer, daylight, 2023 festival. |
+| `boogie-chillsbury-doughboys` | `vybe-11_boogie-chillsbury-doughboys.jpg` | Wide balcony shot at the 2024 Boogie Lights show — the performing act's name is real, read directly off the venue's own stage signage in frame. |
+
+All three are performers-while-performing (same releases-restraint
+precedent as the site's Nordic Daughter / Something for Tomorrow postcards).
+Two other candidates from the same contact sheet (`vybe-13`,
+`vybe-14` — backstage/candid guest portraits, not performers) were reviewed
+and deliberately left out, continuing the original section's restraint
+rule.
+
+**Structural notes:** new component `src/components/PostcardCover.astro`
+is NOT used here (Vybe's cover is bespoke, matching `.fest-cover`'s
+pattern directly in `adventure.astro`, since PostcardCover's grammar is
+reserved for the lighter Postcards tier). `/work/vybe.astro` (the shorter
+case-page version) is untouched and still reachable — from the new page's
+sign-off, and still listed on the flat `/work` archive index.
+
+**Verification:** `npx astro check` 0 errors; `npx astro build` green (46
+pages, honesty-audit passed); confirmed live on the dev server — teaser
+renders correctly on `/adventure`, `/adventure/vybe` renders all 9 photos +
+the video clip at `200 OK`, zero console errors on either page. Screenshots
+taken of both.
+
+### 3. Postcards — Scandinavian Midsummer Festival merged into Nordic Daughter
+
+**Operator instruction:** "MERGE the scandinavian-midsummer-festival
+postcard (currently only Valkyrie dancers) INTO the nordic-daughter one —
+same festival, one postcard telling both (dancers + band). Add a cross-link:
+Nordic Daughter's frontman also fronts Something for Tomorrow → 'see that
+story' linking to the SfT postcard."
+
+**What changed** (`src/data/postcards.ts`): the standalone
+`scandinavian-midsummer-festival` postcard (dance troupe + vendor row, 7
+photos) is retired; its dance-troupe and market paragraphs/photos fold into
+the surviving `nordic-daughter` postcard (slug and title kept, per the
+operator's own naming of the merge target), reordered so the piece opens on
+"that's how I first met them" instead of stating it twice. Nothing was
+reworded beyond that reordering — every sentence already existed in one of
+the two pre-merge entries. The `location` field now leads with the festival
+name ("Scandinavian Midsummer Festival · Parfet Park, Golden, Colorado") so
+the merged scope reads clearly on the tile, since the postcard is no longer
+just about the band.
+
+| Field | Old | New | Flag |
+|---|---|---|---|
+| location | "Parfet Park, Golden, Colorado" | **"Scandinavian Midsummer Festival · Parfet Park, Golden, Colorado"** | ⚠ |
+| date | "2024-06" (coarse) | **"2024-06-16"** (the closing day — matches the merged-in scene-setting paragraph, which specifically describes that day) | ⚠ |
+| paragraphs | 2 (band only) | **5** — opens with arrival/scene-setting (dance stage + market + "that's how I first met them"), the dance-troupe paragraph, the market paragraph, the band paragraph, the closing "one continuous set" paragraph | ⚠ |
+| photos | 2 (`festival-set`, `festival-strings`) | **8** — adds the six dance/market frames (`formation`, `motion`, `closeup`, `overview`, `stalls`, `parasols`), copied from the retired postcard's media directory | reuse |
+| new field | — | **`related: { slug: "something-for-tomorrow", label: "Jason Lycan's other band, Something for Tomorrow — see that story" }`** — a real clickable CTA on the detail page, not just the existing prose mention | ⚠ |
+| new field | — | **`pullQuote`** (verbatim, lifted from paragraph 5): "From the crowd it read as one continuous set — violin and vocals trading the melody, the drummer and keyboardist filling in behind, the whole tent full for it." | reuse (extracted, not new) |
+
+**Reciprocal cross-link (not explicitly instructed, added for symmetry —
+low-risk, reuses the same mechanism):** Something for Tomorrow's postcard
+gains `related: { slug: "nordic-daughter", label: "Jason Lycan's other
+band, Nordic Daughter — see that story" }` and a `pullQuote` ("The room ran
+blue, then red, then green as the set went on.") — its own paragraphs
+already mentioned Nordic Daughter, so this just makes the connection
+clickable both ways.
+
+**Media:** the six migrated photo files were copied (not re-baked) from
+`public/media/adventure/postcards/scandinavian-midsummer-festival/` to
+`.../nordic-daughter/`, then the old directory was deleted.
+`scripts/make-postcards.mjs`'s header documents the supersession for anyone
+re-running it from scratch.
+
+### 4. Something for Tomorrow postcard — framing swap + Postcards redesign
+
+**The problem (operator, photo pick, not a fact correction):** "SfT
+postcard — KEEP the middle photo and the right green-lit photo showing the
+main vocalist; REPLACE the left one (badly framed) with a better-framed
+frame from the same SfT set." The `stage-wide` (left) frame had the
+guitarist pushed to the extreme right edge, partially cropped, with an
+otherwise-empty frame dominated by the drum kit.
+
+**What changed:** re-grabbed from the same source (`Rickhouse
+7-7-2024.mp4`, t=38s — the same edited cut the kept middle/right frames
+came from) and manually cropped — NOT the usual sharp "attention" auto-crop,
+which was tried first and reproduced the identical edge-crop failure.
+Jason Lycan is now centered, the venue screen with the band's name is still
+fully readable above him, and the drummer is visible in context.
+
+| Field | Old | New | Flag |
+|---|---|---|---|
+| `stage-wide` alt text | "Something for Tomorrow performing at The Rickhouse, the venue's screen displaying the band's name behind the drum riser." | **"Something for Tomorrow's Jason Lycan singing and playing guitar at The Rickhouse, the venue's screen displaying the band's name above the stage, the drummer visible behind him."** | ⚠ |
+
+The middle (`stage-bassist`) and right (`stage-hero`, green-lit) frames are
+byte-for-byte unchanged, per the operator's explicit instruction to keep
+them.
+
+**Postcards — tile + detail-page magazine-cover redesign (all three
+postcards, structural + typography, not new prose).** New shared component
+`src/components/PostcardCover.astro` — a smaller, non-"Field Notes"-branded
+FieldCover-derived cover treatment (lead photo + scrim + corner survey
+marks + mono kicker/title/location baked into the image), used in two
+sizes: `compact` for the `/adventure` tile (replacing the old bordered card
+with a 3-photo strip + separate text block) and full-size as each
+`/postcards/[slug]` detail page's new hero (replacing the old plain text
+header). Each detail page also gained: the optional `pullQuote` rendered as
+a large-type callout partway through the prose ("a pull-line... not a full
+spread"); a gallery where the first supporting photo runs wider than the
+rest ("more photos, well laid out" instead of a perfectly uniform grid);
+and the `related` cross-link CTA where present. No visible prose changed on
+Brazilian Living (no merge, no framing issue, no cross-link target) beyond
+gaining a pull-quote (extracted verbatim from its own existing paragraph
+3: "Another dancer, in a shorter blue-feathered piece, had the space to
+herself, mid-stride, all motion.") and the new cover/gallery layout.
+
+**Verification:** `npx astro check` 0 errors; `npx astro build` green (46
+pages — 3 postcard pages, confirming the merge left exactly three, down
+from four; honesty-audit passed); confirmed live on the dev server for
+`/adventure` (postcard tiles), `/postcards/nordic-daughter`, and
+`/postcards/something-for-tomorrow` — covers, pull-quotes, wide gallery
+photo, and related-postcard CTAs all render correctly with the re-framed
+image in place, `200 OK` on every asset, zero console errors. Screenshots
+taken of both postcard detail pages.
 
 ---
 
