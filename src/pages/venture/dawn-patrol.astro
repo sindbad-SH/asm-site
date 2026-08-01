@@ -18,6 +18,22 @@
  * scripts/make-dawn-patrol.mjs header note. Zero images on this page repeat
  * anywhere else in public/media/**.
  *
+ * LAYOUT-OVERHAUL P4 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md): the audit
+ * found THREE pages running the identical newsstand rhythm (steel-and-dust →
+ * vybe → this page) — formulaic template, one level above the operator's
+ * original complaint. This page de-formalizes toward the Atavist text-led
+ * dispatch it already leans to, with the smallest diff that breaks the
+ * triplet: (1) the two corner plates are dropped — the cover reads as an
+ * Alpinist full-bleed opener, not a newsstand rack; (2) the pull quote is
+ * de-overlapped to a plain full-width bold line (Atavist device 8), not the
+ * sd-family shadowed plate; (3) the Ferrari stagger becomes an equal-height
+ * DIPTYCH with one shared caption (Atavist device 4); (4) afterVideo +
+ * beforeLight now run as one unbroken 2-paragraph stretch before the first
+ * stagger (chronology unchanged; a 3rd paragraph would require moving the
+ * video, which the video-first operator rule forbids). Everything else —
+ * video-first, field log + honesty footnote, the bleed, all captions, the
+ * zero-repeats rule — is untouched.
+ *
  * HONESTY: the only relationship claim renders via <LegendMark> from
  * RELATIONSHIPS["pebble-beach"].permittedPhrasing (verbatim). The sign-off
  * attribution composes from the WORK record, gating `engagement` exactly like
@@ -50,7 +66,8 @@ function photo(slug: string) {
   };
 }
 const cover = photo("transporter-row-predawn");
-const plates = dp.cover.plates.map((p) => ({ ...p, media: photo(p.slug) })).filter((p) => p.media);
+// P4: cover plates no longer render (newsstand furniture dropped — see the
+// layout-overhaul note above). dp.cover.plates stays in consts untouched.
 const beforeA = photo("paddock-tent-first-light");
 const beforeB = photo("cobra-in-the-staging-line");
 const bleed = photo("eighteenth-green-sunrise");
@@ -114,19 +131,6 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
         </ul>
       </div>
 
-      {
-        plates.map((p, i) => (
-          <figure class={`dp-plate dp-plate--${i === 0 ? "l" : "r"}`} data-reveal aria-hidden="true">
-            <picture>
-              <source type="image/avif" srcset={p.media!.avif} sizes="220px" />
-              <source type="image/webp" srcset={p.media!.webp} sizes="220px" />
-              <img src={p.media!.src} alt="" loading="lazy" decoding="async" />
-            </picture>
-            <figcaption class="hud-label">{p.label}</figcaption>
-          </figure>
-        ))
-      }
-
       <p class="dp-cue hud-label" aria-hidden="true">{dp.cover.scrollCue} ↓</p>
     </section>
 
@@ -163,8 +167,12 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
           </section>
         )
       }
+      <!-- P4: afterVideo + beforeLight run as ONE unbroken text stretch (the
+           Atavist text-led signature) before the first image pair; chronology
+           unchanged (the pass, then the pre-dawn queue). -->
       <div class="dp-col space-y-6 pt-4">
         <p class="text-lg text-ink" data-reveal>{dp.afterVideo}</p>
+        <p class="text-lg text-ink" data-reveal>{dp.beforeLight}</p>
       </div>
 
       <!-- PASS ONE — before light: asymmetric stagger -->
@@ -196,9 +204,6 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
             </div>
           )
         }
-        <div class="dp-col dp-inline-para-wrap">
-          <p class="text-lg text-ink" data-reveal>{dp.beforeLight}</p>
-        </div>
       </section>
 
       <!-- pull quote — overlaps the stagger above -->
@@ -355,31 +360,34 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
           <p class="text-lg text-ink" data-reveal>{dp.field}</p>
         </div>
       </section>
+      <!-- P4: the Ferraris as an equal-height DIPTYCH — two related frames
+           grouped as ONE beat with a shared caption (Atavist device 4),
+           replacing the third stagger module. -->
       {
         (ferrariA || ferrariB) && (
           <section class="mx-auto max-w-5xl px-8 pt-4">
-            <div class="dp-stagger">
-              {ferrariA && (
-                <figure class="dp-photo dp-stagger-a" data-reveal>
+            <figure class="dp-diptych" data-reveal>
+              <div class="dp-diptych-row">
+                {ferrariA && (
                   <picture>
-                    <source type="image/avif" srcset={ferrariA.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    <source type="image/webp" srcset={ferrariA.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    <img src={ferrariA.src} alt="Three-quarter view of a red Ferrari 250 LM race car, number 8, with a green ribbon on the hood, spectators behind" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    <source type="image/avif" srcset={ferrariA.avif} sizes="(min-width: 1024px) 44vw, 90vw" />
+                    <source type="image/webp" srcset={ferrariA.webp} sizes="(min-width: 1024px) 44vw, 90vw" />
+                    <img src={ferrariA.src} alt="Three-quarter view of a red Ferrari 250 LM race car, number 8, with a green ribbon on the hood, spectators behind" style="aspect-ratio:3/2;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
-                  <figcaption class="dp-cap hud-label">{dp.captions.ferrariA}</figcaption>
-                </figure>
-              )}
-              {ferrariB && (
-                <figure class="dp-photo dp-stagger-b" data-reveal data-reveal-stagger="80">
+                )}
+                {ferrariB && (
                   <picture>
-                    <source type="image/avif" srcset={ferrariB.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <source type="image/webp" srcset={ferrariB.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <img src={ferrariB.src} alt={`Head-on view of a red Ferrari 250 LM, race number 7, with a UK registration plate reading "499FX," a dense crowd behind`} style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    <source type="image/avif" srcset={ferrariB.avif} sizes="(min-width: 1024px) 44vw, 90vw" />
+                    <source type="image/webp" srcset={ferrariB.webp} sizes="(min-width: 1024px) 44vw, 90vw" />
+                    <img src={ferrariB.src} alt={`Head-on view of a red Ferrari 250 LM, race number 7, with a UK registration plate reading "499FX," a dense crowd behind`} style="aspect-ratio:3/2;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
-                  <figcaption class="dp-cap hud-label">{dp.captions.ferrariB}</figcaption>
-                </figure>
-              )}
-            </div>
+                )}
+              </div>
+              {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new shared caption
+                  (composed from the two existing per-frame captions; facts
+                  unchanged), staging-only until read. */}
+              <figcaption class="dp-cap hud-label">Ferrari 250 LMs — race No. 8 already ribboned, No. 7 with a UK plate still on the nose.</figcaption>
+            </figure>
           </section>
         )
       }
@@ -551,33 +559,6 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
     font-size: 0.5em;
     vertical-align: 20%;
   }
-  .dp-plate {
-    display: none;
-    margin: 0;
-    position: absolute;
-    z-index: 2;
-    bottom: 1.4rem;
-    width: clamp(120px, 15vw, 190px);
-  }
-  @media (min-width: 900px) {
-    .dp-plate { display: block; }
-    .dp-plate--l { left: 1.4rem; transform: rotate(-2deg); }
-    .dp-plate--r { right: 1.4rem; transform: rotate(2deg); }
-  }
-  .dp-plate picture img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-  }
-  .dp-plate figcaption {
-    margin-top: 0.4rem;
-    font-size: 0.52rem;
-    text-align: center;
-    color: color-mix(in srgb, #fff 65%, transparent);
-  }
   .dp-cue {
     position: absolute;
     z-index: 2;
@@ -638,22 +619,28 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
     padding-right: 0.12em;
     color: var(--color-accent);
   }
+  /* P4: the pull quote is a plain full-width bold line on its own beat
+     (Atavist device 8) — no panel, no shadow, no overlap. The .panel class
+     on the blockquote is neutralized below rather than removed from markup
+     so the copy-deck diff stays minimal. */
   .dp-pull-wrap {
     position: relative;
     z-index: 2;
-    margin-top: -1.5rem;
+    margin-top: 1.5rem;
   }
-  @media (min-width: 1024px) { .dp-pull-wrap { margin-top: -3.25rem; } }
-  .dp-pull {
-    padding: 1.4rem 1.6rem;
-    border-left: 2px solid var(--color-accent);
+  .dp-pull,
+  .dp-pull.panel {
+    padding: 0.4rem 0;
+    border: none;
+    background: none;
     font-family: var(--font-display);
     font-style: italic;
-    font-weight: 480;
-    font-size: clamp(1.3rem, 3vw, 1.7rem);
-    line-height: 1.35;
+    font-weight: 560;
+    font-size: clamp(1.4rem, 3.1vw, 2rem);
+    line-height: 1.3;
+    text-align: center;
     color: var(--color-peak);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+    box-shadow: none;
   }
   .dp-stagger {
     display: grid;
@@ -663,7 +650,17 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
   }
   .dp-stagger--flip { grid-template-columns: 34fr 58fr; }
   .dp-stagger-b { margin-top: 3rem; }
-  .dp-inline-para-wrap { margin-top: 1rem; }
+  /* P4: equal-height diptych — two related frames as one grouped beat */
+  .dp-diptych { margin: 0; }
+  .dp-diptych-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  .dp-diptych-row img { border-radius: 8px; }
+  @media (max-width: 640px) {
+    .dp-diptych-row { grid-template-columns: 1fr; }
+  }
   @media (max-width: 860px) {
     .dp-stagger, .dp-stagger--flip { grid-template-columns: 1fr; }
     .dp-stagger-b { margin-top: 0; width: 82%; justify-self: end; }
