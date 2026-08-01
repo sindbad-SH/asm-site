@@ -62,7 +62,7 @@ const pbMedia = (file: string) =>
  *
  * Because the new hero is the 2026-01-28 room, two images that were the SAME
  * moment had to move or the page would run one photograph three times:
- *   - the Wednesday-Room bleed  room-wide  → room-full (2026-04-29)
+ *   - the Wednesday-Room bleed  room-wide  → (now room-about, see v3 below)
  *   - the Context still         context-room → context-followus (2026-05-20)
  * The page now spans four sessions instead of leaning on one.
  */
@@ -103,8 +103,24 @@ function wrShot(slug: string) {
     src: url(900, "webp"),
   };
 }
+/**
+ * v3 (2026-08-01) — three operator rejections answered. See
+ * scripts/make-pitchboulder-wednesday-room-v3.mjs for the reasoning:
+ *   - the band is now `room-about` (square-on from the BACK of the room, a
+ *     genuinely different vantage from the hero, "About PitchBoulder" legible
+ *     on both screens) — the April 29 frame it replaces read "too similar to
+ *     the hero";
+ *   - `after-the-pitch` is re-baked from DSC08315 (one clear subject, sharp,
+ *     eyes open) instead of the squinting frame;
+ *   - the closing image is DROPPED rather than replaced — every candidate in
+ *     the archive repeated the same two men, and the chapter closes better on
+ *     the season list than on a filler frame;
+ *   - `origami-title` replaces `leyden-space-title` so Ashle Jantzen appears
+ *     once, not twice.
+ * Net: every person on this page now appears exactly once.
+ */
 const wrHero = wrShot("leyden-space-hero");
-const wrLeydenTitle = wrShot("leyden-space-title");
+const wrOrigamiTitle = wrShot("origami-title");
 const wrPerlionTitle = wrShot("perlion-title");
 const wrFollowUs = wrShot("followus-handoff");
 // v2 (2026-08-01) — three frames lifted from the 2026-01-28 session's RAW
@@ -112,10 +128,9 @@ const wrFollowUs = wrShot("followus-handoff");
 // scripts/make-pitchboulder-wednesday-room-v2.mjs for the extraction method
 // and the selection notes.
 // v3: the bleed moved off `room-wide` (2026-01-28) because that moment is now
-// the page hero — `room-full` is the 2026-04-29 room instead.
-const wrRoomWide = wrShot("room-full");
+// the page hero. v3 replaced it again with `room-about` (a different vantage).
+const wrRoomWide = wrShot("room-about");
 const wrAfter = wrShot("after-the-pitch");
-const wrCloseSlide = wrShot("close-slide");
 
 const WEDNESDAY_ROOM = {
   kicker: "The Wednesday Room",
@@ -129,42 +144,49 @@ const WEDNESDAY_ROOM = {
   afterPitch:
     "The pitch is the part people photograph. The part that actually does the work happens after it: the presenter comes down off the screen and the room re-forms around them in twos and threes, and the questions that were too specific to ask in front of forty people get asked.",
   ledgerIntro:
-    "Every one of those Wednesdays leaves a file. This is the 2026 season as it exists on the drive — one delivered recording per session, named for whoever took the front of the room.",
+    "Who actually took the front of the room in 2026. Where there's a write-up, it's linked — those live on LinkedIn, not here.",
 };
 
 /**
- * THE 2026 LEDGER — built by listing the delivered session recordings in
- * E:\Pitch Boulder\2026 Recordings (one named master per Wednesday), NOT from
- * memory or from the LinkedIn recaps. Sessions whose export carries no company
- * name are listed by date with the label left blank rather than guessed.
+ * THE 2026 SEASON — company names come from the delivered session recordings in
+ * E:\Pitch Boulder\2026 Recordings (one named master per Wednesday), never from
+ * memory. `href` links the sessions he actually wrote up, and those write-ups
+ * live on LinkedIn — this page deliberately does NOT rehost them. Each URL was
+ * matched by date: his recaps say "last Wednesday", so a post dated e.g.
+ * 2026-03-09 maps to the 2026-03-04 session. Verified against the post archive
+ * at C:\builds\asm\LINKEDIN-POSTS.md. Sessions with no write-up on file carry
+ * no link; sessions whose export had no company name are resolved from the
+ * recap where one exists (Jul 1 / Jul 8 / Jul 22) and left blank where none
+ * does (Jun 24) rather than guessed.
  */
+const LI = "https://www.linkedin.com/feed/update/urn:li:activity:";
 const LEDGER = [
   { d: "Jan 14", co: "Career Ops" },
   { d: "Jan 21", co: "PJ Pickup Play" },
   { d: "Jan 28", co: "Hummingbird AI" },
   { d: "Feb 4", co: "Sagittarius Logistics" },
-  { d: "Feb 18", co: "Origami Motion" },
-  { d: "Feb 25", co: "NeuroGeneces" },
-  { d: "Mar 4", co: "Actuate" },
-  { d: "Mar 11", co: "Aika" },
-  { d: "Mar 18", co: "OncoPatch" },
+  { d: "Feb 18", co: "Origami Motion", href: `${LI}7431744706184720384/` },
+  { d: "Feb 25", co: "NeuroGeneces", href: `${LI}7434666417595142144/` },
+  { d: "Mar 4", co: "Actuate", href: `${LI}7436803006056185856/` },
+  { d: "Mar 11", co: "Aika", href: `${LI}7439339729952604161/` },
+  { d: "Mar 18", co: "OncoPatch", href: `${LI}7441876452704268288/` },
   { d: "Mar 25", co: "PickleMatch" },
   { d: "Apr 1", co: "PixelPay" },
   { d: "Apr 8", co: "Retrocycle" },
   { d: "Apr 15", co: "Amplified Space" },
   { d: "Apr 22", co: "Pristino Labs" },
-  { d: "Apr 29", co: "Perlion" },
-  { d: "May 6", co: "PEMPal" },
-  { d: "May 13", co: "Momease Solutions" },
-  { d: "May 20", co: "NoLimitRobotics" },
-  { d: "May 27", co: "DoorBotics" },
-  { d: "Jun 3", co: "Angld.AI" },
-  { d: "Jun 10", co: "Veery" },
-  { d: "Jun 17", co: "Nobility Space" },
+  { d: "Apr 29", co: "Perlion", href: `${LI}7457096795706478592/` },
+  { d: "May 6", co: "PEMPal", href: `${LI}7459980841486569472/` },
+  { d: "May 13", co: "Momease Solutions", href: `${LI}7462155048475611136/` },
+  { d: "May 20", co: "NoLimitRobotics", href: `${LI}7464691825614741505/` },
+  { d: "May 27", co: "DoorBotics", href: `${LI}7467228523712126976/` },
+  { d: "Jun 3", co: "Angld.AI", href: `${LI}7469765230886125569/` },
+  { d: "Jun 10", co: "Veery", href: `${LI}7472301932305334272/` },
+  { d: "Jun 17", co: "Nobility Space", href: `${LI}7474838710073851904/` },
   { d: "Jun 24", co: "—" },
-  { d: "Jul 1", co: "—" },
-  { d: "Jul 8", co: "—" },
-  { d: "Jul 22", co: "—" },
+  { d: "Jul 1", co: "Arkana Therapeutics", href: `${LI}7477399943255699456/` },
+  { d: "Jul 8", co: "GIFD", href: `${LI}7482844808185683968/` },
+  { d: "Jul 22", co: "AquaPuck", href: `${LI}7487934806463369216/` },
 ] as const;
 ---
 
@@ -221,16 +243,16 @@ const LEDGER = [
       <p class="wr-para">{WEDNESDAY_ROOM.paragraphs[2]}</p>
 
       {
-        (wrLeydenTitle || wrPerlionTitle) && (
+        (wrOrigamiTitle || wrPerlionTitle) && (
           <div class="wr-duo">
-            {wrLeydenTitle && (
+            {wrOrigamiTitle && (
               <figure class="wr-duo-fig">
                 <picture>
-                  <source type="image/avif" srcset={wrLeydenTitle.avif} sizes="(max-width: 760px) 48vw, 20rem" />
-                  <source type="image/webp" srcset={wrLeydenTitle.webp} sizes="(max-width: 760px) 48vw, 20rem" />
-                  <img src={wrLeydenTitle.src} alt="A projected title slide reading 'Leyden Space — Pitch Boulder Alumni Update — Founder: Ashle Jantzen,' with Jantzen standing at the podium in front of it." loading="lazy" decoding="async" />
+                  <source type="image/avif" srcset={wrOrigamiTitle.avif} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <source type="image/webp" srcset={wrOrigamiTitle.webp} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <img src={wrOrigamiTitle.src} alt="A founder in red presents beside a projected title slide reading 'origami — The First Smart Cabinet to Autonomously Fold Laundry,' with a rendering of the cabinet beside the text." loading="lazy" decoding="async" />
                 </picture>
-                <figcaption class="wr-cap">The title slide that confirms who's back at the podium, and why.</figcaption>
+                <figcaption class="wr-cap">“The first smart cabinet to autonomously fold laundry” — February 18.</figcaption>
               </figure>
             )}
             {wrPerlionTitle && (
@@ -240,7 +262,7 @@ const LEDGER = [
                   <source type="image/webp" srcset={wrPerlionTitle.webp} sizes="(max-width: 760px) 48vw, 20rem" />
                   <img src={wrPerlionTitle.src} alt="A projected title slide reading 'Perlion — Sunscreen Active Ingredients — Logan Chang, CEO,' with Chang standing beside a whiteboard to the right of the screen." loading="lazy" decoding="async" />
                 </picture>
-                <figcaption class="wr-cap">Logan Chang, CEO of Perlion — three weeks earlier, same podium.</figcaption>
+                <figcaption class="wr-cap">Logan Chang, CEO of Perlion — ten weeks later, same podium.</figcaption>
               </figure>
             )}
           </div>
@@ -259,12 +281,12 @@ const LEDGER = [
             <source type="image/webp" srcset={wrRoomWide.webp} sizes="100vw" />
             <img
               src={wrRoomWide.src}
-              alt="The PitchBoulder room seen wide — attendees at long tables watching a founder present from the far right of the room."
+              alt="The PitchBoulder room from the back, looking square-on at the front wall — roughly eighteen attendees seated either side of a centre aisle, the host standing between two projector screens that both read “About PitchBoulder”."
               loading="lazy"
               decoding="async"
             />
           </picture>
-          <figcaption class="wr-bleed-cap wr-cap">A different Wednesday, the same shape — April 29, 2026.</figcaption>
+          <figcaption class="wr-bleed-cap wr-cap">Every session opens the same way: what this room is, and how it works — April 29, 2026.</figcaption>
         </figure>
       )
     }
@@ -279,39 +301,37 @@ const LEDGER = [
             <picture>
               <source type="image/avif" srcset={wrAfter.avif} sizes="(max-width: 760px) 70vw, 17rem" />
               <source type="image/webp" srcset={wrAfter.webp} sizes="(max-width: 760px) 70vw, 17rem" />
-              <img src={wrAfter.src} alt="An attendee in a grey sweater talking mid-sentence after the pitch, seen past the shoulder of the person he is speaking with." loading="lazy" decoding="async" />
+              <img src={wrAfter.src} alt="A founder mid-sentence, answering one person one-to-one after his pitch, the listener's hair filling the foreground and a plain grey wall behind." loading="lazy" decoding="async" />
             </picture>
-            <figcaption class="wr-cap">After the pitch, the room re-forms in twos and threes.</figcaption>
+            <figcaption class="wr-cap">One question, one answer, after the room has broken up.</figcaption>
           </figure>
         )}
       </div>
 
-      {wrCloseSlide && (
-        <figure class="wr-mid wr-mid--wide">
-          <picture>
-            <source type="image/avif" srcset={wrCloseSlide.avif} sizes="(max-width: 760px) 100vw, 46rem" />
-            <source type="image/webp" srcset={wrCloseSlide.webp} sizes="(max-width: 760px) 100vw, 46rem" />
-            <img src={wrCloseSlide.src} alt="Two founders standing beside their final slide, which reads 'Let's Connect' above a QR code and the name Humming Agent AI." loading="lazy" decoding="async" />
-          </picture>
-          <figcaption class="wr-cap">The last slide is always the same shape: a QR code and an ask — January 28, 2026.</figcaption>
-        </figure>
-      )}
+      {/* v3: the closing photograph was REMOVED, not replaced — see the note at
+          the top of this file. The chapter now closes on the season list. */}
 
-      {/* v2 — THE LEDGER: the scale claim, itemised from the delivered files. */}
+      {/* THE SEASON — the scale claim, itemised, linking out to the write-ups. */}
       <p class="wr-para">{WEDNESDAY_ROOM.ledgerIntro}</p>
-      <div class="wr-ledger" aria-label="PitchBoulder 2026 season — delivered session recordings">
-        <p class="hud-label wr-ledger-head">2026 season · delivered recordings</p>
+      <div class="wr-ledger" aria-label="PitchBoulder 2026 season — who presented">
+        <p class="hud-label wr-ledger-head">The 2026 season</p>
         <ol class="wr-ledger-list">
           {LEDGER.map((s) => (
             <li class={s.co === "—" ? "wr-ledger-row wr-ledger-row--blank" : "wr-ledger-row"}>
               <span class="wr-ledger-date">{s.d}</span>
-              <span class="wr-ledger-co">{s.co}</span>
+              {"href" in s && s.href ? (
+                <a class="wr-ledger-co wr-ledger-link" href={s.href} target="_blank" rel="noopener">
+                  {s.co} <span class="wr-ledger-out" aria-hidden="true">↗</span>
+                </a>
+              ) : (
+                <span class="wr-ledger-co">{s.co}</span>
+              )}
             </li>
           ))}
         </ol>
         <p class="wr-ledger-note">
-          One delivered master per Wednesday, named as filed. Four sessions ship without a company
-          label on the export — listed by date rather than guessed at.
+          Sixteen of these have a write-up. They're on LinkedIn, where the room already is —
+          arrows open them there.
         </p>
       </div>
 
@@ -452,13 +472,6 @@ const LEDGER = [
     .wr-aside { grid-template-columns: 1fr; }
     .wr-aside-fig { max-width: 17rem; }
   }
-  /* the close-slide frame runs wider than .wr-mid's 26rem */
-  .wr-mid--wide {
-    max-width: 100%;
-  }
-  .wr-mid--wide img {
-    aspect-ratio: 3 / 2;
-  }
   /* the season ledger — a filed record, set as a rule-separated list */
   .wr-ledger {
     margin: 0.6rem 0 0.2rem;
@@ -503,6 +516,22 @@ const LEDGER = [
   }
   .wr-ledger-row--blank .wr-ledger-co {
     color: var(--color-ink-muted);
+  }
+  /* linked sessions — the write-up lives on LinkedIn, so these leave the site */
+  .wr-ledger-link {
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 32%, transparent);
+    transition: border-color var(--dur-hover, 160ms) ease, color var(--dur-hover, 160ms) ease;
+  }
+  .wr-ledger-link:hover,
+  .wr-ledger-link:focus-visible {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+  .wr-ledger-out {
+    font-size: 0.7em;
+    opacity: 0.55;
+    vertical-align: 0.15em;
   }
   .wr-ledger-note {
     margin-top: 0.85rem;
