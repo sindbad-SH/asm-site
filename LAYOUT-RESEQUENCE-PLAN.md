@@ -7,13 +7,18 @@ STATUS: COMPLETE (2026-08-01). Inputs: SPEC-EDITORIAL-LAYOUT.md (C:\builds\asm\R
 
 - [x] P1 afm-2025 — c9b6bc2 (dev-verified: 10 widths, 0 standalone same-scale adjacencies, 12 captions)
 - [x] P2 seriesfest hub — 98fd027 (dev-verified: 4 distinct row layouts, ladder 1265/583/480/200/320)
-- [x] P4 dawn-patrol — 45822bd (dev-verified: 0 plates, 2 staggers + diptych, plain pull, h=5674)
+- [x] P4 dawn-patrol — 45822bd (settled h=6255 per the full-lazy-load harness; the earlier
+      5674 figure was measured before below-fold images loaded)
 - [x] P5 meme — 4623591 (dev-verified: paras3/pull/paras3/break/roster@576px)
-- [ ] P3 pitchboulder — photo mining (E:\Pitch Boulder 2026+2025) + identify/replace the
-      repeated room frame + prop-gated CaseStudy caption/pull-quote slots (Shelby-safe) +
-      LinkedIn READ-ONLY caption mining
-- [ ] Step 4: rebuild measure.mjs + adversarial critic pass over all 5 built pages
-- [ ] Step 5: push to staging ONLY after critic passes
+- [x] P3 pitchboulder — 58bcbfd + fix round: top-down frame retired everywhere, hook =
+      Alana Arnold/PEMPal (LinkedIn-verified READ-ONLY), context = DSC08304 after the
+      critic caught DSC08258 baking byte-identical to coworking-presenter (collision
+      guard now built into make-pitchboulder-variety.mjs), hook h1/credit text-shadow
+      contrast fix
+- [x] Step 4: measure.mjs rebuilt (headless-Chrome harness, committed) + adversarial
+      critic pass — CRITIC-REPORT.md: P1/P2/P4/P5 + non-regression + global PASS;
+      P3's one blocking finding (context-room collision) fixed above and re-verified
+- [ ] Step 5: push to staging ONLY after critic re-confirms the P3 fix
 
 NOTE (all builds): dev-server HMR served stale style modules after full-file rewrites —
 always restart the dev server before measuring. Browser-pane-hidden sessions never fire

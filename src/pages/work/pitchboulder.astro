@@ -200,6 +200,18 @@ const WEDNESDAY_ROOM = {
 </Base>
 
 <style>
+  /* CRITIC FIX (CRITIC-REPORT.md, non-blocking finding): the new hook frame
+     has a bright white slide area behind the title block — deepen the text
+     shadow on this page's hook h1 + credit so they hold contrast. Scoped
+     :global so it touches only THIS page's case hook (Shelby unaffected). */
+  :global(.case .hero-video__content h1) {
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85), 0 1px 4px rgba(0, 0, 0, 0.7);
+  }
+  :global(.case .case-hook-credit) {
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: #fff;
+  }
+
   .wr {
     background: color-mix(in srgb, var(--color-elevated) 55%, var(--color-base));
     border-top: 1px solid var(--color-hairline);

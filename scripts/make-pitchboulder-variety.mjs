@@ -33,38 +33,69 @@
 import sharp from "sharp";
 import { execSync } from "node:child_process";
 import { mkdir, rm } from "node:fs/promises";
-import { existsSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, statSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { join, basename } from "node:path";
 import { tmpdir } from "node:os";
 
 const WIDTHS = [900, 1600];
 const AVIF = { quality: 50, effort: 5 };
 const WEBP = { quality: 72, effort: 5 };
 
+// CRITIC FIX (2026-08-01, CRITIC-REPORT.md C2): the original context-room
+// pick (DSC08258) bakes BYTE-IDENTICAL to the pre-existing
+// coworking-presenter-* files (same source frame, baked 2026-07-12 under the
+// other name, rendered on /venture) — a cross-page repeat the first pass
+// missed. DSC08301 is likewise coworking-crowd. Re-picked to DSC08304 (same
+// pro-edited Jan-28 set, sharper per its own tier CSV, hash-verified clean
+// against every existing file). The collision GUARD below now enforces this
+// for every future bake.
 const PICKS = {
   "hook-podium": "E:/Pitch Boulder/Top photos for web build/_TIER 1 - TOP (make stories)/20260506_092416.jpg",
-  "context-room": "E:/Pitch Boulder/2026 Recordings/1-28-2026/Photos/Edited/_TIER 1 - TOP (make stories)/DSC08258.jpg",
+  "context-room": "E:/Pitch Boulder/2026 Recordings/1-28-2026/Photos/Edited/_TIER 2 - GOOD/DSC08304.jpg",
   "ask-thumb": "E:/Pitch Boulder/Top photos for web build/_TIER 1 - TOP (make stories)/20260429_090738.jpg",
 };
 
 const repoRoot = process.cwd();
 const outDir = join(repoRoot, "public", "media", "work", "pitchboulder");
 
-async function exportOne(srcPath, slug) {
+// COLLISION GUARD (critic-mandated): sha1 every existing file in the output
+// dir (recursive) so a re-baked frame that already lives under ANOTHER slug
+// fails loudly instead of shipping a cross-page repeat.
+function hashExisting(dir, self) {
+  const map = {};
+  const walk = (d) => {
+    for (const f of readdirSync(d, { withFileTypes: true })) {
+      const p = join(d, f.name);
+      if (f.isDirectory()) walk(p);
+      else map[createHash("sha1").update(readFileSync(p)).digest("hex")] = p;
+    }
+  };
+  if (existsSync(dir)) walk(dir);
+  return { map, self };
+}
+
+async function exportOne(srcPath, slug, guard) {
   const meta = await sharp(srcPath).rotate().metadata();
   let bytes = 0;
   for (const w of WIDTHS) {
     const base = sharp(srcPath).rotate().resize({ width: w, withoutEnlargement: true });
-    const avifOut = join(outDir, `${slug}-${w}.avif`);
-    const webpOut = join(outDir, `${slug}-${w}.webp`);
-    await base.clone().avif(AVIF).toFile(avifOut);
-    await base.clone().webp(WEBP).toFile(webpOut);
-    bytes += statSync(avifOut).size + statSync(webpOut).size;
+    for (const [ext, opts] of [["avif", AVIF], ["webp", WEBP]]) {
+      const buf = await base.clone()[ext](opts).toBuffer();
+      const sha = createHash("sha1").update(buf).digest("hex");
+      const hit = guard.map[sha];
+      if (hit && !basename(hit).startsWith(`${slug}-`)) {
+        throw new Error(`COLLISION: ${slug}-${w}.${ext} is byte-identical to existing ${basename(hit)} — pick a different source frame`);
+      }
+      writeFileSync(join(outDir, `${slug}-${w}.${ext}`), buf);
+      bytes += buf.length;
+    }
   }
   return { width: meta.width, height: meta.height, bytes };
 }
 
 await mkdir(outDir, { recursive: true });
+const guard = hashExisting(outDir);
 console.log(`\n▸ pitchboulder (variety) → public/media/work/pitchboulder/`);
 for (const [slug, file] of Object.entries(PICKS)) {
   if (!existsSync(file)) {
@@ -72,7 +103,7 @@ for (const [slug, file] of Object.entries(PICKS)) {
     process.exitCode = 1;
     continue;
   }
-  const { width, height, bytes } = await exportOne(file, slug);
+  const { width, height, bytes } = await exportOne(file, slug, guard);
   console.log(`  ✓ ${slug.padEnd(14)} ${String(width)}×${height}  ${(bytes / 1024).toFixed(0)}KB`);
 }
 
