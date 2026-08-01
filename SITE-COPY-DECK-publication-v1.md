@@ -1227,3 +1227,63 @@ CSX 3042.
 - `astro check`: 0 errors, 0 warnings. `astro build`: green, honesty-audit
   passed (exclusions + `[confirm]` sweep).
 | `vendor-tent`, `venue-wide`, `community-dance` | (existing alts) | **Dropped** (no performers in frame) | — |
+
+### Build #2 — `/venture/seriesfest` (new hub page)
+
+New page: `src/pages/venture/seriesfest.astro`. New consts block:
+`PAGES.ventureStories.seriesfestHub`. Source: `_STORY-STAGING/seriesfest/
+STORY.md` ("The Same Air"), heavily condensed for a hub page rather than a
+second flagship photo essay — see the collision-map note below for why.
+
+**Collision-map gate (material change from the plan):** of the miner's 10
+staged picks, `_COLLISION-MAP.md` confirmed 4 pixel-identical collisions with
+images already live elsewhere on the site (`fashion-garment-detail`,
+`s12-soiere-stage`, `s12-red-carpet-duo`, `soulpower-red-carpet-cast`) and 1
+near-crop of two more (`2025-soiree-podium`). Only 5 of 10 are perceptually
+clear: `2025-podium-notecard`, `fashion-runway-crowd`, `fashion-runway-
+floral`, `s12-red-carpet-panel`, `soulpower-lobby-mingle`. That collapses the
+page from a 10-image flagship into a cover + one illustrated card per
+chapter, with nothing spare for a full-bleed band without repeating an
+image — this build deliberately ships without one (material honesty over
+template completeness).
+
+| Row | Content | Flag |
+|---|---|---|
+| Meta title | "SeriesFest — the same air, 2025–2026" | ⚠ |
+| Meta description | "Four visits to SeriesFest across thirteen months — the 2025 festival, the Soul Power premiere, Fashion in Focus, and Season 12 — one relationship-building attendance, told as one story." | ⚠ |
+| Cover masthead | "SeriesFest" | ⚠ |
+| Cover kicker (issue) | "Venture dispatch" | ⚠ |
+| Cover corner slate | "Denver, Colorado" | ⚠ |
+| Cover title | "The Same Air" | ⚠ |
+| Cover deck | "Two years of showing up at SeriesFest — Denver's home for episodic storytelling — from a red carpet through a fashion runway to the Soirée stage twice over. Not press credentials. Just the same room, kept returning to." | ⚠ |
+| Cover teaser row (4) | "2025 festival" / "Soul Power premiere" / "Fashion in Focus" / "Season 12" | ⚠ |
+| Lede + intro | "For a few days each spring, SeriesFest turns Denver into a room where creators, audiences, and industry actually share the same air." + the "we've now sat in that room four times" paragraph, condensed from `STORY.md`'s open/lede | ⚠ |
+| 4 chapter cards | Slate, date, title, 2-sentence body per chapter (condensed from `STORY.md`'s per-chapter paragraphs — full depth stays on each linked page, not duplicated here), "X, in full →" CTA | ⚠ |
+| Close paragraph | The "counter-thesis" / "We'll be back" close, from `STORY.md` verbatim | ⚠ |
+| 5 caption+alt pairs | Cover + 4 card images, adapted from `STORY.md`'s per-image alt text | ⚠ |
+| Sign-off links | "More about SeriesFest →" (`/work/seriesfest`), "← Venture Stories" | ⚠ |
+
+**Structural notes (href-only, not flagged):** `VENTURE_COLLECTIONS["film-
+industry"]`'s "SeriesFest, in depth." row repointed from `/work/seriesfest`
+to `/venture/seriesfest` (title unchanged, per plan §1.2 — `/work/seriesfest`
+stays live, just no longer the card this rail points at); `work/index.astro`
+`VENTURE_LINKS` gets one new row for the hub (both the hub and
+`/work/seriesfest` stay listed).
+
+**Honesty rails applied:** the only relationship claim renders via
+`<LegendMark proof={{relationshipId:"seriesfest"}}>` (verbatim
+`permittedPhrasing`, tier `attended` — "relationship-building attendance —
+keeping a pulse on the industry," never upgraded to a credentialed role);
+every named individual in the four condensed chapter summaries is already
+named on that chapter's own live page — no new person named here.
+
+**Measured (self-verify harness):**
+- 1440×900: settled height **3112px** — well under the ~6200px ceiling
+  (an honestly small hub, not padded to match Pebble Beach's length). No
+  horizontal overflow.
+- 390×844: settled height 4726px, no horizontal overflow, no cover-label
+  collision.
+- 5 unique story images (cover + 4 cards), 0 repeats, plus the 2 global
+  header logo images present on every page.
+- `astro check`: 0 errors, 0 warnings. `astro build`: green, honesty-audit
+  passed.

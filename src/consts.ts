@@ -944,7 +944,11 @@ export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
         title: "MEME is where this lane starts.",
       },
       {
-        href: "/work/seriesfest",
+        // Build #2 (2026-08-01 archive-mining integration) — repointed from
+        // /work/seriesfest to the new hub page per _INTEGRATION-PLAN.md §1.2
+        // "Links in": /work/seriesfest stays live (unretired), just no
+        // longer the card this rail points at.
+        href: "/venture/seriesfest",
         slate: "SeriesFest · Denver, Colorado",
         title: "SeriesFest, in depth.",
         mediaSlug: "seriesfest-2026",
@@ -1945,6 +1949,102 @@ export const PAGES = {
       },
       links: {
         shelbyCase: { label: "See the Shelby case study", href: "/work/shelby-pebble-beach" },
+        back: { label: "Venture Stories", href: "/venture" },
+      },
+    },
+
+    // Build #2 — SeriesFest hub. Source: _STORY-STAGING/seriesfest/STORY.md
+    // ("The Same Air"), heavily condensed. COLLISION-MAP GATE (2026-08-01):
+    // of the miner's 10 staged picks, 4 are pixel-identical to images already
+    // live elsewhere on the site and 1 is a near-crop of two more — only 5
+    // survive (see scripts/make-seriesfest-hub.mjs header). That collapses
+    // this from a 10-image "flagship" into an honestly small hub: a cover +
+    // four illustrated links out to the four chapter pages that already carry
+    // the real depth. No forced full-bleed — five images across a cover and
+    // four chapter cards leaves nothing spare to bleed without repeating one.
+    //
+    // HONESTY: the only relationship claim renders via LegendMark from
+    // RELATIONSHIPS["seriesfest"].permittedPhrasing — verbatim, exactly as
+    // the four existing chapter pages already do. Never "a credentialed
+    // coverage role" or "at the table where the industry decides" (both
+    // explicitly forbidden in consts.ts). Named individuals below are only
+    // those already named on the four live chapter pages.
+    seriesfestHub: {
+      meta: {
+        title: "SeriesFest — the same air, 2025–2026",
+        description:
+          "Four visits to SeriesFest across thirteen months — the 2025 festival, the Soul Power premiere, Fashion in Focus, and Season 12 — one relationship-building attendance, told as one story.",
+      },
+      cover: {
+        masthead: "SeriesFest",
+        credit: "Adventure Storytelling Media",
+        issue: "Venture dispatch",
+        location: "Denver, Colorado",
+        coords: "39.74° N · 104.99° W",
+        storyLabel: "The cover story",
+        title: "The Same Air",
+        deck: "Two years of showing up at SeriesFest — Denver's home for episodic storytelling — from a red carpet through a fashion runway to the Soirée stage twice over. Not press credentials. Just the same room, kept returning to.",
+        teasers: ["2025 festival", "Soul Power premiere", "Fashion in Focus", "Season 12"],
+        scrollCue: "Scroll for the story",
+      },
+      byline: "Words & photographs — Sindbad Horizon",
+      slate: "SeriesFest · Denver, Colorado · 2025–2026",
+      lede: "For a few days each spring, SeriesFest turns Denver into a room where creators, audiences, and industry actually share the same air.",
+      intro:
+        "We've now sat in that room four times: the full 2025 festival, a February premiere, a March fashion panel, and back for the main event in May 2026. Nobody credentialed us. We just kept showing up.",
+      close:
+        "A counter-thesis kept surfacing across all four visits: as the synthetic proliferates, the value of real human encounters only increases. Four rooms, thirteen months, one relationship that keeps carrying forward — and SeriesFest's programming runs year-round, all the way to Season 13. We'll be back.",
+      chapters: [
+        {
+          no: "01",
+          slate: "2025 · The full festival",
+          date: "Apr 30 – May 4, 2025",
+          title: "The deepest visit.",
+          body: "Official-selection screenings, on-stage Q&As, and panels, back to back. There's a saying about SeriesFest — you simply couldn't pull off this kind of intimate, high-access event in New York or LA.",
+          imageSlug: "2025-podium-notecard",
+          alt: "A moderator speaks from the SeriesFest podium, notecard in hand, before an empty panel row and the Season 11 branded screen.",
+          href: "/venture/seriesfest-2025",
+          cta: "SeriesFest 2025, in full",
+        },
+        {
+          no: "02",
+          slate: "Soul Power · a premiere before the storm",
+          date: "Feb 18, 2026",
+          title: "Not a nostalgia trip.",
+          body: "SeriesFest brought Soul Power: The Legend of the American Basketball Association to the Sie FilmCenter for a screening and Q&A. As moderator Vic Lombardi framed it: this is much deeper than that — it's real.",
+          imageSlug: "soulpower-lobby-mingle",
+          alt: "Attendees mingle in the Sie FilmCenter's Lobby & Salon before the Soul Power screening, vintage film posters on the wall behind them.",
+          href: "/venture/seriesfest-2026-soul-power",
+          cta: "Soul Power premiere, in full",
+        },
+        {
+          no: "03",
+          slate: "Fashion in Focus · costume as character",
+          date: "Mar 7, 2026",
+          title: "A nervous system, before dialogue.",
+          body: "A scouting mission to The Cable Center — a runway of more than forty models and costume installations, and a masterclass from Emmy-winning costume designer Molly Rogers.",
+          imageSlug: "fashion-runway-floral",
+          alt: "A model in a plaid coat walks the runway past a floral arrangement, a big screen behind displaying a night skyline.",
+          href: "/venture/seriesfest-2026-fashion-in-focus",
+          cta: "Fashion in Focus, in full",
+        },
+        {
+          no: "04",
+          slate: "Season 12 · the main event",
+          date: "May 6–10, 2026",
+          title: "The room fills back up.",
+          body: "The first-look screening of The Four Seasons Season 2, the NBC100 drama-writers panel, and the Soirée's inaugural Visionary Award, presented to John J. Sie.",
+          imageSlug: "s12-red-carpet-panel",
+          alt: "A cast and producing team pose on the SeriesFest red carpet, a branded screen behind them naming the production.",
+          href: "/venture/seriesfest-2026",
+          cta: "Season 12, in full",
+        },
+      ],
+      coverImageSlug: "fashion-runway-crowd",
+      coverAlt: "A model walks the runway at SeriesFest's Fashion in Focus, a full seated audience watching from both sides under the SeriesFest-branded wall.",
+      links: {
+        moreLabel: "More about SeriesFest",
+        moreHref: "/work/seriesfest",
         back: { label: "Venture Stories", href: "/venture" },
       },
     },

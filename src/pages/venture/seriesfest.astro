@@ -1,0 +1,255 @@
+---
+/**
+ * /venture/seriesfest — Build #2 of the 2026-08-01 archive-mining
+ * integration round. A HUB page, not a second flagship: the four existing
+ * chapter pages (seriesfest-2025, seriesfest-2026-soul-power,
+ * seriesfest-2026-fashion-in-focus, seriesfest-2026) carry the real depth;
+ * this page's value is the architecture — one cover-story frame that
+ * finally gives those four orphan pages a parent, plus a condensed arc.
+ * None of the four is replaced or retired.
+ *
+ * COLLISION-MAP GATE: only 5 of the miner's staged 10 images survive
+ * perceptual dedup — see scripts/make-seriesfest-hub.mjs. That's a cover
+ * image + exactly one illustrated card per chapter, with nothing spare for
+ * a full-bleed band without repeating an image. This page deliberately
+ * skips the "one full-bleed" convention for that reason (material honesty
+ * over template completeness — "small vessels stay small").
+ *
+ * HONESTY: the only status claim is the SeriesFest LegendMark (tier
+ * `attended`), rendered from consts — verbatim, never upgraded. Attendance
+ * != affiliation.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const sf = PAGES.ventureStories.seriesfestHub;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const mediaDir = join(process.cwd(), "public", "media", "venture", "seriesfest");
+const WIDTHS = [900, 1600] as const;
+function photo(slug: string) {
+  if (!existsSync(join(mediaDir, `${slug}-900.avif`))) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/venture/seriesfest/${slug}-${w}.${ext}`;
+  return {
+    avif: WIDTHS.map((w) => `${url(w, "avif")} ${w}w`).join(", "),
+    webp: WIDTHS.map((w) => `${url(w, "webp")} ${w}w`).join(", "),
+    src: url(900, "webp"),
+  };
+}
+const cover = photo(sf.coverImageSlug);
+const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
+---
+
+<Base title={sf.meta.title} description={sf.meta.description}>
+  <div data-lane="venture">
+    <!-- ── COVER · six typographic ranks, landscape full-bleed (source
+         material is 1:1 square; CSS aspect-ratio crops it to a wide frame) -->
+    <section class="sf-stage" aria-label={`${sf.cover.masthead} — ${sf.meta.title}`}>
+      {
+        cover && (
+          <picture>
+            <source type="image/avif" srcset={cover.avif} sizes="100vw" />
+            <source type="image/webp" srcset={cover.webp} sizes="100vw" />
+            <img src={cover.src} alt={sf.coverAlt} class="sf-cover-img" fetchpriority="high" decoding="async" />
+          </picture>
+        )
+      }
+      <div class="sf-scrim" aria-hidden="true"></div>
+      <p class="sf-corner sf-corner--tl hud-label">{sf.cover.issue}</p>
+      <p class="sf-corner sf-corner--tr hud-label sf-accent">{sf.cover.location}</p>
+      <p class="sf-coords hud-label" aria-hidden="true">{sf.cover.coords}</p>
+      <header class="sf-masthead">
+        <p class="sf-masthead-word">{sf.cover.masthead}</p>
+        <p class="sf-masthead-credit hud-label">{sf.cover.credit}</p>
+      </header>
+      <div class="sf-titleblock">
+        <p class="hud-label sf-accent">{sf.cover.storyLabel}</p>
+        <h1 class="sf-title">{sf.cover.title}</h1>
+        <p class="sf-deck">{sf.cover.deck}</p>
+        <ul class="sf-teasers" role="list">
+          {sf.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
+        </ul>
+      </div>
+      <p class="sf-cue hud-label" aria-hidden="true">{sf.cover.scrollCue} ↓</p>
+    </section>
+
+    <!-- ── THE FIELD REPORT ────────────────────────────────────────────── -->
+    <article class="border-t border-hairline sf-report">
+      <header class="sf-col sf-chapter">
+        <hr class="flight-line mb-4" aria-hidden="true" />
+        <p class="hud-label" data-reveal>{sf.slate}</p>
+        <p class="hud-label sf-accent" data-reveal>{sf.byline}</p>
+        <div class="sf-proof" data-reveal>
+          <LegendMark proof={{ relationshipId: "seriesfest" }} />
+        </div>
+        <p class="sf-lede" data-reveal>{sf.lede}</p>
+      </header>
+      <div class="sf-col">
+        <p class="text-lg text-ink" data-reveal>{sf.intro}</p>
+      </div>
+
+      <!-- FOUR CHAPTER CARDS — the hub's real value: architecture, not a
+           second photo essay. One illustrated card per existing page. -->
+      <section class="sf-cards mx-auto max-w-6xl px-8 pt-8" aria-label="The four visits">
+        {
+          chapters.map((c) => (
+            <a href={`${base}${c.href}`} class="sf-card" data-reveal data-reveal-stagger="60">
+              {c.media && (
+                <div class="sf-card-media">
+                  <picture>
+                    <source type="image/avif" srcset={c.media.avif} sizes="(min-width: 900px) 22rem, 90vw" />
+                    <source type="image/webp" srcset={c.media.webp} sizes="(min-width: 900px) 22rem, 90vw" />
+                    <img src={c.media.src} alt={c.alt} style="aspect-ratio:4/3;object-fit:cover" loading="lazy" decoding="async" />
+                  </picture>
+                </div>
+              )}
+              <div class="sf-card-body">
+                <p class="hud-label sf-accent">{c.no} · {c.slate}</p>
+                <p class="hud-label sf-card-date">{c.date}</p>
+                <h2 class="sf-card-title">{c.title}</h2>
+                <p class="sf-card-copy">{c.body}</p>
+                <span class="sf-card-cta">{c.cta} <span class="arrow" aria-hidden="true">→</span></span>
+              </div>
+            </a>
+          ))
+        }
+      </section>
+
+      <section class="sf-col pt-8">
+        <p class="text-lg text-ink" data-reveal>{sf.close}</p>
+      </section>
+
+      <footer class="sf-col pt-6 pb-8">
+        <nav class="sf-links">
+          <a href={`${base}${sf.links.moreHref}`} class="link">{sf.links.moreLabel} <span class="arrow" aria-hidden="true">→</span></a>
+          <a href={`${base}${sf.links.back.href}`} class="link"><span class="arrow" aria-hidden="true">←</span> {sf.links.back.label}</a>
+        </nav>
+      </footer>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .sf-stage {
+    position: relative;
+    min-height: 70svh;
+    display: grid;
+    align-content: end;
+    overflow: clip;
+  }
+  .sf-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16/9; }
+  .sf-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.6) 0%, rgba(10, 13, 18, 0.12) 26%, transparent 42%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.4) 30%, transparent 58%);
+  }
+  .sf-corner { position: absolute; top: 5.5rem; z-index: 2; font-size: 0.6rem; }
+  .sf-corner--tl { left: 1.25rem; }
+  .sf-corner--tr { right: 1.25rem; }
+  .sf-accent { color: var(--color-accent); }
+  .sf-coords {
+    position: absolute;
+    right: 1.1rem;
+    top: 45%;
+    z-index: 2;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--color-accent-deep);
+  }
+  .sf-masthead { position: absolute; top: 10%; left: 0; right: 0; z-index: 2; text-align: center; }
+  .sf-masthead-word {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(2.2rem, 8vw, 4rem);
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+  }
+  .sf-masthead-credit { margin-top: 0.5rem; font-size: 0.58rem; letter-spacing: 0.32em; color: color-mix(in srgb, #fff 72%, transparent); }
+  .sf-titleblock { position: relative; z-index: 2; max-width: 42rem; margin: 0 auto; padding: 0 1.5rem 2.5rem; display: grid; gap: 0.6rem; text-align: center; }
+  .sf-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-size: clamp(2.4rem, 8vw, 4rem);
+    line-height: 0.98;
+    color: #fff;
+    letter-spacing: -0.01em;
+    font-style: italic;
+  }
+  .sf-deck { max-width: 38ch; margin-inline: auto; font-family: var(--font-display); font-style: italic; font-size: 0.98rem; line-height: 1.5; color: color-mix(in srgb, #fff 92%, transparent); }
+  .sf-teasers { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1.2rem; margin-top: 0.2rem; padding: 0; list-style: none; }
+  .sf-teasers li { font-size: 0.56rem; color: color-mix(in srgb, #fff 68%, transparent); }
+  .sf-teasers li::before { content: "◆ "; color: var(--color-accent); font-size: 0.5em; vertical-align: 20%; }
+  .sf-cue { position: relative; z-index: 2; text-align: center; padding-bottom: 0.8rem; font-size: 0.58rem; color: color-mix(in srgb, #fff 55%, transparent); }
+
+  .sf-report { overflow-x: clip; }
+  .sf-col { margin-inline: auto; max-width: 48rem; padding-inline: 2rem; }
+  .sf-chapter { padding-top: 1.5rem; }
+  .sf-proof { max-width: 40rem; }
+  .sf-lede {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 460;
+    font-size: clamp(1.3rem, 2.6vw, 1.6rem);
+    line-height: 1.4;
+    color: var(--color-peak);
+  }
+
+  .sf-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .sf-card {
+    display: grid;
+    gap: 0;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
+    background: var(--color-elevated);
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease), border-color var(--dur-hover, 180ms) ease;
+  }
+  .sf-card:hover, .sf-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+  .sf-card-media { margin: 0; background: color-mix(in srgb, #ffffff 4%, transparent); }
+  .sf-card-media img { display: block; width: 100%; }
+  .sf-card-body { padding: 1.1rem 1.25rem 1.4rem; display: grid; gap: 0.4rem; }
+  .sf-card-date { color: var(--color-ink-muted); letter-spacing: 0.14em; }
+  .sf-card-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    color: var(--color-peak);
+    margin-top: 0.2rem;
+  }
+  .sf-card-copy { font-size: 0.94rem; line-height: 1.55; color: var(--color-ink); }
+  .sf-card-cta {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .sf-card:hover .sf-card-cta .arrow,
+  .sf-card:focus-visible .sf-card-cta .arrow { transform: translateX(4px); }
+  .sf-card-cta .arrow { display: inline-block; transition: transform var(--dur-hover, 160ms) var(--ease-swift); }
+
+  .sf-links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+
+  @media (max-width: 760px) {
+    .sf-cards { grid-template-columns: 1fr; }
+  }
+</style>
