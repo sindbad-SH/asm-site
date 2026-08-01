@@ -95,6 +95,13 @@ const wrHero = wrShot("leyden-space-hero");
 const wrLeydenTitle = wrShot("leyden-space-title");
 const wrPerlionTitle = wrShot("perlion-title");
 const wrFollowUs = wrShot("followus-handoff");
+// v2 (2026-08-01) — three frames lifted from the 2026-01-28 session's RAW
+// archive, which had 98 .ARW files and only 5 ever exported. See
+// scripts/make-pitchboulder-wednesday-room-v2.mjs for the extraction method
+// and the selection notes.
+const wrRoomWide = wrShot("room-wide");
+const wrAfter = wrShot("after-the-pitch");
+const wrCloseSlide = wrShot("close-slide");
 
 const WEDNESDAY_ROOM = {
   kicker: "The Wednesday Room",
@@ -104,7 +111,47 @@ const WEDNESDAY_ROOM = {
     "On disk, that adds up to dated session folders for roughly every Wednesday from mid-January through late July 2026, and — further back — three more from the first week of September 2024. Two years of the same room, recorded practically every time it met.",
     `Most weeks the room hears from someone new. Not always — one May session carried a slide titled, plainly, "Alumni Update": a founder named Ashle Jantzen, back to report on Leyden Space, a company she'd apparently already introduced to this room once before.`,
   ],
+  // v2 additions. ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only.
+  afterPitch:
+    "The pitch is the part people photograph. The part that actually does the work happens after it: the presenter comes down off the screen and the room re-forms around them in twos and threes, and the questions that were too specific to ask in front of forty people get asked.",
+  ledgerIntro:
+    "Every one of those Wednesdays leaves a file. This is the 2026 season as it exists on the drive — one delivered recording per session, named for whoever took the front of the room.",
 };
+
+/**
+ * THE 2026 LEDGER — built by listing the delivered session recordings in
+ * E:\Pitch Boulder\2026 Recordings (one named master per Wednesday), NOT from
+ * memory or from the LinkedIn recaps. Sessions whose export carries no company
+ * name are listed by date with the label left blank rather than guessed.
+ */
+const LEDGER = [
+  { d: "Jan 14", co: "Career Ops" },
+  { d: "Jan 21", co: "PJ Pickup Play" },
+  { d: "Jan 28", co: "Hummingbird AI" },
+  { d: "Feb 4", co: "Sagittarius Logistics" },
+  { d: "Feb 18", co: "Origami Motion" },
+  { d: "Feb 25", co: "NeuroGeneces" },
+  { d: "Mar 4", co: "Actuate" },
+  { d: "Mar 11", co: "Aika" },
+  { d: "Mar 18", co: "OncoPatch" },
+  { d: "Mar 25", co: "PickleMatch" },
+  { d: "Apr 1", co: "PixelPay" },
+  { d: "Apr 8", co: "Retrocycle" },
+  { d: "Apr 15", co: "Amplified Space" },
+  { d: "Apr 22", co: "Pristino Labs" },
+  { d: "Apr 29", co: "Perlion" },
+  { d: "May 6", co: "PEMPal" },
+  { d: "May 13", co: "Momease Solutions" },
+  { d: "May 20", co: "NoLimitRobotics" },
+  { d: "May 27", co: "DoorBotics" },
+  { d: "Jun 3", co: "Angld.AI" },
+  { d: "Jun 10", co: "Veery" },
+  { d: "Jun 17", co: "Nobility Space" },
+  { d: "Jun 24", co: "—" },
+  { d: "Jul 1", co: "—" },
+  { d: "Jul 8", co: "—" },
+  { d: "Jul 22", co: "—" },
+] as const;
 ---
 
 <Base title={study.meta.title} description={study.meta.description}>
@@ -185,6 +232,74 @@ const WEDNESDAY_ROOM = {
           </div>
         )
       }
+    </div>
+
+    {/* v2 — THE ROOM AT SCALE: a full-bleed band breaking the 46rem column.
+        The page's only edge-to-edge beat, and the first frame anywhere on the
+        site that shows how many people are actually in this room. */}
+    {
+      wrRoomWide && (
+        <figure class="wr-bleed">
+          <picture>
+            <source type="image/avif" srcset={wrRoomWide.avif} sizes="100vw" />
+            <source type="image/webp" srcset={wrRoomWide.webp} sizes="100vw" />
+            <img
+              src={wrRoomWide.src}
+              alt="The PitchBoulder room from the back of the long tables — roughly twenty-five attendees seated with laptops and notebooks, two presenters standing at the projector screen at the far right."
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+          <figcaption class="wr-cap wr-bleed-cap">A full room, 9:00 AM on a Wednesday — January 28, 2026.</figcaption>
+        </figure>
+      )
+    }
+
+    <div class="wr-inner">
+      {/* v2 — the human beat: text left, close portrait right, deliberately
+          the smallest-scale image on the page after the widest one. */}
+      <div class="wr-aside">
+        <p class="wr-para">{WEDNESDAY_ROOM.afterPitch}</p>
+        {wrAfter && (
+          <figure class="wr-aside-fig">
+            <picture>
+              <source type="image/avif" srcset={wrAfter.avif} sizes="(max-width: 760px) 70vw, 17rem" />
+              <source type="image/webp" srcset={wrAfter.webp} sizes="(max-width: 760px) 70vw, 17rem" />
+              <img src={wrAfter.src} alt="An attendee in a grey sweater talking mid-sentence after the pitch, seen past the shoulder of the person he is speaking with." loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="wr-cap">After the pitch, the room re-forms in twos and threes.</figcaption>
+          </figure>
+        )}
+      </div>
+
+      {wrCloseSlide && (
+        <figure class="wr-mid wr-mid--wide">
+          <picture>
+            <source type="image/avif" srcset={wrCloseSlide.avif} sizes="(max-width: 760px) 100vw, 46rem" />
+            <source type="image/webp" srcset={wrCloseSlide.webp} sizes="(max-width: 760px) 100vw, 46rem" />
+            <img src={wrCloseSlide.src} alt="Two founders standing beside their final slide, which reads 'Let's Connect' above a QR code and the name Humming Agent AI." loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="wr-cap">The last slide is always the same shape: a QR code and an ask — January 28, 2026.</figcaption>
+        </figure>
+      )}
+
+      {/* v2 — THE LEDGER: the scale claim, itemised from the delivered files. */}
+      <p class="wr-para">{WEDNESDAY_ROOM.ledgerIntro}</p>
+      <div class="wr-ledger" aria-label="PitchBoulder 2026 season — delivered session recordings">
+        <p class="hud-label wr-ledger-head">2026 season · delivered recordings</p>
+        <ol class="wr-ledger-list">
+          {LEDGER.map((s) => (
+            <li class={s.co === "—" ? "wr-ledger-row wr-ledger-row--blank" : "wr-ledger-row"}>
+              <span class="wr-ledger-date">{s.d}</span>
+              <span class="wr-ledger-co">{s.co}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="wr-ledger-note">
+          One delivered master per Wednesday, named as filed. Four sessions ship without a company
+          label on the export — listed by date rather than guessed at.
+        </p>
+      </div>
 
       <p class="wr-para wr-close">
         None of this is dramatic. It's a weekly meeting, in one room, mostly the same shape every time, that's been going on long enough to have its own alumni.
@@ -275,5 +390,110 @@ const WEDNESDAY_ROOM = {
   }
   @media (max-width: 560px) {
     .wr-duo { grid-template-columns: 1fr; }
+  }
+
+  /* ── v2 beats ─────────────────────────────────────────────────────────── */
+  /* the one edge-to-edge band — breaks the 46rem column entirely */
+  .wr-bleed {
+    position: relative;
+    margin: 2.5rem 0;
+    width: 100%;
+  }
+  .wr-bleed img {
+    display: block;
+    width: 100%;
+    max-height: 62svh;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  .wr-bleed-cap {
+    position: absolute;
+    left: max(1.5rem, calc((100vw - 46rem) / 2));
+    bottom: 0.75rem;
+    margin: 0;
+    padding: 0.35rem 0.65rem;
+    background: color-mix(in srgb, var(--color-base) 74%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+  }
+  /* text + a small portrait riding beside it (smallest beat on the page) */
+  .wr-aside {
+    display: grid;
+    grid-template-columns: 1fr 17rem;
+    gap: 1.8rem;
+    align-items: start;
+    margin: 0.4rem 0;
+  }
+  .wr-aside-fig {
+    margin: 0;
+  }
+  .wr-aside-fig img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  @media (max-width: 700px) {
+    .wr-aside { grid-template-columns: 1fr; }
+    .wr-aside-fig { max-width: 17rem; }
+  }
+  /* the close-slide frame runs wider than .wr-mid's 26rem */
+  .wr-mid--wide {
+    max-width: 100%;
+  }
+  .wr-mid--wide img {
+    aspect-ratio: 3 / 2;
+  }
+  /* the season ledger — a filed record, set as a rule-separated list */
+  .wr-ledger {
+    margin: 0.6rem 0 0.2rem;
+    padding: 1.1rem 1.25rem 1rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-base) 45%, transparent);
+  }
+  .wr-ledger-head {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, var(--color-accent) 82%, transparent);
+    margin-bottom: 0.7rem;
+  }
+  .wr-ledger-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (max-width: 620px) {
+    .wr-ledger-list { grid-template-columns: 1fr; }
+  }
+  .wr-ledger-row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-hairline) 70%, transparent);
+    align-items: baseline;
+  }
+  .wr-ledger-date {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted);
+  }
+  .wr-ledger-co {
+    font-size: 0.95rem;
+    color: var(--color-peak);
+  }
+  .wr-ledger-row--blank .wr-ledger-co {
+    color: var(--color-ink-muted);
+  }
+  .wr-ledger-note {
+    margin-top: 0.85rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
   }
 </style>

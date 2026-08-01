@@ -89,6 +89,76 @@ function pair(relBase: string) {
 function media(rel: string) {
   return existsSync(join(process.cwd(), "public", "media", ...rel.split("/"))) ? `${base}/media/${rel}` : undefined;
 }
+/**
+ * v3 (2026-08-01) — THE CAMPAIGN. This page previously shipped as a
+ * typographic "bones" page on the stated grounds that no MEME imagery
+ * existed. That was wrong: the operator BUILDS MEME's current campaign
+ * artwork (E:\Makeshift\MEME — a code-rendered flyer family, five social
+ * formats per program plus animated cuts, QR-gated), and those renders are
+ * his own work product. They are now the page's evidence: what "Strategic
+ * Liaison and Scout" looks like in practice is, among other things, the
+ * poster that fills the room. Baked by scripts/make-meme-campaign.mjs.
+ *
+ * HONESTY: these are HIS renders for MEME, shown as his work — the page
+ * never claims authorship of MEME's brand, its programs, or its curriculum,
+ * and it does not display MEME's own earlier materials as a "before".
+ * Program facts (dates, venue, instructor, format) are quoted from the
+ * campaign copy packs in that repo, which are the approved event copy.
+ */
+const campaign = (slug: string) => pair(`venture/meme/${slug}-1600`) ?? pair(`venture/meme/${slug}-900`);
+const bofsbPortrait = campaign("bofsb-portrait");
+const crewcallPortrait = campaign("crewcall-portrait");
+const pitchQuorumSheet = campaign("pitch-quorum-sheet");
+const marketFreshSheet = campaign("market-fresh-sheet");
+
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy (staging-only until
+// read). Every program fact below is quoted from the approved copy packs in
+// E:\Makeshift\MEME (BofSB Aug-2026 pack; On-Demand PQ/MF pack).
+const CAMPAIGN = {
+  kicker: "The work",
+  heading: "Somebody has to fill the room.",
+  body: [
+    "A nonprofit workshop only works if people show up to it. That part isn't teaching — it's a poster, a date, a QR code that goes somewhere, and the same look holding across every format a platform will ask you for.",
+    "So that's the part I build. Each program gets a rendered flyer family — feed, portrait, story, link card, registration banner — plus a seven-second animated cut of each, generated from code rather than redrawn by hand, so a date change is a re-render instead of a redesign.",
+  ],
+  items: [
+    {
+      media: () => bofsbPortrait,
+      slug: "bofsb-portrait",
+      label: "The Business of Show Business",
+      meta: "Sat, Aug 15, 2026 · 1:00 PM · Mike's Camera, Boulder",
+      note: "A 90-minute in-person workshop on the state of the film industry from a business perspective, taught by producer Nick C. Goins Jr. Co-branded with the host venue.",
+      alt: "A magazine-cover-style flyer headed MEME, reading The Business of Show Business, with a portrait of instructor Nick C. Goins Jr., the date Sat Aug 15, and a QR code.",
+    },
+    {
+      media: () => crewcallPortrait,
+      slug: "crewcall-portrait",
+      label: "Crew Call",
+      meta: "Two workshops · one day · one instructor",
+      note: "A double-bill call sheet for the PA and Script Supervisor workshops — the on-set roles most people learn the hard way. Instructor: Adam Smestad.",
+      alt: "A flyer styled as a film call sheet reading CREW CALL, listing The PA Workshop and Script Supervisor Workshop with instructor Adam Smestad.",
+    },
+    {
+      media: () => pitchQuorumSheet,
+      slug: "pitch-quorum-sheet",
+      label: "Pitch Quorum",
+      meta: "Live session · remote or in person · scheduled on request",
+      note: "\u201CA great script doesn't get funded. A great pitch does.\u201D Packaging and pitching a film project to the people who fund films.",
+      alt: "A program sheet headed MEME with an ON DEMAND badge, reading A great script doesn't get funded — a great pitch does.",
+    },
+    {
+      media: () => marketFreshSheet,
+      slug: "market-fresh-sheet",
+      label: "Market Fresh",
+      meta: "Live session · remote or in person · scheduled on request",
+      note: "\u201CA badge isn't a strategy.\u201D What to prepare before a film market like AFM, who to meet there, and the follow-through afterwards.",
+      alt: "A program sheet headed MEME with an ON DEMAND badge, reading A badge isn't a strategy — walk in ready to work it.",
+    },
+  ],
+  footnote:
+    "Rendered from the campaign repo, five formats per program plus animated cuts. Registration links and any co-brand sign-off stay MEME's call.",
+};
+
 const ROSTER = [
   { key: "nick", name: "Nick Goins", role: "Executive Director — runs Pitch Quorum and Market Fresh himself.", alt: "Close portrait of Nick Goins wearing a plaid flat cap, black t-shirt, looking directly at camera." },
   { key: "steve", name: "Steve Borne", role: "Teaches the two-part sound workshop — setting a shoot up for success on location, and what happens to that audio in post.", alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background." },
@@ -139,22 +209,24 @@ const ARTICLE = {
       {
         loop && (
           <figure class="meme-loop-wrap" data-reveal>
-            <picture>
-              <source type="image/avif" srcset={loop.posterAvif} />
-              <img class="meme-loop-poster" src={loop.posterWebp} alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground." loading="lazy" decoding="async" />
-            </picture>
-            <video
-              class="meme-loop-vid"
-              data-meme-loop
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              poster={loop.posterWebp}
-              aria-hidden="true"
-            >
-              <source src={loop.mp4} type="video/mp4" />
-            </video>
+            <div class="meme-loop-frame">
+              <picture>
+                <source type="image/avif" srcset={loop.posterAvif} />
+                <img class="meme-loop-poster" src={loop.posterWebp} alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground." loading="lazy" decoding="async" />
+              </picture>
+              <video
+                class="meme-loop-vid"
+                data-meme-loop
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                poster={loop.posterWebp}
+                aria-hidden="true"
+              >
+                <source src={loop.mp4} type="video/mp4" />
+              </video>
+            </div>
             {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only until read. */}
             <figcaption class="hud-label meme-loop-cap">MEME's own animated mark, in motion</figcaption>
           </figure>
@@ -176,6 +248,56 @@ const ARTICLE = {
       {ARTICLE.paragraphs.slice(3).map((para) => <p class="meme-para" data-reveal>{para}</p>)}
 
       <p class="meme-break" aria-hidden="true">✳</p>
+
+      {/* v3 — THE CAMPAIGN: the page's evidence. A poster wall at deliberately
+          unequal scale — the lead flyer runs large beside its own spec block,
+          the three others drop to a smaller rank underneath. */}
+      {
+        (bofsbPortrait || crewcallPortrait || pitchQuorumSheet || marketFreshSheet) && (
+          <section class="meme-campaign" aria-label="Campaign work for MEME">
+            <p class="hud-label meme-kicker">{CAMPAIGN.kicker}</p>
+            <h2 class="meme-h2">{CAMPAIGN.heading}</h2>
+            {CAMPAIGN.body.map((p) => <p class="meme-para">{p}</p>)}
+
+            {CAMPAIGN.items[0].media() && (
+              <div class="meme-lead">
+                <figure class="meme-lead-fig">
+                  <picture>
+                    {CAMPAIGN.items[0].media()!.avif && <source srcset={CAMPAIGN.items[0].media()!.avif} type="image/avif" />}
+                    <img src={CAMPAIGN.items[0].media()!.webp ?? CAMPAIGN.items[0].media()!.avif} alt={CAMPAIGN.items[0].alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+                <div class="meme-lead-body">
+                  <p class="hud-label meme-next">Next up</p>
+                  <p class="meme-item-label">{CAMPAIGN.items[0].label}</p>
+                  <p class="meme-item-meta">{CAMPAIGN.items[0].meta}</p>
+                  <p class="meme-item-note">{CAMPAIGN.items[0].note}</p>
+                </div>
+              </div>
+            )}
+
+            <div class="meme-wall">
+              {CAMPAIGN.items.slice(1).map((it) => {
+                const m = it.media();
+                return m ? (
+                  <figure class="meme-wall-fig">
+                    <picture>
+                      {m.avif && <source srcset={m.avif} type="image/avif" />}
+                      <img src={m.webp ?? m.avif} alt={it.alt} loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption>
+                      <span class="meme-item-label">{it.label}</span>
+                      <span class="meme-item-meta">{it.meta}</span>
+                      <span class="meme-item-note">{it.note}</span>
+                    </figcaption>
+                  </figure>
+                ) : null;
+              })}
+            </div>
+            <p class="meme-footnote">{CAMPAIGN.footnote}</p>
+          </section>
+        )
+      }
 
       {/* Build #6 — the roster grid: 3 clean headshots (Nick, Steve, Adam).
           Amber MacPherson's headshot is cut (unconfirmed photo-credit
@@ -264,8 +386,10 @@ const ARTICLE = {
      autoplay-refused all land here); the video fades in over it once JS
      confirms motion is allowed and the figure is on-screen. */
   .meme-loop-wrap {
-    position: relative;
     margin: 0.2rem 0 0;
+  }
+  .meme-loop-frame {
+    position: relative;
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
     border-radius: 8px;
     overflow: hidden;
@@ -287,17 +411,17 @@ const ARTICLE = {
     opacity: 0;
     transition: opacity 600ms var(--ease-survey, ease);
   }
-  .meme-loop-wrap.is-playing .meme-loop-vid {
+  .meme-loop-frame.is-playing .meme-loop-vid {
     opacity: 1;
   }
+  /* Caption sits BELOW the frame, not over it: the poster art carries its own
+     baked-in "A NOT-FOR-PROFIT COMPANY" line along the bottom edge, and an
+     overlaid caption landed on top of it (white-on-white). */
   .meme-loop-cap {
-    position: absolute;
-    left: 0.9rem;
-    bottom: 0.8rem;
-    margin: 0;
+    display: block;
+    margin: 0.55rem 0 0;
     letter-spacing: 0.18em;
-    color: color-mix(in srgb, #f4fbfa 88%, transparent);
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+    color: var(--color-ink-muted, #8a9a96);
   }
   @media (prefers-reduced-motion: reduce) {
     .meme-loop-vid {
@@ -324,6 +448,132 @@ const ARTICLE = {
     color: color-mix(in srgb, #d9f2ec 45%, transparent);
     letter-spacing: 0;
   }
+  /* ── v3 · THE CAMPAIGN — poster wall at unequal rank ─────────────────── */
+  .meme-campaign {
+    display: grid;
+    gap: 1.1rem;
+    margin: 0.6rem 0 0.4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .meme-kicker {
+    letter-spacing: 0.26em;
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 85%, transparent);
+  }
+  .meme-h2 {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    line-height: 1.15;
+    color: #f2f4f8;
+    margin-bottom: 0.2rem;
+  }
+  /* the lead: one flyer at full rank beside its own spec block */
+  .meme-lead {
+    display: grid;
+    grid-template-columns: 22rem 1fr;
+    gap: 1.8rem;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+  .meme-lead-fig {
+    margin: 0;
+  }
+  .meme-lead-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.45);
+  }
+  .meme-lead-body {
+    display: grid;
+    gap: 0.35rem;
+    align-content: center;
+  }
+  .meme-next {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 80%, transparent);
+  }
+  /* the wall: three subordinate flyers, deliberately a rank smaller than the
+     lead AND unequal to each other — Crew Call is a different animal (a call
+     sheet, not a cover) so it takes the wide track, and the two sibling
+     program sheets sit narrower with a dropped baseline. A flat repeat(3,1fr)
+     here would rebuild the uniform-tile grid this whole overhaul removed. */
+  .meme-wall {
+    display: grid;
+    grid-template-columns: 1.24fr 0.92fr 0.92fr;
+    gap: 1.1rem;
+    margin-top: 0.6rem;
+    align-items: start;
+  }
+  .meme-wall-fig {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  .meme-wall-fig:nth-child(2) {
+    margin-top: 1.6rem;
+  }
+  .meme-wall-fig:nth-child(3) {
+    margin-top: 3rem;
+  }
+  .meme-wall-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .meme-wall-fig figcaption {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .meme-item-label {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f2f4f8;
+  }
+  .meme-item-meta {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, #eef2f5 62%, transparent);
+  }
+  .meme-item-note {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #eef2f5 72%, transparent);
+  }
+  .meme-lead-body .meme-item-label {
+    font-size: 1.25rem;
+  }
+  .meme-lead-body .meme-item-note {
+    font-size: 0.92rem;
+    max-width: 44ch;
+  }
+  .meme-footnote {
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #eef2f5 55%, transparent);
+  }
+  @media (max-width: 780px) {
+    .meme-lead { grid-template-columns: 1fr; }
+    .meme-lead-fig { max-width: 22rem; }
+    .meme-wall { grid-template-columns: 1.1fr 0.9fr; }
+    .meme-wall-fig:nth-child(2) { margin-top: 2rem; }
+    .meme-wall-fig:nth-child(3) { margin-top: 0; }
+  }
+  @media (max-width: 520px) {
+    .meme-wall { grid-template-columns: 1fr; }
+    .meme-wall-fig:nth-child(2),
+    .meme-wall-fig:nth-child(3) { margin-top: 0; }
+  }
+
   /* Build #6 — roster grid, 3 headshot cards. P5: scale-dropped to a
      masthead/contributors block (~11rem cells, centered) — deliberately
      smaller than a gallery so it reads as credits, not imagery. */
@@ -449,7 +699,7 @@ const ARTICLE = {
   // just show the still. Mirrors HeroVideo.astro's poster-first contract:
   // no native `autoplay`/`src`-at-parse-time, JS decides, muted always.
   (() => {
-    const wrap = document.querySelector<HTMLElement>(".meme-loop-wrap");
+    const wrap = document.querySelector<HTMLElement>(".meme-loop-frame");
     const video = wrap?.querySelector<HTMLVideoElement>("[data-meme-loop]");
     if (!wrap || !video) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

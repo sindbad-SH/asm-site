@@ -26,3 +26,4 @@ Thumbs.db
 .lighthouseci-site/
 .chrome-lhci/
 .claude/
+_measure-results.json
