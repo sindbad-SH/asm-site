@@ -212,3 +212,49 @@ identically in the builder's run.
 The fix is small (one re-bake with a different Jan-28 frame, or one /venture collage-card
 swap). Everything else across all five pages held up under re-measurement, computed-style
 inspection, git verification, byte-level hashing, and visual crop review.
+
+---
+
+## FIX-ROUND RE-VERIFICATION (2026-08-01, commit 7647cf5)
+
+**Attribution note:** the critic agent's transcript was lost before it could re-verify
+(machine constraint), so this section was verified by the BUILDER session re-running the
+critic's own checks. Evidence is mechanical (hashes, harness output, computed styles,
+screenshots), not self-assessment — but the operator should know it was not a second
+independent pair of eyes.
+
+- **C2 (blocking):** context-room re-picked DSC08258 → DSC08304 (same pro-edited Jan-28
+  set). DSC08301 was test-baked and REJECTED — it is byte-identical to coworking-crowd,
+  confirming the whole Jan-28 edited set overlaps the July-12 coworking bakes. New
+  context-room-1600.webp sha1 d5544e0f… vs coworking-presenter-1600.webp 9b88e222… —
+  DISTINCT (all four variants clean per the bake script's new guard). Harness re-run on
+  /work/pitchboulder + /venture: **crossPageRepeats = []**. Case page renders
+  context-room-1600.webp with its caption (computed check). The new frame eye-verified: an
+  eye-level room-wide (audience at tables, two presenters at the screen) — the caption
+  "The room at work — January 28, 2026 session." still matches. **RESOLVED.**
+- **Collision guard:** make-pitchboulder-variety.mjs now sha1-hashes every existing file in
+  the output dir (recursive) and THROWS if a new bake matches a file under another slug;
+  a slug re-baking itself is exempt (basename prefix check). Code-reviewed: cross-slug
+  matches are caught, self re-bakes pass. hook-poster.avif's in-place replacement bypasses
+  the guard by design (same-purpose file replacement, vybe FIX-1 precedent).
+- **Hook contrast (non-blocking C note):** scoped :global text-shadow now on the case hook
+  h1 (rgba(0,0,0,.85) 0 2px 18px + …) and .case-hook-credit (rgba(0,0,0,.9) 0 1px 10px + …,
+  color #fff) — computed styles confirmed; headless screenshot of the hook shows the title
+  and Alana Arnold/PEMPal credit readable over the white slide area. Shelby untouched
+  (page-scoped selector).
+- **Stale artifacts:** dawn-patrol "overlaps the stagger above" comment corrected; plan
+  checklist P3/step-4 updated; the "h=5674" note corrected to the harness's settled 6255.
+
+## REVISED VERDICT TABLE
+
+| Page | Verdict | Blocking issues |
+|---|---|---|
+| P1 /venture/afm-2025 | **PASS** | none |
+| P2 /venture/seriesfest | **PASS** | none |
+| P3 /work/pitchboulder | **PASS-WITH-NOTES** (fix round verified mechanically by the builder session — see attribution note) | none |
+| P4 /venture/dawn-patrol | **PASS** | none |
+| P5 /venture/meme | **PASS** | none |
+| Non-regression sd/vybe/shelby | **PASS** | none |
+| Global (mobile, errors, repeats) | **PASS** | none |
+
+## GATE (revised): **STAGING PUSH ALLOWED.** Production remains gated on the operator's copy-deck read (all new captions/kickers/pull quotes are flagged ⚠ OPERATOR READ-APPROVAL in source).
