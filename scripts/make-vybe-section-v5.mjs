@@ -111,11 +111,12 @@ const RECROPS = [
     dropOldWidths: [800, 1120], // old vertical-only bake, now orphaned
   },
   {
-    slug: "festival-grounds",
+    // Distinct slug: the landscape festival-grounds-{900,1600} bake is still
+    // consumed by adventure.astro — this portrait recrop must never overwrite it.
+    slug: "festival-grounds-vert",
     src: join(EXISTING_SRC, "vybe-02_fall-lake-mountains.jpg"),
     ratio: [4, 5],
     widths: [800, 1120, 1600],
-    dropOldWidths: [900], // old landscape-only bake, now orphaned
   },
 ];
 
