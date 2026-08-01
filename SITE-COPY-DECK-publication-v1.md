@@ -1322,3 +1322,47 @@ content images across the full page including the original 10, plus the 2
 global header logo images), no horizontal overflow, no broken layout in the
 new section. Not bound by the 6200px full-page ceiling (upgrade vessel, per
 the plan) — settled height 10364px across the now-two-chapter page.
+
+### Build #4 — `/work/pitchboulder` upgrade: "The Wednesday Room"
+
+Upgrade, appended below the existing `CaseStudy` component (not inside it —
+keeps the shared template untouched for the Shelby page too). Source:
+`_STORY-STAGING/pitchboulder-institution/STORY.md`.
+
+**Collision-map block (material change from the plan):** the plan's
+original 5-image pick loses 2 to `_COLLISION-MAP.md` —
+`founder-duo-fullroom` is a near/adjacent frame of the live
+`coworking-presenter-1600` and `full-room-bleed` is a near-crop of the live
+`coworking-crowd-1600` (same fixed-camera DSLR session the site's existing
+gallery already draws from). No fresh bleed- or founder-duo-scale candidate
+exists in the remaining staged set. **Shipped with 4 images** (the plan's
+own documented fallback): `leyden-space-hero`, `followus-handoff`,
+`perlion-title`, plus `leyden-space-title` reinstated from the miner's cut
+list (it was cut only for being a near-duplicate of `attendance-ritual`,
+which isn't used here) — restoring `STORY.md`'s own "Coming back" duo. No
+full-bleed device on this chapter.
+
+| Row | Content | Flag |
+|---|---|---|
+| Chapter kicker | "The Wednesday Room" | ⚠ |
+| Chapter heading | "What two years of showing up looks like." | ⚠ |
+| 3 body paragraphs (down from 6) | Open/lede + "the record" + "coming back," condensed from `STORY.md` | ⚠ |
+| 4 caption+alt pairs | `leyden-space-hero`, `followus-handoff`, `leyden-space-title`, `perlion-title` — adapted from `STORY.md`'s per-image alt text | ⚠ |
+
+**Named-individual rows (both already sourced from their own in-frame
+presentation slides, per the miner's manifest, never guessed):** Ashle
+Jantzen (Leyden Space) and Logan Chang (Perlion) — both public speakers at
+a public pitch event.
+
+**Honesty rails applied:** confirmed the Rothschild testimonial (`TESTIMONIALS
+["pitchboulder"]`) is NOT rendered twice — `CaseStudy.astro`'s own "05 ·
+Words" chapter already carries it once; the new chapter has no pull-quote of
+its own. The two-year date-range claim ("mid-January through late July 2026
+… three more from the first week of September 2024") stands on prose alone,
+no image implies visual proof from the 2024 period (none exists).
+
+**Verified:** `astro check` 0 errors, `astro build` green, honesty-audit
+passed. Screenshot-checked at 1440×900 — settled height 6488px across the
+full page (case study + new chapter; not a full-page-vessel build so no
+6200px ceiling applies), 0 repeated images, no horizontal overflow, the
+testimonial confirmed visually to render exactly once.

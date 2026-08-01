@@ -28,6 +28,42 @@ const commercialVideoId = "n7k-Bwu3KIU";
 const hookPoster = `${base}/media/work/pitchboulder/hook-poster.avif`;
 const contextImage = `${base}/media/work/pitchboulder/context.avif`;
 // BTS: no PitchBoulder BTS footage exists → section hidden (DIRECTION §2.5/§2.7).
+
+// Build #4 (2026-08-01 archive-mining integration) — "The Wednesday Room"
+// chapter, appended below the case-study template (not inside it — keeps
+// CaseStudy.astro's shared shape untouched for the Shelby page too).
+// COLLISION-MAP BLOCK: 2 of the plan's original 5 kept images collide with
+// stills already live on THIS page (founder-duo-fullroom / full-room-bleed —
+// same fixed-camera session as coworking-presenter-1600 / coworking-crowd-
+// 1600 above). Ships with the 4 clean images instead — see
+// scripts/make-pitchboulder-wednesday-room.mjs header for the full swap
+// rationale. No pull-quote here: TESTIMONIALS["pitchboulder"] already
+// renders once in CaseStudy's own "05 · Words" chapter above — repeating it
+// would render the same quote twice on one page.
+const wrDir = join(process.cwd(), "public", "media", "work", "pitchboulder", "wednesday-room");
+function wrShot(slug: string) {
+  if (!existsSync(join(wrDir, `${slug}-900.avif`))) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/work/pitchboulder/wednesday-room/${slug}-${w}.${ext}`;
+  return {
+    avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
+    webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
+    src: url(900, "webp"),
+  };
+}
+const wrHero = wrShot("leyden-space-hero");
+const wrLeydenTitle = wrShot("leyden-space-title");
+const wrPerlionTitle = wrShot("perlion-title");
+const wrFollowUs = wrShot("followus-handoff");
+
+const WEDNESDAY_ROOM = {
+  kicker: "The Wednesday Room",
+  heading: "What two years of showing up looks like.",
+  paragraphs: [
+    `Most weeks, it starts the same way: a projector screen at the front of a Boulder Chamber meeting room, a "Follow Us!" slide with four QR codes, and someone standing at the podium while the last few chairs fill in. Then the slide changes, and for the next hour a rotation of founders gets a few minutes each to make their case to whoever showed up that Wednesday.`,
+    "On disk, that adds up to dated session folders for roughly every Wednesday from mid-January through late July 2026, and — further back — three more from the first week of September 2024. Two years of the same room, recorded practically every time it met.",
+    `Most weeks the room hears from someone new. Not always — one May session carried a slide titled, plainly, "Alumni Update": a founder named Ashle Jantzen, back to report on Leyden Space, a company she'd apparently already introduced to this room once before.`,
+  ],
+};
 ---
 
 <Base title={study.meta.title} description={study.meta.description}>
@@ -40,4 +76,146 @@ const contextImage = `${base}/media/work/pitchboulder/context.avif`;
     hookLogoAlt="PitchBoulder"
     contextImage={contextImage}
   />
+
+  <section class="wr" aria-label="The Wednesday Room">
+    <div class="wr-inner">
+      <p class="hud-label wr-kicker">{WEDNESDAY_ROOM.kicker}</p>
+      <h2 class="wr-heading">{WEDNESDAY_ROOM.heading}</h2>
+
+      {
+        wrHero && (
+          <figure class="wr-hero">
+            <picture>
+              <source type="image/avif" srcset={wrHero.avif} sizes="(max-width: 760px) 100vw, 46rem" />
+              <source type="image/webp" srcset={wrHero.webp} sizes="(max-width: 760px) 100vw, 46rem" />
+              <img src={wrHero.src} alt="Ashle Jantzen, founder of Leyden Space, mid-gesture at a Boulder Chamber podium, both arms spread wide, a slide reading 'New Electromagnetic Propulsion' projected behind her." loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="wr-cap">Ashle Jantzen, back for a PitchBoulder alumni update on Leyden Space.</figcaption>
+          </figure>
+        )
+      }
+
+      <p class="wr-para">{WEDNESDAY_ROOM.paragraphs[0]}</p>
+      <p class="wr-para">{WEDNESDAY_ROOM.paragraphs[1]}</p>
+
+      {
+        wrFollowUs && (
+          <figure class="wr-mid">
+            <picture>
+              <source type="image/avif" srcset={wrFollowUs.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={wrFollowUs.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={wrFollowUs.src} alt="Two men stand together in front of the 'Follow Us!' QR slide, one gesturing toward the room, the other laughing." loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="wr-cap">End of session — the room's own recurring closing ritual.</figcaption>
+          </figure>
+        )
+      }
+
+      <p class="wr-para">{WEDNESDAY_ROOM.paragraphs[2]}</p>
+
+      {
+        (wrLeydenTitle || wrPerlionTitle) && (
+          <div class="wr-duo">
+            {wrLeydenTitle && (
+              <figure class="wr-duo-fig">
+                <picture>
+                  <source type="image/avif" srcset={wrLeydenTitle.avif} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <source type="image/webp" srcset={wrLeydenTitle.webp} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <img src={wrLeydenTitle.src} alt="A projected title slide reading 'Leyden Space — Pitch Boulder Alumni Update — Founder: Ashle Jantzen,' with Jantzen standing at the podium in front of it." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="wr-cap">The title slide that confirms who's back at the podium, and why.</figcaption>
+              </figure>
+            )}
+            {wrPerlionTitle && (
+              <figure class="wr-duo-fig">
+                <picture>
+                  <source type="image/avif" srcset={wrPerlionTitle.avif} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <source type="image/webp" srcset={wrPerlionTitle.webp} sizes="(max-width: 760px) 48vw, 20rem" />
+                  <img src={wrPerlionTitle.src} alt="A projected title slide reading 'Perlion — Sunscreen Active Ingredients — Logan Chang, CEO,' with Chang standing beside a whiteboard to the right of the screen." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="wr-cap">Logan Chang, CEO of Perlion — three weeks earlier, same podium.</figcaption>
+              </figure>
+            )}
+          </div>
+        )
+      }
+
+      <p class="wr-para wr-close">
+        None of this is dramatic. It's a weekly meeting, in one room, mostly the same shape every time, that's been going on long enough to have its own alumni.
+      </p>
+    </div>
+  </section>
+
+  {/* Structural-only outbound link — see the second CTA already carried by
+      /venture/dawn-patrol's own sign-off pattern, applied here. */}
+  <section class="mx-auto max-w-3xl px-8 pb-10 text-center">
+    <a href={`${base}/venture`} class="link">← Venture Stories</a>
+  </section>
 </Base>
+
+<style>
+  .wr {
+    background: color-mix(in srgb, var(--color-elevated) 55%, var(--color-base));
+    border-top: 1px solid var(--color-hairline);
+    padding: 4rem 1.5rem 3rem;
+  }
+  .wr-inner {
+    max-width: 46rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 1.3rem;
+  }
+  .wr-kicker {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, var(--color-accent) 82%, transparent);
+  }
+  .wr-heading {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    line-height: 1.15;
+    color: var(--color-peak);
+    margin: 0 0 0.3rem;
+  }
+  .wr-para {
+    font-size: clamp(1.02rem, 1.4vw, 1.15rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--color-ink) 92%, transparent);
+  }
+  .wr-close { font-style: italic; }
+  .wr-hero, .wr-mid {
+    margin: 0.3rem 0;
+  }
+  .wr-hero img, .wr-mid img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .wr-mid { max-width: 26rem; }
+  .wr-cap {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted);
+  }
+  .wr-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin: 0.3rem 0;
+  }
+  .wr-duo-fig img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  @media (max-width: 560px) {
+    .wr-duo { grid-template-columns: 1fr; }
+  }
+</style>
