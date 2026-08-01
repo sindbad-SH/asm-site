@@ -161,7 +161,21 @@ const ARTICLE = {
         )
       }
 
-      {ARTICLE.paragraphs.map((para) => <p class="meme-para" data-reveal>{para}</p>)}
+      <!-- LAYOUT-OVERHAUL P5 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md):
+           the 6-paragraph stretch gets one typographic beat — a full-width
+           pull quote after the founding-fact paragraph (Atavist device 8),
+           and an asterisk divider before the roster (device 6). No new
+           imagery; this is a bones page and stays one.
+           ⚠ OPERATOR READ-APPROVAL REQUIRED — the pull quote is new visible
+           copy (a tightened reprise of the paragraph above it; facts
+           unchanged), staging-only until read. -->
+      {ARTICLE.paragraphs.slice(0, 3).map((para) => <p class="meme-para" data-reveal>{para}</p>)}
+      <blockquote class="meme-pull" data-reveal>
+        Founded on the Ides of March, 2020 — built so Colorado's filmmaking talent doesn't have to leave the state.
+      </blockquote>
+      {ARTICLE.paragraphs.slice(3).map((para) => <p class="meme-para" data-reveal>{para}</p>)}
+
+      <p class="meme-break" aria-hidden="true">✳</p>
 
       {/* Build #6 — the roster grid: 3 clean headshots (Nick, Steve, Adam).
           Amber MacPherson's headshot is cut (unconfirmed photo-credit
@@ -290,12 +304,36 @@ const ARTICLE = {
       transition: none;
     }
   }
-  /* Build #6 — roster grid, 3 headshot cards */
+  /* P5 — the one typographic beat in the text stretch: a plain full-width
+     pull quote (no panel, no border — the Atavist device) */
+  .meme-pull {
+    margin: 0.6rem 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.35rem, 2.8vw, 1.9rem);
+    line-height: 1.35;
+    text-align: center;
+    color: #f2f4f8;
+  }
+  /* P5 — bare asterisk chapter break before the roster (device 6) */
+  .meme-break {
+    margin: 0.4rem 0 0;
+    text-align: center;
+    font-size: 1.1rem;
+    color: color-mix(in srgb, #d9f2ec 45%, transparent);
+    letter-spacing: 0;
+  }
+  /* Build #6 — roster grid, 3 headshot cards. P5: scale-dropped to a
+     masthead/contributors block (~11rem cells, centered) — deliberately
+     smaller than a gallery so it reads as credits, not imagery. */
   .meme-roster {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-    margin: 0.4rem 0 0.2rem;
+    margin: 0.4rem auto 0.2rem;
+    max-width: 36rem;
+    width: 100%;
   }
   .meme-roster-card {
     margin: 0;
