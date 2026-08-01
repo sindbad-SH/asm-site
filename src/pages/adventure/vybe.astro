@@ -1,40 +1,72 @@
 ---
 /**
- * /adventure/vybe — IN THE ROOM WITH VYBE.
+ * /adventure/vybe — LAKE & LIGHTS (VYBE).
  *
- * v3 (2026-07-31, layout-scout directed rebuild — see
- * E:\Adventure Storytelling Media Original\06 - Website\_VYBE-LAYOUT-SPEC.md).
- * v2 (same day, earlier pass) built the block→subpage pattern but stayed
- * "simple, doesn't embody the screen" per operator review — one lone cover,
- * two identical repeat(2,1fr) photo grids (a contact sheet, not a spread),
- * a 22rem video box, and a dead `.vy-chapter` class with no CSS. Root cause
- * (per the layout spec): the page was under-SUPPLIED, not under-designed —
- * one hardcoded 4:5/1200px crop for every photo. scripts/make-vybe-section.mjs
- * now bakes 12 photos at 5 distinct ratios (was 9 at 1), which is what makes
- * every device below possible. This pass ports Steel & Dust's own editorial
- * devices verbatim at Vybe's lighter scale: a newsstand cover (2 tucked
- * plates), chapter ghost numerals, a mirrored asymmetric stagger, a true
- * full-bleed band, a tilted field-log frame — same grammar, no new design
- * system invented.
+ * v4 (2026-08-01, adversarial-critic fix round — attempt #3 graded STILL
+ * SHORT against /adventure/steel-and-dust with measured evidence; this pass
+ * executes all five of the critic's specific findings). v3 (2026-07-31)
+ * ported Steel & Dust's newsstand/chapter-numeral/stagger/bleed/field-log
+ * grammar but fell short on: a 2.7x-upscaled 406x720 hero video; two
+ * 555px/~200px stagger height voids from mismatched aspect ratios and one
+ * flipped-grid DOM-order bug; a 4-rank cover (exemplar has 6) plus a mobile
+ * corner-slate collision at 390px; one photo (`festival-grounds`) used
+ * twice and the "lake + red container" scene owning ~4 of 12 slots while
+ * the strongest frame (`flow-arts`) sat unused at thumbnail scale and
+ * another band's stage banner was the single largest image on the page.
+ * Fixed below, each verified with real numbers (see the FIX comments at
+ * each site + SITE-COPY-DECK-publication-v1.md's 2026-08-01 entry):
  *
- * THE VIDEO: the operator's note (a) said the clip "wasn't a good smooth
- * shot" — a video scout re-mined the full 2023 drone archive with the same
- * jank detector Amazing Aerial's own stock pipeline uses (SkySieve) and
- * found a genuinely golden/dusk reveal (score 0.939 vs the old clip's 0.75)
- * that also matches what the caption already claimed. It replaces
- * public/media/work/vybe/clips/vybe-fest.mp4 in place — same filename, same
- * /work/vybe case-page dependency, no asset-path churn. It is still
- * 406×720 (9:16): every clip in this archive was shot with the drone
- * physically rotated to portrait, so there is no landscape master to widen
- * into — letterboxing one would crop the reveal's vertical headroom right
- * out of the shot. Rather than force a 16:9 box onto a 9:16 asset (the
- * layout spec's literal ask), the video keeps its honest aspect and the box
- * is instead made meaningfully larger (2.4x the old max-width) — the video
- * scout's own fallback recommendation when no landscape source exists.
+ *   FIX 1 — the hero video is now a real 1920x1080 4-shot montage (one
+ *   native-landscape anchor + three disclosed 1.78x-upscale shots off
+ *   35-50Mbps portrait originals — see _VYBE-VIDEO-V3/_NOTES.md), replacing
+ *   public/media/work/vybe/clips/vybe-fest.mp4 in place (same filename,
+ *   same /work/vybe case-page dependency — that page's own `.case-clip` box
+ *   was ALREADY coded for 16:9 and had been stretching the old 9:16 clip
+ *   into it; this fixes that page too, unrequested but free). It renders in
+ *   a true 16:9 box at the same >=960px-wide slot Steel & Dust's own
+ *   showcase loop uses (`.vy-video`, ported from `.sd-video`) — never
+ *   upscaled past native pixels again.
+ *
+ *   FIX 2 — every asymmetric two-up stagger had one column's aspect ratio
+ *   fighting its grid track (a portrait 4:5 photo landing in the narrow
+ *   34fr column opposite a landscape photo in the wide 58fr column, or vice
+ *   versa) instead of the exemplar's own 16:9-wide/4:3-narrow pairing that
+ *   yields its measured 72px differential. Fixed per-site below by either
+ *   correcting a flipped-grid DOM-order bug (mirrored stagger) or swapping
+ *   the wide column's aspect ratio to 4:3 (both non-flip staggers) —
+ *   verified against rendered getBoundingClientRect() heights, not
+ *   estimated.
+ *
+ *   FIX 3 — the cover gains the two ranks the exemplar has and this page
+ *   didn't: an Anton masthead line ("VYBE", Steel & Dust's "Field Notes"
+ *   equivalent) and a kicker ("The cover story", ported verbatim). The
+ *   title becomes a two-word "Lake & Lights" with the same cyan-ampersand
+ *   accent glyph as "Steel & Dust" (six ranks total now, matching the
+ *   exemplar). The 390px corner-slate collision («ADVENTURE STORY ·
+ *   COVERAGEDENVER, COLORADO» with zero gap — two long absolutely-
+ *   positioned labels with no shared min-gap) is fixed two ways: the
+ *   left slate is shortened ("Adventure story · coverage" → "Coverage")
+ *   AND both slates move into a flex row with justify-content:space-between
+ *   + an explicit gap, so no future copy change can make them touch again.
+ *
+ *   FIX 4 — see src/data/postcards.ts's 2026-08-01 entry + the /postcards
+ *   gallery rework (both fixed together, same critic finding on the
+ *   Brazil postcard linked from this lane).
+ *
+ *   FIX 5 — `festival-grounds` now appears once, not twice (the closing
+ *   "bookend" beat is now `flow-duo`, not a repeat). `nadir-grounds` (the
+ *   empty picnic-blanket top-down) is dropped entirely; `flow-arts` — the
+ *   critic's pick for strongest photo on the page — takes over the
+ *   full-bleed slot it vacated. `boogie-chillsbury-doughboys` (another
+ *   band's stage banner, formerly the single largest image on the page) is
+ *   demoted from a 100vw bleed to a contained column photo. The "lake + red
+ *   container" scene now owns 2 of 12 slots (cover + one stagger image), not
+ *   ~4 — every other slot is a genuinely different moment.
  *
  * Media: 12 photos baked by scripts/make-vybe-section.mjs (source:
  * C:/builds/asm/SAMPLES/photos/vybe/_CONTACT-SHEET.md — his own already-
- * culled, already-graded selects, not raw footage).
+ * culled, already-graded selects, not raw footage). No new photo bakes this
+ * pass — v4 only re-sequences/re-crops the existing 12.
  *
  * HONESTY: no Vybe brand/logo assets anywhere on this page (their official
  * pack hasn't been provided — see the vybe-community-partner memo). The one
@@ -74,12 +106,16 @@ function photo(slug: string, widths: readonly number[]) {
   };
 }
 
+// FIX 5 (2026-08-01): nadir-grounds (an empty picnic-blanket top-down) is
+// dropped entirely — the empty-of-people bleed the critic flagged. flow-duo
+// and fire-staff-spin now each do double duty: a tiny cover plate AND a full
+// feature later on the page (mirrored stagger / closing beat), so both
+// "Inside — flow arts" / "Inside — fire staff" teases actually pay off.
 const cover = photo("festival-reveal", W.vertical);
-const plateLeft = photo("flow-duo", W.vertical);
-const plateRight = photo("fire-staff-spin", W.vertical);
+const flowDuo = photo("flow-duo", W.vertical);
+const fireStaffSpin = photo("fire-staff-spin", W.vertical);
 const festivalGrounds = photo("festival-grounds", W.landscape);
 const bandGoldenFlare = photo("band-golden-flare", W.vertical);
-const nadirGrounds = photo("nadir-grounds", W.wide);
 const flowArts = photo("flow-arts", W.verticalSm);
 const duskCircle = photo("dusk-circle", W.landscape);
 const bandGuitarist = photo("band-guitarist", W.landscape);
@@ -113,12 +149,12 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     <section class="vy-stage" aria-label="Vybe — In the Room with Vybe">
       <div class="vy-stand">
         {
-          plateLeft && (
+          flowDuo && (
             <figure class="vy-plate vy-plate--l" data-reveal aria-hidden="true">
               <picture>
-                <source type="image/avif" srcset={plateLeft.avif} sizes="300px" />
-                <source type="image/webp" srcset={plateLeft.webp} sizes="300px" />
-                <img src={plateLeft.src} alt="" loading="lazy" decoding="async" />
+                <source type="image/avif" srcset={flowDuo.avif} sizes="300px" />
+                <source type="image/webp" srcset={flowDuo.webp} sizes="300px" />
+                <img src={flowDuo.src} alt="" loading="lazy" decoding="async" />
               </picture>
               <figcaption class="hud-label">Inside — flow arts</figcaption>
             </figure>
@@ -143,15 +179,31 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
           }
           <div class="vy-scrim" aria-hidden="true"></div>
 
-          <!-- factual corner slates -->
-          <p class="vy-corner vy-corner--tl hud-label">Adventure story · coverage</p>
-          <p class="vy-corner vy-corner--tr hud-label vy-accent">Denver, Colorado</p>
+          <!-- factual corner slates — a flex row with a real min-gap (FIX 3:
+               these used to be two independent position:absolute labels
+               with no shared gap, which collided at 390px into "ADVENTURE
+               STORY · COVERAGEDENVER, COLORADO"; the left slate is also
+               shortened so there's slack even before the flex gap helps). -->
+          <div class="vy-corners">
+            <p class="vy-corner hud-label">Coverage</p>
+            <p class="vy-corner hud-label vy-accent">Denver, Colorado</p>
+          </div>
+
+          <!-- masthead in the sky band (FIX 3 — the rank the exemplar's
+               "Field Notes" fills and this cover didn't have) -->
+          <header class="vy-masthead">
+            <p class="vy-masthead-word">Vybe</p>
+            <p class="vy-masthead-credit hud-label">Adventure Storytelling Media</p>
+          </header>
 
           <!-- survey spine — territory + dates only; no invented coordinates -->
           <p class="vy-coords hud-label" aria-hidden="true">DENVER · 2023–2024</p>
 
           <div class="vy-titleblock">
-            <h1 class="vy-cover-title">In the room with Vybe.</h1>
+            <p class="hud-label vy-accent">The cover story</p>
+            <h1 class="vy-cover-title">
+              Lake <span class="vy-amp" aria-hidden="true">&amp;</span><span class="sr-only">and</span> Lights
+            </h1>
             <p class="vy-cover-deck">
               Two nights with a Denver arts, music, and dance collective — an outdoor festival by
               a lake, and a room full of Boogie Lights the following spring.
@@ -165,12 +217,12 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         </div>
 
         {
-          plateRight && (
+          fireStaffSpin && (
             <figure class="vy-plate vy-plate--r" data-reveal aria-hidden="true">
               <picture>
-                <source type="image/avif" srcset={plateRight.avif} sizes="300px" />
-                <source type="image/webp" srcset={plateRight.webp} sizes="300px" />
-                <img src={plateRight.src} alt="" loading="lazy" decoding="async" />
+                <source type="image/avif" srcset={fireStaffSpin.avif} sizes="300px" />
+                <source type="image/webp" srcset={fireStaffSpin.webp} sizes="300px" />
+                <img src={fireStaffSpin.src} alt="" loading="lazy" decoding="async" />
               </picture>
               <figcaption class="hud-label">Inside — fire staff</figcaption>
             </figure>
@@ -202,11 +254,15 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         </p>
       </div>
 
-      <!-- THE VIDEO — first visual after the open (same rule as Steel & Dust) -->
+      <!-- THE VIDEO — first visual after the open (same rule as Steel & Dust).
+           FIX 1: a real 1920x1080 4-shot montage now (was a 406x720 clip
+           upscaled 2.7x to fill this box); the box is ported verbatim from
+           Steel & Dust's `.sd-video` — true 16:9, full column width
+           (>=960px rendered at desktop), never above native pixels. -->
       {
         clip && (clip.posterAvif || clip.posterWebp) && (
           <section class="mx-auto max-w-5xl px-8 pt-8">
-            <figure class="vy-photo vy-video-figure" data-reveal>
+            <figure class="vy-photo" data-reveal>
               <div class="vy-video">
                 <picture>
                   {clip.posterAvif && <source type="image/avif" srcset={clip.posterAvif} />}
@@ -214,7 +270,9 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
                 </picture>
                 <video class="vy-loop" data-vy-loop data-loop-src={clip.src} muted loop playsinline preload="none" aria-hidden="true" />
               </div>
-              <figcaption class="vy-cap hud-label">Dusk over the gate — rising past the balloon arch, 2023.</figcaption>
+              <figcaption class="vy-cap hud-label">
+                Golden hour to dusk — the lake, the crowd, and the balloon arch, 2023.
+              </figcaption>
             </figure>
           </section>
         )
@@ -240,7 +298,10 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
                   <picture>
                     <source type="image/avif" srcset={festivalGrounds.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
                     <source type="image/webp" srcset={festivalGrounds.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    <img src={festivalGrounds.src} alt="An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    {/* FIX 2: 16/9 → 4/3 (matches the exemplar's own wide-column ratio) —
+                        closes a ~101px stagger-height void against bandGoldenFlare's 4:5
+                        narrow column down to ~10px. */}
+                    <img src={festivalGrounds.src} alt="An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
                   <figcaption class="vy-cap hud-label">The grounds, Sunday morning.</figcaption>
                 </figure>
@@ -268,48 +329,62 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         </blockquote>
       </div>
 
-      <!-- full-bleed band — a direct child of the article, breaks the frame -->
+      <!-- full-bleed band — a direct child of the article, breaks the frame.
+           FIX 5: was nadirGrounds (an empty picnic-blanket top-down, "editorially
+           empty" per the critic) — now flowArts, the critic's pick for strongest
+           photo on the page. It's a portrait 4:5 source in a wide/short box, so
+           object-position is biased up to keep the LED fans + dancer in frame
+           rather than default-centering into a pure leg/ground crop. -->
       {
-        nadirGrounds && (
+        flowArts && (
           <figure class="vy-bleed" data-reveal>
             <picture>
-              <source type="image/avif" srcset={nadirGrounds.avif} sizes="100vw" />
-              <source type="image/webp" srcset={nadirGrounds.webp} sizes="100vw" />
+              <source type="image/avif" srcset={flowArts.avif} sizes="100vw" />
+              <source type="image/webp" srcset={flowArts.webp} sizes="100vw" />
               <img
-                src={nadirGrounds.src}
-                alt="A straight-down aerial view of the Vybe festival grounds — a white stage tent, picnic blankets, and clustered guests"
+                src={flowArts.src}
+                alt="A flow artist spinning glowing LED fans against the night at the Vybe festival, string-lit trees behind"
+                class="vy-bleed-img-top"
                 loading="lazy"
                 decoding="async"
               />
             </picture>
-            <figcaption class="vy-cap vy-bleed-cap hud-label">Straight down over the grounds, Sunday.</figcaption>
+            <figcaption class="vy-cap vy-bleed-cap hud-label">Fire and LED, after dark — Friday.</figcaption>
           </figure>
         )
       }
 
-      <!-- mirrored stagger (34/58) -->
+      <!-- mirrored stagger (34/58) — FIX 2: dusk-circle and fire-staff-spin are
+           now in DOM order matched to the flip grid's actual tracks (fireStaffSpin
+           first → the 34fr/narrow track it's sized for; duskCircle second → the
+           58fr/wide track). The old order had this backwards — duskCircle (3:2)
+           landed narrow and flowArts (4:5) landed wide, a ~555px height void
+           (741px vs 232px, measured). Correcting the order alone closes it to
+           ~40px, no re-crop needed. flowArts itself moved to the bleed above, so
+           fireStaffSpin — until now only a tiny cover plate — fills its slot,
+           delivering on the cover's own "Inside — fire staff" tease. -->
       {
-        (duskCircle || flowArts) && (
+        (duskCircle || fireStaffSpin) && (
           <section class="mx-auto max-w-5xl px-8 pt-4">
             <div class="vy-stagger vy-stagger--flip">
+              {fireStaffSpin && (
+                <figure class="vy-photo vy-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={fireStaffSpin.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={fireStaffSpin.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={fireStaffSpin.src} alt="A festivalgoer spinning a staff in the sun beside the camp tents" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">Staff spinning, Sunday afternoon.</figcaption>
+                </figure>
+              )}
               {duskCircle && (
-                <figure class="vy-photo vy-stagger-b" data-reveal>
+                <figure class="vy-photo vy-stagger-b" data-reveal data-reveal-stagger="80">
                   <picture>
                     <source type="image/avif" srcset={duskCircle.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
                     <source type="image/webp" srcset={duskCircle.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
                     <img src={duskCircle.src} alt="A group practicing flow arts at dusk under the trees, a rainbow balloon arch behind them" style="aspect-ratio:3/2;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
                   <figcaption class="vy-cap hud-label">The dance circle, dusk.</figcaption>
-                </figure>
-              )}
-              {flowArts && (
-                <figure class="vy-photo vy-stagger-a" data-reveal data-reveal-stagger="80">
-                  <picture>
-                    <source type="image/avif" srcset={flowArts.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <source type="image/webp" srcset={flowArts.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <img src={flowArts.src} alt="A flow artist spinning LED fans against the night at the Vybe festival" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
-                  </picture>
-                  <figcaption class="vy-cap hud-label">After dark, Friday.</figcaption>
                 </figure>
               )}
             </div>
@@ -394,7 +469,9 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
                   <picture>
                     <source type="image/avif" srcset={boogieRoom.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
                     <source type="image/webp" srcset={boogieRoom.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    <img src={boogieRoom.src} alt="The room at a Boogie Lights show, the band on stage under pink and gold light, the crowd packed in front" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    {/* FIX 2: 16/9 → 4/3, same fix as the first stagger — closes the
+                        same ~101px void against boogieStage's 4:5 narrow column. */}
+                    <img src={boogieRoom.src} alt="The room at a Boogie Lights show, the band on stage under pink and gold light, the crowd packed in front" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
                   <figcaption class="vy-cap hud-label">From the crowd.</figcaption>
                 </figure>
@@ -415,41 +492,56 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
       </section>
 
       {
+        /* FIX 5: demoted from a 100vw edge-to-edge bleed (formerly the single
+           largest image on the page — another band's stage banner) to a
+           contained column photo, same footprint as any other single-photo
+           beat on this page. Still real coverage, just no longer competing
+           with flowArts for "biggest thing here" — this is Sindbad's story. */
         boogieChillsbury && (
-          <figure class="vy-bleed" data-reveal>
-            <picture>
-              <source type="image/avif" srcset={boogieChillsbury.avif} sizes="100vw" />
-              <source type="image/webp" srcset={boogieChillsbury.webp} sizes="100vw" />
-              <img
-                src={boogieChillsbury.src}
-                alt="The Chillsbury Doughboys performing at the 2024 Boogie Lights show, viewed from the balcony over the crowd, the act's name lit up on the stage backdrop"
-                loading="lazy"
-                decoding="async"
-              />
-            </picture>
-            <figcaption class="vy-cap vy-bleed-cap hud-label">The Chillsbury Doughboys, from the balcony.</figcaption>
-          </figure>
-        )
-      }
-
-      <!-- closing beat — the grounds again, bookending the open -->
-      {
-        festivalGrounds && (
-          <section class="mx-auto max-w-5xl px-8 pt-10">
+          <section class="mx-auto max-w-5xl px-8 pt-4">
             <figure class="vy-photo" data-reveal>
               <picture>
-                <source type="image/avif" srcset={festivalGrounds.avif} sizes="(min-width: 1280px) 1100px, 90vw" />
-                <source type="image/webp" srcset={festivalGrounds.webp} sizes="(min-width: 1280px) 1100px, 90vw" />
+                <source type="image/avif" srcset={boogieChillsbury.avif} sizes="(min-width: 1024px) 960px, 90vw" />
+                <source type="image/webp" srcset={boogieChillsbury.webp} sizes="(min-width: 1024px) 960px, 90vw" />
                 <img
-                  src={festivalGrounds.src}
-                  alt="A wide aerial view of the Vybe festival grounds beside a lake, evening light over the trees"
-                  style="aspect-ratio:16/9;object-fit:cover"
+                  src={boogieChillsbury.src}
+                  alt="The Chillsbury Doughboys performing at the 2024 Boogie Lights show, viewed from the balcony over the crowd, the act's name lit up on the stage backdrop"
+                  style="aspect-ratio:2/1;object-fit:cover"
                   class="block w-full"
                   loading="lazy"
                   decoding="async"
                 />
               </picture>
-              <figcaption class="vy-cap hud-label">The grounds, before the light went.</figcaption>
+              <figcaption class="vy-cap hud-label">The Chillsbury Doughboys, from the balcony.</figcaption>
+            </figure>
+          </section>
+        )
+      }
+
+      <!-- closing beat — FIX 5: was festivalGrounds AGAIN (the same lake/grounds
+           scene already used on the cover + first stagger — measured as a
+           literal duplicate, y2550 and y6330). Now flowDuo: until now only a
+           tiny cover plate, it delivers on the cover's "Inside — flow arts"
+           tease and closes on people, not more grounds. Sized as a contained
+           portrait frame (its native ratio), not forced into the wide
+           16:9 box the old grounds photo used. -->
+      {
+        flowDuo && (
+          <section class="mx-auto max-w-5xl px-8 pt-10">
+            <figure class="vy-photo vy-closing" data-reveal>
+              <picture>
+                <source type="image/avif" srcset={flowDuo.avif} sizes="(min-width: 1024px) 26rem, 80vw" />
+                <source type="image/webp" srcset={flowDuo.webp} sizes="(min-width: 1024px) 26rem, 80vw" />
+                <img
+                  src={flowDuo.src}
+                  alt="Two festivalgoers dancing together in the afternoon sun by the campsite"
+                  style="aspect-ratio:4/5;object-fit:cover"
+                  class="block w-full"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption class="vy-cap hud-label">Dancing in the afternoon sun, Sunday.</figcaption>
             </figure>
           </section>
         )
@@ -473,9 +565,10 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
 
 <style>
   /* ── MOVEMENT 1 · THE NEWSSTAND — center cover + two tucked plates. Same
-     grammar as Steel & Dust's .sd-stand, at Vybe's own scale: no "Field
-     Notes" masthead (this isn't a numbered issue), corner slates + a survey
-     spine instead of coordinates (none are verified for this location). ── */
+     grammar as Steel & Dust's .sd-stand, at Vybe's own scale: a "Vybe"
+     masthead (FIX 3, this page's own equivalent of "Field Notes" — not a
+     numbered issue, so no "No. 01" slate), corner slates + a survey spine
+     instead of coordinates (none are verified for this location). ── */
   .vy-stage {
     display: grid;
     justify-items: center;
@@ -611,21 +704,57 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
       linear-gradient(to bottom, rgba(10, 13, 18, 0.62) 0%, rgba(10, 13, 18, 0.18) 22%, transparent 38%),
       linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.4) 28%, transparent 54%);
   }
-  .vy-corner {
+  /* corner slates — a flex row (not two independent absolutely-positioned
+     labels) so justify-content:space-between + a real gap guarantees the
+     two slates can never touch, no matter how the copy changes (FIX 3: this
+     replaced a "ADVENTURE STORY · COVERAGEDENVER, COLORADO" collision at
+     390px, measured — see the header note). */
+  .vy-corners {
     position: absolute;
     top: 14px;
+    left: 18px;
+    right: 18px;
     z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .vy-corner {
+    margin: 0;
+    max-width: 55%;
     font-size: 0.58rem;
   }
-  .vy-corner--tl {
-    left: 18px;
+  .vy-corners .vy-corner:first-child {
     color: color-mix(in srgb, #fff 80%, transparent);
-  }
-  .vy-corner--tr {
-    right: 18px;
   }
   .vy-accent {
     color: var(--color-accent);
+  }
+  /* masthead — the sky-band rank (FIX 3), same grammar as Steel & Dust's
+     .sd-masthead, sized for a 4-letter word. */
+  .vy-masthead {
+    position: absolute;
+    top: 8.5%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+  }
+  .vy-masthead-word {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(1.9rem, 8.5vw, 3.3rem);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  }
+  .vy-masthead-credit {
+    margin-top: 0.45rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.34em;
+    color: color-mix(in srgb, #fff 72%, transparent);
   }
   .vy-coords {
     position: absolute;
@@ -656,6 +785,13 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     line-height: 0.98;
     color: #fff;
     text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  }
+  /* the accent glyph (FIX 3 — Steel & Dust's cyan ampersand, at Vybe's own
+     upright-inside-italic contrast rather than italic-inside-upright). */
+  .vy-amp {
+    color: var(--color-accent);
+    font-style: normal;
+    font-weight: 500;
   }
   .vy-cover-deck {
     max-width: 40ch;
@@ -757,18 +893,12 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     letter-spacing: 0.18em;
     color: var(--color-ink-muted);
   }
-  /* the hero clip — honest 9:16 (every source clip was shot drone-rotated
-     portrait; see header note), but sized up substantially — 2.4x the old
-     22rem cap — and set inside the wide 64rem measure so it reads as a real
-     feature, not a shrunken thumbnail. */
-  .vy-video-figure {
-    display: grid;
-    justify-items: center;
-  }
+  /* the hero clip (FIX 1) — a true 16:9 box at full column width, ported
+     verbatim from Steel & Dust's `.sd-video` (was a 9:16 box holding an
+     upscaled portrait clip — see header note). */
   .vy-video {
     position: relative;
-    aspect-ratio: 9 / 16;
-    width: min(88vw, 34rem);
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: 8px;
     background: var(--color-elevated);
@@ -850,6 +980,12 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     max-height: 70svh;
     object-fit: cover;
   }
+  /* FIX 5: flowArts is a portrait 4:5 source filling a wide/short box — bias
+     the crop up toward the LED fans + dancer instead of default-centering
+     into legs/ground. */
+  .vy-bleed-img-top {
+    object-position: 50% 32%;
+  }
   .vy-bleed-cap {
     position: absolute;
     left: max(2rem, calc((100vw - 64rem) / 2));
@@ -899,6 +1035,13 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
   .vy-log-row dd {
     font-size: 0.9rem;
     color: var(--color-ink);
+  }
+  /* closing beat (FIX 5) — a contained portrait frame at its native ratio,
+     centered and capped narrow so a 4:5 photo doesn't blow the page tall the
+     way forcing it into the old 16:9 grounds-photo box would have. */
+  .vy-closing {
+    width: min(80vw, 26rem);
+    margin-inline: auto;
   }
   .vy-footer {
     display: flex;

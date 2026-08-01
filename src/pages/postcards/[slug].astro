@@ -73,6 +73,12 @@ const meta = {
 
 const gallerySizes = "(min-width: 900px) 30vw, 45vw";
 const wideSizes = "(min-width: 900px) 46vw, 92vw";
+const heroSizes = "(min-width: 900px) 620px, 92vw";
+// Any postcard whose photos set an explicit `scale` (2026-08-01,
+// VYBE-quality critic-fix round) gets the tiered hero/bleed/mid layout; a
+// postcard that doesn't set `scale` on any photo keeps the original
+// "first supporting photo runs wide" behavior untouched.
+const hasScaleTiers = galleryPhotos.some((ph) => ph.scale);
 ---
 
 <Base title={meta.title} description={meta.description}>
@@ -110,19 +116,33 @@ const wideSizes = "(min-width: 900px) 46vw, 92vw";
 
       {
         galleryPhotos.length > 0 && (
-          <section class="pc-gallery" data-reveal aria-label={`More photos from ${pc.title}`}>
-            {galleryPhotos.map(
-              (ph, i) =>
-                ph.media && (
-                  <figure class={`pc-photo ${i === 0 ? "pc-photo--wide" : ""}`}>
-                    <picture>
-                      <source type="image/avif" srcset={ph.media.avif} sizes={i === 0 ? wideSizes : gallerySizes} />
-                      <source type="image/webp" srcset={ph.media.webp} sizes={i === 0 ? wideSizes : gallerySizes} />
-                      <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
-                    </picture>
-                  </figure>
-                ),
-            )}
+          <section class={`pc-gallery ${hasScaleTiers ? "pc-gallery--tiered" : ""}`} data-reveal aria-label={`More photos from ${pc.title}`}>
+            {galleryPhotos.map((ph, i) => {
+              if (!ph.media) return null;
+              // Tiered layout (scale set): hero = full-width face-forward
+              // feature, bleed = full-width 2:1 wow shot, mid = default grid
+              // cell. Untiered layout (no postcard photo sets `scale`):
+              // original behavior — the first supporting photo runs wide.
+              const cls = hasScaleTiers
+                ? ph.scale === "hero"
+                  ? "pc-photo--hero"
+                  : ph.scale === "bleed"
+                    ? "pc-photo--bleed"
+                    : ""
+                : i === 0
+                  ? "pc-photo--wide"
+                  : "";
+              const sizes = hasScaleTiers ? (ph.scale === "hero" || ph.scale === "bleed" ? heroSizes : gallerySizes) : i === 0 ? wideSizes : gallerySizes;
+              return (
+                <figure class={`pc-photo ${cls}`}>
+                  <picture>
+                    <source type="image/avif" srcset={ph.media.avif} sizes={sizes} />
+                    <source type="image/webp" srcset={ph.media.webp} sizes={sizes} />
+                    <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              );
+            })}
           </section>
         )
       }
@@ -222,6 +242,13 @@ const wideSizes = "(min-width: 900px) 46vw, 92vw";
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 0.75rem;
   }
+  /* tiered layout (2026-08-01, VYBE-quality critic-fix round) — a postcard
+     whose photos set an explicit `scale` gets bigger mid cells (~300px, was
+     150px) so "more photos" doesn't collapse into a contact sheet. */
+  .pc-gallery--tiered {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.9rem;
+  }
   .pc-photo {
     margin: 0;
     overflow: hidden;
@@ -236,7 +263,8 @@ const wideSizes = "(min-width: 900px) 46vw, 92vw";
     object-fit: cover;
   }
   /* the first supporting photo runs wider — "more photos, well laid out"
-     without falling back to a perfectly uniform grid. */
+     without falling back to a perfectly uniform grid. (Untiered postcards
+     only — see .pc-photo--hero/--bleed below for the tiered equivalent.) */
   .pc-photo--wide {
     grid-column: span 2;
   }
@@ -250,6 +278,23 @@ const wideSizes = "(min-width: 900px) 46vw, 92vw";
     .pc-photo--wide img {
       aspect-ratio: 4 / 5;
     }
+  }
+  /* hero cell — a full-width, face-forward feature photo (>=560px
+     rendered on desktop, matching the postcard's own cover scale), so a
+     gallery can carry more than one "the wow shot" without every image
+     shrinking to a contact-sheet thumbnail. */
+  .pc-photo--hero {
+    grid-column: 1 / -1;
+  }
+  .pc-photo--hero img {
+    aspect-ratio: 4 / 5;
+  }
+  /* bleed cell — a full-width 2:1 wide establishing/wow shot. */
+  .pc-photo--bleed {
+    grid-column: 1 / -1;
+  }
+  .pc-photo--bleed img {
+    aspect-ratio: 2 / 1;
   }
   /* related-postcard cross-link (2026-07-31) — a real clickable CTA, not
      just a prose mention (e.g. Nordic Daughter ↔ Something for Tomorrow). */

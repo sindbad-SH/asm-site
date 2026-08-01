@@ -1085,3 +1085,63 @@ of what actually renders):
   `<title>`/description tags:** found and fixed on Home's `meta.description`
   (the one instance PUB-A explicitly flagged and deferred). No other page's
   title/description tag carries the old services phrasing.
+
+---
+
+## 2026-08-01 — VYBE-quality critic-fix round (5 fixes, `/adventure/vybe` + `/postcards/brazilian-living`)
+
+Adversarial-critic pass graded the 2026-07-31 v3 rebuild STILL SHORT of
+`/adventure/steel-and-dust` with measured evidence (2.7x-upscaled hero video,
+two stagger height voids, a 4-rank cover vs. the exemplar's 6, a 390px
+corner-slate collision, `festival-grounds` used twice, the strongest photo
+on the page sitting unused, another band's banner as the largest image, and
+a Brazil postcard gallery where 10 of 11 photos rendered under half the
+exemplar's smallest image). All copy rows below are ⚠ **OPERATOR
+READ-APPROVAL REQUIRED** (staging-only, same as every other row in this
+deck) — verified fix numbers (page height, stagger-column differentials) are
+in `src/pages/adventure/vybe.astro`'s own header comment and FIX-comments at
+each site, not repeated here.
+
+### `/adventure/vybe` cover (FIX 3 — was 4 typographic ranks, now 6)
+
+| Old | New | Flag |
+|---|---|---|
+| *(no masthead existed)* | **"VYBE"** — Anton condensed masthead line, sky band, credited "Adventure Storytelling Media" beneath (Steel & Dust's "Field Notes" equivalent) | ⚠ |
+| *(no kicker existed)* | **"The cover story"** — kicker line above the title, ported verbatim from the exemplar | ⚠ |
+| "In the room with Vybe." (title) | **"Lake & Lights."** — the ampersand rendered in `--color-accent` (the exemplar's own cyan-glyph device); deck paragraph below it is UNCHANGED | ⚠ |
+| "Adventure story · coverage" (top-left corner slate) | **"Coverage"** — shortened; this is also the fix for the 390px mobile collision (paired with a structural change: both corner slates now live in a flex row with a real `gap`, not two independent `position:absolute` labels) | ⚠ |
+
+### `/adventure/vybe` hero video caption (FIX 1)
+
+| Old | New | Flag |
+|---|---|---|
+| "Dusk over the gate — rising past the balloon arch, 2023." | **"Golden hour to dusk — the lake, the crowd, and the balloon arch, 2023."** — the clip is now a real 4-shot montage (golden-hour lake establishing wide → midday stage → dusk lights → balloon arch), so the caption now describes the whole piece, not just its closing shot | ⚠ |
+
+### `/adventure/vybe` re-sequenced photo captions (FIX 2 + FIX 5 — no new photos baked, existing 12 re-cropped/re-sequenced)
+
+| Photo | Old caption/role | New caption/role | Flag |
+|---|---|---|---|
+| `nadir-grounds` | Full-bleed: "Straight down over the grounds, Sunday." | **Dropped entirely** — an empty picnic-blanket top-down, the critic's "editorially empty" finding | ⚠ |
+| `flow-arts` | Small (34%) mirrored-stagger frame: "After dark, Friday." | **Full-bleed feature: "Fire and LED, after dark — Friday."** — takes over nadir-grounds' slot; the critic's pick for strongest photo on the page | ⚠ |
+| `fire-staff-spin` | Tiny cover plate only ("Inside — fire staff") | **+ mirrored-stagger frame: "Staff spinning, Sunday afternoon."** — now does double duty, delivering on its own cover tease | ⚠ |
+| `boogie-chillsbury-doughboys` | 100vw full-bleed: "The Chillsbury Doughboys, from the balcony." | **Contained column photo (same caption text, smaller footprint)** — demoted from "largest image on the page" (another band's banner) to a normal single-photo beat | ⚠ |
+| `festival-grounds` (closing beat) | "The grounds, before the light went." (2nd appearance of this exact photo — also the cover's scene) | **Dropped as the closing image** — `festival-grounds` now appears once, not twice | ⚠ |
+| `flow-duo` | Tiny cover plate only ("Inside — flow arts") | **+ closing beat: "Dancing in the afternoon sun, Sunday."** — now does double duty, delivering on its own cover tease and closing the piece on people instead of the lake/grounds scene a 3rd/4th time | ⚠ |
+
+### `src/data/postcards.ts` — "brazilian-living" gallery (FIX 4, see also `src/pages/postcards/[slug].astro`'s tiered gallery rework)
+
+Count: 9 photos (was 11). Dropped: `aline-stage` (cover/only-large image —
+on inspection a side-lit profile with hair across the face, not a clear
+face, confirming the critic over the prior scout's own notes), `vendor-tent`,
+`venue-wide`, `community-dance` (no performers in frame). Added: two new
+frames from a previously-unmined clip (`JJ Footage/JJ Samba dancers 2.mp4` @
+246.0s — see `postcards.ts`'s own 2026-08-01 comment for full sourcing).
+
+| Photo | Old alt | New alt / role | Flag |
+|---|---|---|---|
+| `dancers-rainbow-trio` | *(new photo)* | **New cover:** "Three Boulder Samba School dancers in orange, green, and blue feathered headdresses, all smiling and facing the camera mid-song, the percussion band behind them" — three unambiguous, in-focus, camera-facing faces in one frame | ⚠ |
+| `dancers-rainbow-lineup` | *(new photo)* | **New bleed cell (2:1):** "All six Boulder Samba School dancers lined up on stage in purple, red, orange, green, blue, and gold feathered headdresses, a wide establishing view of the full line" | ⚠ |
+| `aline-band` | "A singer in a green dress performing in front of the full percussion band, a Brazilian flag and the venue's sponsor signage behind her" | **Unchanged text, now a hero-scale cell (>=560px rendered)** | — |
+| `dancer-motion` | "A dancer in a green feathered headdress mid-dance, smiling, fully in frame on the stage apron" | **Unchanged text, now a hero-scale cell (>=560px rendered)** | — |
+| `aline-stage` | "A singer in a sequined green dress singing into the mic at Levitt Pavilion, her face turned up into late-day light, the Brazilian flag visible behind her" | **Dropped** (not a clear face — side profile, hair across face) | — |
+| `vendor-tent`, `venue-wide`, `community-dance` | (existing alts) | **Dropped** (no performers in frame) | — |

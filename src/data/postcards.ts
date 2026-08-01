@@ -98,6 +98,15 @@
 export type PostcardPhoto = {
   slug: string;
   alt: string;
+  /**
+   * Optional display scale for the detail-page gallery (2026-08-01,
+   * VYBE-quality critic-fix round — see SITE-COPY-DECK-publication-v1.md).
+   * "hero" = a full-width feature cell (face-forward, >=560px rendered);
+   * "bleed" = a full-width 2:1 wide cell (a single establishing/wow shot);
+   * omitted (default) = the standard ~300px grid cell. Postcards that don't
+   * set this keep the original uniform-grid behavior untouched.
+   */
+  scale?: "hero" | "bleed";
 };
 
 export type Postcard = {
@@ -194,6 +203,28 @@ export const POSTCARDS: readonly Postcard[] = [
     // skin-forward than the rest of the set — both flagged by the scout for
     // operator read before going live, so left out pending that read rather
     // than decided unilaterally.
+    //
+    // ⚠ 2026-08-01 V3 REPLACEMENT (VYBE-quality critic-fix round, finding
+    // #4 — "the one large image shows the back of a singer's head; the rest
+    // render at ~182x228px, under half the exemplar's smallest image"):
+    // reopened all 11 V2 images pixel-by-pixel. `aline-stage` (the only
+    // large image, 560x700 display) is NOT a clear face — a side-lit
+    // profile with hair across the face. Dropped as cover/hero. A fresh pass
+    // over previously-unmined clips found `JJ Footage/JJ Samba dancers 2.mp4`
+    // @ 246.0s — six dancers lined up, three (orange/green/blue) fully
+    // camera-facing and smiling in one frame, nothing else in ~2 hours of
+    // footage matches it. Baked two ways: `dancers-rainbow-trio` (tight crop
+    // on the three clear faces, now the cover) and `dancers-rainbow-lineup`
+    // (full six-dancer 2:1 wide crop, a new bleed cell). `vendor-tent`,
+    // `venue-wide`, and `community-dance` (no performers in frame) dropped
+    // per the brief; `aline-stage` superseded by `aline-band` +
+    // `dancers-rainbow-trio`, which between them give two much clearer
+    // faces. The `pc-gallery` template on /postcards/[slug].astro was also
+    // reworked (uniform 182px grid → hero/bleed/mid scale tiers via the new
+    // `PostcardPhoto.scale` field) so this pool actually renders at the size
+    // it was shot for. Count: 9 photos (was 11) — fewer but every one is
+    // performer-forward and the cover is now unambiguously face-clear. Full
+    // sourcing: `_BRAZIL-PHOTOS-V3/_NOTES.md`.
     slug: "brazilian-living",
     title: "The Art of Brazilian Living",
     date: "2025-06-22",
@@ -205,17 +236,15 @@ export const POSTCARDS: readonly Postcard[] = [
       "Later, a big circle formed on the pavement in front of a smaller stage — kids and adults both, working through steps together while a Brazilian flag flew from the barrier.",
     ],
     photos: [
-      { slug: "aline-stage", alt: "A singer in a sequined green dress singing into the mic at Levitt Pavilion, her face turned up into late-day light, the Brazilian flag visible behind her" },
+      { slug: "dancers-rainbow-trio", alt: "Three Boulder Samba School dancers in orange, green, and blue feathered headdresses, all smiling and facing the camera mid-song, the percussion band behind them" },
+      { slug: "aline-band", alt: "A singer in a green dress performing in front of the full percussion band, a Brazilian flag and the venue's sponsor signage behind her", scale: "hero" },
+      { slug: "dancer-motion", alt: "A dancer in a green feathered headdress mid-dance, smiling, fully in frame on the stage apron", scale: "hero" },
+      { slug: "dancers-rainbow-lineup", alt: "All six Boulder Samba School dancers lined up on stage in purple, red, orange, green, blue, and gold feathered headdresses, a wide establishing view of the full line", scale: "bleed" },
       { slug: "dancers-headdress", alt: "Four dancers in orange, blue, yellow, and red feathered headdresses on stage, the center dancer in blue smiling directly at the camera" },
-      { slug: "aline-band", alt: "A singer in a green dress performing in front of the full percussion band, a Brazilian flag and the venue's sponsor signage behind her" },
-      { slug: "dancer-motion", alt: "A dancer in a green feathered headdress mid-dance, smiling, fully in frame on the stage apron" },
       { slug: "dancers-ensemble", alt: "Two dancers in gold dresses and yellow and orange feathered headdresses dancing together on stage" },
-      { slug: "percussion-detail", alt: "Boulder Samba School percussionists in matching blue shirts playing congas and surdos, several faces visible and smiling" },
       { slug: "percussion-line", alt: "Boulder Samba School's full percussion line on stage, their shirts reading the group's name over a Colorado-flag-style patch" },
+      { slug: "percussion-detail", alt: "Boulder Samba School percussionists in matching blue shirts playing congas and surdos, several faces visible and smiling" },
       { slug: "chorus-finale", alt: "A line of dancers and singers in red, purple, green, and orange performance outfits clapping and dancing together in front of the band" },
-      { slug: "vendor-tent", alt: "A food truck and vendor tent along the venue's walkway, guests gathered under umbrellas before the show" },
-      { slug: "venue-wide", alt: "Levitt Pavilion's bowl-shaped lawn packed with picnic blankets, the stage and Denver skyline visible below" },
-      { slug: "community-dance", alt: "A large group dancing together on a plaza in front of a grassy, picnic-blanket-covered hillside, a dancer in a green and white dress leading in the foreground" },
     ],
     pullQuote: "A solo dancer, in a green feathered piece, had the space to herself, mid-stride, all motion.",
   },
