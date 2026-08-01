@@ -52,6 +52,19 @@ interface Props {
    *  the BTS scrub). */
   photos?: readonly { slug: string; alt: string }[];
   photosBase?: string;
+  /** LAYOUT-OVERHAUL P3 (2026-08-01) — optional editorial beats, all
+   *  prop-gated so cases that don't pass them (Shelby) render byte-identical:
+   *  a real alt + caption for the context still, a small thumbnail beside
+   *  "The Ask" (the Magnum related-content device), and one plain full-width
+   *  pull quote in "The Work" (Atavist device 8). */
+  contextAlt?: string;
+  contextCaption?: string;
+  askThumb?: { src: string; alt: string; caption: string };
+  workPull?: string;
+  /** Small credit line under the hook h1 (names who/what the hook frame
+   *  shows — caption discipline for the one image that can't carry a normal
+   *  figcaption). Prop-gated like the rest. */
+  hookCredit?: string;
 }
 const {
   study,
@@ -68,6 +81,11 @@ const {
   btsPoster,
   photos = [],
   photosBase,
+  contextAlt = "",
+  contextCaption,
+  askThumb,
+  workPull,
+  hookCredit,
 } = Astro.props;
 
 // The "Words" chapter only exists when the case supplies a testimonialId — a
@@ -97,6 +115,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   >
     {hookLogo && <img src={hookLogo} alt={hookLogoAlt} class="case-hook-logo" loading="eager" decoding="async" />}
     <h1 class="text-4xl font-bold sm:text-6xl">{study.hook}</h1>
+    {hookCredit && <p class="case-hook-credit hud-label">{hookCredit}</p>}
   </HeroVideo>
 
   <!-- Sticky survey chapter rail (desktop; jump-links without JS) -->
@@ -133,7 +152,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
           <figure class="map-inset mt-4">
             <img
               src={contextImage}
-              alt=""
+              alt={contextAlt}
               class="block w-full"
               style="aspect-ratio:16/9;object-fit:cover"
               width="1600"
@@ -141,6 +160,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
               loading="lazy"
               decoding="async"
             />
+            {contextCaption && <figcaption class="case-cap">{contextCaption}</figcaption>}
           </figure>
         ) : (
           <Placeholder ratio="16/9" class="mt-4" label="CONTEXT STILL — a PitchBoulder event frame (S3)" />
@@ -157,6 +177,14 @@ const isPending = (body: string) => body.trim() === "[confirm]";
       {
         isPending(study.ask.body) ? (
           <p class="case-pending">[confirm] — what they needed, in Sindbad's words (S3)</p>
+        ) : askThumb ? (
+          <div class="case-askrow">
+            <p class="text-lg text-ink" data-reveal>{study.ask.body}</p>
+            <figure class="case-thumb" data-reveal>
+              <img src={askThumb.src} alt={askThumb.alt} loading="lazy" decoding="async" />
+              <figcaption class="case-cap">{askThumb.caption}</figcaption>
+            </figure>
+          </div>
         ) : (
           <p class="text-lg text-ink" data-reveal>{study.ask.body}</p>
         )
@@ -171,6 +199,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
       <h2 class="text-2xl font-bold" data-reveal>{study.work.heading}</h2>
       <p class="text-lg text-ink" data-reveal>{study.work.body}</p>
       <LegendMark proof={study.work.proof} />
+      {workPull && <blockquote class="case-pull" data-reveal>{workPull}</blockquote>}
     </div>
 
     <!-- BTS scroll-scrub moment (§2c). OPTIONAL-media (DIRECTION §2.7): rendered
@@ -317,6 +346,63 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     .case-cta .arrow {
       transition: none;
     }
+  }
+
+  /* ── LAYOUT-OVERHAUL P3 — optional editorial beats (inert unless the case
+     passes the matching props; Shelby passes none) ──────────────────────── */
+  /* caption voice — small mono, directly under the image (genre convention,
+     SPEC-EDITORIAL-LAYOUT §3) */
+  .case-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+  /* The Ask + a small related thumbnail riding beside the text (~240px) */
+  .case-askrow {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 1.6rem;
+    align-items: start;
+  }
+  .case-thumb {
+    margin: 0;
+  }
+  .case-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  @media (max-width: 640px) {
+    .case-askrow {
+      grid-template-columns: 1fr;
+    }
+    .case-thumb {
+      max-width: 240px;
+    }
+  }
+  /* hook credit line — small, under the h1, over the scrim */
+  .case-hook-credit {
+    margin-top: 0.9rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, #fff 72%, transparent);
+  }
+  /* one plain full-width pull quote (Atavist device 8 — no panel, no shadow) */
+  .case-pull {
+    margin: 1.2rem 0 0.2rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.35rem, 2.8vw, 1.9rem);
+    line-height: 1.35;
+    text-align: center;
+    color: var(--color-peak);
   }
 </style>
 

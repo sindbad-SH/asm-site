@@ -22,11 +22,52 @@ const pbLogo = existsSync(join(process.cwd(), "public", "media", "work", "pitchb
   : undefined;
 // The embed his live site already uses (COPY.md §3 / DIRECTION §2.5).
 const commercialVideoId = "n7k-Bwu3KIU";
-// Hook poster = a representative frame from the commercial (builder-pick, t=28:
-// the PitchBoulder brand lockup over the room). Context still = the published
-// event frame. Both are his own published assets.
-const hookPoster = `${base}/media/work/pitchboulder/hook-poster.avif`;
-const contextImage = `${base}/media/work/pitchboulder/context.avif`;
+/**
+ * LAYOUT-OVERHAUL P3 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md +
+ * scripts/make-pitchboulder-variety.mjs): the operator flagged the repeated
+ * "top-down box-opening" fixed-camera frame — it was BOTH this page's hook
+ * and /venture's chapter-card poster. Retired everywhere:
+ *  - this hook is now `hook-podium` (his own Tier-1 web pick, 2026-05-06:
+ *    a presenter at the Boulder Chamber podium beside the "Every Parent's
+ *    Worst Fear" slide);
+ *  - the context still is now `context-room` (the professionally edited
+ *    Jan-28-2026 eye-level room-wide, per the archive's own _ABOUT.md);
+ *  - /venture's hook-poster.avif was re-extracted in place from loop.mp4
+ *    (frame n=120) so that card fronts a real frame of the loop it plays.
+ * Old files existence-gated as fallbacks so a missing bake never breaks the
+ * page. ⚠ OPERATOR READ-APPROVAL REQUIRED — the context caption, Ask-thumb
+ * caption, and Work pull quote below are new visible copy (the pull quote is
+ * a verbatim reprise of this page's own Context sentence); staging-only
+ * until read.
+ *
+ * LINKEDIN-VERIFIED (rider #2, READ-ONLY mining 2026-08-01): the hook
+ * photo's presenter is Alana Arnold, MD, MBA pitching PEMPal — named in
+ * Sindbad's OWN LinkedIn recap of that session ("PEMPal at PitchBoulder —
+ * Boulder Startup Week... set up shop at the Boulder Chamber"), the same
+ * session as the Leyden Space alumni update (photo set 2026-05-06, a
+ * Wednesday, matches). The 2026-04-29 ask-thumb founder is NOT named in any
+ * recap found, so that caption stays date-only — no name is invented.
+ */
+const pbMedia = (file: string) =>
+  existsSync(join(process.cwd(), "public", "media", "work", "pitchboulder", file))
+    ? `${base}/media/work/pitchboulder/${file}`
+    : undefined;
+// Hook = Alana Arnold, MD, MBA pitching PEMPal at the Boulder Chamber
+// (Boulder Startup Week session, 2026-05-06 — see the LinkedIn-verified note).
+const hookPoster = pbMedia("hook-podium-1600.avif") ?? `${base}/media/work/pitchboulder/hook-poster.avif`;
+const contextImage = pbMedia("context-room-1600.webp") ?? `${base}/media/work/pitchboulder/context.avif`;
+const contextAlt =
+  "The PitchBoulder room mid-session — presenters at the front, the audience around the tables.";
+const contextCaption = "The room at work — January 28, 2026 session.";
+const askThumbSrc = pbMedia("ask-thumb-900.webp");
+const askThumb = askThumbSrc
+  ? {
+      src: askThumbSrc,
+      alt: "A founder in a blazer taking the floor beside a projected slide at a PitchBoulder session.",
+      caption: "A founder takes the floor — April 29, 2026.",
+    }
+  : undefined;
+const workPull = "Watching the gap between what a founder says and what the room actually hears.";
 // BTS: no PitchBoulder BTS footage exists → section hidden (DIRECTION §2.5/§2.7).
 
 // Build #4 (2026-08-01 archive-mining integration) — "The Wednesday Room"
@@ -75,6 +116,11 @@ const WEDNESDAY_ROOM = {
     hookLogo={pbLogo}
     hookLogoAlt="PitchBoulder"
     contextImage={contextImage}
+    contextAlt={contextAlt}
+    contextCaption={contextCaption}
+    askThumb={askThumb}
+    workPull={workPull}
+    hookCredit="On the wall: Alana Arnold, MD, MBA pitching PEMPal — Boulder Startup Week session, May 6, 2026"
   />
 
   <section class="wr" aria-label="The Wednesday Room">

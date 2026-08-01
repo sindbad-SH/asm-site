@@ -3,6 +3,23 @@
 STATUS: COMPLETE (2026-08-01). Inputs: SPEC-EDITORIAL-LAYOUT.md (C:\builds\asm\REFERENCE-RESEARCH)
 + LAYOUT-AUDIT.md (this repo). Successor session to 12ab3daa; see LAYOUT-OVERHAUL-HANDOFF.md.
 
+## BUILD PROGRESS (restart-safe; local commits only, NO push until critic passes)
+
+- [x] P1 afm-2025 — c9b6bc2 (dev-verified: 10 widths, 0 standalone same-scale adjacencies, 12 captions)
+- [x] P2 seriesfest hub — 98fd027 (dev-verified: 4 distinct row layouts, ladder 1265/583/480/200/320)
+- [x] P4 dawn-patrol — 45822bd (dev-verified: 0 plates, 2 staggers + diptych, plain pull, h=5674)
+- [x] P5 meme — 4623591 (dev-verified: paras3/pull/paras3/break/roster@576px)
+- [ ] P3 pitchboulder — photo mining (E:\Pitch Boulder 2026+2025) + identify/replace the
+      repeated room frame + prop-gated CaseStudy caption/pull-quote slots (Shelby-safe) +
+      LinkedIn READ-ONLY caption mining
+- [ ] Step 4: rebuild measure.mjs + adversarial critic pass over all 5 built pages
+- [ ] Step 5: push to staging ONLY after critic passes
+
+NOTE (all builds): dev-server HMR served stale style modules after full-file rewrites —
+always restart the dev server before measuring. Browser-pane-hidden sessions never fire
+native lazy-load; 0-height lazy images below the fold are an environment artifact, not a
+page bug (confirmed on dawn-patrol's untouched bleed, files healthy on disk).
+
 ## Governing idea
 
 The audit's core finding: within-page variance is mostly solved; BETWEEN-page variance is
