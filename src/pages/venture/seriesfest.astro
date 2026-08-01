@@ -8,6 +8,23 @@
  * finally gives those four orphan pages a parent, plus a condensed arc.
  * None of the four is replaced or retired.
  *
+ * LAYOUT-OVERHAUL P2 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md): the
+ * uniform 2×2 card grid (four identical 4:3 tiles — the audit's
+ * "grid-as-body" fail, the operator's boxes complaint verbatim) becomes an
+ * editorial CONTENTS-PAGE column: four chapter rows, each a different
+ * layout, separated by hairlines instead of enclosed in bordered boxes.
+ *   01 · 2025 festival — FEATURED row: 16:9 image at 58fr beside the text
+ *        (the deepest visit reads biggest).
+ *   02 · Soul Power — a contained 2:1 banner above its text (the
+ *        step-and-repeat + press pack composition is a natural wide band).
+ *   03 · Fashion in Focus — a small ~200px square thumbnail beside text
+ *        (the Magnum related-content device; deliberately the smallest).
+ *   04 · Season 12 — mirrored row: portrait 4:5 image (the red-carpet
+ *        lineup is a standing-figures vertical) with text to its right.
+ * Crop note: the hub bakes are square/near-square (900×900, s12 900×996);
+ * all four crops are CSS aspect-ratio + object-position tuned against a
+ * contact sheet (eye-reviewed) — no new bakes, originals untouched.
+ *
  * COLLISION-MAP GATE: only 5 of the miner's staged 10 images survive
  * perceptual dedup — see scripts/make-seriesfest-hub.mjs. That's a cover
  * image + exactly one illustrated card per chapter, with nothing spare for
@@ -41,6 +58,15 @@ function photo(slug: string) {
 }
 const cover = photo(sf.coverImageSlug);
 const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
+
+// Per-row layout + crop assignment (index-aligned with sf.chapters 01–04;
+// crops tuned against the eye-reviewed contact sheet — see header note).
+const ROW_STYLE = [
+  "aspect-ratio:16/9;object-fit:cover;object-position:50% 42%", // 01 featured — keeps the Season 11 wordmark + moderator
+  "aspect-ratio:2/1;object-fit:cover;object-position:50% 45%",  // 02 banner — backdrop + press pack band
+  "aspect-ratio:1/1;object-fit:cover;object-position:55% 60%",  // 03 thumb — model + florals
+  "aspect-ratio:4/5;object-fit:cover;object-position:50% 45%",  // 04 portrait — the standing lineup
+] as const;
 ---
 
 <Base title={sf.meta.title} description={sf.meta.description}>
@@ -91,27 +117,32 @@ const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
         <p class="text-lg text-ink" data-reveal>{sf.intro}</p>
       </div>
 
-      <!-- FOUR CHAPTER CARDS — the hub's real value: architecture, not a
-           second photo essay. One illustrated card per existing page. -->
-      <section class="sf-cards mx-auto max-w-6xl px-8 pt-8" aria-label="The four visits">
+      <!-- THE CONTENTS COLUMN — four visits, four different row layouts
+           (featured / banner / thumbnail / portrait), hairline-separated.
+           The hub's value is architecture; the variety is the point. -->
+      <section class="sf-toc mx-auto px-8 pt-6" aria-label="The four visits">
         {
-          chapters.map((c) => (
-            <a href={`${base}${c.href}`} class="sf-card" data-reveal data-reveal-stagger="60">
+          chapters.map((c, i) => (
+            <a
+              href={`${base}${c.href}`}
+              class={`sf-row sf-row--${i === 0 ? "featured" : i === 1 ? "banner" : i === 2 ? "thumb" : "portrait"}`}
+              data-reveal
+            >
               {c.media && (
-                <div class="sf-card-media">
+                <div class="sf-row-media">
                   <picture>
-                    <source type="image/avif" srcset={c.media.avif} sizes="(min-width: 900px) 22rem, 90vw" />
-                    <source type="image/webp" srcset={c.media.webp} sizes="(min-width: 900px) 22rem, 90vw" />
-                    <img src={c.media.src} alt={c.alt} style="aspect-ratio:4/3;object-fit:cover" loading="lazy" decoding="async" />
+                    <source type="image/avif" srcset={c.media.avif} sizes={i === 0 ? "(max-width: 760px) 100vw, 38rem" : i === 1 ? "(max-width: 760px) 100vw, 30rem" : i === 2 ? "200px" : "(max-width: 760px) 80vw, 20rem"} />
+                    <source type="image/webp" srcset={c.media.webp} sizes={i === 0 ? "(max-width: 760px) 100vw, 38rem" : i === 1 ? "(max-width: 760px) 100vw, 30rem" : i === 2 ? "200px" : "(max-width: 760px) 80vw, 20rem"} />
+                    <img src={c.media.src} alt={c.alt} style={ROW_STYLE[i]} loading="lazy" decoding="async" />
                   </picture>
                 </div>
               )}
-              <div class="sf-card-body">
+              <div class="sf-row-body">
                 <p class="hud-label sf-accent">{c.no} · {c.slate}</p>
-                <p class="hud-label sf-card-date">{c.date}</p>
-                <h2 class="sf-card-title">{c.title}</h2>
-                <p class="sf-card-copy">{c.body}</p>
-                <span class="sf-card-cta">{c.cta} <span class="arrow" aria-hidden="true">→</span></span>
+                <p class="hud-label sf-row-date">{c.date}</p>
+                <h2 class="sf-row-title">{c.title}</h2>
+                <p class="sf-row-copy">{c.body}</p>
+                <span class="sf-row-cta">{c.cta} <span class="arrow" aria-hidden="true">→</span></span>
               </div>
             </a>
           ))
@@ -205,37 +236,54 @@ const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
     color: var(--color-peak);
   }
 
-  .sf-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-  .sf-card {
+  /* ── THE CONTENTS COLUMN — de-boxed rows, hairline-separated ─────────── */
+  .sf-toc {
+    max-width: 64rem;
     display: grid;
-    gap: 0;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
+  }
+  .sf-row {
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 2.2rem);
+    padding-block: 2rem;
+    border-top: 1px solid var(--color-hairline);
     text-decoration: none;
     color: inherit;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease), border-color var(--dur-hover, 180ms) ease;
+    align-items: center;
   }
-  .sf-card:hover, .sf-card:focus-visible {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  .sf-row:first-child {
+    border-top: none;
   }
-  .sf-card-media { margin: 0; background: color-mix(in srgb, #ffffff 4%, transparent); }
-  .sf-card-media img { display: block; width: 100%; }
-  .sf-card-body { padding: 1.1rem 1.25rem 1.4rem; display: grid; gap: 0.4rem; }
-  .sf-card-date { color: var(--color-ink-muted); letter-spacing: 0.14em; }
-  .sf-card-title {
+  .sf-row-media {
+    margin: 0;
+  }
+  .sf-row-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .sf-row:hover .sf-row-media img,
+  .sf-row:focus-visible .sf-row-media img {
+    transform: scale(1.015);
+  }
+  .sf-row-body {
+    display: grid;
+    gap: 0.4rem;
+    align-content: center;
+  }
+  .sf-row-date { color: var(--color-ink-muted); letter-spacing: 0.14em; }
+  .sf-row-title {
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 560;
-    font-size: 1.3rem;
+    font-size: clamp(1.3rem, 2.4vw, 1.7rem);
     line-height: 1.2;
     color: var(--color-peak);
     margin-top: 0.2rem;
   }
-  .sf-card-copy { font-size: 0.94rem; line-height: 1.55; color: var(--color-ink); }
-  .sf-card-cta {
+  .sf-row-copy { font-size: 0.96rem; line-height: 1.55; color: var(--color-ink); max-width: 52ch; }
+  .sf-row-cta {
     margin-top: 0.4rem;
     font-family: var(--font-mono);
     font-size: 0.68rem;
@@ -243,13 +291,61 @@ const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
     text-transform: uppercase;
     color: var(--color-accent);
   }
-  .sf-card:hover .sf-card-cta .arrow,
-  .sf-card:focus-visible .sf-card-cta .arrow { transform: translateX(4px); }
-  .sf-card-cta .arrow { display: inline-block; transition: transform var(--dur-hover, 160ms) var(--ease-swift); }
+  .sf-row:hover .sf-row-cta .arrow,
+  .sf-row:focus-visible .sf-row-cta .arrow { transform: translateX(4px); }
+  .sf-row-cta .arrow { display: inline-block; transition: transform var(--dur-hover, 160ms) var(--ease-swift); }
+
+  /* 01 — FEATURED: big 16:9 image left (58fr), text right */
+  .sf-row--featured {
+    grid-template-columns: 58fr 34fr;
+  }
+  /* 02 — BANNER: contained 2:1 band stacked above centered text */
+  .sf-row--banner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1.1rem;
+  }
+  .sf-row--banner .sf-row-media {
+    width: min(100%, 30rem);
+  }
+  .sf-row--banner .sf-row-body {
+    max-width: 38rem;
+    text-align: center;
+    justify-items: center;
+  }
+  /* 03 — THUMB: text left, small square thumbnail right (~200px) */
+  .sf-row--thumb {
+    grid-template-columns: 1fr 200px;
+  }
+  .sf-row--thumb .sf-row-media {
+    order: 2;
+    width: 200px;
+  }
+  .sf-row--thumb .sf-row-body {
+    order: 1;
+  }
+  /* 04 — PORTRAIT: 4:5 image left at 20rem, text right */
+  .sf-row--portrait {
+    grid-template-columns: 20rem 1fr;
+  }
 
   .sf-links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
 
   @media (max-width: 760px) {
-    .sf-cards { grid-template-columns: 1fr; }
+    .sf-row--featured,
+    .sf-row--thumb,
+    .sf-row--portrait {
+      grid-template-columns: 1fr;
+    }
+    .sf-row--thumb .sf-row-media {
+      order: 1;
+      width: 200px;
+    }
+    .sf-row--thumb .sf-row-body {
+      order: 2;
+    }
+    .sf-row--portrait .sf-row-media {
+      width: min(80vw, 20rem);
+    }
   }
 </style>
