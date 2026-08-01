@@ -1287,3 +1287,38 @@ named on that chapter's own live page — no new person named here.
   header logo images present on every page.
 - `astro check`: 0 errors, 0 warnings. `astro build`: green, honesty-audit
   passed.
+
+### Build #3 — `/venture/afm-2025` upgrade: "Movement 2 · The Floor"
+
+Upgrade, not a new page (per the plan §1.3: two thin AFM pages would be
+worse than one good one). Appends a new chapter to the existing 303-line
+`src/pages/venture/afm-2025.astro` — nothing on the page is replaced.
+Source: `_STORY-STAGING/afm-2025-market-floor/STORY.md`. No collision-map
+rework needed here — `_COLLISION-MAP.md` confirmed the 6 images the plan
+kept are all perceptually clear; the 2 flagged staged picks
+(`hero-panel-close`↔`home/industry/cluster/ridge`, `panel-second-session`↔
+the live page's own `panel-seated`) were already excluded by the plan's own
+CUT list #11 for editorial redundancy, independent of the collision sweep.
+
+| Row | Content | Flag |
+|---|---|---|
+| Chapter kicker | "Movement 2 · The Floor" | ⚠ |
+| Chapter heading | "The rest of the building." | ⚠ |
+| 4 body paragraphs | Merged down from the miner's 6 (the panel paragraph dropped as redundant with the page's existing Sessions copy, per the plan's copy-deck-plan table) — adapted from `STORY.md` | ⚠ |
+| 6 caption+alt pairs | `venue-century-plaza`, `stage-before-doors`, `pavilion-cinecitta`, `pavilion-row-egypt`, `floor-wvfilm-booth`, `reception-evening` — adapted from `STORY.md`'s per-image alt text | ⚠ |
+
+**Honesty rails applied:** no new relationship claim (the existing AFM
+LegendMark at the top of the page already carries the page's only status
+claim); `pavilion-cinecitta` and `pavilion-row-egypt` show real, verifiable
+trade-show signage (a working studio's and a national film commission's own
+booths) — neither is the largest image on the page (the "no other brand's
+signage as a dominant image" rule); `floor-wvfilm-booth` shows public
+commercial activity on an open trade-show floor, same risk class as the
+panel photography already live.
+
+**Verified:** `astro check` 0 errors, `astro build` green, honesty-audit
+passed. Screenshot-checked at 1440×900 — 0 repeated images (18 unique
+content images across the full page including the original 10, plus the 2
+global header logo images), no horizontal overflow, no broken layout in the
+new section. Not bound by the 6200px full-page ceiling (upgrade vessel, per
+the plan) — settled height 10364px across the now-two-chapter page.
