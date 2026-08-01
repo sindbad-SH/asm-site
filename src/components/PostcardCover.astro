@@ -1,0 +1,194 @@
+---
+/**
+ * PostcardCover.astro — the "Postcards from the Road" cover treatment
+ * (2026-07-31, adventure-page visual upgrade).
+ *
+ * Postcards are a lighter, smaller tier than a Field Notes dispatch (see
+ * src/data/postcards.ts's header) — this is deliberately NOT the FieldCover
+ * component (that one carries the "Field Notes" masthead + the Amazing
+ * Aerial licensing stitch, neither of which applies here: postcards are
+ * personal archive coverage, not the licensed aerial archive). It borrows
+ * FieldCover's GRAMMAR at a smaller scale, per the operator's direction —
+ * "same magazine treatment at ONE-PAGER scale": one full-bleed lead photo, a
+ * bottom scrim, corner survey marks, a mono kicker + display title.
+ *
+ * ONE component, TWO sizes via the `compact` prop:
+ *   compact  — the /adventure tile: the entire clickable card (caller wraps
+ *              it in <a>, matching the site's existing .fest-cover pattern —
+ *              a <div>, never a <figure>, so it nests cleanly inside <a>).
+ *   (full)   — the /postcards/[slug] detail-page hero.
+ *
+ * HONESTY: every string is passed in from the postcard's own data (title,
+ * date, location). No invented copy lives in this component.
+ */
+interface Media {
+  avif: string;
+  webp: string;
+  src: string;
+}
+interface Props {
+  media: Media;
+  alt: string;
+  title: string;
+  date: string;
+  location: string;
+  compact?: boolean;
+  class?: string;
+}
+const { media, alt, title, date, location, compact = false, class: klass = "" } = Astro.props;
+const sizes = compact ? "(min-width: 900px) 22vw, 45vw" : "(min-width: 900px) 620px, 92vw";
+---
+
+<div class={`pc-cover ${compact ? "pc-cover--compact" : "pc-cover--full"} ${klass}`}>
+  <picture>
+    <source type="image/avif" srcset={media.avif} sizes={sizes} />
+    <source type="image/webp" srcset={media.webp} sizes={sizes} />
+    <img src={media.src} alt={alt} class="pc-cover-img" loading={compact ? "lazy" : "eager"} decoding="async" fetchpriority={compact ? undefined : "high"} />
+  </picture>
+  <span class="pc-cover-scrim" aria-hidden="true"></span>
+  <span class="pc-cover-mark pc-cover-mark--tl" aria-hidden="true"></span>
+  <span class="pc-cover-mark pc-cover-mark--br" aria-hidden="true"></span>
+  <div class="pc-cover-block">
+    <p class="pc-cover-kicker hud-label">
+      Postcard <span class="pc-cover-date">· {date}</span>
+    </p>
+    <h3 class="pc-cover-title">{title}</h3>
+    <p class="pc-cover-loc hud-label">{location}</p>
+  </div>
+</div>
+
+<style>
+  .pc-cover {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-elevated, #1c2530);
+  }
+  .pc-cover > picture {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .pc-cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease-survey, ease);
+  }
+  .pc-cover-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.5) 0%, transparent 30%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.92) 0%, rgba(10, 13, 18, 0.35) 40%, transparent 62%);
+  }
+  .pc-cover-mark {
+    position: absolute;
+    z-index: 2;
+    width: 14px;
+    height: 14px;
+    opacity: 0.75;
+    pointer-events: none;
+  }
+  .pc-cover-mark--tl {
+    top: 10px;
+    left: 10px;
+    border-top: 1px solid var(--color-accent-deep);
+    border-left: 1px solid var(--color-accent-deep);
+  }
+  .pc-cover-mark--br {
+    bottom: 10px;
+    right: 10px;
+    border-bottom: 1px solid var(--color-accent-deep);
+    border-right: 1px solid var(--color-accent-deep);
+  }
+  .pc-cover-block {
+    position: absolute;
+    z-index: 2;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    display: grid;
+    gap: 0.3rem;
+  }
+  .pc-cover-kicker {
+    color: var(--color-adventure-warm, var(--color-accent));
+  }
+  .pc-cover-date {
+    color: color-mix(in srgb, #fff 65%, transparent);
+  }
+  .pc-cover-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+    line-height: 1.04;
+  }
+  .pc-cover-loc {
+    margin: 0;
+    color: color-mix(in srgb, #fff 74%, transparent);
+  }
+
+  /* ── compact (tile) sizing ── */
+  .pc-cover--compact {
+    aspect-ratio: 4 / 5;
+    box-shadow: 0 16px 38px -14px rgba(0, 0, 0, 0.55);
+  }
+  .pc-cover--compact .pc-cover-kicker {
+    font-size: 0.54rem;
+  }
+  .pc-cover--compact .pc-cover-title {
+    font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+  }
+  .pc-cover--compact .pc-cover-loc {
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── full (detail-page hero) sizing ── */
+  .pc-cover--full {
+    width: min(92vw, 560px);
+    aspect-ratio: 4 / 5;
+    margin: 0 auto;
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.65);
+  }
+  .pc-cover--full .pc-cover-block {
+    left: 22px;
+    right: 22px;
+    bottom: 20px;
+    gap: 0.5rem;
+  }
+  .pc-cover--full .pc-cover-kicker {
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+  }
+  .pc-cover--full .pc-cover-title {
+    font-size: clamp(2rem, 6vw, 2.9rem);
+  }
+  .pc-cover--full .pc-cover-loc {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .pc-cover-img {
+      animation: pc-cover-settle 2000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes pc-cover-settle {
+      from { transform: scale(1.04); }
+      to { transform: scale(1); }
+    }
+  }
+  /* the whole cover div fills its parent <a> hit-area, so hovering/focusing
+     the div itself is equivalent to hovering the tile link — no need to
+     reach into the parent (Astro's style scoping wouldn't see it anyway). */
+  .pc-cover--compact:hover .pc-cover-img,
+  .pc-cover--compact:focus-visible .pc-cover-img {
+    transform: scale(1.04);
+  }
+</style>

@@ -5,16 +5,28 @@
  * The detail page for a single "postcard" — the smallest story unit on the
  * site (src/data/postcards.ts): one place, a short paragraph or two, a small
  * gallery, a date. Deliberately LIGHT — a postcard, not a Field Notes
- * dispatch (/field-notes/[slug]). No FieldCover magazine treatment, no
- * Amazing Aerial licensing funnel (postcards are personal archive coverage,
- * not the licensed aerial archive) — just the words and a few frames, with a
- * back-link to /adventure.
+ * dispatch (/field-notes/[slug]). No Amazing Aerial licensing funnel
+ * (postcards are personal archive coverage, not the licensed aerial
+ * archive) — just the words and a few frames, with a back-link to
+ * /adventure.
+ *
+ * ⚠ 2026-07-31 (operator direct review) — "same magazine treatment at
+ * ONE-PAGER scale": the page now opens on a PostcardCover hero (the compact
+ * FieldCover-derived grammar, see src/components/PostcardCover.astro) instead
+ * of a plain text header; an optional pull-line (lifted verbatim from the
+ * postcard's own paragraphs, see postcards.ts) renders as a callout partway
+ * through the prose; the gallery gives its first supporting photo a wider
+ * cell so the grid isn't perfectly uniform ("more photos, well laid out");
+ * and an optional `related` cross-link (e.g. Nordic Daughter ↔ Something for
+ * Tomorrow) renders as a real CTA, not just a prose mention. Still
+ * deliberately light — no chapters, no full editorial spread.
  *
  * STATIC PATHS: one page per entry in POSTCARDS. No draft concept — every
  * filed postcard is routable (the array itself is the honesty gate: nothing
  * renders until it's actually filed, per postcards.ts's own header).
  */
 import Base from "../../layouts/Base.astro";
+import PostcardCover from "../../components/PostcardCover.astro";
 import { POSTCARDS } from "../../data/postcards";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -44,6 +56,13 @@ type Props = { pc: (typeof POSTCARDS)[number] };
 const { pc } = Astro.props;
 
 const photos = pc.photos.map((ph) => ({ ...ph, media: postcardPhoto(pc.slug, ph.slug) })).filter((ph) => ph.media);
+// The lead photo becomes the cover hero; the gallery below shows the rest —
+// "mostly more photos, well laid out" without repeating the cover image.
+const cover = photos[0];
+const galleryPhotos = photos.slice(1);
+
+const related = pc.related ? POSTCARDS.find((p) => p.slug === pc.related!.slug) : undefined;
+const relatedCover = related ? postcardPhoto(related.slug, related.photos[0]!.slug) : undefined;
 
 const meta = {
   title: `${pc.title} — Postcard | Adventure Storytelling Media`,
@@ -53,6 +72,7 @@ const meta = {
 };
 
 const gallerySizes = "(min-width: 900px) 30vw, 45vw";
+const wideSizes = "(min-width: 900px) 46vw, 92vw";
 ---
 
 <Base title={meta.title} description={meta.description}>
@@ -62,32 +82,67 @@ const gallerySizes = "(min-width: 900px) 30vw, 45vw";
         <a class="link" href={`${base}/adventure`}>← All postcards</a>
       </p>
 
-      <header class="pc-head" data-reveal>
-        <p class="hud-label pc-kicker">Postcard · {pc.date}</p>
-        <h1 class="pc-title">{pc.title}</h1>
-        <p class="pc-loc hud-label">{pc.location}</p>
-      </header>
+      {
+        cover?.media ? (
+          <PostcardCover
+            media={cover.media}
+            alt={cover.alt}
+            title={pc.title}
+            date={pc.date}
+            location={pc.location}
+            class="pc-detail-cover"
+          />
+        ) : (
+          <header class="pc-head" data-reveal>
+            <p class="hud-label pc-kicker">Postcard · {pc.date}</p>
+            <h1 class="pc-title">{pc.title}</h1>
+            <p class="pc-loc hud-label">{pc.location}</p>
+          </header>
+        )
+      }
+      {cover?.media && <h1 class="sr-only">{pc.title}</h1>}
 
       <div class="pc-prose" data-reveal>
-        {pc.paragraphs.map((graf) => <p>{graf}</p>)}
+        <p>{pc.paragraphs[0]}</p>
+        {pc.pullQuote && <blockquote class="pc-pull panel">{pc.pullQuote}</blockquote>}
+        {pc.paragraphs.slice(1).map((graf) => <p>{graf}</p>)}
       </div>
 
       {
-        photos.length > 0 && (
-          <section class="pc-gallery" data-reveal aria-label={`Photos from ${pc.title}`}>
-            {photos.map(
-              (ph) =>
+        galleryPhotos.length > 0 && (
+          <section class="pc-gallery" data-reveal aria-label={`More photos from ${pc.title}`}>
+            {galleryPhotos.map(
+              (ph, i) =>
                 ph.media && (
-                  <figure class="pc-photo">
+                  <figure class={`pc-photo ${i === 0 ? "pc-photo--wide" : ""}`}>
                     <picture>
-                      <source type="image/avif" srcset={ph.media.avif} sizes={gallerySizes} />
-                      <source type="image/webp" srcset={ph.media.webp} sizes={gallerySizes} />
+                      <source type="image/avif" srcset={ph.media.avif} sizes={i === 0 ? wideSizes : gallerySizes} />
+                      <source type="image/webp" srcset={ph.media.webp} sizes={i === 0 ? wideSizes : gallerySizes} />
                       <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
                     </picture>
                   </figure>
                 ),
             )}
           </section>
+        )
+      }
+
+      {
+        related && relatedCover && (
+          <a class="pc-related" href={`${base}/postcards/${related.slug}`} data-reveal>
+            <span class="pc-related-thumb">
+              <picture>
+                <source type="image/avif" srcset={relatedCover.avif} sizes="72px" />
+                <source type="image/webp" srcset={relatedCover.webp} sizes="72px" />
+                <img src={relatedCover.src} alt="" loading="lazy" decoding="async" />
+              </picture>
+            </span>
+            <span class="pc-related-text">
+              <span class="hud-label pc-related-kicker">Related postcard</span>
+              <span class="pc-related-label">{pc.related!.label}</span>
+            </span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
         )
       }
 
@@ -111,6 +166,11 @@ const gallerySizes = "(min-width: 900px) 30vw, 45vw";
   }
   .pc-head {
     margin-bottom: 1.75rem;
+  }
+  /* the PostcardCover hero (2026-07-31) replaces .pc-head on postcards with
+     a lead photo; give it the same breathing room the old text header had. */
+  :global(.pc-detail-cover) {
+    margin-bottom: 2.25rem;
   }
   .pc-kicker {
     margin: 0 0 0.6rem;
@@ -142,6 +202,20 @@ const gallerySizes = "(min-width: 900px) 30vw, 45vw";
   .pc-prose p:last-child {
     margin-bottom: 0;
   }
+  /* pull-line (2026-07-31) — one sentence lifted verbatim from the prose,
+     set large; same left-accent-rule grammar as Steel & Dust's sd-pull, at
+     postcard scale ("a pull-line or two, not a full spread"). */
+  .pc-pull {
+    margin: 0 0 1.4em;
+    padding: 0.9rem 1.2rem;
+    border-left: 2px solid var(--color-adventure-warm, var(--color-accent));
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 480;
+    font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+    line-height: 1.4;
+    color: var(--color-peak);
+  }
   .pc-gallery {
     margin-top: 2.25rem;
     display: grid;
@@ -160,6 +234,77 @@ const gallerySizes = "(min-width: 900px) 30vw, 45vw";
     width: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
+  }
+  /* the first supporting photo runs wider — "more photos, well laid out"
+     without falling back to a perfectly uniform grid. */
+  .pc-photo--wide {
+    grid-column: span 2;
+  }
+  .pc-photo--wide img {
+    aspect-ratio: 16 / 10;
+  }
+  @media (max-width: 480px) {
+    .pc-photo--wide {
+      grid-column: span 1;
+    }
+    .pc-photo--wide img {
+      aspect-ratio: 4 / 5;
+    }
+  }
+  /* related-postcard cross-link (2026-07-31) — a real clickable CTA, not
+     just a prose mention (e.g. Nordic Daughter ↔ Something for Tomorrow). */
+  .pc-related {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-peak) 16%, transparent);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color var(--dur-hover, 180ms) var(--ease-swift, ease),
+      background var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .pc-related:hover,
+  .pc-related:focus-visible {
+    border-color: color-mix(in srgb, var(--color-adventure-warm, var(--color-accent)) 45%, transparent);
+    background: color-mix(in srgb, #ffffff 3%, transparent);
+  }
+  .pc-related-thumb {
+    flex: none;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .pc-related-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pc-related-text {
+    flex: 1 1 auto;
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+  .pc-related-kicker {
+    color: var(--color-adventure-warm, var(--color-accent));
+  }
+  .pc-related-label {
+    font-size: 0.94rem;
+    color: var(--color-ink);
+  }
+  .pc-related .arrow {
+    flex: none;
+    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .pc-related:hover .arrow,
+  .pc-related:focus-visible .arrow {
+    transform: translateX(4px);
   }
   .pc-foot {
     margin-top: 3rem;

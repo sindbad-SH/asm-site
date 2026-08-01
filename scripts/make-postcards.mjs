@@ -12,6 +12,19 @@
  * / honesty note on every entry (band-name correction, the audience/stage
  * split, the venue ID for Brazilian Living).
  *
+ * ⚠ 2026-07-31 — SUPERSEDED for the dance/market frames below: the operator
+ * merged "scandinavian-midsummer-festival" INTO "nordic-daughter" (one
+ * postcard, "same festival, dancers + band"). The six frames this script
+ * bakes under `postcard: "scandinavian-midsummer-festival"` were copied
+ * (not re-baked) to public/media/adventure/postcards/nordic-daughter/ — if
+ * you re-run this script from scratch, also copy/rename that output into
+ * the nordic-daughter/ folder, or update the `postcard` field below to
+ * "nordic-daughter" directly. The "nd-set" frame is dropped from the merged
+ * postcard (superseded by the two sharper, distinct frames in
+ * scripts/fix-nordic-daughter-postcard.mjs — festival-set/festival-strings)
+ * but is left in this script unchanged as it's still a valid extra frame if
+ * ever needed.
+ *
  * Sources (READ-ONLY):
  *  - Scandinavian Midsummer Festival frames: unchanged from the original
  *    pass — see git history / SITE-COPY-DECK-publication-v1.md for that

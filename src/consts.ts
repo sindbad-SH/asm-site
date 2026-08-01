@@ -1395,12 +1395,22 @@ export const PAGES = {
     // attribution line composes from the WORK record (single source); the
     // aerial-licensing note renders ONLY via LegendMark (amazing-aerial's
     // verbatim permittedPhrasing) as an inline credibility marker.
+    // 2026-07-31 (operator direct review) — the section was carrying a
+    // PLACEHOLDER description ("A medieval festival in Loveland") instead of
+    // the event's real name. Verified: Colorado Medieval Festival, run by The
+    // Savage Woods LLC at 1750 Savage Road, Loveland, CO (coloradocastle.com,
+    // colorado.com/loveland/events/history-heritage/colorado-medieval-festival,
+    // tickettailor.com/events/thesavagewoodsllc — confirmed again 2026-07-31
+    // via web search: annual June weekend, Knights of Mayhem full-contact
+    // jousting, Colorado Wardens armored combat). Same name already used
+    // correctly on the full story page (steelDust below) — this teaser now
+    // matches it.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new visible
     // copy (staging-only until read). Facts: Colorado Medieval Festival,
     // Loveland, CO, June 2024 — dates read from the source files.
     festival: {
       kicker: "Adventure story · Loveland, Colorado",
-      heading: "A medieval festival in Loveland",
+      heading: "The Colorado Medieval Festival",
       body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. We covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
     },
     // M1 — STEEL & DUST (2026-07-22, operator-directed "magazine light"

@@ -1,0 +1,607 @@
+---
+/**
+ * /adventure/vybe — IN THE ROOM WITH VYBE (2026-07-31, adventure-page visual
+ * upgrade, block→subpage pattern — same pattern as /adventure/steel-and-dust
+ * for the medieval-festival block).
+ *
+ * The operator's bar: "on par with the medieval festival spread — magazine-
+ * cover treatment... AND a rich click-through page, a lot more layout, a lot
+ * better — not the current link to the plain /work/vybe case page." This
+ * page extends the site's own editorial grammar (Steel & Dust's de-boxed
+ * spread: asymmetric photo staggers, a full-bleed band, a pull quote) at a
+ * lighter scale appropriate to Vybe's story — two nights of friend coverage,
+ * not a flagship Field Notes issue, so there's no "Field Notes No. 0X"
+ * masthead here, no newsstand-with-plates cover, no chapter ghost-numerals.
+ *
+ * Media: all nine photos baked by scripts/make-vybe-section.mjs (source:
+ * C:/builds/asm/SAMPLES/photos/vybe/_CONTACT-SHEET.md — his own already-
+ * culled, already-graded selects, not raw footage) + the existing
+ * public/media/work/vybe/clips/vybe-fest.mp4 golden-hour aerial loop (built
+ * for the /work/vybe case page, reused here — same asset, no new render).
+ *
+ * HONESTY: no Vybe brand/logo assets anywhere on this page (their official
+ * pack hasn't been provided — see the vybe-community-partner memo). The one
+ * relationship claim is LegendMark's verbatim permittedPhrasing ("event
+ * coverage for Vybe"). The live band at the 2023 festival is captioned
+ * generically ("a band") — no name is verified in the source material, so
+ * none is invented. The Chillsbury Doughboys' name IS verified (read
+ * straight off the venue's own stage signage in frame).
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every heading/paragraph/caption below
+ * is new copy (staging-only until read), matching this page's own existing
+ * VYBE-section convention (copy authored inline, not routed through
+ * consts.ts — unlike the festival/steelDust copy blocks).
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const VDIR = join(process.cwd(), "public", "media", "adventure", "vybe");
+const WIDTHS = [700, 1200] as const;
+function photo(slug: string) {
+  if (!existsSync(join(VDIR, `${slug}-${WIDTHS[0]}.avif`))) return undefined;
+  return {
+    avif: WIDTHS.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: WIDTHS.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/vybe/${slug}-${WIDTHS[0]}.webp`,
+  };
+}
+
+const cover = photo("festival-reveal");
+const festivalGrounds = photo("festival-grounds");
+const flowArts = photo("flow-arts");
+const duskCircle = photo("dusk-circle");
+const bandGoldenFlare = photo("band-golden-flare");
+const fireStaffSpin = photo("fire-staff-spin");
+const boogieRoom = photo("boogie-room");
+const boogieChillsbury = photo("boogie-chillsbury-doughboys");
+const boogieStage = photo("boogie-stage");
+
+// The golden-hour aerial loop, built for /work/vybe and reused here
+// (existence-gated, poster-first, IO-gated — same contract as every other
+// ambient loop on the site).
+const clipDir = join(process.cwd(), "public", "media", "work", "vybe", "clips");
+const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
+  ? {
+      src: `${base}/media/work/vybe/clips/vybe-fest.mp4`,
+      posterAvif: existsSync(join(clipDir, "vybe-fest-poster.avif"))
+        ? `${base}/media/work/vybe/clips/vybe-fest-poster.avif`
+        : undefined,
+      posterWebp: existsSync(join(clipDir, "vybe-fest-poster.webp"))
+        ? `${base}/media/work/vybe/clips/vybe-fest-poster.webp`
+        : undefined,
+    }
+  : undefined;
+---
+
+<Base
+  title="In the Room with Vybe — Adventure Storytelling Media"
+  description="Two nights with Vybe, a Denver arts, music, and dance collective — the 2023 outdoor festival from the air and the 2024 Boogie Lights show, in frames and a short clip."
+>
+  <div data-lane="adventure">
+    <!-- ── COVER ─────────────────────────────────────────────────────────── -->
+    <section class="vy-stage" aria-label="Vybe — In the Room with Vybe">
+      <div class="vy-cover" data-reveal>
+        {
+          cover && (
+            <picture>
+              <source type="image/avif" srcset={cover.avif} sizes="(min-width: 900px) 900px, 94vw" />
+              <source type="image/webp" srcset={cover.webp} sizes="(min-width: 900px) 900px, 94vw" />
+              <img
+                src={cover.src}
+                alt="A blue-hour aerial reveal over the Vybe festival grounds beside a lake, string lights glowing through the cottonwoods"
+                class="vy-cover-img"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+          )
+        }
+        <span class="vy-cover-scrim" aria-hidden="true"></span>
+        <p class="vy-cover-corner hud-label">Denver, Colorado · 2023–2024</p>
+        <div class="vy-cover-block">
+          <p class="hud-label vy-cover-kicker">Adventure story · coverage</p>
+          <h1 class="vy-cover-title">In the room with Vybe.</h1>
+          <p class="vy-cover-deck">
+            Two nights with a Denver arts, music, and dance collective — an outdoor festival by a
+            lake, and a room full of Boogie Lights the following spring.
+          </p>
+        </div>
+      </div>
+      <p class="vy-cue hud-label" aria-hidden="true">Scroll for the story ↓</p>
+    </section>
+
+    <!-- ── THE STORY ─────────────────────────────────────────────────────── -->
+    <article class="border-t border-hairline vy-report">
+      <header class="vy-col vy-open" data-reveal>
+        <hr class="flight-line mb-6" aria-hidden="true" />
+        <p class="hud-label" data-reveal>Vybe · Denver · 2023–2024</p>
+        <p class="hud-label vy-accent" data-reveal>Words &amp; drone — Sindbad Horizon</p>
+        <p class="vy-lede" data-reveal>
+          Vybe — short for Vibrate Your Best Energy — is a Denver arts, music, and dance
+          collective built around community: Park &amp; Play gatherings, an annual outdoor
+          festival, and whatever room they show up in.
+        </p>
+      </header>
+
+      <div class="vy-col space-y-6">
+        <p class="text-lg text-ink" data-reveal>
+          I've known the founders since 2023 and have covered two of their nights since — camera
+          coverage only, nothing official. The first was their outdoor festival that fall; the
+          second was a Boogie Lights show in Denver the following spring, on someone else's
+          stage.
+        </p>
+      </div>
+
+      <!-- THE VIDEO — first visual after the open (same rule as Steel & Dust) -->
+      {
+        clip && (clip.posterAvif || clip.posterWebp) && (
+          <section class="mx-auto max-w-md px-8 pt-8">
+            <figure class="vy-photo" data-reveal>
+              <div class="vy-video">
+                <picture>
+                  {clip.posterAvif && <source type="image/avif" srcset={clip.posterAvif} />}
+                  <img class="vy-poster" src={clip.posterWebp ?? clip.posterAvif} alt="" loading="lazy" decoding="async" />
+                </picture>
+                <video class="vy-loop" data-vy-loop data-loop-src={clip.src} muted loop playsinline preload="none" aria-hidden="true" />
+              </div>
+              <figcaption class="vy-cap hud-label">Approaching the festival gate, golden hour, 2023.</figcaption>
+            </figure>
+          </section>
+        )
+      }
+
+      <!-- CHAPTER 01 — the 2023 festival -->
+      <section class="mx-auto max-w-5xl px-8 pt-10 vy-chapter">
+        <p class="hud-label vy-accent vy-chapter-label" data-reveal>2023 — The festival</p>
+        <div class="vy-col-wide space-y-6">
+          <p class="text-lg text-ink" data-reveal>
+            Two days beside a lake in the Boulder area, cottonwoods just turning gold. Friday ran
+            into night: fire and LED flow artists working under string lights strung through the
+            trees, a band playing into the last of the light. Sunday was the same ground in
+            daylight — a dance circle, the same band again, a rainbow balloon arch over the gate.
+          </p>
+        </div>
+
+        {
+          (festivalGrounds || bandGoldenFlare) && (
+            <div class="vy-stagger">
+              {festivalGrounds && (
+                <figure class="vy-photo vy-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={festivalGrounds.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={festivalGrounds.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={festivalGrounds.src} alt="An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">The grounds, Sunday morning.</figcaption>
+                </figure>
+              )}
+              {bandGoldenFlare && (
+                <figure class="vy-photo vy-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={bandGoldenFlare.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={bandGoldenFlare.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={bandGoldenFlare.src} alt="A band performing at golden hour at the 2023 Vybe festival, the singer backlit through fall leaves" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">A band played into the last of the light, both days.</figcaption>
+                </figure>
+              )}
+            </div>
+          )
+        }
+
+        <!-- pull quote — overlaps the stagger above, same grammar as Steel & Dust -->
+        <div class="vy-pull-wrap">
+          <blockquote class="vy-pull panel" data-reveal>
+            Friday ran into night: fire and LED flow artists working under string lights strung
+            through the trees.
+          </blockquote>
+        </div>
+
+        {
+          fireStaffSpin && (
+            <figure class="vy-bleed" data-reveal>
+              <img
+                src={fireStaffSpin.src}
+                srcset={fireStaffSpin.webp}
+                sizes="(min-width: 900px) 900px, 92vw"
+                alt="A fire-staff performer working the crowd in daylight at the 2023 Vybe festival"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="vy-cap vy-bleed-cap hud-label">Fire staff, Sunday afternoon.</figcaption>
+            </figure>
+          )
+        }
+
+        {
+          (flowArts || duskCircle) && (
+            <div class="vy-col-wide pt-6">
+              <div class="vy-duo">
+                {flowArts && (
+                  <figure class="vy-photo" data-reveal>
+                    <picture>
+                      <source type="image/avif" srcset={flowArts.avif} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <source type="image/webp" srcset={flowArts.webp} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <img src={flowArts.src} alt="A flow artist spinning LED fans against the night at the Vybe festival" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="vy-cap hud-label">After dark, Friday.</figcaption>
+                  </figure>
+                )}
+                {duskCircle && (
+                  <figure class="vy-photo" data-reveal data-reveal-stagger="80">
+                    <picture>
+                      <source type="image/avif" srcset={duskCircle.avif} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <source type="image/webp" srcset={duskCircle.webp} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <img src={duskCircle.src} alt="A group practicing flow arts at dusk under the trees, a rainbow balloon arch behind them" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="vy-cap hud-label">The dance circle, dusk.</figcaption>
+                  </figure>
+                )}
+              </div>
+            </div>
+          )
+        }
+      </section>
+
+      <!-- CHAPTER 02 — Boogie Lights, 2024 -->
+      <section class="mx-auto max-w-5xl px-8 pt-10 vy-chapter">
+        <p class="hud-label vy-accent vy-chapter-label" data-reveal>2024 — Boogie Lights</p>
+        <div class="vy-col-wide space-y-6">
+          <p class="text-lg text-ink" data-reveal>
+            The following spring, Boogie Lights' night, not Vybe's. The collective had a corner
+            of the room, their own chalkboard propped against the wall, and a few of their own
+            performers sat in with the acts on stage. I shot it from the crowd and the balcony
+            both.
+          </p>
+        </div>
+
+        {
+          (boogieRoom || boogieStage) && (
+            <div class="vy-col-wide pt-2">
+              <div class="vy-duo">
+                {boogieRoom && (
+                  <figure class="vy-photo" data-reveal>
+                    <picture>
+                      <source type="image/avif" srcset={boogieRoom.avif} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <source type="image/webp" srcset={boogieRoom.webp} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <img src={boogieRoom.src} alt="The room at a Boogie Lights show, the band on stage under pink and gold light, the crowd packed in front" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="vy-cap hud-label">From the crowd.</figcaption>
+                  </figure>
+                )}
+                {boogieStage && (
+                  <figure class="vy-photo" data-reveal data-reveal-stagger="80">
+                    <picture>
+                      <source type="image/avif" srcset={boogieStage.avif} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <source type="image/webp" srcset={boogieStage.webp} sizes="(min-width: 1024px) 24vw, 46vw" />
+                      <img src={boogieStage.src} alt="The stage at a Boogie Lights show glowing under a golden spotlight, viewed from the back of the room" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="vy-cap hud-label">From the balcony.</figcaption>
+                  </figure>
+                )}
+              </div>
+            </div>
+          )
+        }
+
+        {
+          boogieChillsbury && (
+            <figure class="vy-bleed" data-reveal>
+              <img
+                src={boogieChillsbury.src}
+                srcset={boogieChillsbury.webp}
+                sizes="(min-width: 900px) 900px, 92vw"
+                alt="The Chillsbury Doughboys performing at the 2024 Boogie Lights show, viewed from the balcony over the crowd, the act's name lit up on the stage backdrop"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="vy-cap vy-bleed-cap hud-label">The Chillsbury Doughboys, from the balcony.</figcaption>
+            </figure>
+          )
+        }
+      </section>
+
+      <!-- sign-off -->
+      <footer class="vy-col pt-10 pb-8">
+        <div class="vy-footer" data-reveal>
+          <LegendMark proof={{ relationshipId: "vybe" }} showName={false} />
+          <a href={`${base}/work/vybe`} class="link">The short version, on /work →</a>
+        </div>
+      </footer>
+    </article>
+
+    <!-- close — the lane's spine -->
+    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+      <p><a href={`${base}/adventure`} class="link"><span class="arrow" aria-hidden="true">←</span> Back to Adventure Stories</a></p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  /* ── COVER — a single full-bleed cover, no newsstand plates (that flourish
+     stays reserved for Steel & Dust's numbered-issue conceit). ── */
+  .vy-stage {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 1.1rem;
+    min-height: 90svh;
+    padding: 5.5rem 1rem 2rem;
+  }
+  .vy-cover {
+    position: relative;
+    width: min(94vw, 900px);
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-elevated);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  }
+  @media (min-width: 760px) {
+    .vy-cover {
+      aspect-ratio: 16 / 10;
+    }
+  }
+  .vy-cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .vy-cover-img {
+      animation: vy-settle 2400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes vy-settle {
+      from { transform: scale(1.045); }
+      to { transform: scale(1); }
+    }
+  }
+  .vy-cover-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.5) 0%, transparent 30%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.3) 42%, transparent 62%);
+  }
+  .vy-cover-corner {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    color: color-mix(in srgb, #fff 80%, transparent);
+  }
+  .vy-cover-block {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 22px;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .vy-cover-kicker {
+    color: var(--color-adventure-warm, var(--color-accent));
+    letter-spacing: 0.22em;
+  }
+  .vy-cover-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-style: italic;
+    font-size: clamp(2.2rem, 8vw, 4rem);
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  }
+  .vy-cover-deck {
+    max-width: 46ch;
+    font-family: var(--font-display);
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+    line-height: 1.5;
+    color: color-mix(in srgb, #fff 90%, transparent);
+  }
+  .vy-cue {
+    font-size: 0.58rem;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── THE STORY — de-boxed spread, same family as Steel & Dust, lighter ── */
+  .vy-col {
+    margin-inline: auto;
+    max-width: 48rem;
+    padding-inline: 2rem;
+  }
+  .vy-col-wide {
+    margin-inline: auto;
+    max-width: 48rem;
+  }
+  .vy-open {
+    padding-top: 2rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .vy-accent {
+    color: var(--color-accent);
+  }
+  .vy-lede {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 460;
+    font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+    line-height: 1.42;
+    color: var(--color-peak);
+  }
+  .vy-lede::first-letter {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.9em;
+    line-height: 0.82;
+    float: left;
+    padding-right: 0.12em;
+    color: var(--color-accent);
+  }
+  .vy-chapter-label {
+    margin-bottom: 1rem;
+    letter-spacing: 0.28em;
+  }
+  .vy-photo {
+    margin: 0;
+  }
+  .vy-photo img {
+    border-radius: 8px;
+  }
+  .vy-cap {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+  }
+  .vy-video {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    max-width: 22rem;
+    margin-inline: auto;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--color-elevated);
+  }
+  .vy-poster,
+  .vy-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .vy-loop {
+    opacity: 0;
+    transition: opacity 500ms ease;
+    pointer-events: none;
+  }
+  .vy-video.is-playing .vy-loop {
+    opacity: 1;
+  }
+  /* asymmetric two-up stagger — same proportions as Steel & Dust's PASS ONE */
+  .vy-stagger {
+    max-width: 56rem;
+    margin-inline: auto;
+    padding: 1.5rem 2rem 0;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 58fr 34fr;
+    align-items: start;
+  }
+  .vy-stagger-b {
+    margin-top: 3rem;
+  }
+  @media (max-width: 860px) {
+    .vy-stagger {
+      grid-template-columns: 1fr;
+    }
+    .vy-stagger-b {
+      margin-top: 0;
+      width: 82%;
+      justify-self: end;
+    }
+  }
+  .vy-duo {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 560px) {
+    .vy-duo {
+      grid-template-columns: 1fr;
+    }
+  }
+  .vy-pull-wrap {
+    max-width: 56rem;
+    margin: -1.25rem auto 0;
+    padding-inline: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .vy-pull {
+    padding: 1.1rem 1.4rem;
+    border-left: 2px solid var(--color-adventure-warm, var(--color-accent));
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 480;
+    font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+    line-height: 1.38;
+    color: var(--color-peak);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+  }
+  /* contained "wide" band — not true 100vw bleed, since the source exports
+     top out at 1200px (kept honest to the baked assets rather than
+     upscaling past their real resolution). */
+  .vy-bleed {
+    max-width: 56rem;
+    margin: 2rem auto 0;
+    padding-inline: 2rem;
+    position: relative;
+  }
+  .vy-bleed img {
+    display: block;
+    width: 100%;
+    max-height: 60svh;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .vy-bleed-cap {
+    position: absolute;
+    left: 2.6rem;
+    bottom: 0.9rem;
+    margin: 0;
+    padding: 0.4rem 0.7rem;
+    background: color-mix(in srgb, var(--color-base) 72%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+  }
+  .vy-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .vy-footer :global(.legend-mark) {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-ink-muted, #8a9a96);
+  }
+</style>
+
+<script>
+  // ── the golden-hour reel: plays only when motion is allowed and the
+  // figure is on screen; poster is the permanent base layer (reduced-motion
+  // / no-JS / Save-Data / autoplay-refused all show the still). Same
+  // IO-gated pattern used across the site. ──
+  (() => {
+    const video = document.querySelector<HTMLVideoElement>("[data-vy-loop]");
+    const box = video?.closest<HTMLElement>(".vy-video");
+    if (!box || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => box.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {});
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(box);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+</script>
