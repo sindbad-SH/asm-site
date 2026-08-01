@@ -1421,3 +1421,39 @@ confirmed "Kuliasha" appears zero times in the output; (2)
 correctly, 0 repeated images across the full page (12 unique content
 images: the existing 6 + this chapter's 6), no horizontal overflow. The
 repo was left in the DEFAULT (gated-off) build state.
+
+### Build #6 — `/venture/meme` copy refresh only (no new page)
+
+Copy-only build, per the plan's own framing of this archive as BONES (its
+miner's STORY.md says so explicitly — no real MEME event photography
+exists yet, only headshots + one rights-flagged archival photo). Replaces
+2 of the page's 6 body paragraphs; adds a 3-headshot roster grid. Source:
+`_STORY-STAGING/meme-origin-story/STORY.md`.
+
+**Date verification (per the plan's explicit gate):** fetched the live
+`meme.ngo/about` page directly. It states, in its own words: *"MEME was
+founded on the Ides of March in 2020, just as COVID-19 was becoming a
+major societal problem."* This confirms the March 15, 2020 founding/
+501(c)(3) date — now a 3-source match (two internal documents + the live
+public site). The miner's other claim, "traces its origin to a market in
+2019," is **NOT corroborated anywhere on meme.ngo** (checked both the home
+and about pages) and was single-sourced to one internal AI-assisted
+strategy document per the miner's own manifest — **dropped**, not shipped.
+
+| Row | Content | Flag |
+|---|---|---|
+| Paragraph 3 (replaced) | "MEME was founded on March 15, 2020 — the Ides of March, as the organization's own site puts it — just as COVID-19 was becoming a major societal problem. What it teaches is deliberately narrow: not directing, not cinematography — film schools already do that — but the business side of filmmaking that founders rarely get taught anywhere. The goal is to keep Colorado's filmmaking talent, and the projects it makes, from having to leave the state to get made." | ⚠ |
+| Paragraph 4 (new) | "Nick Goins runs the organization as Executive Director and teaches its flagship programs himself. The rest of the working roster is taught by people with real credits behind them — Steve Borne runs the sound workshop, and Adam Smestad teaches the on-set roles most people learn the hard way." | ⚠ |
+| 3 roster caption+alt pairs | Nick Goins / Steve Borne / Adam Smestad — name, role line, alt text, adapted from `STORY.md`'s per-image alt text | ⚠ |
+
+**What's NOT included, and why:** `nick-goins-afm` (the 2017 AFM photo) —
+cut, rights unresolved (very likely shot by AFM's own market photographer,
+not Nick or MEME, per the miner's own flag). `amber-macpherson-portrait` —
+cut, visible "April O'Hare Photography" watermark in the source file,
+credit unconfirmed. Both stay out until the operator can confirm rights
+directly — no headshot ships without a clean rights posture.
+
+**Verified:** `astro check` 0 errors, `astro build` green, honesty-audit
+passed. Screenshot-checked at 1440×900 — settled height 2934px (an
+honestly small refresh, no new page, no padding), 0 repeated images (3
+roster headshots, all unique, all at native resolution — none upscaled).

@@ -56,6 +56,45 @@ const loop = existsSync(join(loopDir, "meme-loop.mp4"))
     }
   : undefined;
 
+// Build #6 (2026-08-01 archive-mining integration) — copy refresh only, per
+// _INTEGRATION-PLAN.md §1.6 ("bones — no new page, no padding"). Source:
+// _STORY-STAGING/meme-origin-story/STORY.md, itself flagged BONES by its own
+// miner (no real event photography exists yet for MEME). Only the
+// origin/mission paragraphs below are new; the two "my role" paragraphs
+// above stay exactly as they were (the personal-voice exception, unchanged).
+//
+// DATE VERIFICATION (per the plan's explicit gate — "verify both dates
+// against meme.ngo before they become sentences"):
+//  - March 15, 2020 founding date: CONFIRMED directly against the live
+//    meme.ngo/about page, which states in its own words "MEME was founded
+//    on the Ides of March in 2020, just as COVID-19 was becoming a major
+//    societal problem." Two internal documents already agreed; the public
+//    site is now a third, independent match.
+//  - "Traces its origin to a market in 2019": NOT corroborated anywhere on
+//    meme.ngo (checked both the home and about pages) — single-sourced to
+//    one internal AI-assisted strategy document per the miner's own
+//    manifest. Per the honesty rule, DROPPED rather than shipped as fact.
+//    The AFM-2017 photo this claim would have illustrated is separately
+//    rights-flagged and not used either (see below).
+const memeShots = {
+  nick: pair("venture/meme/nick-goins-portrait-640"),
+  steve: pair("venture/meme/steve-borne-portrait-854"),
+  adam: pair("venture/meme/adam-smestad-portrait-620"),
+};
+function pair(relBase: string) {
+  const avif = media(`${relBase}.avif`);
+  const webp = media(`${relBase}.webp`);
+  return avif || webp ? { avif, webp } : undefined;
+}
+function media(rel: string) {
+  return existsSync(join(process.cwd(), "public", "media", ...rel.split("/"))) ? `${base}/media/${rel}` : undefined;
+}
+const ROSTER = [
+  { key: "nick", name: "Nick Goins", role: "Executive Director — runs Pitch Quorum and Market Fresh himself.", alt: "Close portrait of Nick Goins wearing a plaid flat cap, black t-shirt, looking directly at camera." },
+  { key: "steve", name: "Steve Borne", role: "Teaches the two-part sound workshop — setting a shoot up for success on location, and what happens to that audio in post.", alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background." },
+  { key: "adam", name: "Adam Smestad", role: "Teaches the production-assistant and script-supervisor workshops — the on-set roles most people learn by getting yelled at until they figure it out.", alt: "Studio portrait of Adam Smestad, bald, short beard, smiling, black blazer, gray backdrop." },
+] as const;
+
 // ── THE ARTICLE (all new sentences — see the approval note above) ──
 const ARTICLE = {
   slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION",
@@ -63,14 +102,15 @@ const ARTICLE = {
   paragraphs: [
     "MEME — Makeshift Entertainment Media Education — is a Colorado nonprofit, and it holds the most formal title I carry anywhere: Member At-Large.",
     "The work is to be a Strategic Liaison and Scout — often the first point of contact for new talent. I look for storytellers worth backing, and help them find a way in.",
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (source: his LinkedIn post
-    // "Joined MEME as Member at Large", ~Apr 2026: "a nonprofit dedicated to
-    // supporting entertainment professionals through education and workforce
-    // development, and building a stronger independent film community right here
-    // in Colorado … exactly the kind of infrastructure Colorado's creative
-    // community needs"). Staging-only until read. His own descriptor "(Strategic
-    // Liaison and Scout)" already renders above, verbatim from that post.
-    "The organization exists to support entertainment professionals through education and workforce development, and to build a stronger independent film community right here in Colorado. That mission is the reason this role matters to me.",
+    // Build #6 — replaces the prior generic mission line with the
+    // organization's own verified founding fact (meme.ngo/about, quoted
+    // above) plus its actual teaching focus, sourced from the internal
+    // playbook + one-pager (cross-checked, matching on every fact used).
+    "MEME was founded on March 15, 2020 — the Ides of March, as the organization's own site puts it — just as COVID-19 was becoming a major societal problem. What it teaches is deliberately narrow: not directing, not cinematography — film schools already do that — but the business side of filmmaking that founders rarely get taught anywhere. The goal is to keep Colorado's filmmaking talent, and the projects it makes, from having to leave the state to get made.",
+    // Build #6 — new roster paragraph, first person (matches this page's
+    // established voice), names the instructors the roster grid below
+    // pictures. Facts: Playbook Appendix + MEME_OnePager.html, matching.
+    "Nick Goins runs the organization as Executive Director and teaches its flagship programs himself. The rest of the working roster is taught by people with real credits behind them — Steve Borne runs the sound workshop, and Adam Smestad teaches the on-set roles most people learn the hard way.",
     "It runs on the same instinct as everything else this studio makes: a StorySmith's read on what an audience will feel, and a market strategist's read on who that audience actually is.",
     "The cinematic drone work over Switzerland and Italy, the founders met around the Boulder startup scene, and this role at MEME are one practice — pointed at the same question: whose story is this, and who is it for?",
   ],
@@ -122,6 +162,30 @@ const ARTICLE = {
       }
 
       {ARTICLE.paragraphs.map((para) => <p class="meme-para" data-reveal>{para}</p>)}
+
+      {/* Build #6 — the roster grid: 3 clean headshots (Nick, Steve, Adam).
+          Amber MacPherson's headshot is cut (unconfirmed photo-credit
+          watermark) and the AFM 2017 photo is cut (rights unresolved) —
+          see the header note. Native-resolution images, not upscaled. */}
+      <div class="meme-roster" data-reveal aria-label="The roster">
+        {
+          ROSTER.map((r) => {
+            const shot = memeShots[r.key as keyof typeof memeShots];
+            return shot ? (
+              <figure class="meme-roster-card">
+                <picture>
+                  {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+                  <img src={shot.webp ?? shot.avif} alt={r.alt} loading="lazy" decoding="async" />
+                </picture>
+                <figcaption>
+                  <span class="meme-roster-name">{r.name}</span>
+                  <span class="meme-roster-role">{r.role}</span>
+                </figcaption>
+              </figure>
+            ) : null;
+          })
+        }
+      </div>
 
       <nav class="meme-ctas" data-reveal>
         {
@@ -226,6 +290,45 @@ const ARTICLE = {
       transition: none;
     }
   }
+  /* Build #6 — roster grid, 3 headshot cards */
+  .meme-roster {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+  .meme-roster-card {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .meme-roster-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+  }
+  .meme-roster-card figcaption {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .meme-roster-name {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f2f4f8;
+  }
+  .meme-roster-role {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, #eef2f5 70%, transparent);
+  }
+  @media (max-width: 640px) {
+    .meme-roster { grid-template-columns: 1fr 1fr; }
+  }
+
   .meme-ctas {
     display: flex;
     flex-wrap: wrap;
