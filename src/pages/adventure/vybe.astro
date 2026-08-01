@@ -68,6 +68,66 @@
  * culled, already-graded selects, not raw footage). No new photo bakes this
  * pass — v4 only re-sequences/re-crops the existing 12.
  *
+ * v5 (2026-08-01, second critic pass — CLOSE grade, 4/5 fixes verified PASS,
+ * one prescribed fix + a repetition bug remained). The critic's own
+ * measurement (see results.json / measure.mjs in the session scratchpad)
+ * still showed: `flow-arts` (an out-of-focus LED-blur frame) as the single
+ * LARGEST image on the page at the 1440x630 full-bleed slot; the sharp
+ * `band-golden-flare` singer face buried at ~373x469 in a narrow column;
+ * and `flow-duo`/`fire-staff-spin` each still double-booked (tiny newsstand
+ * plate + a full body slot) — two same-page repeats, cover plates counted.
+ *
+ * Fix: mined 3 NEW stills from the raw 2023 festival archive (not the
+ * already-picked SAMPLES set) via scripts/make-vybe-section-v5.mjs —
+ * `E:\Old Projects\Vybe\Vybe Fest\Vybe event 2023\Cam B Sun\CLIP\` (the
+ * Sunday ground camera, native 1920x1080, reported 1080x1920 once ffmpeg
+ * honors the clip's own rotation tag). Selection method: a face/sharpness
+ * scan (OpenCV Haar cascade + Laplacian-variance) across all 78 Cam B Sun
+ * clips plus the operator's own edit (`compose_video_1696750901719.mp4`,
+ * 16.4Mbps) as a taste reference, dense-extracted around every strong
+ * window found, then every candidate frame was actually looked at before
+ * picking (per SPEC-SHOT-SELECTION.md) — not just the numeric score:
+ *   - `festival-crowd-sing` (C0057.MP4 @ 172.5s, Laplacian 782, local peak
+ *     of the burst) — the strongest new frame, takes the full-bleed that
+ *     `flow-arts` vacates. A festivalgoer singing into a mic mid-dance,
+ *     three more people dancing behind him under gold fall canopy, the
+ *     rainbow balloon arch at the right edge — the same arch this page's
+ *     own lede already promises ("a rainbow balloon arch over the gate").
+ *   - `festival-emcee` (C0117.MP4 @ 10.4s) — sharp, sun-lit, face-forward:
+ *     the festival's own emcee on the mic, red trailer + Front Range
+ *     foothills behind. Backfills the mirrored stagger's narrow slot that
+ *     `fireStaffSpin` used to double up in.
+ *   - `festival-arms-up` (C0058.MP4 @ 0.6s) — three festivalgoers, arms up
+ *     together in front of their own hand-lettered "Soul Stage" sign.
+ *     Backfills the closing beat that `flowDuo` used to double up in.
+ * Two frames were scouted and REJECTED on sharpness alone: C0063 (a
+ * fire-club juggler at night) was motion-blurred and underexposed in every
+ * frame reviewed — the exact defect being fixed elsewhere on this page, so
+ * it would have been self-defeating to ship it.
+ *
+ * `band-golden-flare` and `festival-grounds` needed no new extraction —
+ * both are already-graded SAMPLES stills with plenty of resolution for a
+ * second crop, so they simply SWAP columns in the opening (chapter 01)
+ * stagger: `band-golden-flare` re-baked landscape (4:3) takes the wide
+ * 58fr track it never had, `festival-grounds` re-baked portrait (4:5,
+ * manually top-cropped so the parking-lot rows don't dominate a tall
+ * narrow frame) takes the 34fr track. `festival-grounds`'s ORIGINAL
+ * landscape (16:9) bake is untouched under its own slug — /adventure's own
+ * teaser section still depends on it — the new portrait crop ships under
+ * a distinct slug (`festival-grounds-vert`) instead of overwriting it.
+ *
+ * `flow-arts` is now unused anywhere on this page (same precedent as
+ * `nadir-grounds` in v3) — it was the out-of-focus frame the critic named,
+ * so dropping it outright rather than demoting it to a smaller slot was
+ * the honest fix. Net result: zero repeated images on this page — every
+ * one of `flowDuo`/`fireStaffSpin`'s two uses is now a differently-cropped
+ * SAME photo used ONCE at newsstand-plate scale, not twice.
+ *
+ * Grading note (honesty): the 3 new frames get a light sharp()-only pass
+ * (mild sharpen + a small saturation/contrast lift), not a full LightForge
+ * regrade — that tool wasn't run this pass. They sit close to the graded
+ * originals but are flagged here if a future pass wants to match closer.
+ *
  * HONESTY: no Vybe brand/logo assets anywhere on this page (their official
  * pack hasn't been provided — see the vybe-community-partner memo). The one
  * relationship claim is LegendMark's verbatim permittedPhrasing ("event
@@ -114,14 +174,25 @@ function photo(slug: string, widths: readonly number[]) {
 const cover = photo("festival-reveal", W.vertical);
 const flowDuo = photo("flow-duo", W.vertical);
 const fireStaffSpin = photo("fire-staff-spin", W.vertical);
-const festivalGrounds = photo("festival-grounds", W.landscape);
-const bandGoldenFlare = photo("band-golden-flare", W.vertical);
-const flowArts = photo("flow-arts", W.verticalSm);
+// FIX (v5): swapped crops — bandGoldenFlare is now the wide (landscape)
+// bake and festivalGrounds is now the narrow (portrait) bake, so they can
+// trade places in the opening stagger. festivalGrounds's ORIGINAL landscape
+// bake still exists under its own slug for /adventure's teaser section —
+// this page now reads the distinct "festival-grounds-vert" portrait crop.
+const festivalGrounds = photo("festival-grounds-vert", W.vertical);
+const bandGoldenFlare = photo("band-golden-flare", W.landscape);
 const duskCircle = photo("dusk-circle", W.landscape);
 const bandGuitarist = photo("band-guitarist", W.landscape);
 const boogieRoom = photo("boogie-room", W.landscape);
 const boogieStage = photo("boogie-stage", W.verticalSm);
 const boogieChillsbury = photo("boogie-chillsbury-doughboys", W.wideSm);
+// FIX (v5): 3 newly-mined stills — see the header note for sourcing.
+// festivalCrowdSing takes the full-bleed flow-arts (dropped, out-of-focus)
+// used to occupy; festivalEmcee and festivalArmsUp backfill the two body
+// slots that used to double-book flowDuo/fireStaffSpin.
+const festivalCrowdSing = photo("festival-crowd-sing", [1120, 1600]);
+const festivalEmcee = photo("festival-emcee", W.vertical);
+const festivalArmsUp = photo("festival-arms-up", W.vertical);
 
 // The hero reveal — re-mined 2026-07-31 (see header note), existence-gated,
 // poster-first, IO-gated, same contract as every other ambient loop on the
@@ -291,29 +362,31 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         </div>
 
         {
-          (festivalGrounds || bandGoldenFlare) && (
+          /* FIX (v5): band-golden-flare (the sharp singer face) is promoted
+             to the wide 58fr track; festival-grounds moves to the narrow
+             34fr track. Same two photos, swapped columns + swapped crops
+             (see the const declarations above) — no new slot, no page
+             growth, just re-allocated by subject strength. */
+          (bandGoldenFlare || festivalGrounds) && (
             <div class="vy-stagger">
-              {festivalGrounds && (
+              {bandGoldenFlare && (
                 <figure class="vy-photo vy-stagger-a" data-reveal>
                   <picture>
-                    <source type="image/avif" srcset={festivalGrounds.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    <source type="image/webp" srcset={festivalGrounds.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
-                    {/* FIX 2: 16/9 → 4/3 (matches the exemplar's own wide-column ratio) —
-                        closes a ~101px stagger-height void against bandGoldenFlare's 4:5
-                        narrow column down to ~10px. */}
-                    <img src={festivalGrounds.src} alt="An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
-                  </picture>
-                  <figcaption class="vy-cap hud-label">The grounds, Sunday morning.</figcaption>
-                </figure>
-              )}
-              {bandGoldenFlare && (
-                <figure class="vy-photo vy-stagger-b" data-reveal data-reveal-stagger="80">
-                  <picture>
-                    <source type="image/avif" srcset={bandGoldenFlare.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <source type="image/webp" srcset={bandGoldenFlare.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <img src={bandGoldenFlare.src} alt="A band performing at golden hour at the 2023 Vybe festival, the singer backlit through fall leaves" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    <source type="image/avif" srcset={bandGoldenFlare.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={bandGoldenFlare.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={bandGoldenFlare.src} alt="A band performing at golden hour at the 2023 Vybe festival, the singer backlit through fall leaves" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
                   <figcaption class="vy-cap hud-label">A band played into the last of the light, both days.</figcaption>
+                </figure>
+              )}
+              {festivalGrounds && (
+                <figure class="vy-photo vy-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={festivalGrounds.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={festivalGrounds.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={festivalGrounds.src} alt="An aerial view of the Vybe festival grounds beside a lake in fall, the red stage trailer under gold cottonwoods above a row of parked cars" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">The grounds, Sunday morning.</figcaption>
                 </figure>
               )}
             </div>
@@ -330,51 +403,49 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
       </div>
 
       <!-- full-bleed band — a direct child of the article, breaks the frame.
-           FIX 5: was nadirGrounds (an empty picnic-blanket top-down, "editorially
-           empty" per the critic) — now flowArts, the critic's pick for strongest
-           photo on the page. It's a portrait 4:5 source in a wide/short box, so
-           object-position is biased up to keep the LED fans + dancer in frame
-           rather than default-centering into a pure leg/ground crop. -->
+           FIX (v5): was flow-arts (out-of-focus LED-blur, per the critic's
+           second pass) — now festival-crowd-sing, a newly-mined sharp frame
+           and the strongest new still on the page (see header note). It's a
+           portrait 4:5 source in a wide/short box, so object-position is
+           biased up to keep the dancers' faces in frame rather than
+           default-centering into a leg/ground crop. -->
       {
-        flowArts && (
+        festivalCrowdSing && (
           <figure class="vy-bleed" data-reveal>
             <picture>
-              <source type="image/avif" srcset={flowArts.avif} sizes="100vw" />
-              <source type="image/webp" srcset={flowArts.webp} sizes="100vw" />
+              <source type="image/avif" srcset={festivalCrowdSing.avif} sizes="100vw" />
+              <source type="image/webp" srcset={festivalCrowdSing.webp} sizes="100vw" />
               <img
-                src={flowArts.src}
-                alt="A flow artist spinning glowing LED fans against the night at the Vybe festival, string-lit trees behind"
+                src={festivalCrowdSing.src}
+                alt="A festivalgoer singing into a microphone mid-dance, three more people dancing behind him under gold fall trees, a rainbow balloon arch at the edge of frame"
                 class="vy-bleed-img-top"
                 loading="lazy"
                 decoding="async"
               />
             </picture>
-            <figcaption class="vy-cap vy-bleed-cap hud-label">Fire and LED, after dark — Friday.</figcaption>
+            <figcaption class="vy-cap vy-bleed-cap hud-label">The crowd, dancing under the cottonwoods — Sunday.</figcaption>
           </figure>
         )
       }
 
-      <!-- mirrored stagger (34/58) — FIX 2: dusk-circle and fire-staff-spin are
-           now in DOM order matched to the flip grid's actual tracks (fireStaffSpin
-           first → the 34fr/narrow track it's sized for; duskCircle second → the
-           58fr/wide track). The old order had this backwards — duskCircle (3:2)
-           landed narrow and flowArts (4:5) landed wide, a ~555px height void
-           (741px vs 232px, measured). Correcting the order alone closes it to
-           ~40px, no re-crop needed. flowArts itself moved to the bleed above, so
-           fireStaffSpin — until now only a tiny cover plate — fills its slot,
-           delivering on the cover's own "Inside — fire staff" tease. -->
+      <!-- mirrored stagger (34/58) — dusk-circle stays in the 58fr/wide track
+           it's sized for. FIX (v5): the narrow 34fr track used to be
+           fireStaffSpin (a same-page repeat — it's also a newsstand cover
+           plate above); it's now festival-emcee, one of the 3 newly-mined
+           stills (see header note), which both closes the repeat and
+           delivers a second sharp face-forward beat in this chapter. -->
       {
-        (duskCircle || fireStaffSpin) && (
+        (duskCircle || festivalEmcee) && (
           <section class="mx-auto max-w-5xl px-8 pt-4">
             <div class="vy-stagger vy-stagger--flip">
-              {fireStaffSpin && (
+              {festivalEmcee && (
                 <figure class="vy-photo vy-stagger-a" data-reveal>
                   <picture>
-                    <source type="image/avif" srcset={fireStaffSpin.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <source type="image/webp" srcset={fireStaffSpin.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
-                    <img src={fireStaffSpin.src} alt="A festivalgoer spinning a staff in the sun beside the camp tents" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                    <source type="image/avif" srcset={festivalEmcee.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={festivalEmcee.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={festivalEmcee.src} alt="The festival's emcee, sunglasses and a bucket hat, addressing the crowd on the mic beside the red stage trailer, Front Range foothills behind" style="aspect-ratio:4/5;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
                   </picture>
-                  <figcaption class="vy-cap hud-label">Staff spinning, Sunday afternoon.</figcaption>
+                  <figcaption class="vy-cap hud-label">The emcee, working the crowd — Sunday.</figcaption>
                 </figure>
               )}
               {duskCircle && (
@@ -496,7 +567,8 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
            largest image on the page — another band's stage banner) to a
            contained column photo, same footprint as any other single-photo
            beat on this page. Still real coverage, just no longer competing
-           with flowArts for "biggest thing here" — this is Sindbad's story. */
+           with festival-crowd-sing for "biggest thing here" — this is
+           Sindbad's story. */
         boogieChillsbury && (
           <section class="mx-auto max-w-5xl px-8 pt-4">
             <figure class="vy-photo" data-reveal>
@@ -518,30 +590,29 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         )
       }
 
-      <!-- closing beat — FIX 5: was festivalGrounds AGAIN (the same lake/grounds
-           scene already used on the cover + first stagger — measured as a
-           literal duplicate, y2550 and y6330). Now flowDuo: until now only a
-           tiny cover plate, it delivers on the cover's "Inside — flow arts"
-           tease and closes on people, not more grounds. Sized as a contained
-           portrait frame (its native ratio), not forced into the wide
-           16:9 box the old grounds photo used. -->
+      <!-- closing beat — FIX (v5): was flowDuo (a same-page repeat — it's
+           also a newsstand cover plate above). Now festival-arms-up, one of
+           the 3 newly-mined stills (see header note): three festivalgoers,
+           arms raised together by their own "Soul Stage" sign — closes on
+           people and on the community's own joy, not a repeat. Sized as a
+           contained portrait frame, same footprint flowDuo used here. -->
       {
-        flowDuo && (
+        festivalArmsUp && (
           <section class="mx-auto max-w-5xl px-8 pt-10">
             <figure class="vy-photo vy-closing" data-reveal>
               <picture>
-                <source type="image/avif" srcset={flowDuo.avif} sizes="(min-width: 1024px) 26rem, 80vw" />
-                <source type="image/webp" srcset={flowDuo.webp} sizes="(min-width: 1024px) 26rem, 80vw" />
+                <source type="image/avif" srcset={festivalArmsUp.avif} sizes="(min-width: 1024px) 26rem, 80vw" />
+                <source type="image/webp" srcset={festivalArmsUp.webp} sizes="(min-width: 1024px) 26rem, 80vw" />
                 <img
-                  src={flowDuo.src}
-                  alt="Two festivalgoers dancing together in the afternoon sun by the campsite"
+                  src={festivalArmsUp.src}
+                  alt="Three festivalgoers with arms raised together in front of a hand-lettered Soul Stage sign under the fall trees"
                   style="aspect-ratio:4/5;object-fit:cover"
                   class="block w-full"
                   loading="lazy"
                   decoding="async"
                 />
               </picture>
-              <figcaption class="vy-cap hud-label">Dancing in the afternoon sun, Sunday.</figcaption>
+              <figcaption class="vy-cap hud-label">Arms up together, near the Soul Stage.</figcaption>
             </figure>
           </section>
         )
@@ -980,8 +1051,8 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     max-height: 70svh;
     object-fit: cover;
   }
-  /* FIX 5: flowArts is a portrait 4:5 source filling a wide/short box — bias
-     the crop up toward the LED fans + dancer instead of default-centering
+  /* festival-crowd-sing is a portrait 4:5 source filling a wide/short box —
+     bias the crop up toward the dancers' faces instead of default-centering
      into legs/ground. */
   .vy-bleed-img-top {
     object-position: 50% 32%;
