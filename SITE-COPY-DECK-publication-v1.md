@@ -266,6 +266,137 @@ errors.
 
 ---
 
+### Nordic Daughter postcard — image re-sourcing correction (2026-07-31,
+operator direct review)
+
+**The error.** The POSTCARD2 pass above shipped Nordic Daughter's postcard
+with two Rickhouse audience/crowd frames (`crowd-floor`, `crowd-side`) —
+captioned honestly at the time ("genuine crowd/audience frames... never
+claiming any specific person in frame is a Nordic Daughter member"), but
+wrong at a level honesty of caption couldn't fix. Operator: *"For Nordic
+Daughter you used shots from their Something for Tomorrow set. I filmed
+Nordic Daughter at the Scandinavian Midsummer Festival — any shots will be
+from that."* Nordic Daughter was never on the Rickhouse stage — that night
+was Something for Tomorrow's own show (a different band that shares a
+guitarist, Jason Lycan). The operator's actual Nordic Daughter footage is at
+the Scandinavian Midsummer Festival, Parfet Park, Golden, CO, June 2024
+(`Nordic Daughter\Scandinavian Festivle\Nordic Daughter Scandi Fest Part
+1/2/3.mp4` — 4K/60fps edited masters, titled after the band; this is the
+same source that already supplied the scandinavian-midsummer-festival
+postcard's "nd-set" frame).
+
+**What changed** (`scripts/fix-nordic-daughter-postcard.mjs`, new script;
+`src/data/postcards.ts`):
+
+| Field | Old | New | Flag |
+|---|---|---|---|
+| date | "2024-07-07" | **"2024-06"** (coarser — the edited masters' own export timestamps span 06-16/06-17, one step removed from true capture date, so a month-level date is the honest claim) | ⚠ |
+| location | "The Rickhouse, Denver, Colorado" | **"Parfet Park, Golden, Colorado"** | ⚠ |
+| paragraph 1 | "Nordic Daughter's guitarist, Jason Lycan, also plays in the hard-rock band Something for Tomorrow — and on this July night at The Rickhouse in Denver, it was Something for Tomorrow's turn on stage. I shot the room from the crowd's side instead: people packed in close under green and red stage light, drinks in hand, watching from just past the monitors." | **"Nordic Daughter played a set under one of the festival tents at the Scandinavian Midsummer Festival in Golden — the full band on the plywood stage, Nordic flags hung behind them, tent canvas overhead and the crowd seated right up to the edge. Guitarist Jason Lycan led out front; I'd shoot him again a few weeks later fronting his other band, Something for Tomorrow, at a show across town."** | ⚠ |
+| paragraph 2 | "From the side of the room the floor was full — tables in the back, a warehouse-sized crowd on a warehouse floor." | **"From the crowd it read as one continuous set — violin and vocals trading the melody, the drummer and keyboardist filling in behind, the whole tent full for it."** | ⚠ |
+| photo 1 | `crowd-floor` — Rickhouse audience, deleted | **`festival-set`** — the band performing under the festival tent, singer's arms raised, drummer + guitarist beside her, Nordic flags overhead | ⚠ |
+| photo 2 | `crowd-side` — Rickhouse audience, deleted | **`festival-strings`** — violinist and keyboardist performing on the festival stage, festival grounds + Nordic flags visible behind them | ⚠ |
+
+**Frame confidence.** Reviewed via a 42-frame contact sheet sampled across
+all three "Scandi Fest" parts (session scratchpad) — continuous, clear
+footage of the full band performing under the festival tent throughout; no
+ambiguity about which act's stage this is (the source files are literally
+titled after the band, and match the setting of the already-shipped "nd-set"
+frame). Two frames chosen for maximum distinctness from that existing frame:
+Part 3 @ 1270s (wide band shot) and Part 1 @ 100s (violinist + keyboardist
+two-shot, "KEEP IT COLD" grounds signage visible). Something for Tomorrow's
+own postcard is untouched — its stage footage was already correctly sourced
+from its own Rickhouse show.
+
+**Verification:** old `crowd-floor`/`crowd-side` files deleted from disk
+(not just replaced); new files baked at the standard 700/1200 avif+webp
+convention; `npx astro check` 0 errors, `npx astro build` green (46 pages,
+honesty-audit passed); confirmed live on the dev server on both `/adventure`
+and `/postcards/nordic-daughter` — correct text, both new images `200 OK`,
+zero console errors, zero remaining references to the old Rickhouse frames
+anywhere in the built output.
+
+---
+
+## VYBE section (2026-07-31) — replaces "From the Archive" on `/adventure`
+
+**The problem.** `/adventure`'s "From the Archive" band (Round 4/5) rendered
+all four `WORK_ARCHIVE` items tagged `lane: "adventure"` — Vybe, Nordic
+Daughter, Something for Tomorrow, The Art of Brazilian Living. Three of
+those four (everything except Vybe) also render in the Postcards section
+immediately below on the same page — a straight content duplication.
+Operator: Postcards is the home for those short stories, so the whole band
+is retired, not trimmed to just Vybe. Vybe — the one item that wasn't a
+postcard duplicate — gets a full section in that slot instead of the old
+quiet display-only tile.
+
+**Constraint (per `vybe-community-partner` memo):** editorial coverage only
+— NO Vybe brand or logo assets anywhere on this page. Their official asset
+pack hasn't been provided yet; this is his own footage/photos of their
+events, credited via the site's one honesty channel (LegendMark's verbatim
+`permittedPhrasing`, unchanged: "event coverage for Vybe").
+
+**Structure.** Same section grammar as the rest of `/adventure` (hairline
+rule + flight-line divider + `hud-label` kicker + `h2`), three body
+paragraphs, a 6-photo grid reusing the site's existing 4:5 tile convention
+(`scripts/make-vybe-section.mjs`, new — sources the already-culled selects
+at `C:/builds/asm/SAMPLES/photos/vybe/`, not raw footage), and a footer row
+pairing the LegendMark line with a "Read the full story" link out to the
+existing `/work/vybe` case page (content NOT duplicated here — the fuller
+account stays on that page, one source of truth).
+
+| Field | New text | Flag |
+|---|---|---|
+| kicker | "Vybe · Denver · 2023–2024" | ⚠ |
+| heading | "In the room with Vybe." | ⚠ |
+| paragraph 1 (who) | "Vybe — short for Vibrate Your Best Energy — is a Denver arts, music, and dance collective built around community: Park & Play gatherings, an annual outdoor festival, and whatever room they show up in. I've known the founders since 2023 and have covered two of their nights since — camera coverage only, nothing official." | ⚠ |
+| paragraph 2 (2023 festival) | "The first was their outdoor festival in the fall of 2023 — two days beside a lake in the Boulder area, cottonwoods just turning. Friday ran into night: fire and LED flow artists working under string lights strung through the trees. Sunday was the same ground in daylight — a dance circle, a band, a rainbow balloon arch over the gate." | ⚠ |
+| paragraph 3 (2024 Boogie Lights — host/guest framing) | "The second was a Boogie Lights show in Denver the following May — Boogie Lights' night, not Vybe's. The collective had a corner of the room, their own chalkboard propped against the wall, and a few of their own performers sat in with the acts on stage. I shot it from the crowd and the balcony both." | ⚠ |
+| photo captions (6) | "The 2023 festival · blue hour" / "· from above" / "· after dark" / "· dusk" · "Boogie Lights, 2024" ×2 | ⚠ |
+| footer CTA | "Read the full story →" → `/work/vybe` | reuse |
+
+**Assets used** (all camera coverage, zero brand/logo files):
+
+| Slug | Source | What |
+|---|---|---|
+| `festival-reveal` | `SAMPLES/photos/vybe/vybe-01_blue-hour-reveal.jpg` | Aerial blue-hour reveal, 2023 festival grounds beside the lake |
+| `festival-grounds` | `vybe-02_fall-lake-mountains.jpg` | Aerial daylight establishing shot, lake + fall cottonwoods + foothills |
+| `flow-arts` | `vybe-05_led-fan-trails.jpg` | LED fan flow artist at night (silhouette, not identifiable) |
+| `dusk-circle` | `vybe-06_flowarts-circle-dusk.jpg` | Group flow-arts circle at dusk, balloon arch, wide/no close faces |
+| `boogie-room` | `vybe-10_boogie-spotlight-crowd.jpg` | Boogie Lights show, full room + stage, wide |
+| `boogie-stage` | `vybe-12_boogie-stage-glow.jpg` | Boogie Lights show, stage glow from the back of the room |
+
+Deliberately excluded from the grid: the two close-up "portrait"/"candid"
+Boogie Lights frames (`vybe-13`, `vybe-14`) — this shoot was filmed "on a
+handshake, mostly without releases" (per the existing `/work/vybe` case
+page), so the grid stays to wide/atmospheric/performance frames, matching
+that page's own restraint (`still-stage`, `still-art` — no tight portraits).
+
+**Host vs. guest.** Paragraph 3 states plainly that the May 2024 show was
+"Boogie Lights' night, not Vybe's" and that Vybe "had a corner of the room"
+— matches the operator's own ruling in `BRAND-SHEET.md` §5 ("Boogie Lights
+hosted it; VYBE attended, had a corner, and some VYBE-affiliated acts
+performed... may credit VYBE's presence only as a guest"). No venue name is
+stated (unconfirmed from footage, per the same memo).
+
+**Structural notes.** `adventure.astro`'s `archive`/`archiveMediaRoot`/
+`archivePair` computation and its `WORK_ARCHIVE`/`RELATIONSHIP_BY_ID`
+imports are removed (both still used/exported for `/venture` and
+`/work/index.astro`, untouched). The unused `.arch-*` CSS block is replaced
+with new `.vybe-*` rules in the same file location. `WORK_ARCHIVE`'s data
+entries themselves (`consts.ts`) are untouched — Vybe's entry there still
+backs its own `/work/vybe` case-page routing; this page just no longer
+renders a tile from it.
+
+**Verification:** `npx astro check` 0 errors; `npx astro build` green (46
+pages, honesty-audit passed); confirmed live on the dev server — section
+renders between the Steel & Dust festival spread and Postcards, all 6 photos
+`200 OK`, zero console errors, and the old "From the Archive" content (plus
+the now-orphaned Nordic-Daughter/Something-for-Tomorrow/Brazilian-Living
+duplicate tiles) confirmed absent from the built HTML.
+
+---
+
 ## /venture (`src/pages/venture.astro`, renamed from `entertainment.astro`) — PUB-A
 
 The retired `/entertainment` page's content (Pebble Beach + PitchBoulder

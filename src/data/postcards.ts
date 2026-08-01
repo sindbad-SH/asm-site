@@ -32,14 +32,27 @@
  *    edited cuts, and the one phone photo (a band-logo graphic, not a live
  *    shot). ALL stage/performance frames confirm Something for Tomorrow (the
  *    venue screen displays their name throughout; no Nordic Daughter
- *    performance is visible anywhere in this folder). Per the operator's own
- *    framing ("Nordic Daughter shots are from the AUDIENCE vantage"), the
- *    split is: Something for Tomorrow's postcard uses the confirmed stage
- *    footage; Nordic Daughter's postcard uses genuine audience/crowd frames
- *    from the same night, captioned honestly as the room/crowd (never
- *    claiming any specific person in frame is a Nordic Daughter member — no
- *    face in the footage is identifiable as such). UNSORTED: none — no frame
- *    reviewed was ambiguous about which band's stage it showed.
+ *    performance is visible anywhere in this folder).
+ *
+ *    ⚠ SECOND CORRECTION (2026-07-31, operator direct review): the pass above
+ *    shipped Nordic Daughter's postcard with Rickhouse audience/crowd frames
+ *    (from the Something for Tomorrow shoot) — technically honest captions,
+ *    but the operator caught the deeper problem: "For Nordic Daughter you
+ *    used shots from their Something for Tomorrow set. I filmed Nordic
+ *    Daughter at the Scandinavian Midsummer Festival — any shots will be
+ *    from that." Nordic Daughter was never on the Rickhouse stage at all
+ *    (that was Something for Tomorrow, a different band that happens to
+ *    share a guitarist) — the operator's own footage of Nordic Daughter
+ *    performing is at the Scandinavian Midsummer Festival, Parfet Park,
+ *    Golden, CO, June 2024 (`Nordic Daughter\Scandinavian Festivle\Nordic
+ *    Daughter Scandi Fest Part 1/2/3.mp4` — 4K/60fps edited masters, titled
+ *    after the band; that same source already supplied the
+ *    scandinavian-midsummer-festival postcard's "nd-set" frame). Re-sourced
+ *    (scripts/fix-nordic-daughter-postcard.mjs) to two new, distinct
+ *    festival-stage frames of the band performing under the tent — the old
+ *    Rickhouse crowd-floor/crowd-side files were deleted, not just replaced.
+ *    Something for Tomorrow's postcard is untouched (its stage footage was
+ *    already correctly sourced from its own Rickhouse show).
  *
  * 4. "brazilian-living" — Boulder Samba School's outdoor showcase, June 22,
  *    2025. Venue identified as Levitt Pavilion, Ruby Hill Park, Denver
@@ -127,15 +140,15 @@ export const POSTCARDS: readonly Postcard[] = [
   {
     slug: "nordic-daughter",
     title: "Nordic Daughter",
-    date: "2024-07-07",
-    location: "The Rickhouse, Denver, Colorado",
+    date: "2024-06",
+    location: "Parfet Park, Golden, Colorado",
     paragraphs: [
-      "Nordic Daughter's guitarist, Jason Lycan, also plays in the hard-rock band Something for Tomorrow — and on this July night at The Rickhouse in Denver, it was Something for Tomorrow's turn on stage. I shot the room from the crowd's side instead: people packed in close under green and red stage light, drinks in hand, watching from just past the monitors.",
-      "From the side of the room the floor was full — tables in the back, a warehouse-sized crowd on a warehouse floor.",
+      "Nordic Daughter played a set under one of the festival tents at the Scandinavian Midsummer Festival in Golden — the full band on the plywood stage, Nordic flags hung behind them, tent canvas overhead and the crowd seated right up to the edge. Guitarist Jason Lycan led out front; I'd shoot him again a few weeks later fronting his other band, Something for Tomorrow, at a show across town.",
+      "From the crowd it read as one continuous set — violin and vocals trading the melody, the drummer and keyboardist filling in behind, the whole tent full for it.",
     ],
     photos: [
-      { slug: "crowd-floor", alt: "The crowd at The Rickhouse packed close to the stage under green light, watching from the floor" },
-      { slug: "crowd-side", alt: "The room at The Rickhouse viewed from the side of the stage, red stage light over a full dance floor" },
+      { slug: "festival-set", alt: "Nordic Daughter performing under the festival tent at the Scandinavian Midsummer Festival — the singer with arms raised, the drummer and guitarist beside her, Nordic flags overhead" },
+      { slug: "festival-strings", alt: "Nordic Daughter's violinist and keyboardist performing on the festival stage, the festival grounds and Nordic flags visible behind them" },
     ],
   },
   {
