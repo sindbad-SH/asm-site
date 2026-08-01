@@ -1241,11 +1241,25 @@ images already live elsewhere on the site (`fashion-garment-detail`,
 `s12-soiere-stage`, `s12-red-carpet-duo`, `soulpower-red-carpet-cast`) and 1
 near-crop of two more (`2025-soiree-podium`). Only 5 of 10 are perceptually
 clear: `2025-podium-notecard`, `fashion-runway-crowd`, `fashion-runway-
-floral`, `s12-red-carpet-panel`, `soulpower-lobby-mingle`. That collapses the
-page from a 10-image flagship into a cover + one illustrated card per
+floral`, `s12-red-carpet-panel`, `soulpower-red-carpet-press`. That collapses
+the page from a 10-image flagship into a cover + one illustrated card per
 chapter, with nothing spare for a full-bleed band without repeating an
 image — this build deliberately ships without one (material honesty over
 template completeness).
+
+**Provenance gate, resolved 2026-08-01 (surgical honesty pass):** the fifth
+pick was originally baked as `soulpower-lobby-mingle` — a UUID-named,
+zero-EXIF, non-native-square-crop file unlike every other source in this
+archive (`_INTEGRATION-PLAN.md` §1.2 blocking issue (a), CUT list #5).
+Operator confirmation of that frame's provenance was never obtained, so it
+was never eligible to ship. Swapped for the plan's own identified fallback,
+`20260218_174536.jpg` — a real-EXIF, camera-native capture from the same
+Soul Power premiere archive, `_TIER 1 - TOP` — rebaked under the slug
+`soulpower-red-carpet-press` (SeriesFest step-and-repeat + red carpet
+outside the Sie FilmCenter, press in position). The four old
+`soulpower-lobby-mingle-*` derivative files were deleted from
+`public/media/venture/seriesfest/`; chapter card 02's `imageSlug` and `alt`
+were updated to match.
 
 | Row | Content | Flag |
 |---|---|---|
@@ -1443,7 +1457,7 @@ strategy document per the miner's own manifest — **dropped**, not shipped.
 | Row | Content | Flag |
 |---|---|---|
 | Paragraph 3 (replaced) | "MEME was founded on March 15, 2020 — the Ides of March, as the organization's own site puts it — just as COVID-19 was becoming a major societal problem. What it teaches is deliberately narrow: not directing, not cinematography — film schools already do that — but the business side of filmmaking that founders rarely get taught anywhere. The goal is to keep Colorado's filmmaking talent, and the projects it makes, from having to leave the state to get made." | ⚠ |
-| Paragraph 4 (new) | "Nick Goins runs the organization as Executive Director and teaches its flagship programs himself. The rest of the working roster is taught by people with real credits behind them — Steve Borne runs the sound workshop, and Adam Smestad teaches the on-set roles most people learn the hard way." | ⚠ |
+| Paragraph 4 (new; revised 2026-08-01 honesty pass) | "Per MEME's own program materials, Nick Goins runs the organization as Executive Director and teaches its flagship programs himself, and the rest of the working roster is taught by people with real credits behind them — Steve Borne runs the sound workshop, and Adam Smestad teaches the on-set roles most people learn the hard way." — the three staff roles/titles are single-sourced to internal MEME materials (playbook + one-pager) and are absent from meme.ngo; attributed in-copy ("per MEME's own program materials") rather than stated as site-verified fact, per the honesty auditor's option (b). | ⚠ |
 | 3 roster caption+alt pairs | Nick Goins / Steve Borne / Adam Smestad — name, role line, alt text, adapted from `STORY.md`'s per-image alt text | ⚠ |
 
 **What's NOT included, and why:** `nick-goins-afm` (the 2017 AFM photo) —

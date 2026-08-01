@@ -1912,7 +1912,7 @@ export const PAGES = {
         "The lawn is not empty. It is, for about an hour, merely uncrowded — the gap between the transporter lot and the crush that's coming.",
       gap: "By the time the sun clears the treeline, three Shelby Cobras have found space on the 18th green, spaced out across grass still dark with dew, the bunkers and Carmel Bay laid out behind them like a golf broadcast.",
       gapDetail:
-        "One of them, hood already up, is getting a last look from a small knot of people before the judges arrive: this is CSX 3042, a 1967 Shelby Cobra 427 S/C Roadster, out on loan from an owner who has known this family a long time — which is the only reason a camera gets to stand this close.",
+        "One of them, hood already up, is getting a last look from a small knot of people before the judges arrive: this is CSX 3042, a 1967 Shelby Cobra 427 S/C Roadster, out on loan from its owner.",
       judged:
         "Judging happens in the open, with no rope keeping anyone back. CSX 3042 wears a green class ribbon on its nose, and the small crowd that has gathered around it — blazers, sun hats, one photographer with a case at his feet — is doing the thing car people do at a judged car: standing close, saying little, looking at the details. The engine bay is popped for anyone who wants to see twin carburetors polished past their working purpose. The entrant placard staked in the grass spells out what the judges already know: 1967 Shelby Cobra 427 S/C Roadster, entered by Jack & Debbie Bell — read directly off the card, not guessed.",
       field:
@@ -1973,7 +1973,7 @@ export const PAGES = {
       meta: {
         title: "SeriesFest — the same air, 2025–2026",
         description:
-          "Four visits to SeriesFest across thirteen months — the 2025 festival, the Soul Power premiere, Fashion in Focus, and Season 12 — one relationship-building attendance, told as one story.",
+          "Four visits to SeriesFest across thirteen months — the 2025 festival, the Soul Power premiere, Fashion in Focus, and Season 12.",
       },
       cover: {
         masthead: "SeriesFest",
@@ -1983,7 +1983,7 @@ export const PAGES = {
         coords: "39.74° N · 104.99° W",
         storyLabel: "The cover story",
         title: "The Same Air",
-        deck: "Two years of showing up at SeriesFest — Denver's home for episodic storytelling — from a red carpet through a fashion runway to the Soirée stage twice over. Not press credentials. Just the same room, kept returning to.",
+        deck: "Two years of showing up at SeriesFest — Denver's home for episodic storytelling — from a red carpet through a fashion runway to the Soirée stage twice over.",
         teasers: ["2025 festival", "Soul Power premiere", "Fashion in Focus", "Season 12"],
         scrollCue: "Scroll for the story",
       },
@@ -1991,7 +1991,7 @@ export const PAGES = {
       slate: "SeriesFest · Denver, Colorado · 2025–2026",
       lede: "For a few days each spring, SeriesFest turns Denver into a room where creators, audiences, and industry actually share the same air.",
       intro:
-        "We've now sat in that room four times: the full 2025 festival, a February premiere, a March fashion panel, and back for the main event in May 2026. Nobody credentialed us. We just kept showing up.",
+        "We've now sat in that room four times: the full 2025 festival, a February premiere, a March fashion panel, and back for the main event in May 2026. We just kept showing up.",
       close:
         "A counter-thesis kept surfacing across all four visits: as the synthetic proliferates, the value of real human encounters only increases. Four rooms, thirteen months, one relationship that keeps carrying forward — and SeriesFest's programming runs year-round, all the way to Season 13. We'll be back.",
       chapters: [
@@ -2012,8 +2012,8 @@ export const PAGES = {
           date: "Feb 18, 2026",
           title: "Not a nostalgia trip.",
           body: "SeriesFest brought Soul Power: The Legend of the American Basketball Association to the Sie FilmCenter for a screening and Q&A. As moderator Vic Lombardi framed it: this is much deeper than that — it's real.",
-          imageSlug: "soulpower-lobby-mingle",
-          alt: "Attendees mingle in the Sie FilmCenter's Lobby & Salon before the Soul Power screening, vintage film posters on the wall behind them.",
+          imageSlug: "soulpower-red-carpet-press",
+          alt: "The SeriesFest step-and-repeat and red carpet outside the Sie FilmCenter, press photographers already in position ahead of the Soul Power screening.",
           href: "/venture/seriesfest-2026-soul-power",
           cta: "Soul Power premiere, in full",
         },

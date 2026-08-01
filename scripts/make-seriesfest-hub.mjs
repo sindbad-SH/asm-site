@@ -9,7 +9,7 @@
  * _STORY-STAGING/_COLLISION-MAP.md §2. Only 5 of the 10 staged picks are
  * perceptually clear:
  *   2025-podium-notecard, fashion-runway-crowd, fashion-runway-floral,
- *   s12-red-carpet-panel, soulpower-lobby-mingle
+ *   s12-red-carpet-panel, soulpower-red-carpet-press
  * This script bakes ONLY those 5, sourced fresh from the operator's tiered
  * archive (same convention as scripts/make-venture-story.mjs: EXIF
  * auto-orient, 900w+1600w, avif+webp). The dropped picks
@@ -20,6 +20,18 @@
  * identical to the live venture/seriesfest-2026/hero-1600 — cut. This build
  * uses fashion-runway-crowd instead (also carries a clear "SeriesFest"
  * wordmark, per the plan's own cover-swap note in the CUT list).
+ *
+ * SURGICAL HONESTY FIX (2026-08-01): the originally baked `soulpower-lobby-
+ * mingle` pick had unconfirmed provenance — a UUID filename, zero EXIF, and
+ * a non-native square crop, unlike every other file in this archive (see
+ * _STORY-STAGING/_INTEGRATION-PLAN.md §1.2 blocking issue (a) and CUT #5).
+ * Operator confirmation of that frame was never obtained. Per the plan's
+ * own identified fallback, this script now bakes `20260218_174536.jpg` — a
+ * real-EXIF, camera-native capture from the same premiere, same archive
+ * tier — under the slug `soulpower-red-carpet-press` instead. The old
+ * `soulpower-lobby-mingle-*` files were deleted from
+ * public/media/venture/seriesfest/ and consts.ts's chapter card 02 now
+ * points at the new slug.
  */
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
@@ -34,7 +46,7 @@ const PICKS = {
   "fashion-runway-crowd": "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Fashion in Focus/_TIER 2 - GOOD/20260307_185251.jpg",
   "fashion-runway-floral": "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Fashion in Focus/_TIER 2 - GOOD/20260307_185619.jpg",
   "2025-podium-notecard": "E:/Old Projects/Series Fest/2025 Photos/Series Fest 2025 - Festival/_TIER 1 - TOP (make stories)/20250502_130558.jpg",
-  "soulpower-lobby-mingle": "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Soul Power ABA Premiere/f0a58ffb-fc81-4d3f-9183-be9649192d27.jpg",
+  "soulpower-red-carpet-press": "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Soul Power ABA Premiere/_TIER 1 - TOP (make stories)/20260218_174536.jpg",
   "s12-red-carpet-panel": "E:/Old Projects/Series Fest/2026 Photos-20260222T213731Z-1-001/2026 Photos/Series Fest 2026 - Festival/_TIER 1 - TOP (make stories)/20260509_113749.jpg",
 };
 
