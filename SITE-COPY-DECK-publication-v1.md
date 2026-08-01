@@ -1366,3 +1366,58 @@ passed. Screenshot-checked at 1440×900 — settled height 6488px across the
 full page (case study + new chapter; not a full-page-vessel build so no
 6200px ceiling applies), 0 repeated images, no horizontal overflow, the
 testimonial confirmed visually to render exactly once.
+
+### Build #5 — `/venture/ko-law-workshops` upgrade: "The teacher" ⚠⚠ DOUBLE-GATED, NOT LIVE
+
+**This is the first ASM piece to name Ian Kuliasha by name and firm role.
+It DOES NOT SHIP to the built site as it stands.** Per
+`_INTEGRATION-PLAN.md` §1.5 and §2, this chapter needs BOTH (1) the
+operator's own read-approval (the same gate every row in this deck already
+carries) AND (2) a courtesy heads-up to Ian himself before it goes anywhere
+public. **Neither has happened — this builder cannot and did not perform
+either.**
+
+**How it's built to enforce that:** the chapter is code-complete and
+committed, but wrapped in the same HELD-FROM-PUBLISH interlock the codebase
+already uses for `venture/makeshift-film-group.astro`
+(`const PUBLISH_KO_IAN = import.meta.env.DEV || process.env.PUBLISH_KO_IAN
+=== "true"`). A normal `astro build` — what every actual deploy runs —
+renders the rest of the page exactly as it ships today and **omits this
+chapter entirely**; verified directly against `dist/venture/ko-law-
+workshops/index.html`, which contains zero occurrences of "Kuliasha." The
+chapter only renders in `astro dev` (operator local preview) or an explicit
+`PUBLISH_KO_IAN=true` build — never a default build. Flipping that flag is
+a conscious operator action, not a default this integration round took.
+
+| Row | Content | Flag |
+|---|---|---|
+| Chapter kicker | "The teacher" | ⚠⚠ |
+| Chapter title | "Ian Kuliasha, at the front of the room." | ⚠⚠ |
+| 3 body paragraphs (down from the miner's 5) | Adapted from `_STORY-STAGING/ko-law-ian/STORY.md`, NO-COUNT rule applied ("across this year's sessions," never "four 2026 sessions" — the miner's own draft used the numerized phrase; rewritten here) | ⚠⚠ |
+| 6 caption+alt pairs | `hero-team-launch`, `audience-classification`, `formation-gesture`, `boulder-office-wide`, `lifecycle-screen`, `next-workshop` | ⚠⚠ |
+
+**Collision-map trim:** the miner staged 7 images; `whiteboard-open` is a
+confirmed collision (same/adjacent frame as the live `boardroom-1600`) and
+is cut entirely — never baked. `boulder-office-wide` (a near-crop of that
+same live image, a different exact moment) is kept per the map's own
+permissive guidance ("at most one of the two wide-room picks"). 6 of 7
+ship, structurally, inside the gate.
+
+**Honesty rails applied:** both named individuals (Ian Kuliasha, and his
+unnamed KO Law colleague — "John Kyd" per an auto-transcript spelling the
+miner flagged as unconfirmed and deliberately did not use as a caption-
+worthy name) are sourced from the operator's own event photography plus
+kofirm.com's team page and the session's own transcript (self-
+identification), never guessed. The relationship tier stays `informal`
+(`RELATIONSHIPS["workshop-coverage"]`) — this chapter adds a named
+individual but does not change the relationship's tier or phrasing. Ian's
+Pitch Boulder co-founder role (true, public, on kofirm.com) is deliberately
+NOT mentioned, per the miner's own note, to avoid re-opening a KO
+Law/Pitch Boulder framing confusion a prior pass already had to correct.
+
+**Verified:** `astro check` 0 errors. Two builds run: (1) default —
+confirmed "Kuliasha" appears zero times in the output; (2)
+`PUBLISH_KO_IAN=true` — screenshot-checked at 1440×900, chapter renders
+correctly, 0 repeated images across the full page (12 unique content
+images: the existing 6 + this chapter's 6), no horizontal overflow. The
+repo was left in the DEFAULT (gated-off) build state.

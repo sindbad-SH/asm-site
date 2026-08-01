@@ -122,6 +122,63 @@ const CTAS = [
   { label: "See the venture lane", href: `${base}/venture`, external: false },
   { label: "About KO Law", href: "https://kofirm.com", external: true },
 ];
+
+// ── Build #5 (2026-08-01 archive-mining integration) — "the teacher"
+// chapter, named-teacher content about Ian Kuliasha. ⚠⚠ DOUBLE-GATED — the
+// FIRST ASM piece to name Ian by name and firm role.
+// _INTEGRATION-PLAN.md §1.5 requires BOTH (1) the operator's own
+// read-approval (same as every other row in this round) AND (2) a courtesy
+// heads-up to Ian himself before this goes anywhere public. Neither has
+// happened. Same HELD-FROM-PUBLISH interlock as
+// venture/makeshift-film-group.astro: renders under `astro dev` (operator
+// preview) or when explicitly built with PUBLISH_KO_IAN=true; a normal
+// `astro build` (what every deploy uses) omits the section entirely. The
+// rest of this page (firm-first, no individual named) is unaffected and
+// ships normally.
+const PUBLISH_KO_IAN = import.meta.env.DEV || process.env.PUBLISH_KO_IAN === "true";
+
+const ianDir = join(process.cwd(), "public", "media", "venture", "ko-law-workshops");
+function ianShot(slug: string) {
+  if (!existsSync(join(ianDir, `ian-${slug}-900.avif`))) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/venture/ko-law-workshops/ian-${slug}-${w}.${ext}`;
+  return {
+    avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
+    webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
+    src: url(900, "webp"),
+  };
+}
+const ianHero = ianShot("hero-team-launch");
+const ianBleed = ianShot("audience-classification");
+const ianFormation = ianShot("formation-gesture");
+const ianOfficeWide = ianShot("boulder-office-wide");
+const ianLifecycle = ianShot("lifecycle-screen");
+const ianNext = ianShot("next-workshop");
+
+// COLLISION-MAP DROP: `whiteboard-open` confirmed-collides with the live
+// boardroom-1600 image above (same/adjacent frame) — never baked, never
+// referenced. `boulder-office-wide` (a near-crop of the same live image, a
+// different exact moment) is kept per the map's permissive guidance.
+//
+// NO-COUNT rule (consts.ts, RELATIONSHIPS["workshop-coverage"]): the
+// sessions are referred to plurally, never numerized — "across this year's
+// sessions," never "four 2026 sessions."
+const IAN_CHAPTER = {
+  kicker: "The teacher",
+  title: "Ian Kuliasha, at the front of the room.",
+  paragraphs: [
+    "KO Law's startup workshop series has one constant across every session: Ian Kuliasha, a partner in the firm's corporate practice, opens the room and teaches it. He works with founders on formation, financing, and exits — the standing subject of the series — and across this year's sessions he's the one at the whiteboard, the one at the screen, the one who hands the room a framework before the coffee's gone.",
+    `The series moves rooms as it grows. It starts in KO Law's own Boulder boardroom — a whiteboard, a wall-mounted screen, coffee cups and a dozen chairs pulled close. By June, the same series fills a stage at Kiln, a Boulder coworking space, house lighting and all. He teaches in examples, not just slides: on independent contractors versus employees, his test is a lawyer joke — call him and ask for legal advice, he says yes, that's the job; ask him to bring the room coffee and he'll say no.`,
+    `By the "Building Your Team" session, he's not doing it alone — a colleague from KO Law's corporate team joins him on stage, and the workshop turns into a back-and-forth. None of this is an embedded engagement or a client relationship — it's coverage, session by session, of a workshop series a Boulder firm runs for founders. What holds it together on camera is simple: whichever room, whichever slide, Ian Kuliasha is the one teaching it.`,
+  ],
+  captions: {
+    hero: "Ian Kuliasha (left) opens a session the way he opens every session — with a show of hands.",
+    bleed: "By June the series fills a stage — same teacher, a bigger room to read.",
+    formation: `Back in KO Law's own office: "You don't form a company. You answer questions, and what falls out of them is a company."`,
+    officeWide: "KO Law's own Boulder office, the room this series started in.",
+    lifecycle: "The framework on screen, twenty minutes into a session.",
+    next: "He closes every session the same way — by naming the next one.",
+  },
+};
 ---
 
 <Base
@@ -184,6 +241,90 @@ const CTAS = [
             </div>
             <figcaption class="hud-label ko-collage-cap">From the 2026 sessions — Boulder + Denver</figcaption>
           </figure>
+        )
+      }
+
+      {
+        PUBLISH_KO_IAN && (
+          <section class="ko-ian" aria-label="The teacher">
+            <p class="hud-label ko-ian-kicker">{IAN_CHAPTER.kicker}</p>
+            <h2 class="ko-ian-title">{IAN_CHAPTER.title}</h2>
+
+            {ianHero && (
+              <figure class="ko-ian-hero">
+                <picture>
+                  <source type="image/avif" srcset={ianHero.avif} sizes="(max-width: 760px) 100vw, 46rem" />
+                  <source type="image/webp" srcset={ianHero.webp} sizes="(max-width: 760px) 100vw, 46rem" />
+                  <img src={ianHero.src} alt="Two presenters on a stage give an enthusiastic thumbs-up in front of a screen reading KO Law, Startup Workshop, Building Your Team, colorful stage lighting behind them." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="ko-ian-cap">{IAN_CHAPTER.captions.hero}</figcaption>
+              </figure>
+            )}
+
+            <p class="ko-ian-para">{IAN_CHAPTER.paragraphs[0]}</p>
+
+            {ianBleed && (
+              <figure class="ko-ian-bleed">
+                <picture>
+                  <source type="image/avif" srcset={ianBleed.avif} sizes="100vw" />
+                  <source type="image/webp" srcset={ianBleed.webp} sizes="100vw" />
+                  <img src={ianBleed.src} alt="A full room of seated workshop attendees facing a stage where two presenters stand beside a screen reading Classification, Employee versus IC, at a venue branded Kiln." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="ko-ian-cap ko-ian-bleed-cap">{IAN_CHAPTER.captions.bleed}</figcaption>
+              </figure>
+            )}
+
+            <p class="ko-ian-para">{IAN_CHAPTER.paragraphs[1]}</p>
+
+            {ianFormation && (
+              <figure class="ko-ian-mid ko-ian-mid--large">
+                <picture>
+                  <source type="image/avif" srcset={ianFormation.avif} sizes="(max-width: 760px) 100vw, 30rem" />
+                  <source type="image/webp" srcset={ianFormation.webp} sizes="(max-width: 760px) 100vw, 30rem" />
+                  <img src={ianFormation.src} alt="A bald man with glasses and a beard, wearing a checkered shirt, gestures with both hands while speaking beside a screen reading Startup Workshop, Formation, Building the Foundation, a KO Law sign visible through the window behind him." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="ko-ian-cap">{IAN_CHAPTER.captions.formation}</figcaption>
+              </figure>
+            )}
+
+            {(ianOfficeWide || ianLifecycle) && (
+              <div class="ko-ian-duo">
+                {ianOfficeWide && (
+                  <figure class="ko-ian-mid">
+                    <picture>
+                      <source type="image/avif" srcset={ianOfficeWide.avif} sizes="(max-width: 760px) 48vw, 22rem" />
+                      <source type="image/webp" srcset={ianOfficeWide.webp} sizes="(max-width: 760px) 48vw, 22rem" />
+                      <img src={ianOfficeWide.src} alt="A wide view of a law-firm boardroom with attendees seated around a table, a presenter standing at a whiteboard in the background, and a street sign reading Broadway and Portland visible through the window." loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="ko-ian-cap">{IAN_CHAPTER.captions.officeWide}</figcaption>
+                  </figure>
+                )}
+                {ianLifecycle && (
+                  <figure class="ko-ian-mid">
+                    <picture>
+                      <source type="image/avif" srcset={ianLifecycle.avif} sizes="(max-width: 760px) 48vw, 22rem" />
+                      <source type="image/webp" srcset={ianLifecycle.webp} sizes="(max-width: 760px) 48vw, 22rem" />
+                      <img src={ianLifecycle.src} alt="A presenter stands beside a wall-mounted screen displaying a diagram titled Lifecycle Stages, addressing a seated group in a law-office boardroom." loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption class="ko-ian-cap">{IAN_CHAPTER.captions.lifecycle}</figcaption>
+                  </figure>
+                )}
+              </div>
+            )}
+
+            <p class="ko-ian-para">{IAN_CHAPTER.paragraphs[2]}</p>
+
+            {ianNext && (
+              <figure class="ko-ian-mid ko-ian-mid--small">
+                <picture>
+                  <source type="image/avif" srcset={ianNext.avif} sizes="(max-width: 760px) 60vw, 18rem" />
+                  <source type="image/webp" srcset={ianNext.webp} sizes="(max-width: 760px) 60vw, 18rem" />
+                  <img src={ianNext.src} alt="A man in a checkered shirt stands with hands in his pockets beside a screen reading Next Workshop, Save the Date, Thursday June 25, Building a Team." loading="lazy" decoding="async" />
+                </picture>
+                <figcaption class="ko-ian-cap">{IAN_CHAPTER.captions.next}</figcaption>
+              </figure>
+            )}
+          </section>
         )
       }
 
@@ -330,6 +471,89 @@ const CTAS = [
     margin-top: 0.8rem;
     letter-spacing: 0.18em;
     color: color-mix(in srgb, #d9f2ec 60%, transparent);
+  }
+
+  /* ── "The teacher" chapter (Build #5, DOUBLE-GATED — see PUBLISH_KO_IAN
+     above; only ever rendered in dev preview or an explicit gated build) ── */
+  .ko-ian {
+    margin-top: 0.8rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    display: grid;
+    gap: 1.1rem;
+  }
+  .ko-ian-kicker {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+  }
+  .ko-ian-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(1.7rem, 3.6vw, 2.6rem);
+    line-height: 1.15;
+    color: #f2f4f8;
+    margin: 0;
+  }
+  .ko-ian-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.02rem, 1.4vw, 1.15rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+  }
+  .ko-ian-hero, .ko-ian-bleed { margin: 0.2rem 0; }
+  .ko-ian-hero img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .ko-ian-bleed {
+    margin-inline: calc(-1 * (100vw - 100%) / 2 - 1px);
+    width: 100vw;
+    max-width: 100vw;
+    position: relative;
+  }
+  .ko-ian-bleed img {
+    display: block;
+    width: 100%;
+    max-height: 62svh;
+    object-fit: cover;
+  }
+  .ko-ian-bleed-cap {
+    position: absolute;
+    left: 1.5rem;
+    bottom: 1rem;
+    margin: 0;
+    padding: 0.4rem 0.7rem;
+    background: color-mix(in srgb, #11131c 72%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+  }
+  .ko-ian-mid img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .ko-ian-mid--large { max-width: 30rem; }
+  .ko-ian-mid--small { max-width: 18rem; }
+  .ko-ian-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .ko-ian-cap {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, #eef2f5 60%, transparent);
+  }
+  @media (max-width: 560px) {
+    .ko-ian-duo { grid-template-columns: 1fr; }
   }
 
   /* CTA row — shared button grammar: 1px border, Space Mono caps, arrow slides
