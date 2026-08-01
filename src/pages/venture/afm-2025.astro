@@ -1,12 +1,36 @@
 ---
 /**
- * Venture story · American Film Market 2025 — built on the P12.8 pilot pattern
- * (seriesfest-2026.astro). Mono slate, mixed-face headline, native-aspect collage,
- * AFM LegendMark near the top.
+ * Venture story · American Film Market 2025.
  *
- * HONESTY: the only status claim is the AFM LegendMark (tier `attended`), rendered
- * near the top from consts — verbatim, never upgraded. The prose is the operator's
- * OWN words (see the read-approval block). Attendance ≠ affiliation.
+ * LAYOUT-OVERHAUL P1 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md): the page's
+ * two prose-wall → gallery-wall dumps are resequenced into four Magnum-style
+ * movements ("Picturing a Place" repeating-unit rhythm: image beat → heading →
+ * paragraphs → pull quote → small thumbnail → whitespace). Every image now
+ * sits at a deliberate scale next to the text it illustrates, no two adjacent
+ * image beats share width AND orientation, and every image carries a caption.
+ * The page head (mono slate, mixed-face headline, framed native-aspect hero,
+ * AFM LegendMark) keeps the original vs-* identity — deliberately DIFFERENT
+ * from the steel-and-dust newsstand family.
+ *
+ * CROP NOTE: every bake in public/media/venture/afm-2025 is NATIVELY SQUARE
+ * (1:1) — the root cause of the old collage's boxes-look. This pass crops per
+ * beat via CSS aspect-ratio + object-position, tuned against a contact sheet
+ * of all 14 frames (eye-reviewed, not blind): the hero/panel shots carry
+ * their subjects in the lower band (positions biased ~55-68% down), the
+ * Century Plaza sign + sculpture sit low-left (2:1 @ 68% down), Cinecittà is
+ * a tall banner (portrait 4:5), podium-speaker is a standing-figure vertical
+ * (portrait 4:5, biased right). Originals untouched on disk; no new bakes.
+ *
+ * Image budget: 13 of the previous 16 render. CUTS (no-silent-caps rule):
+ * podium-address + step-and-repeat-2 (near-duplicates of podium-speaker /
+ * step-and-repeat), and venue-signage (the frame is an Arizona Film & Digital
+ * Media lounge — off-theme for the Sessions movement its slot lived in, and
+ * M4 is already at density).
+ *
+ * HONESTY: the only status claim is the AFM LegendMark (tier `attended`),
+ * rendered near the top from consts — verbatim, never upgraded. The prose is
+ * the operator's OWN words (see the read-approval block) — NOT reworded in
+ * this pass; only re-grouped under movement kickers. Attendance ≠ affiliation.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
@@ -40,20 +64,15 @@ async function shot(slug: string, alt: string) {
   };
 }
 
-const [hero, ...gallery] = await Promise.all([
-  shot("hero", "An AFM Sessions panel on the blue AFM-branded stage."),
-  shot("venue-signage", "The market venue interior with lit AFM signage."),
-  shot("panel-stage", "Panelists on stools with microphones on the AFM stage."),
-  shot("podium-speaker", "A speaker presenting at the podium during a session."),
-  shot("step-and-repeat", "The blue AFM-branded step-and-repeat backdrop."),
-  shot("panel-mics", "A session panel seated with microphones."),
-  shot("podium-lectern", "A speaker at the lectern during an AFM session."),
-  shot("step-and-repeat-2", "The branded AFM backdrop at the market."),
-  shot("panel-seated", "A seated panel on the AFM stage."),
-  shot("podium-address", "A speaker addressing the session from the stage."),
-].map((p) => p));
-
-const spans = [3, 3, 2, 2, 2, 3, 3, 2, 2];
+// The sessions set (alts verbatim from the previous build; podium-address,
+// step-and-repeat-2, and venue-signage deliberately not loaded — see header).
+const hero = await shot("hero", "An AFM Sessions panel on the blue AFM-branded stage.");
+const panelStage = await shot("panel-stage", "Panelists on stools with microphones on the AFM stage.");
+const podiumSpeaker = await shot("podium-speaker", "A speaker presenting at the podium during a session.");
+const stepAndRepeat = await shot("step-and-repeat", "The blue AFM-branded step-and-repeat backdrop.");
+const panelMics = await shot("panel-mics", "A session panel seated with microphones.");
+const podiumLectern = await shot("podium-lectern", "A speaker at the lectern during an AFM session.");
+const panelSeated = await shot("panel-seated", "A seated panel on the AFM stage.");
 
 // The AFM proof line — imported from consts, rendered VERBATIM. This is the only
 // status claim on the page (tier `attended`), and it sits up top.
@@ -61,25 +80,49 @@ const afmRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "afm",
 );
 
-// Build #3 (2026-08-01 archive-mining integration) — "Movement 2 · The
-// Floor": the AFM Sessions panels get the stage; this appended chapter is
-// the market itself (venue, pavilions, booth-level trade, evening
-// receptions). Source: _STORY-STAGING/afm-2025-market-floor/STORY.md,
-// condensed. Only the 6 collision-clear picks ship — see
-// scripts/make-afm-floor.mjs header (3 of the miner's 9 were cut for being
-// editorially redundant with this page's existing gallery, per the plan's
-// own CUT list #11, independent of the collision sweep).
-const floorSpans = { "venue-century-plaza": 6, "stage-before-doors": 3, "pavilion-cinecitta": 3, "pavilion-row-egypt": 3, "floor-wvfilm-booth": 4, "reception-evening": 2 };
-const floor = await Promise.all([
-  shot("venue-century-plaza", "The Fairmont Century Plaza hotel exterior at night, lit facade and a large woven sculpture out front."),
-  shot("stage-before-doors", "An empty conference stage under blue lighting, American Film Market branding projected on the backdrop, rows of unoccupied seats."),
-  shot("pavilion-cinecitta", "A trade-show banner for Cinecittà studios in Rome, advertising soundstages and an Italian production tax incentive, at an AFM exhibitor pavilion."),
-  shot("pavilion-row-egypt", "A row of exhibitor booths at American Film Market, including a banner for the Egypt Film Commission promoting local production incentives."),
-  shot("floor-wvfilm-booth", "Two attendees talking with representatives at the West Virginia Film Office booth, browsing location photos and brochures at their market table."),
-  shot("reception-evening", "Guests mingling at an evening reception under string lights and chandeliers, a step-and-repeat backdrop visible in the background."),
-]);
+// Build #3 (2026-08-01 archive-mining integration) — "The Floor": the market
+// itself (venue, pavilions, booth-level trade, evening receptions). Source:
+// _STORY-STAGING/afm-2025-market-floor/STORY.md, condensed. Only the
+// collision-clear picks ship — see scripts/make-afm-floor.mjs header.
+const venueCenturyPlaza = await shot("venue-century-plaza", "The Fairmont Century Plaza hotel exterior at night, lit facade and a large woven sculpture out front.");
+const stageBeforeDoors = await shot("stage-before-doors", "An empty conference stage under blue lighting, American Film Market branding projected on the backdrop, rows of unoccupied seats.");
+const pavilionCinecitta = await shot("pavilion-cinecitta", "A trade-show banner for Cinecittà studios in Rome, advertising soundstages and an Italian production tax incentive, at an AFM exhibitor pavilion.");
+const pavilionRowEgypt = await shot("pavilion-row-egypt", "A row of exhibitor booths at American Film Market, including a banner for the Egypt Film Commission promoting local production incentives.");
+const floorWvfilmBooth = await shot("floor-wvfilm-booth", "Two attendees talking with representatives at the West Virginia Film Office booth, browsing location photos and brochures at their market table.");
+const receptionEvening = await shot("reception-evening", "Guests mingling at an evening reception under string lights and chandeliers, a step-and-repeat backdrop visible in the background.");
+
+/*
+  ⚠ OPERATOR READ-APPROVAL REQUIRED — the movement kickers, the floor heading
+  (carried from Build #3), the pull quote (a reprise of his own P4 sentence,
+  standard pull-quote practice), and EVERY caption below are new visible copy
+  (staging-only until read). Caption facts trace only to what is verifiable
+  in-frame (Cinecittà / Egypt Film Commission / West Virginia Film Office
+  signage) or to his own published post copy already on this page. The FLOOR
+  paragraphs are Build #3's, unchanged.
+*/
+const KICKERS = {
+  m1: "Movement 1 · The Sessions",
+  m2: "Movement 2 · The Pitch Conference",
+  m3: "Movement 3 · The Panels",
+  m4: "Movement 4 · The Floor",
+};
+const PULL = "The story tells us why we care. The strategy tells us why it works.";
+const CAPTIONS = {
+  hero: "The AFM Sessions stage, mid-panel.",
+  panelStage: "Panelists on the Sessions stage — the week's recurring format.",
+  panelSeated: "The seated panel, mid-session.",
+  podiumSpeaker: "A session speaker at the podium.",
+  stepAndRepeat: "Between sessions, off the stage.",
+  panelsDiptych: "Panels and podiums, in rotation all week.",
+  venueCenturyPlaza: "The Fairmont Century Plaza at night — the market fills the building for a week.",
+  stageBeforeDoors: "Before doors: a blue-lit stage and rows of empty seats.",
+  pavilionCinecitta: "Cinecittà's pavilion banner — “your studio in Italy.”",
+  pavilionRowEgypt: "The Egypt Film Commission's pavilion, a few aisles on.",
+  wvfilmBooth: "Booth-level trade at the West Virginia Film Office table.",
+  receptionEvening: "The market moves outside — an evening reception under string lights.",
+};
+
 const FLOOR = {
-  kicker: "Movement 2 · The Floor",
   heading: "The rest of the building.",
   paragraphs: [
     "The AFM Sessions panels get the spotlight and the recap posts. The market itself is what actually fills the building — a trading floor for film and television, built for a week inside the Fairmont Century Plaza in Century City.",
@@ -120,106 +163,261 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style={`--ar:${hero.ar}`} loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 60%" loading="eager" decoding="async" />
         </picture>
+        <figcaption class="vs-cap">{CAPTIONS.hero}</figcaption>
       </figure>
     )}
 
     <!--
-      ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (source: his LinkedIn AFM 2025
-      posts, ~Nov 2025), staging-only until read. Three threads chosen, per his
-      own posts:
-        · P1–P2 — his AFM kickoff post (energizing/grounding; first Waymo ride;
-          drone cinematography + story-driven brand strategy; "visual and
-          emotional altitude").
-        · P3–P4 — his AFM Pitch Conference post (2-minute pitches; the film-vs-
-          startup mirror; "the story tells us why we care, the strategy tells us
-          why it works … an invitation"). PitchBoulder referenced generally only.
-        · P5–P6 — his indie-action-films panel post (FLIP Creative; indie ≠ low
-          quality; betting on a team; "the relationships are the infrastructure";
-          vision vs viability).
+      ⚠ OPERATOR READ-APPROVAL — prose P1–P6 below is UNCHANGED from the prior
+      build (source: his LinkedIn AFM 2025 posts, ~Nov 2025; original sourcing
+      note in git history at 0c54e07). This pass only re-groups it under
+      movement kickers:
+        · Movement 1 (P1–P2) — his AFM kickoff post.
+        · Movement 2 (P3–P4) — his AFM Pitch Conference post.
+        · Movement 3 (P5) — his indie-action-films panel post (FLIP Creative).
+        · Close (P6) — the vision-and-viability synthesis.
       Named entities only as he named them; no relationship claims.
     -->
-    <section class="vs-prose" data-reveal>
-      <p>
-        Kicking off the week at the American Film Market was energizing and
-        grounding at once — a place where creativity feels tangible and every
-        conversation holds a spark of possibility. Even getting around Los Angeles
-        was an adventure: a first ride in a Waymo, one of those quietly
-        futuristic moments — a reminder of how fast storytelling and technology
-        are converging.
-      </p>
-      <p>
-        The connections we were most excited to explore were around drone
-        cinematography and story-driven brand strategy — helping ideas find both
-        their visual and emotional altitude.
-      </p>
-      <p>
-        A highlight was the AFM Pitch Conference, where dozens of filmmakers had
-        two minutes each to distill a project into a snapshot. As someone who sits
-        in pitch rooms every week at PitchBoulder, it played like a mirror image:
-        in film, creators lead with the story; in startups, founders lead with the
-        business — but the truth is both sides need both.
-      </p>
-      <p>
-        The story tells us why we care. The strategy tells us why it works. When
-        those two come together, a pitch stops feeling like a presentation and
-        starts feeling like an invitation — to invest, to collaborate, or simply
-        to believe.
-      </p>
-      <p>
-        On the indie-action-films panel presented by FLIP Creative, the
-        throughline was honesty about the miracle of getting a film made — and how
-        that miracle becomes a business model when you do it right. Indie no
-        longer means low quality; you're not just buying a movie, you're betting
-        on a team; and the people who keep working together across projects prove
-        the real point — the relationships are the infrastructure.
-      </p>
-      <p>
-        Different industries, different vocabulary, the same tension: how do you
-        blend vision and viability, the engine and the soul of an idea? That
-        intersection is where a lot of future opportunity lives. The AFM Sessions,
-        American Film Market, Los Angeles, California, November 8–15, 2025.
-      </p>
+    <!-- MOVEMENT 1 · THE SESSIONS — heading → paragraphs → full-width beat →
+         asymmetric pair (widths 58/34, orientations differ, tops aligned —
+         deliberately NOT the newsstand family's dropped-baseline stagger). -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m1}</p>
+      <div class="vs-prose">
+        <p>
+          Kicking off the week at the American Film Market was energizing and
+          grounding at once — a place where creativity feels tangible and every
+          conversation holds a spark of possibility. Even getting around Los Angeles
+          was an adventure: a first ride in a Waymo, one of those quietly
+          futuristic moments — a reminder of how fast storytelling and technology
+          are converging.
+        </p>
+        <p>
+          The connections we were most excited to explore were around drone
+          cinematography and story-driven brand strategy — helping ideas find both
+          their visual and emotional altitude.
+        </p>
+      </div>
     </section>
 
-    <section class="vs-gallery" aria-label="American Film Market 2025 — frames">
-      {gallery.map((g, i) =>
-        g ? (
-          <figure class="vs-card" style={`--span:${spans[i] ?? 2}`} data-reveal data-reveal-stagger="70">
+    {panelStage && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={panelStage.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={panelStage.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={panelStage.fallback} alt={panelStage.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 58%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.panelStage}</figcaption>
+      </figure>
+    )}
+
+    {(panelSeated || podiumSpeaker) && (
+      <div class="vs-pair" data-reveal>
+        {panelSeated && (
+          <figure class="vs-pair-a">
             <picture>
-              <source type="image/avif" srcset={g.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-              <source type="image/webp" srcset={g.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-              <img src={g.fallback} alt={g.alt} style={`--ar:${g.ar}`} loading="lazy" decoding="async" />
+              <source type="image/avif" srcset={panelSeated.avif} sizes="(max-width: 760px) 100vw, 44rem" />
+              <source type="image/webp" srcset={panelSeated.webp} sizes="(max-width: 760px) 100vw, 44rem" />
+              <img src={panelSeated.fallback} alt={panelSeated.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 60%" loading="lazy" decoding="async" />
             </picture>
+            <figcaption class="vs-cap">{CAPTIONS.panelSeated}</figcaption>
           </figure>
-        ) : null,
+        )}
+        {podiumSpeaker && (
+          <figure class="vs-pair-b">
+            <picture>
+              <source type="image/avif" srcset={podiumSpeaker.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={podiumSpeaker.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={podiumSpeaker.fallback} alt={podiumSpeaker.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:60% 50%" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.podiumSpeaker}</figcaption>
+          </figure>
+        )}
+      </div>
+    )}
+
+    <!-- MOVEMENT 2 · THE PITCH CONFERENCE — paragraphs with a small ~200px
+         related-thumbnail riding beside the text (the Magnum device: smallness
+         as a rhythm tool), then the page's one full-width pull quote. -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m2}</p>
+      <div class="vs-thumbrow">
+        <div class="vs-prose vs-prose--inrow">
+          <p>
+            A highlight was the AFM Pitch Conference, where dozens of filmmakers had
+            two minutes each to distill a project into a snapshot. As someone who sits
+            in pitch rooms every week at PitchBoulder, it played like a mirror image:
+            in film, creators lead with the story; in startups, founders lead with the
+            business — but the truth is both sides need both.
+          </p>
+          <p>
+            The story tells us why we care. The strategy tells us why it works. When
+            those two come together, a pitch stops feeling like a presentation and
+            starts feeling like an invitation — to invest, to collaborate, or simply
+            to believe.
+          </p>
+        </div>
+        {stepAndRepeat && (
+          <figure class="vs-thumb">
+            <picture>
+              <source type="image/avif" srcset={stepAndRepeat.avif} sizes="200px" />
+              <source type="image/webp" srcset={stepAndRepeat.webp} sizes="200px" />
+              <img src={stepAndRepeat.fallback} alt={stepAndRepeat.alt} style="aspect-ratio:1/1;object-fit:cover" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.stepAndRepeat}</figcaption>
+          </figure>
+        )}
+      </div>
+    </section>
+
+    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
+
+    <!-- MOVEMENT 3 · THE PANELS — paragraph, then a small two-image diptych
+         (one grouped beat, deliberately dropped in scale — the smallness
+         device; a triptych would have needed an off-theme third frame). -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m3}</p>
+      <div class="vs-prose">
+        <p>
+          On the indie-action-films panel presented by FLIP Creative, the
+          throughline was honesty about the miracle of getting a film made — and how
+          that miracle becomes a business model when you do it right. Indie no
+          longer means low quality; you're not just buying a movie, you're betting
+          on a team; and the people who keep working together across projects prove
+          the real point — the relationships are the infrastructure.
+        </p>
+      </div>
+      {(panelMics || podiumLectern) && (
+        <figure class="vs-diptych">
+          <div class="vs-diptych-row">
+            {panelMics && (
+              <picture>
+                <source type="image/avif" srcset={panelMics.avif} sizes="(max-width: 760px) 50vw, 26rem" />
+                <source type="image/webp" srcset={panelMics.webp} sizes="(max-width: 760px) 50vw, 26rem" />
+                <img src={panelMics.fallback} alt={panelMics.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 60%" loading="lazy" decoding="async" />
+              </picture>
+            )}
+            {podiumLectern && (
+              <picture>
+                <source type="image/avif" srcset={podiumLectern.avif} sizes="(max-width: 760px) 50vw, 26rem" />
+                <source type="image/webp" srcset={podiumLectern.webp} sizes="(max-width: 760px) 50vw, 26rem" />
+                <img src={podiumLectern.fallback} alt={podiumLectern.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+              </picture>
+            )}
+          </div>
+          <figcaption class="vs-cap">{CAPTIONS.panelsDiptych}</figcaption>
+        </figure>
       )}
     </section>
 
-    <!-- Build #3 — "Movement 2 · The Floor" (archive-mining integration,
-         2026-08-01). Same vs-* grammar as the chapter above, appended, not
-         replacing anything. -->
-    <section class="vs-prose vs-prose--floor" data-reveal>
-      <p class="hud-label vs-slate">{FLOOR.kicker}</p>
+    <!-- MOVEMENT 4 · THE FLOOR (Build #3 prose, unchanged) — the page's
+         biggest scale beat (edge-to-edge night exterior), then medium beat
+         beside text, a mirrored asymmetric pair (portrait banner + wide row),
+         a duo, and a small quiet closer. -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m4}</p>
       <h2 class="vs-floor-heading">{FLOOR.heading}</h2>
-      {FLOOR.paragraphs.map((p) => <p>{p}</p>)}
+      <div class="vs-prose">
+        <p>{FLOOR.paragraphs[0]}</p>
+      </div>
     </section>
 
-    <section class="vs-gallery" aria-label="American Film Market 2025 — the market floor">
-      {
-        Object.keys(floorSpans).map((slug, i) =>
-          floor[i] ? (
-            <figure class="vs-card" style={`--span:${floorSpans[slug as keyof typeof floorSpans]}`} data-reveal data-reveal-stagger="70">
-              <picture>
-                <source type="image/avif" srcset={floor[i]!.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-                <source type="image/webp" srcset={floor[i]!.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-                <img src={floor[i]!.fallback} alt={floor[i]!.alt} style={`--ar:${floor[i]!.ar}`} loading="lazy" decoding="async" />
-              </picture>
-            </figure>
-          ) : null,
-        )
-      }
+    {venueCenturyPlaza && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={venueCenturyPlaza.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={venueCenturyPlaza.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={venueCenturyPlaza.fallback} alt={venueCenturyPlaza.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 68%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.venueCenturyPlaza}</figcaption>
+      </figure>
+    )}
+
+    <div class="vs-duo" data-reveal>
+      {stageBeforeDoors && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={stageBeforeDoors.avif} sizes="(max-width: 760px) 100vw, 30rem" />
+            <source type="image/webp" srcset={stageBeforeDoors.webp} sizes="(max-width: 760px) 100vw, 30rem" />
+            <img src={stageBeforeDoors.fallback} alt={stageBeforeDoors.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.stageBeforeDoors}</figcaption>
+        </figure>
+      )}
+      <div class="vs-prose vs-prose--inrow">
+        <p>{FLOOR.paragraphs[1]}</p>
+      </div>
+    </div>
+
+    {(pavilionCinecitta || pavilionRowEgypt) && (
+      <div class="vs-pair vs-pair--flip" data-reveal>
+        {pavilionCinecitta && (
+          <figure class="vs-pair-b">
+            <picture>
+              <source type="image/avif" srcset={pavilionCinecitta.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={pavilionCinecitta.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={pavilionCinecitta.fallback} alt={pavilionCinecitta.alt} style="aspect-ratio:4/5;object-fit:cover" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.pavilionCinecitta}</figcaption>
+          </figure>
+        )}
+        {pavilionRowEgypt && (
+          <figure class="vs-pair-a">
+            <picture>
+              <source type="image/avif" srcset={pavilionRowEgypt.avif} sizes="(max-width: 760px) 100vw, 44rem" />
+              <source type="image/webp" srcset={pavilionRowEgypt.webp} sizes="(max-width: 760px) 100vw, 44rem" />
+              <img src={pavilionRowEgypt.fallback} alt={pavilionRowEgypt.alt} style="aspect-ratio:16/9;object-fit:cover" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.pavilionRowEgypt}</figcaption>
+          </figure>
+        )}
+      </div>
+    )}
+
+    <div class="vs-duo vs-duo--flip" data-reveal>
+      <div class="vs-prose vs-prose--inrow">
+        <p>{FLOOR.paragraphs[2]}</p>
+      </div>
+      {floorWvfilmBooth && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={floorWvfilmBooth.avif} sizes="(max-width: 760px) 100vw, 34rem" />
+            <source type="image/webp" srcset={floorWvfilmBooth.webp} sizes="(max-width: 760px) 100vw, 34rem" />
+            <img src={floorWvfilmBooth.fallback} alt={floorWvfilmBooth.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.wvfilmBooth}</figcaption>
+        </figure>
+      )}
+    </div>
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>{FLOOR.paragraphs[3]}</p>
+      </div>
+    </section>
+
+    {receptionEvening && (
+      <figure class="vs-closer" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={receptionEvening.avif} sizes="(max-width: 760px) 100vw, 40rem" />
+          <source type="image/webp" srcset={receptionEvening.webp} sizes="(max-width: 760px) 100vw, 40rem" />
+          <img src={receptionEvening.fallback} alt={receptionEvening.alt} style="aspect-ratio:1/1;object-fit:cover" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.receptionEvening}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p class="vs-close">
+          Different industries, different vocabulary, the same tension: how do you
+          blend vision and viability, the engine and the soul of an idea? That
+          intersection is where a lot of future opportunity lives. The AFM Sessions,
+          American Film Market, Los Angeles, California, November 8–15, 2025.
+        </p>
+      </div>
     </section>
 
     <section class="vs-foot">
@@ -234,7 +432,7 @@ const meta = {
     min-height: 100svh;
     padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
     display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
+    gap: clamp(2rem, 4vw, 3.25rem);
     max-width: 90rem;
     margin-inline: auto;
   }
@@ -298,10 +496,32 @@ const meta = {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
+  }
+  .vs-hero .vs-cap {
+    padding: 0.55rem 0.35rem 0.15rem;
   }
 
+  /* the shared caption voice — small mono, directly under the image (the one
+     device every reference site shares; see SPEC-EDITORIAL-LAYOUT §3). */
+  .vs-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
+  .vs-movement {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+  }
+  .vs-kicker {
+    justify-self: center;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-accent) 82%, transparent);
+  }
   .vs-prose {
     max-width: 44rem;
     display: grid;
@@ -309,9 +529,13 @@ const meta = {
     font-size: clamp(1.05rem, 1.5vw, 1.3rem);
     line-height: 1.6;
     color: color-mix(in srgb, var(--color-ink) 92%, transparent);
-    justify-self: center;
   }
-  .vs-prose--floor { padding-top: 1.5rem; border-top: 1px solid var(--color-hairline); margin-top: 1rem; }
+  .vs-prose--inrow {
+    max-width: none;
+  }
+  .vs-close {
+    font-style: italic;
+  }
   .vs-floor-heading {
     font-family: var(--font-display);
     font-style: italic;
@@ -319,31 +543,150 @@ const meta = {
     font-size: clamp(1.6rem, 3.4vw, 2.3rem);
     line-height: 1.15;
     color: var(--color-peak);
+    justify-self: center;
+    text-align: center;
   }
 
-  .vs-gallery {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: clamp(0.6rem, 1.4vw, 1.1rem);
-    align-items: start;
-  }
-  .vs-card {
-    grid-column: span var(--span, 2);
+  /* full-width single beat — contained, unframed (the framed hero stays the
+     only framed image, so the two full beats read as different treatments) */
+  .vs-fullbeat {
     margin: 0;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
+    max-width: 60rem;
+    width: 100%;
+    justify-self: center;
   }
-  .vs-card img {
+  .vs-fullbeat img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
-    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+    border-radius: 6px;
   }
-  .vs-card:hover img {
-    transform: scale(1.03);
+
+  /* the page's widest beat — edge-to-edge of the page grid, no frame */
+  .vs-widest {
+    margin: 0;
+    width: 100%;
+  }
+  .vs-widest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* asymmetric pair — unequal widths, one portrait crop, TOPS ALIGNED
+     (not the newsstand family's dropped-baseline stagger). --flip mirrors
+     the wide/narrow order for the second use (M4 pavilions). */
+  .vs-pair {
+    display: grid;
+    grid-template-columns: 58fr 34fr;
+    gap: clamp(0.9rem, 2vw, 1.6rem);
+    align-items: start;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-pair--flip {
+    grid-template-columns: 34fr 58fr;
+  }
+  .vs-pair figure {
+    margin: 0;
+  }
+  .vs-pair img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* text with a small ~200px related thumbnail riding beside it */
+  .vs-thumbrow {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    align-items: start;
+    max-width: 58rem;
+    width: 100%;
+  }
+  .vs-thumb {
+    margin: 0;
+  }
+  .vs-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* the one full-width pull quote — bold, own line, no panel, no overlap
+     (Atavist device; deliberately not the sd-family shadowed plate) */
+  .vs-pull {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding-inline: 1rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+    line-height: 1.3;
+    text-align: center;
+    color: var(--color-peak);
+  }
+
+  /* small diptych — two related frames grouped as ONE beat, shared caption,
+     deliberately smaller than every solo beat above it */
+  .vs-diptych {
+    margin: 0;
+    max-width: 54rem;
+    width: 100%;
+  }
+  .vs-diptych-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .vs-diptych img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* image + text duo rows */
+  .vs-duo {
+    display: grid;
+    grid-template-columns: 30rem 1fr;
+    gap: clamp(1.2rem, 3vw, 2.6rem);
+    align-items: center;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-duo--flip {
+    grid-template-columns: 1fr 34rem;
+  }
+  .vs-duo-fig {
+    margin: 0;
+  }
+  .vs-duo-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* the small quiet closer */
+  .vs-closer {
+    margin: 0;
+    max-width: 40rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-closer img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
   }
 
   .vs-foot {
@@ -354,12 +697,30 @@ const meta = {
   }
 
   @media (max-width: 760px) {
-    .vs-line--push { transform: none; }
-    .vs-gallery { grid-template-columns: repeat(2, 1fr); }
-    .vs-card { grid-column: span 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .vs-card img { transition: none; }
-    .vs-card:hover img { transform: none; }
+    .vs-line--push {
+      transform: none;
+    }
+    .vs-pair,
+    .vs-pair--flip,
+    .vs-duo,
+    .vs-duo--flip {
+      grid-template-columns: 1fr;
+    }
+    .vs-thumbrow {
+      grid-template-columns: 1fr;
+    }
+    .vs-thumb {
+      max-width: 200px;
+    }
+    .vs-diptych-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    /* text leads on mobile for the flipped rows, image follows */
+    .vs-duo--flip .vs-duo-fig {
+      order: 2;
+    }
+    .vs-pair--flip .vs-pair-b {
+      order: 2;
+    }
   }
 </style>
