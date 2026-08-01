@@ -12,14 +12,20 @@
  * ROUND 5 (2026-07-21, operator consolidation): final order is
  * hero/sales → THE TERRITORY (count-free, coverage places added) → THE FIELD
  * teaser (the gallery wall moved to /adventure/field) → the Medieval Festival
- * spread → FROM THE ARCHIVE (the lane's micro local stories) → close.
+ * spread → VYBE → Postcards from the Road → close.
+ *
+ * 2026-07-31 (operator direct review): "FROM THE ARCHIVE" is RETIRED — it
+ * duplicated the Postcards section below it (Nordic Daughter / Something for
+ * Tomorrow / The Art of Brazilian Living all appeared in both). Vybe, the one
+ * archive item that wasn't a postcard duplicate, now gets its own full
+ * section in that slot instead of a quiet tile.
  */
 import Base from "../layouts/Base.astro";
 import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import LegendMark from "../components/LegendMark.astro";
 import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
-import { PAGES, RELATIONSHIP_BY_ID, WORK, WORK_ARCHIVE } from "../consts";
+import { PAGES, WORK } from "../consts";
 import { TERRITORY } from "../data/territory";
 import { POSTCARDS } from "../data/postcards";
 import { getCollection } from "astro:content";
@@ -222,36 +228,43 @@ const FESTIVAL_PHOTOS = [
 ].map((ph) => ({ ...ph, media: festImg(ph.slug, [900, 1600]) })).filter((ph) => ph.media);
 
 /* ─────────────────────────────────────────────────────────────────────────
- * A4c — FROM THE ARCHIVE (Round 4 band, Round 5 roster).
+ * A4c — VYBE (2026-07-31 replacement, operator direct review).
  *
- * The micro local stories not worth a full spread, kept modestly at the
- * bottom of the lane. Round 5 (operator-directed): the band now holds The Art
- * of Brazilian Living, Vybe (MOVED here from /entertainment — operator
- * confirmed), Nordic Daughter, and Something for Tomorrow (the old combined
- * diptych tile SPLIT in two; SfT has no exported tile media yet —
- * ⚠ OPERATOR-CONFIRM, see consts).
+ * The old "FROM THE ARCHIVE" band (Round 4/5) DUPLICATED the Postcards
+ * section below it — Nordic Daughter, Something for Tomorrow, and The Art of
+ * Brazilian Living all appeared in both places. Operator: Postcards is the
+ * home for those short stories, so that band is retired entirely, not just
+ * trimmed. Vybe was the one archive item that WASN'T a postcard duplicate —
+ * it gets a full section here instead of a quiet display-only tile.
  *
- * The lane assignment lives on the DATA (WORK_ARCHIVE[].lane) — this page
- * filters rather than hardcoding slugs, so the two pages can never drift apart
- * or double-render the same tile. Tiles are display-only EXCEPT where a light
- * case page exists (item.href — Vybe): those render the "Read the story →"
- * affordance, links only where content exists. The one honest line per tile is
- * the relationship's permittedPhrasing rendered VERBATIM. Media paths are
- * UNCHANGED (public/media/work/archive/<slug>.*).
+ * Vybe is a Denver arts, music, and dance collective the operator has
+ * filmed across 2023–2024 and is friends with. This is his own editorial
+ * coverage, not theirs — NO Vybe brand/logo assets appear anywhere below
+ * (their official pack hasn't been provided yet; see the vybe-community-
+ * partner memo). The one honesty statement is still LegendMark's verbatim
+ * permittedPhrasing, and the section links out to the existing /work/vybe
+ * case page for the fuller story rather than re-writing it here.
  * ───────────────────────────────────────────────────────────────────────── */
-const archiveMediaRoot = join(process.cwd(), "public", "media");
-const archivePair = (relBase: string) => {
-  const has = (ext: string) => existsSync(join(archiveMediaRoot, ...`${relBase}.${ext}`.split("/")));
-  const avif = has("avif") ? `${base}/media/${relBase}.avif` : undefined;
-  const webp = has("webp") ? `${base}/media/${relBase}.webp` : undefined;
-  return avif || webp ? { avif, webp } : undefined;
-};
-const archive = WORK_ARCHIVE.filter((a) => a.lane === "adventure").map((a) => ({
-  item: a,
-  media: archivePair(`work/archive/${a.slug}`),
-  href: a.href ? `${base}${a.href}` : undefined,
-  phrasing: RELATIONSHIP_BY_ID[a.relationshipId]?.permittedPhrasing ?? "",
-}));
+function vybePhoto(slug: string) {
+  const widths = [700, 1200];
+  const dir = join(process.cwd(), "public", "media", "adventure", "vybe");
+  if (!existsSync(join(dir, `${slug}-${widths[0]}.avif`))) return undefined;
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/vybe/${slug}-${widths[0]}.webp`,
+  };
+}
+const VYBE_PHOTOS = [
+  { slug: "festival-reveal", cap: "The 2023 festival · blue hour", alt: "A blue-hour aerial reveal over the Vybe festival grounds beside a lake, string lights glowing through the cottonwoods" },
+  { slug: "festival-grounds", cap: "The 2023 festival · from above", alt: "An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" },
+  { slug: "flow-arts", cap: "The 2023 festival · after dark", alt: "A flow artist spinning LED fans against the night at the Vybe festival" },
+  { slug: "dusk-circle", cap: "The 2023 festival · dusk", alt: "A group practicing flow arts at dusk under the trees, a rainbow balloon arch behind them" },
+  { slug: "boogie-room", cap: "Boogie Lights, 2024", alt: "The room at a Boogie Lights show, the band on stage under pink and gold light, the crowd packed in front" },
+  { slug: "boogie-stage", cap: "Boogie Lights, 2024", alt: "The stage at a Boogie Lights show glowing under a golden spotlight, viewed from the back of the room" },
+]
+  .map((ph) => ({ ...ph, media: vybePhoto(ph.slug) }))
+  .filter((ph): ph is typeof ph & { media: NonNullable<typeof ph.media> } => !!ph.media);
 
 /* ─────────────────────────────────────────────────────────────────────────
  * A4d — POSTCARDS (PUB-E, 2026-07-27, Directive PUB-E "collections
@@ -693,54 +706,66 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       )
     }
 
-    <!-- A4c — FROM THE ARCHIVE (Round 5 roster): the lane's bottom band of
-         micro local stories. Deliberately the QUIETEST band on the page —
-         small tiles, muted stills, one honest line each (the relationship's
-         permittedPhrasing, printed VERBATIM). Tiles link ONLY where a light
-         case page exists (Vybe); the rest are display-only. Uses the page's
-         own section grammar (hairline rule + flight-line divider + hud-label
-         kicker) so it reads as part of /adventure. -->
+    <!-- A4c — VYBE (2026-07-31 replacement): the old "FROM THE ARCHIVE" band
+         duplicated the Postcards section below (Nordic Daughter / Something
+         for Tomorrow / The Art of Brazilian Living all appeared in both) —
+         retired entirely per operator direction, and Vybe — the one archive
+         item that wasn't a duplicate — gets a full section here instead of a
+         quiet tile. Editorial coverage of a Denver arts/music/dance
+         collective; no Vybe brand or logo assets anywhere below, only his own
+         footage. Same section grammar as the rest of the lane (hairline rule
+         + flight-line divider + hud-label kicker), a photo grid in the
+         site's existing 4:5 tile convention, the one honesty line via
+         LegendMark, and a link out to the fuller /work/vybe case page rather
+         than duplicating it here. -->
     {
-      archive.length > 0 && (
+      VYBE_PHOTOS.length > 0 && (
         <section class="border-t border-hairline p-8">
-          <div class="mx-auto max-w-5xl space-y-3">
+          <div class="mx-auto max-w-5xl space-y-4">
             <hr class="flight-line mb-6" aria-hidden="true" />
-            <p class="hud-label" data-reveal>{p.coverage.kicker}</p>
-            <h2 class="text-2xl font-bold" data-reveal>{p.coverage.heading}</h2>
-            <p class="max-w-3xl text-ink" data-reveal>{p.coverage.body}</p>
-            <div class="arch-grid">
-              {archive.map(({ item, media: m, href: ahref, phrasing }) => {
-                const Tag = ahref ? "a" : "figure";
-                return (
-                  <Tag
-                    class={`arch-tile${ahref ? " arch-tile--link" : ""}`}
-                    href={ahref}
-                    data-reveal
-                    data-reveal-stagger="60"
-                  >
-                    <div class="arch-media" aria-hidden="true">
-                      {m && (
-                        <picture>
-                          {m.avif && <source type="image/avif" srcset={m.avif} />}
-                          <img src={m.webp ?? m.avif} alt="" loading="lazy" decoding="async" />
-                        </picture>
-                      )}
-                    </div>
-                    <div class="arch-meta">
-                      <span class="arch-head">
-                        <span class="arch-title">{item.title}</span>
-                        <span class="arch-date hud-label">{item.date}</span>
-                      </span>
-                      <span class="arch-line">{phrasing}</span>
-                      {ahref && (
-                        <span class="arch-cta link" aria-hidden="true">
-                          Read the story <span class="arrow">→</span>
-                        </span>
-                      )}
-                    </div>
-                  </Tag>
-                );
-              })}
+            <p class="hud-label" data-reveal>Vybe · Denver · 2023–2024</p>
+            <h2 class="text-2xl font-bold" data-reveal>In the room with Vybe.</h2>
+            <div class="vybe-body space-y-3" data-reveal>
+              <p class="max-w-3xl text-ink">
+                Vybe — short for Vibrate Your Best Energy — is a Denver arts, music, and dance
+                collective built around community: Park &amp; Play gatherings, an annual outdoor
+                festival, and whatever room they show up in. I've known the founders since 2023
+                and have covered two of their nights since — camera coverage only, nothing
+                official.
+              </p>
+              <p class="max-w-3xl text-ink">
+                The first was their outdoor festival in the fall of 2023 — two days beside a lake
+                in the Boulder area, cottonwoods just turning. Friday ran into night: fire and LED
+                flow artists working under string lights strung through the trees. Sunday was the
+                same ground in daylight — a dance circle, a band, a rainbow balloon arch over the
+                gate.
+              </p>
+              <p class="max-w-3xl text-ink">
+                The second was a Boogie Lights show in Denver the following May — Boogie Lights'
+                night, not Vybe's. The collective had a corner of the room, their own chalkboard
+                propped against the wall, and a few of their own performers sat in with the acts
+                on stage. I shot it from the crowd and the balcony both.
+              </p>
+            </div>
+
+            <div class="vybe-grid" data-reveal>
+              {VYBE_PHOTOS.map((ph) => (
+                <figure class="vybe-photo">
+                  <picture>
+                    <source type="image/avif" srcset={ph.media.avif} sizes="(min-width: 900px) 30vw, 45vw" />
+                    <source type="image/webp" srcset={ph.media.webp} sizes="(min-width: 900px) 30vw, 45vw" />
+                    <img src={ph.media.src} alt={ph.alt} loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="hud-label vybe-cap">{ph.cap}</figcaption>
+                </figure>
+              ))}
+            </div>
+
+            <div class="vybe-footer" data-reveal>
+              <LegendMark proof={{ relationshipId: "vybe" }} showName={false} />
+              <a href={`${base}/work/vybe`} class="btn">
+                Read the full story <span class="arrow" aria-hidden="true">→</span>
+              </a>
             </div>
           </div>
         </section>
@@ -991,96 +1016,54 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     color: var(--color-ink-muted, #8a9a96);
   }
 
-  /* ── A4c · FROM THE ARCHIVE (Round 4) — the page's quietest band. Small
-     tiles (max ~300px), stills muted at rest, mono metadata. No hover lift and
-     no CTA: these are display-only records, not features. ── */
-  .arch-grid {
+  /* ── A4c · VYBE (2026-07-31) — replaces the old "From the Archive" band.
+     A full section: intro copy, a 4:5 photo grid (the postcard/case-still
+     tile convention, sized up), and a footer row pairing the honesty line
+     with a link out to the fuller /work/vybe case page. ── */
+  .vybe-body {
+    margin-top: 0.2rem;
+  }
+  .vybe-grid {
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
-    margin-top: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-top: 0.4rem;
   }
-  .arch-tile {
+  .vybe-photo {
+    position: relative;
     margin: 0;
-    display: grid;
-    gap: 0.5rem;
-    align-content: start;
-    padding: 0.8rem;
-    border: 1px solid color-mix(in srgb, #ffffff 9%, transparent);
-    border-radius: 10px;
-    background: color-mix(in srgb, #ffffff 2%, transparent);
-  }
-  .arch-media {
-    aspect-ratio: 16 / 9;
     overflow: hidden;
-    border-radius: 6px;
+    border-radius: 8px;
     background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
   }
-  .arch-media img {
+  .vybe-photo img {
+    display: block;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
-    /* quieter than the gallery paintings — the archive sits back */
-    filter: saturate(0.8) brightness(0.84);
   }
-  .arch-meta {
-    display: grid;
-    gap: 0.3rem;
+  .vybe-cap {
+    position: absolute;
+    left: 0.6rem;
+    bottom: 0.55rem;
+    margin: 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, #f4fbfa 92%, transparent);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
   }
-  .arch-head {
+  .vybe-footer {
     display: flex;
-    align-items: baseline;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
+    gap: 1rem;
+    margin-top: 0.4rem;
   }
-  .arch-title {
-    font-weight: 600;
-    font-size: 0.9rem;
-    line-height: 1.25;
-    color: #eef5fa;
-  }
-  .arch-date {
-    flex: none;
-    font-size: 0.56rem;
-    letter-spacing: 0.14em;
+  .vybe-footer :global(.legend-mark) {
+    margin: 0;
+    font-size: 0.85rem;
     color: var(--color-ink-muted, #8a9a96);
-  }
-  .arch-line {
-    font-size: 0.74rem;
-    line-height: 1.4;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-  /* Round 5 — linked archive tiles (a case page exists, e.g. Vybe): the same
-     quiet tile, plus the site's link affordance and a gentle lift on hover. */
-  .arch-tile--link {
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-    transition:
-      transform 380ms var(--ease-survey, ease),
-      border-color 380ms ease;
-  }
-  .arch-tile--link:hover,
-  .arch-tile--link:focus-visible {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, #ffffff 26%, transparent);
-  }
-  .arch-tile--link:hover .arch-media img {
-    filter: saturate(1) brightness(0.95);
-  }
-  .arch-cta {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .arch-tile--link {
-      transition: none;
-    }
-    .arch-tile--link:hover {
-      transform: none;
-    }
   }
 
   /* ── A4d · POSTCARDS (PUB-E) — micro-story tiles: a small photo strip (2–3
