@@ -180,23 +180,43 @@ export const POSTCARDS: readonly Postcard[] = [
     pullQuote: "The room ran blue, then red, then green as the set went on.",
   },
   {
+    // 2026-07-31 (Brazil-photo-scout expansion, operator note (d) — "no
+    // clear version of any of the performers' faces" + "expanding the number
+    // of photos is important"): the old 5-photo set was mined from just 4 of
+    // ~20 available clips in the source archive; a fresh pass through the
+    // full ~2-hour, multi-camera shoot replaces 3 weak picks and adds 6 new
+    // ones (11 total; see _BRAZIL-PHOTOS-V2/_NOTES.md for full sourcing).
+    // `dancer-motion`'s headdress is GREEN in the new frame (was described
+    // as blue below, matching the old photo) — copy corrected to match.
+    // One candidate frame from the scout's shortlist (`singer-closing`, a
+    // second vocalist) was held back here rather than shipped: her identity/
+    // act is unconfirmed against this show, and her costume is markedly more
+    // skin-forward than the rest of the set — both flagged by the scout for
+    // operator read before going live, so left out pending that read rather
+    // than decided unilaterally.
     slug: "brazilian-living",
     title: "The Art of Brazilian Living",
     date: "2025-06-22",
     location: "Levitt Pavilion, Ruby Hill Park, Denver, Colorado",
     paragraphs: [
       "This is Boulder Samba School's outdoor showcase from June 22, 2025, at Levitt Pavilion in Denver's Ruby Hill Park — a bowl-shaped lawn amphitheater with the city skyline behind the stage. I got there early enough to walk the grounds: a food truck, a jewelry tent, the hillside filling in with picnic blankets under a clear sky.",
-      "On stage, a singer in a sequined green dress worked the mic in front of a full percussion line — congas, surdos, a drum kit — a Brazilian flag hanging off the scaffolding beside her.",
-      "Three dancers came out in full feathered headdresses — gold, orange, and red — working the front of the stage together. Another dancer, in a shorter blue-feathered piece, had the space to herself, mid-stride, all motion.",
+      "On stage, a singer in a sequined green dress worked the mic in front of a full percussion line — congas, surdos, a drum kit — a Brazilian flag hanging off the scaffolding beside her. Boulder Samba School's own drum line anchored it, their blue shirts stamped with the group's name over a Colorado-flag-style patch.",
+      "Dancers came out one act after another in full feathered headdresses — orange, blue, yellow, red, and gold — working the front of the stage together. A solo dancer, in a green feathered piece, had the space to herself, mid-stride, all motion.",
       "Later, a big circle formed on the pavement in front of a smaller stage — kids and adults both, working through steps together while a Brazilian flag flew from the barrier.",
     ],
     photos: [
-      { slug: "aline-stage", alt: "A singer in a sequined green dress performing with a full percussion line at Levitt Pavilion, a Brazilian flag hanging beside the stage" },
-      { slug: "dancers-headdress", alt: "Three dancers in gold, orange, and red feathered headdresses performing in front of the percussion band" },
-      { slug: "dancer-motion", alt: "A dancer in a blue feathered headdress mid-stride on the stage apron" },
+      { slug: "aline-stage", alt: "A singer in a sequined green dress singing into the mic at Levitt Pavilion, her face turned up into late-day light, the Brazilian flag visible behind her" },
+      { slug: "dancers-headdress", alt: "Four dancers in orange, blue, yellow, and red feathered headdresses on stage, the center dancer in blue smiling directly at the camera" },
+      { slug: "aline-band", alt: "A singer in a green dress performing in front of the full percussion band, a Brazilian flag and the venue's sponsor signage behind her" },
+      { slug: "dancer-motion", alt: "A dancer in a green feathered headdress mid-dance, smiling, fully in frame on the stage apron" },
+      { slug: "dancers-ensemble", alt: "Two dancers in gold dresses and yellow and orange feathered headdresses dancing together on stage" },
+      { slug: "percussion-detail", alt: "Boulder Samba School percussionists in matching blue shirts playing congas and surdos, several faces visible and smiling" },
+      { slug: "percussion-line", alt: "Boulder Samba School's full percussion line on stage, their shirts reading the group's name over a Colorado-flag-style patch" },
+      { slug: "chorus-finale", alt: "A line of dancers and singers in red, purple, green, and orange performance outfits clapping and dancing together in front of the band" },
+      { slug: "vendor-tent", alt: "A food truck and vendor tent along the venue's walkway, guests gathered under umbrellas before the show" },
       { slug: "venue-wide", alt: "Levitt Pavilion's bowl-shaped lawn packed with picnic blankets, the stage and Denver skyline visible below" },
-      { slug: "community-dance", alt: "A large group dancing together on the pavement in front of a smaller stage, a Brazilian flag flying from the barrier" },
+      { slug: "community-dance", alt: "A large group dancing together on a plaza in front of a grassy, picnic-blanket-covered hillside, a dancer in a green and white dress leading in the foreground" },
     ],
-    pullQuote: "Another dancer, in a shorter blue-feathered piece, had the space to herself, mid-stride, all motion.",
+    pullQuote: "A solo dancer, in a green feathered piece, had the space to herself, mid-stride, all motion.",
   },
 ] as const;

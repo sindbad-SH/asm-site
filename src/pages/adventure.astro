@@ -250,6 +250,16 @@ const FESTIVAL_PHOTOS = [
  * per-frame sourcing and the releases-restraint reasoning for what was left
  * out — backstage/candid guest portraits, kept off the site).
  *
+ * ⚠ 2026-07-31 THIRD PASS (layout-scout rebuild — _VYBE-LAYOUT-SPEC.md Part
+ * C): the teaser's hierarchy was inverted — its two 4:5 supporting stills
+ * rendered TALLER (47.8vh) than the 41.7vh cover they were meant to support,
+ * unlike the festival teaser where the cover dominates 2:1. Root cause was
+ * the same one-ratio asset problem the story page had. Fix: the stills are
+ * now real 16:9 bakes (make-vybe-section.mjs varies ratio per photo), a
+ * third still joins (3 total, matching the richer 12-photo pool), and the
+ * cover gets the festival teaser's own mini-masthead grammar so the two
+ * blocks read as siblings, not a strong one and a weak one.
+ *
  * Vybe is a Denver arts, music, and dance collective the operator has
  * filmed across 2023–2024 and is friends with. This is his own editorial
  * coverage, not theirs — NO Vybe brand/logo assets appear anywhere below
@@ -257,26 +267,29 @@ const FESTIVAL_PHOTOS = [
  * partner memo). The one honesty statement is still LegendMark's verbatim
  * permittedPhrasing.
  * ───────────────────────────────────────────────────────────────────────── */
-function vybePhoto(slug: string) {
-  const widths = [700, 1200];
+function vybePhoto(slug: string, widths: number[]) {
   const dir = join(process.cwd(), "public", "media", "adventure", "vybe");
-  if (!existsSync(join(dir, `${slug}-${widths[0]}.avif`))) return undefined;
+  const w0 = widths[0]!;
+  if (!existsSync(join(dir, `${slug}-${w0}.avif`))) return undefined;
   return {
     avif: widths.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.avif ${w}w`).join(", "),
     webp: widths.map((w) => `${base}/media/adventure/vybe/${slug}-${w}.webp ${w}w`).join(", "),
-    src: `${base}/media/adventure/vybe/${slug}-${widths[0]}.webp`,
+    src: `${base}/media/adventure/vybe/${slug}-${w0}.webp`,
   };
 }
 // The teaser's mini cover — the blue-hour festival reveal, the single
 // strongest establishing frame in the set (per _CONTACT-SHEET.md).
-const VYBE_COVER = vybePhoto("festival-reveal");
-// Two supporting stills, one per era — signals the section spans both 2023
-// and 2024 before the reader even clicks through (mirrors A4b's fest-stills).
+const VYBE_COVER = vybePhoto("festival-reveal", [800, 1120, 1600]);
+// Three supporting stills, real 16:9/landscape bakes (not a 4:5 force-crop)
+// so the cover reads 2x dominant, same ratio as the festival teaser's
+// fest-stills — one per beat: the grounds, a clear performer face, Boogie
+// Lights 2024.
 const VYBE_STILLS = [
-  { slug: "band-golden-flare", alt: "A band performing at golden hour at the 2023 Vybe festival, the singer backlit through fall leaves" },
-  { slug: "boogie-chillsbury-doughboys", alt: "The Chillsbury Doughboys performing at the 2024 Boogie Lights show, viewed from the balcony over the crowd" },
+  { slug: "festival-grounds", alt: "An aerial view of the Vybe festival grounds beside a lake in fall, a stage tent and parked cars below distant foothills" },
+  { slug: "band-guitarist", alt: "A guitarist playing in a live band at golden hour at the 2023 Vybe festival, sunlight through the fall trees" },
+  { slug: "boogie-room", alt: "The room at a Boogie Lights show, the band on stage under pink and gold light, the crowd packed in front" },
 ]
-  .map((ph) => ({ ...ph, media: vybePhoto(ph.slug) }))
+  .map((ph) => ({ ...ph, media: vybePhoto(ph.slug, [900, 1600]) }))
   .filter((ph): ph is typeof ph & { media: NonNullable<typeof ph.media> } => !!ph.media);
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -733,7 +746,7 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
          Vybe brand or logo assets anywhere below, only his own footage. -->
     {
       VYBE_COVER && (
-        <section class="border-t border-hairline p-8">
+        <section id="vybe" class="border-t border-hairline p-8">
           <div class="mx-auto max-w-5xl space-y-4">
             <hr class="flight-line mb-6" aria-hidden="true" />
             <p class="hud-label" data-reveal>Vybe · Denver · 2023–2024</p>
@@ -758,8 +771,8 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                   />
                 </picture>
                 <span class="vybe-cover-scrim" aria-hidden="true"></span>
-                <span class="vybe-cover-corner hud-label">Denver, Colorado</span>
-                <span class="vybe-cover-title">Vybe</span>
+                <span class="vybe-cover-mast hud-label">Vybe <span class="vybe-cover-years">2023–2024</span></span>
+                <span class="vybe-cover-title">In the room</span>
                 <span class="vybe-cover-deck">Two nights with a Denver arts, music, and dance collective.</span>
                 <span class="vybe-cover-enter hud-label" aria-hidden="true">Read the story →</span>
               </a>
@@ -777,12 +790,12 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                     {VYBE_STILLS.map((ph) => (
                       <figure class="vybe-still">
                         <picture>
-                          <source type="image/avif" srcset={ph.media!.avif} sizes="(min-width: 900px) 28vw, 45vw" />
-                          <source type="image/webp" srcset={ph.media!.webp} sizes="(min-width: 900px) 28vw, 45vw" />
+                          <source type="image/avif" srcset={ph.media!.avif} sizes="(min-width: 900px) 19vw, 45vw" />
+                          <source type="image/webp" srcset={ph.media!.webp} sizes="(min-width: 900px) 19vw, 45vw" />
                           <img
                             src={ph.media!.src}
                             alt={ph.alt}
-                            style="aspect-ratio:4/5;object-fit:cover"
+                            style="aspect-ratio:16/9;object-fit:cover"
                             class="block w-full"
                             loading="lazy"
                             decoding="async"
@@ -1094,12 +1107,29 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       linear-gradient(to bottom, rgba(10, 13, 18, 0.5) 0%, transparent 34%),
       linear-gradient(to top, rgba(10, 13, 18, 0.85) 0%, transparent 50%);
   }
-  .vybe-cover-corner {
+  /* mini-masthead — same weight class as .fest-cover-mast above, so the two
+     teaser covers read as siblings rather than a strong one and a weak
+     one (layout-spec C2). No "Field Notes" numbering — Vybe carries its
+     own name + date range instead of an issue number. */
+  .vybe-cover-mast {
     position: absolute;
     top: 14px;
+    left: 16px;
     right: 16px;
     z-index: 2;
-    color: color-mix(in srgb, #fff 80%, transparent);
+    font-family: var(--font-display-condensed);
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  }
+  .vybe-cover-years {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.24em;
+    color: var(--color-accent, #38f8ec);
+    vertical-align: 30%;
   }
   .vybe-cover-title {
     position: absolute;
@@ -1127,9 +1157,11 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     color: color-mix(in srgb, #fff 82%, transparent);
   }
   .vybe-cover-enter {
+    /* sits just below the mini-masthead (top:14px, ~18px tall) so the two
+       don't overlap now that the cover carries a masthead (C2). */
     position: absolute;
     left: 18px;
-    top: 14px;
+    top: 42px;
     z-index: 2;
     font-size: 0.55rem;
     color: var(--color-adventure-warm, var(--color-accent));
@@ -1157,10 +1189,19 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   .vybe-teaser-body > p:first-child {
     max-width: 48ch;
   }
+  /* three real 16:9 stills (layout-spec C1/C4) — was repeat(2,1fr) at a
+     forced 4:5, which rendered TALLER than the cover it was meant to
+     support. 16:9 drops still height to ~half the cover's, restoring the
+     festival teaser's 2:1 cover-dominant hierarchy. */
   .vybe-stills {
     display: grid;
     gap: 12px;
     grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 900px) {
+    .vybe-stills {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
   @media (max-width: 480px) {
     .vybe-stills {

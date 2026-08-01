@@ -596,6 +596,209 @@ taken of both postcard detail pages.
 
 ---
 
+## 2026-07-31 — VYBE deep rebuild + Brazilian Living photo expansion (round 2, operator direct review)
+
+The VYBE section shipped in the pass just above (section "2. VYBE section
+v2") was still, per the operator, "better but not mind-blowingly amazing...
+still kind of simple, doesn't sort of embody the screen like the Savage
+Woods Loveland Medieval Festival." Four scouted findings implemented this
+round: (1) a full layout rebuild of `/adventure/vybe` and its `/adventure`
+teaser, porting Steel & Dust's own editorial devices (newsstand cover,
+chapter ghost numerals, mirrored stagger, true full-bleed, tilted field-log
+frame) at Vybe's scale; (2) a replacement hero clip, re-mined from the full
+2023 festival drone archive; (3) "The Savage Woods" added to the festival
+teaser's kicker + body (it was already correct on the story page); (4) the
+Brazilian Living postcard's photo set expanded 5 → 11 with clear performer
+faces, addressing the "no clear version of any of the performers' faces"
+note. `npx astro check` 0 errors, `npx astro build` green, dev-server
+screenshots taken of all three touched pages at desktop + mobile — see the
+verification block at the end of this section.
+
+### 5. `/adventure/vybe` — newsstand cover, chapter numerals, real bleed, field log
+
+**The problem (root cause, per the layout scout):** the page wasn't
+under-designed, it was under-supplied. `scripts/make-vybe-section.mjs`
+hardcoded every one of its nine photos to one 4:5 crop at max 1200px — so
+the page rendered six identical aspect ratios where Steel & Dust renders
+six different ones, its "bleed" band topped out at 62.2vw (no asset was
+ever wider than 1200px), and the hero video was boxed at `max-width:22rem`
+9:16 versus the exemplar's 66.7vw × 60vh 16:9 block. Measured gap (1440×900
+and 390×844, live in-page): 1 hero object vs. 3; 2 identical
+`repeat(2,1fr)` photo grids (a contact sheet, not a spread) vs. 0 on the
+exemplar; 1 aspect ratio in the story body vs. 6; a dead `.vy-chapter`
+class applied in markup with zero matching CSS.
+
+**What changed.** `scripts/make-vybe-section.mjs` rewritten on the
+`make-steel-dust.mjs` model — a deliberate crop ratio + width set per photo
+(no more one global 5/4 box) — and expanded 9 → 12 photos, three new frames
+from the same already-graded contact sheet (`flow-duo`, `nadir-grounds`,
+`band-guitarist` — a clear performer face). `src/pages/adventure/vybe.astro`
+rebuilt section-by-section on Steel & Dust's own grammar: a newsstand cover
+(center cover + two rotated "inside" plates), corner survey slates + a
+vertical territory/date spine (no invented coordinates), chapter ghost
+numerals (`.vy-chapter::before`, now with real CSS), a mirrored asymmetric
+stagger (58/34 then 34/58), a true 100vw full-bleed band (was 56rem/62vw
+contained), a new third movement — a tilted performer-face frame beside a
+verified-facts field-log panel — and a three-measure column ladder (48rem
+text / 64rem media / 100vw bleed, was two measures with one dead alias).
+Both former `repeat(2,1fr)` equal-square grids are gone.
+
+| Field | New text | Flag |
+|---|---|---|
+| `/adventure/vybe` — cover corner slates | "Adventure story · coverage" (top-left) / "Denver, Colorado" (top-right, accent) | ⚠ |
+| `/adventure/vybe` — cover survey spine | "DENVER · 2023–2024" (territory + dates only, no invented lat/long) | ⚠ |
+| `/adventure/vybe` — cover teasers | "Fire & LED flow arts" · "A lake in fall" · "Boogie Lights, 2024" | ⚠ |
+| `/adventure/vybe` — newsstand plate captions | "Inside — flow arts" / "Inside — fire staff" | ⚠ |
+| `/adventure/vybe` — new bleed captions | "Straight down over the grounds, Sunday." / "The grounds, before the light went." (closing bookend, reuses `festival-grounds`) | ⚠ |
+| `/adventure/vybe` — field-log movement | heading "The field log"; prose "Same band, a different angle on the same run into evening — the light dropping fast below the treeline while the set kept going."; panel rows: Event / Where / Dates / Second night / Coverage | ⚠ |
+
+**Structural notes / deviations from the layout spec, both flagged for the
+operator:** (a) the spec's acceptance check wanted the newsstand's kicker
+duplicated into the title block too — implemented instead as corner-slate
+only, matching how Steel & Dust itself splits `issue`/`location` (corners)
+from `storyLabel` (title block), avoiding a literal repeat of "Adventure
+story · coverage" twice on one cover; (b) `boogie-chillsbury-doughboys` is
+used ONCE (the chapter-02 closing bleed), not also as a newsstand plate as
+one reading of the spec's Part B1 suggested — `flow-duo` and
+`fire-staff-spin` are the two plates instead, so no single photo is shown
+twice on the page (Steel & Dust's own plates are likewise never reused in
+its body).
+
+### 6. `/adventure/vybe` hero clip replaced — a real golden-hour reveal
+
+**The problem:** the operator's own note — "the video segment... was not
+even a really good smooth shot... find some better smoother shots." A video
+scout re-mined the full 2023 festival drone archive (74 clips, MD5-verified
+as one dataset despite being backed up under multiple folder names) with
+the same phase-correlation jank detector Amazing Aerial's own stock-mining
+pipeline uses. The old clip scored 0.75 with a real jerk spike at t=2.6–4.2s
+and — more importantly — was flying low under branches in flat midday
+light, not the "golden hour" its own caption claimed.
+
+**What changed:** `public/media/work/vybe/clips/vybe-fest.mp4` replaced
+in-place (same filename — both `/adventure/vybe` and `/work/vybe` point at
+it, so no other file changed) with the scout's top pick: a backlit dusk
+reveal (score 0.939) that tilts up past the rainbow balloon arch to open
+sky and settles on two figures at the gate — genuinely the golden/dusk
+light the caption always claimed. Matching poster regenerated in both webp
+and avif so the still frame and the video agree.
+
+| Field | Old caption | New caption | Flag |
+|---|---|---|---|
+| `/adventure/vybe` — hero video caption | "Approaching the festival gate, golden hour, 2023." | **"Dusk over the gate — rising past the balloon arch, 2023."** | ⚠ |
+
+**Deviation flagged for the operator:** the layout spec asked for a 16:9
+box matching Steel & Dust's video treatment. Every clip in this archive was
+shot with the drone physically rotated to portrait — there is no landscape
+master anywhere in the dataset, and the video scout explicitly advised
+against letterboxing one (it would crop the reveal's vertical headroom out
+of the shot). The video keeps its honest 9:16 aspect; the box itself is
+instead sized up substantially (`width:min(88vw,34rem)`, was capped at
+`22rem` — a 2.4x increase) so it reads as a real feature rather than a
+shrunken thumbnail. This is the video scout's own documented fallback when
+no landscape source exists, not a layout-spec literal implementation.
+
+### 7. `/adventure` — VYBE teaser hierarchy fixed, third still, promoted cover
+
+**The problem:** measured live — the teaser's two supporting stills
+rendered at 47.8vh, TALLER than the 41.7vh cover they were meant to
+support (inverted from the festival teaser, where the cover is 2x the
+stills). Root cause was the same one: the stills were forced to 4:5 from
+source photos that were never baked at that ratio for teaser use.
+
+**What changed:** `VYBE_STILLS` now bakes and renders real 16:9 photos
+(`festival-grounds`, `band-guitarist`, `boogie-room` — was
+`band-golden-flare` + `boogie-chillsbury-doughboys` at a forced 4:5), a
+third still added (grid runs `repeat(3,1fr)` at ≥900px), and the mini cover
+gains the festival teaser's own mini-masthead grammar (Anton condensed,
+uppercase) so the two teaser blocks read as siblings.
+
+| Field | Old | New | Flag |
+|---|---|---|---|
+| `/adventure` VYBE teaser — cover masthead | (none — plain "Denver, Colorado" corner label) | **"VYBE" + accent sub-slate "2023–2024"** (top-left, same weight class as the festival teaser's "FIELD NOTES No. 01") | ⚠ |
+| `/adventure` VYBE teaser — cover title | "Vybe" | **"In the room"** (was redundant with the new masthead) | ⚠ |
+| `/adventure` VYBE teaser — section anchor | (none) | **`id="vybe"`** (parity with the festival teaser's `id="festival"`, for future territory linking — `territory.ts` itself not touched this pass) | reuse |
+
+### 8. The Savage Woods — added to the `/adventure` festival teaser (operator note (c))
+
+**The problem:** the operator asked, again, whether "Savage Woods" is
+mentioned on the adventure page — it already was, but only on the full
+`steel-and-dust` story page (`consts.ts:1450/1462/1483/1489`), not on the
+`/adventure` teaser itself (`PAGES.adventure.festival`), which only said "a
+field outside Loveland." A naming scout re-verified both names are real and
+distinct: **Colorado Medieval Festival** is the event; **The Savage
+Woods** (The Savage Woods LLC, 1750 Savage Road) is the venue/producer.
+"Loveland Medieval Festival" is not an official name anywhere sourced
+(coloradocastle.com, colorado.com, Ticket Tailor, Yelp, Uncover Colorado
+all say "Colorado Medieval Festival") and was not introduced.
+
+| Field (`consts.ts`, `PAGES.adventure.festival`) | Old | New | Flag |
+|---|---|---|---|
+| kicker | "Adventure story · Loveland, Colorado" | **"Adventure story · The Savage Woods, Loveland, Colorado"** | ⚠ |
+| body | "One weekend a year, a field outside Loveland turns into a tournament ground..." | **"One weekend a year, The Savage Woods, an event ground in the trees off Savage Road outside Loveland, turns into a tournament ground..."** | ⚠ |
+
+Heading stays "The Colorado Medieval Festival" (the event's real name,
+unchanged). Story page (`steelDust` copy block) already correct — no
+change made there.
+
+### 9. Brazilian Living postcard — photo set expanded 5 → 11, faces added
+
+**The problem (operator note (d)):** "some of the image selections for the
+Art of Brazil weren't great... don't really have a clear version of any of
+the performers' faces... expanding the number of photos is important." A
+photo scout confirmed firsthand: `aline-stage` showed her face turned away,
+`dancer-motion` showed a dancer's back fully to camera and cropped at the
+frame edge, and no frame in the 5-photo set had an unambiguous, well-lit
+performer face. Root cause: the original set mined only 4 of ~20 available
+clips in the ~2-hour, multi-camera source archive.
+
+**What changed** (`src/data/postcards.ts`, `public/media/adventure/
+postcards/brazilian-living/`): 3 weak photos replaced, 6 new ones added (11
+total, `venue-wide` kept as-is — already a clean pick). `dancer-motion`'s
+headdress is green in the new frame (the old one was blue, matching the
+old photo) — the paragraph and pull-quote are corrected to match, not left
+inconsistent. One new sentence added noting Boulder Samba School's drum
+line by name (visually confirmed on their own shirts in the new
+`percussion-line`/`percussion-detail` frames).
+
+| Field | Old | New | Flag |
+|---|---|---|---|
+| paragraph 2 | "...a Brazilian flag hanging off the scaffolding beside her." | **+ "Boulder Samba School's own drum line anchored it, their blue shirts stamped with the group's name over a Colorado-flag-style patch."** | ⚠ |
+| paragraph 3 | "Three dancers came out in full feathered headdresses — gold, orange, and red — working the front of the stage together. Another dancer, in a shorter blue-feathered piece, had the space to herself, mid-stride, all motion." | **"Dancers came out one act after another in full feathered headdresses — orange, blue, yellow, red, and gold — working the front of the stage together. A solo dancer, in a green feathered piece, had the space to herself, mid-stride, all motion."** | ⚠ |
+| pullQuote | "Another dancer, in a shorter blue-feathered piece, had the space to herself, mid-stride, all motion." | **"A solo dancer, in a green feathered piece, had the space to herself, mid-stride, all motion."** (re-extracted to match the corrected paragraph, still verbatim) | ⚠ |
+| photos | 5 (`aline-stage`, `dancers-headdress`, `dancer-motion`, `venue-wide`, `community-dance`) | **11** — adds `aline-band`, `dancers-ensemble`, `percussion-detail`, `percussion-line`, `chorus-finale`, `vendor-tent`; replaces the crops on `aline-stage`, `dancers-headdress`, `dancer-motion` | ⚠ (alt text) |
+
+**Faces added (the core ask):** `aline-stage`'s new frame has her face
+turned up into clean light, singing; `dancers-headdress` now shows the
+center dancer (blue headdress) smiling directly at camera — checked
+personally against the baked image rather than taken on the scout's
+description alone, since the scout's note described a different dancer
+(red headdress, partially cropped at the frame's right edge in this
+particular crop) as the clear face, which the shipped alt text does not
+claim; `percussion-detail`/`percussion-line` show several Boulder Samba
+School percussionists' faces, smiling, mid-song.
+
+**Held back, not shipped — flagged for operator read:** the scout's
+shortlist included a 12th photo, `singer-closing` (a second vocalist,
+clear face, `JJ Closing performance .mp4`). Not included in `postcards.ts`
+and its baked files were not kept in the repo. Two reasons, both raised by
+the scout itself: her identity/act relative to this specific show is
+unconfirmed, and her costume is markedly more skin-forward than every
+other frame in the set. Both are exactly the kind of open question this
+file's "⚠ operator read-approval required" convention exists for — rather
+than resolve it unilaterally, it was left out pending that read. If wanted
+later, the scout's staging folder (`_BRAZIL-PHOTOS-V2/`) still has the
+baked files and full sourcing note.
+
+**Verification:** `npx astro check` 0 errors; `npx astro build` green;
+confirmed live on the dev server — `/adventure` (VYBE teaser + festival
+teaser), `/adventure/vybe` (all 12 photos + the new hero clip), and
+`/postcards/brazilian-living` (11 photos, cover face readable) all render
+at desktop and mobile widths, every media file `200 OK`, zero console
+errors. Screenshots taken of all three pages at both widths.
+
+---
+
 ## /venture (`src/pages/venture.astro`, renamed from `entertainment.astro`) — PUB-A
 
 The retired `/entertainment` page's content (Pebble Beach + PitchBoulder

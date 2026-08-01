@@ -1408,10 +1408,18 @@ export const PAGES = {
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new visible
     // copy (staging-only until read). Facts: Colorado Medieval Festival,
     // Loveland, CO, June 2024 — dates read from the source files.
+    // 2026-07-31 (naming-scout re-verify, operator note (c) — "did you
+    // mention Savage Woods?"): the venue name was already correct on the
+    // story page (steelDust below) but missing from THIS teaser, which only
+    // said "a field outside Loveland." Both names are real and distinct —
+    // Colorado Medieval Festival is the event, The Savage Woods is the venue
+    // (The Savage Woods LLC, 1750 Savage Road) — so both now appear here too.
+    // "Loveland Medieval Festival" is not an official name anywhere sourced
+    // and is deliberately not used.
     festival: {
-      kicker: "Adventure story · Loveland, Colorado",
+      kicker: "Adventure story · The Savage Woods, Loveland, Colorado",
       heading: "The Colorado Medieval Festival",
-      body: "One weekend a year, a field outside Loveland turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. We covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
+      body: "One weekend a year, The Savage Woods, an event ground in the trees off Savage Road outside Loveland, turns into a tournament ground — full-contact jousting down the lists, armored fighters in the arena, and a few thousand people around the rails. We covered it from the air and the ground, and cut the Knights of Mayhem's showcase piece from it.",
     },
     // M1 — STEEL & DUST (2026-07-22, operator-directed "magazine light"
     // direction): the festival block's FULL STORY subpage at
