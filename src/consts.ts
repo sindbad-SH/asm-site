@@ -1835,4 +1835,118 @@ export const PAGES = {
     followHeading: "Follow the stories",
     // Form endpoint, book-a-call, and socials resolve from SITE ([confirm]).
   },
+
+  // ---- VENTURE STORIES (archive-mining integration, 2026-08-01) ------------
+  // Full magazine-grade story pages built to the steel-and-dust grammar
+  // (src/pages/adventure/steel-and-dust.astro — the exemplar). Copy lives
+  // here, same convention as PAGES.adventure.steelDust, so it flows through
+  // the same copy-deck read-approval process.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
+  // (staging-only until read). Logged in
+  // SITE-COPY-DECK-publication-v1.md § "2026-08-01 — archive-mining
+  // integration".
+  ventureStories: {
+    // Build #1 — Pebble Beach Dawn Patrol. Source: _STORY-STAGING/
+    // pebble-beach-dawn-patrol/STORY.md (staged copy, written fresh against
+    // the 14 selected frames — see that file's own divergence note re: the
+    // pre-existing ARTICLE-dawn-patrol.md draft, which this does NOT reuse).
+    //
+    // HONESTY:
+    //  - The only relationship claim renders via LegendMark from
+    //    RELATIONSHIPS["pebble-beach"].permittedPhrasing — verbatim.
+    //  - WORK["shelby-pebble-beach"].engagement stays "[confirm]" — nothing
+    //    here resolves paid-vs-unpaid by implication.
+    //  - Every clock time (08:34, 16:26) traces to the shoot's per-car log
+    //    (CAR-INDEX.csv), not EXIF (stripped on export at every stage of the
+    //    pack) — attributed via `fieldLog.timeNote`, never stated bare.
+    //  - The two Ferrari 250 LM cars: race number + the legible UK plate on
+    //    No. 7 are visible facts; no chassis number is asserted for either
+    //    (the pack's own CAR-INDEX flags even the model ID as tentative).
+    //  - The entrant placard's hometown line is partly out of focus in frame
+    //    and is not stated here (dropped rather than guessed).
+    //  - TESTIMONIALS["pebble-beach-owner"] (Jack & Debbie Bell) is RESERVED
+    //    per operator — not quoted on this page.
+    dawnPatrol: {
+      meta: {
+        title: "Dawn Patrol — a Shelby Cobra at Pebble Beach",
+        description:
+          "Before the crowds, before the judges — a photo essay following a restored 1967 Shelby Cobra 427 S/C, chassis CSX 3042, from the transporter lot to a green ribbon on Pebble Beach's 18th fairway.",
+      },
+      cover: {
+        masthead: "Dawn Patrol",
+        credit: "Adventure Storytelling Media",
+        issue: "Venture dispatch",
+        location: "Pebble Beach, California",
+        coords: "36.57° N · 121.97° W",
+        storyLabel: "The cover story",
+        title: "Dawn Patrol",
+        deck: "Before the crowds, before the judges, before the light is even good — the cars arrive in the dark. One Shelby Cobra, chassis CSX 3042, from the transporter lot to a green ribbon on the 18th fairway.",
+        teasers: ["Pebble Beach Concours d'Elegance", "A restored 1967 Shelby Cobra 427 S/C", "August 2025"],
+        scrollCue: "Scroll for the story",
+        plates: [
+          { label: "Plate — the hood up", slug: "csx3042-head-on-hood-up" },
+          { label: "Plate — race No. 8", slug: "ferrari-250-lm-no8-head-on" },
+        ],
+      },
+      byline: "Words & photographs — Sindbad Horizon",
+      slate: "Pebble Beach Concours d'Elegance · August 2025",
+      lede: "The cars are already staged by the time the sky starts to lighten. This part belongs to the crew.",
+      paragraphs: [
+        "Behind the show field, in a fenced lot lined with orange cones, a queue of car-haulers idles nose to tail — a Reliable Carriers rig among them — and the pre-war machines they carried through the night are already parked in rows: a deep maroon coupe, a brass-lamped tourer, a long black sedan wearing a 1930s-style California plate. The horizon still holds a strip of the previous day's orange. The people moving between the cars are mostly crew — checking tires, wiping down paint, watching the clock. The show doesn't open for hours.",
+      ],
+      afterVideo:
+        "A hundred yards on, past a second line of transporters, a tent marked CARS — Classic Automotive Relocation Services holds the International Entrant Pavilion, lit warm against the dawn outside. Inside: a scatter of postwar sedans, a pale blue Cobra parked nose-out, more cars queued at the flap waiting to be walked onto the field proper. Nobody here is posing for anything. It's a staging area doing its job.",
+      chapters: {
+        before: "Movement one — before light",
+        gap: "Movement two — the gap",
+        judged: "Movement three — judged",
+        field: "Movement four — the field becomes a city",
+      },
+      beforeLight:
+        "On the fairway itself the cars form up in a line before the marshals wave them through — a dark Cobra idling behind a cream-colored sedan flying a pair of small flags, itself behind a black pre-war limousine, the whole queue backlit by a work light. It is, panel for panel, some of the most valuable traffic anywhere in the world, inching forward the same way any traffic does: slowly, with somebody checking a phone.",
+      pullQuote:
+        "The lawn is not empty. It is, for about an hour, merely uncrowded — the gap between the transporter lot and the crush that's coming.",
+      gap: "By the time the sun clears the treeline, three Shelby Cobras have found space on the 18th green, spaced out across grass still dark with dew, the bunkers and Carmel Bay laid out behind them like a golf broadcast.",
+      gapDetail:
+        "One of them, hood already up, is getting a last look from a small knot of people before the judges arrive: this is CSX 3042, a 1967 Shelby Cobra 427 S/C Roadster, out on loan from an owner who has known this family a long time — which is the only reason a camera gets to stand this close.",
+      judged:
+        "Judging happens in the open, with no rope keeping anyone back. CSX 3042 wears a green class ribbon on its nose, and the small crowd that has gathered around it — blazers, sun hats, one photographer with a case at his feet — is doing the thing car people do at a judged car: standing close, saying little, looking at the details. The engine bay is popped for anyone who wants to see twin carburetors polished past their working purpose. The entrant placard staked in the grass spells out what the judges already know: 1967 Shelby Cobra 427 S/C Roadster, entered by Jack & Debbie Bell — read directly off the card, not guessed.",
+      field:
+        "By late morning the lawn has filled in completely. A class sign reading L-3 · Postwar Preservation Late marks one judging category among many, a tan and a maroon coupe parked nose to tail in front of it, Stillwater Cove and the coastal hills behind a crowd now several hundred deep. Further along the field, two Ferrari 250 LM competition cars — race numbers 7 and 8, one with a UK plate reading 499FX still bolted to the front, both already wearing their own green ribbons — sit roped off with nothing more than string, close enough that the crowd standing around them is closer than most owners would ever allow at a track.",
+      close:
+        "By mid-afternoon a line of pre-war classics has formed along the coast road above the rocks: black Packards and their contemporaries, chrome catching the light, a woman in a gold evening dress crossing in front of one of them as though the whole show were a period drama and not a parking lot. This is the other bookend to the empty-ish lot at dawn — the same coastline, the crowd now measured in the hundreds instead of the dozen or so who watched the cars arrive in the dark.",
+      captions: {
+        beforeA: "The pre-war line forms up, backlit by a work light before the marshals wave it through.",
+        beforeB: "A Cobra queued behind a run of pre-war classics, transporters still lined up behind.",
+        bleed: "The 18th green, first light. Carmel Bay behind three Shelby Cobras.",
+        gapHero: "CSX 3042 gets a last look before the judges arrive.",
+        judgedHero: "Judged — the green class ribbon already on the nose.",
+        engineDetail: "Twin carburetors, polished past their working purpose.",
+        threeQuarter: "CSX 3042, front three-quarter, ribbon on the nose.",
+        fieldWide: "By late morning, the lawn is a city.",
+        ferrariA: "Ferrari 250 LM, race No. 8 — already ribboned.",
+        ferrariB: "Race No. 7 — a UK plate still on the nose.",
+        closing: "Mid-afternoon, the pre-war line forms along the coast road.",
+        loop: "The dawn-to-midday cut, scored to a cleared library track.",
+      },
+      fieldLog: {
+        heading: "Field log",
+        rows: [
+          { label: "Chassis", value: "CSX 3042" },
+          { label: "Model", value: "1967 Shelby Cobra 427 S/C Roadster" },
+          { label: "Entrant", value: "Jack & Debbie Bell" },
+          { label: "Judged", value: "08:34" },
+          { label: "Coastal line", value: "16:26" },
+        ],
+        // Rendered as a small footnote under the log — the honesty rail from
+        // COLLISION-MAP/INTEGRATION-PLAN §3: times trace to the shoot's own
+        // per-car log, not EXIF (stripped on export at every stage of the pack).
+        timeNote: "Times per the shoot's own per-car log — EXIF was stripped on export at every stage of this pack.",
+      },
+      links: {
+        shelbyCase: { label: "See the Shelby case study", href: "/work/shelby-pebble-beach" },
+        back: { label: "Venture Stories", href: "/venture" },
+      },
+    },
+  },
 } as const;

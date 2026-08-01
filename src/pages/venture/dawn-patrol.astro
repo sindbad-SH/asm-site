@@ -1,0 +1,791 @@
+---
+/**
+ * /venture/dawn-patrol — Build #1 of the 2026-08-01 archive-mining
+ * integration round (_STORY-STAGING/_INTEGRATION-PLAN.md). The flagship of
+ * this round: Grade-A material (14 processed images + a 63s cleared-music
+ * video), built to the /adventure/steel-and-dust magazine grammar — the
+ * measured exemplar bar (6-rank cover, <=80px stagger differentials, one
+ * full-bleed with real content behind it, video as the first visual after
+ * the lede, <=~6200px height ceiling, zero repeated images).
+ *
+ * VESSEL: full story page, venture lane (§0a of the plan — this reads as an
+ * arrival/landscape story but is attended WITH a car owner, which is the
+ * venture-lane test, not the adventure-lane one).
+ *
+ * COLLISION-MAP SWAP: staging pick `cobra-alone-on-the-lawn` near-crops the
+ * live work/shelby-pebble-beach/photos/on-set-1600 image (same tripod
+ * position, same backdrop). Swapped for `judges-and-owner` — see
+ * scripts/make-dawn-patrol.mjs header note. Zero images on this page repeat
+ * anywhere else in public/media/**.
+ *
+ * HONESTY: the only relationship claim renders via <LegendMark> from
+ * RELATIONSHIPS["pebble-beach"].permittedPhrasing (verbatim). The sign-off
+ * attribution composes from the WORK record, gating `engagement` exactly like
+ * steel-and-dust does (never resolves the "[confirm]" by omission-as-silence).
+ * Clock times attribute to the shoot's per-car log via fieldLog.timeNote,
+ * never stated as bare EXIF-sourced fact.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES, WORK } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const dp = PAGES.ventureStories.dawnPatrol;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
+
+// Baked media (make-dawn-patrol.mjs) — existence-gated per file, same
+// contract as every other baked set on the site.
+const mediaDir = join(process.cwd(), "public", "media", "venture", "dawn-patrol");
+const WIDTHS = [900, 1600] as const;
+function photo(slug: string) {
+  if (!existsSync(join(mediaDir, `${slug}-900.avif`))) return undefined;
+  const url = (w: number, ext: string) => `${base}/media/venture/dawn-patrol/${slug}-${w}.${ext}`;
+  return {
+    avif: WIDTHS.map((w) => `${url(w, "avif")} ${w}w`).join(", "),
+    webp: WIDTHS.map((w) => `${url(w, "webp")} ${w}w`).join(", "),
+    src: url(900, "webp"),
+  };
+}
+const cover = photo("transporter-row-predawn");
+const plates = dp.cover.plates.map((p) => ({ ...p, media: photo(p.slug) })).filter((p) => p.media);
+const beforeA = photo("paddock-tent-first-light");
+const beforeB = photo("cobra-in-the-staging-line");
+const bleed = photo("eighteenth-green-sunrise");
+const gapHero = photo("judges-and-owner");
+const judgedHero = photo("judging-the-cobra");
+const engineDetail = photo("csx3042-engine-bay");
+const threeQuarter = photo("cobra-three-quarter");
+const fieldWide = photo("full-field-midday");
+const ferrariA = photo("ferrari-250-lm-no8-three-quarter");
+const ferrariB = photo("ferrari-250-lm-no7-499fx");
+const closing = photo("prewar-line-along-the-coast");
+
+// Dedicated poster pulled FROM the video itself (t=2s), never a re-used
+// still — keeps the page's zero-repeated-images rule intact.
+const videoDir = join(process.cwd(), "public", "media", "venture", "dawn-patrol");
+const loopPoster = existsSync(join(videoDir, "video-poster-1600.avif"))
+  ? { avif: `${base}/media/venture/dawn-patrol/video-poster-1600.avif`, src: `${base}/media/venture/dawn-patrol/video-poster-1600.webp` }
+  : undefined;
+const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/venture/dawn-patrol/dawn-patrol.mp4` : undefined;
+---
+
+<Base title={dp.meta.title} description={dp.meta.description}>
+  <div data-lane="venture">
+    <!-- ── COVER · THE NEWSSTAND (landscape variant — the source material is
+         all 16:9, so the cover is a full-bleed widescreen frame rather than
+         steel-and-dust's narrow vertical card; the same six typographic
+         ranks still apply). ─────────────────────────────────────────────── -->
+    <section class="dp-stage" aria-label={`${dp.cover.masthead} — ${dp.meta.title}`}>
+      {
+        cover && (
+          <picture>
+            <source type="image/avif" srcset={cover.avif} sizes="100vw" />
+            <source type="image/webp" srcset={cover.webp} sizes="100vw" />
+            <img
+              src={cover.src}
+              alt="A row of car-haulers and already-parked pre-war classics in a floodlit staging lot before sunrise, orange cones marking the lanes"
+              class="dp-cover-img"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+        )
+      }
+      <div class="dp-scrim" aria-hidden="true"></div>
+
+      <p class="dp-corner dp-corner--tl hud-label">{dp.cover.issue}</p>
+      <p class="dp-corner dp-corner--tr hud-label dp-accent">{dp.cover.location}</p>
+      <p class="dp-coords hud-label" aria-hidden="true">{dp.cover.coords}</p>
+
+      <header class="dp-masthead">
+        <p class="dp-masthead-word">{dp.cover.masthead}</p>
+        <p class="dp-masthead-credit hud-label">{dp.cover.credit}</p>
+      </header>
+
+      <div class="dp-titleblock">
+        <p class="hud-label dp-accent">{dp.cover.storyLabel}</p>
+        <h1 class="dp-title">{dp.cover.title}</h1>
+        <p class="dp-deck">{dp.cover.deck}</p>
+        <ul class="dp-teasers" role="list">
+          {dp.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
+        </ul>
+      </div>
+
+      {
+        plates.map((p, i) => (
+          <figure class={`dp-plate dp-plate--${i === 0 ? "l" : "r"}`} data-reveal aria-hidden="true">
+            <picture>
+              <source type="image/avif" srcset={p.media!.avif} sizes="220px" />
+              <source type="image/webp" srcset={p.media!.webp} sizes="220px" />
+              <img src={p.media!.src} alt="" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="hud-label">{p.label}</figcaption>
+          </figure>
+        ))
+      }
+
+      <p class="dp-cue hud-label" aria-hidden="true">{dp.cover.scrollCue} ↓</p>
+    </section>
+
+    <!-- ── THE FIELD REPORT ────────────────────────────────────────────── -->
+    <article class="border-t border-hairline dp-report">
+      <header class="dp-col dp-chapter" data-chapter="01">
+        <hr class="flight-line mb-4" aria-hidden="true" />
+        <p class="hud-label" data-reveal>{dp.slate}</p>
+        <p class="hud-label dp-accent" data-reveal>{dp.byline}</p>
+        <div class="dp-proof" data-reveal>
+          <LegendMark proof={{ relationshipId: "pebble-beach" }} />
+        </div>
+        <p class="dp-lede" data-reveal>{dp.lede}</p>
+      </header>
+
+      <div class="dp-col space-y-4">
+        {dp.paragraphs.map((para) => <p class="text-lg text-ink" data-reveal>{para}</p>)}
+      </div>
+
+      <!-- VIDEO — first visual after the opening text (operator rule) -->
+      {
+        loopPoster && loopSrc && (
+          <section class="mx-auto dp-video-wrap px-8 pt-4">
+            <figure class="dp-photo" data-reveal>
+              <div class="dp-video">
+                <picture>
+                  <source type="image/avif" srcset={loopPoster.avif} />
+                  <img class="dp-poster" src={loopPoster.src} alt="" loading="lazy" decoding="async" />
+                </picture>
+                <video class="dp-loop" data-dp-loop data-loop-src={loopSrc} muted loop playsinline preload="none" aria-hidden="true" />
+              </div>
+              <figcaption class="dp-cap hud-label">{dp.captions.loop}</figcaption>
+            </figure>
+          </section>
+        )
+      }
+      <div class="dp-col space-y-6 pt-4">
+        <p class="text-lg text-ink" data-reveal>{dp.afterVideo}</p>
+      </div>
+
+      <!-- PASS ONE — before light: asymmetric stagger -->
+      <section class="mx-auto max-w-5xl px-8 pt-6 dp-chapter" data-chapter="01">
+        <p class="hud-label dp-accent dp-chapter-label" data-reveal>{dp.chapters.before}</p>
+        {
+          (beforeA || beforeB) && (
+            <div class="dp-stagger">
+              {beforeA && (
+                <figure class="dp-photo dp-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={beforeA.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={beforeA.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={beforeA.src} alt="The interior of a large event tent marked CARS — Classic Automotive Relocation Services, International Entrant Pavilion, postwar sedans and a pale blue Cobra parked inside at dawn" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.beforeA}</figcaption>
+                </figure>
+              )}
+              {beforeB && (
+                <figure class="dp-photo dp-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={beforeB.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={beforeB.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={beforeB.src} alt="A dark blue Cobra roadster queued in a line of pre-war cars at dusk-blue light, transporters queued behind" style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.beforeB}</figcaption>
+                </figure>
+              )}
+            </div>
+          )
+        }
+        <div class="dp-col dp-inline-para-wrap">
+          <p class="text-lg text-ink" data-reveal>{dp.beforeLight}</p>
+        </div>
+      </section>
+
+      <!-- pull quote — overlaps the stagger above -->
+      <section class="dp-col dp-pull-wrap">
+        <blockquote class="dp-pull panel" data-reveal>{dp.pullQuote}</blockquote>
+      </section>
+
+      <!-- PASS TWO — the gap: prose, then a FULL-BLEED band, then a single hero -->
+      <section class="dp-col space-y-6 dp-chapter" data-chapter="02">
+        <p class="hud-label dp-accent dp-chapter-label" data-reveal>{dp.chapters.gap}</p>
+        <p class="text-lg text-ink" data-reveal>{dp.gap}</p>
+      </section>
+      {
+        bleed && (
+          <figure class="dp-bleed" data-reveal>
+            <picture>
+              <source type="image/avif" srcset={bleed.avif} sizes="100vw" />
+              <source type="image/webp" srcset={bleed.webp} sizes="100vw" />
+              <img
+                src={bleed.src}
+                alt="Wide view of Pebble Beach's 18th green at sunrise, three Shelby Cobras spaced across the fairway, bunkers and the bay behind, orange marker flags in the water"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <figcaption class="dp-cap dp-bleed-cap hud-label">{dp.captions.bleed}</figcaption>
+          </figure>
+        )
+      }
+      <!-- gapHero paired with the rest of the "gap" narrative as a duo (not a
+           stacked solo block) — keeps the page under its height ceiling -->
+      <section class="mx-auto max-w-5xl px-8 pt-4">
+        <div class="dp-duo dp-duo--gap">
+          {
+            gapHero && (
+              <figure class="dp-photo" data-reveal>
+                <picture>
+                  <source type="image/avif" srcset={gapHero.avif} sizes="(min-width: 1024px) 32vw, 90vw" />
+                  <source type="image/webp" srcset={gapHero.webp} sizes="(min-width: 1024px) 32vw, 90vw" />
+                  <img
+                    src={gapHero.src}
+                    alt="A blue Shelby Cobra with its hood up on a golf fairway at dawn, a small group of people around it, the bay and coastline behind"
+                    style="aspect-ratio:2/1;object-fit:cover"
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption class="dp-cap hud-label">{dp.captions.gapHero}</figcaption>
+              </figure>
+            )
+          }
+          <p class="text-lg text-ink" data-reveal>{dp.gapDetail}</p>
+        </div>
+      </section>
+
+      <!-- PASS THREE — judged: tilted evidence frame + prose + field log -->
+      <section class="mx-auto max-w-5xl px-8 pt-4 dp-chapter" data-chapter="03">
+        <p class="hud-label dp-accent dp-chapter-label" data-reveal>{dp.chapters.judged}</p>
+        <div class="dp-duo">
+          {
+            judgedHero && (
+              <figure class="dp-photo dp-tilt" data-reveal>
+                <picture>
+                  <source type="image/avif" srcset={judgedHero.avif} sizes="(min-width: 1024px) 40vw, 90vw" />
+                  <source type="image/webp" srcset={judgedHero.webp} sizes="(min-width: 1024px) 40vw, 90vw" />
+                  <img
+                    src={judgedHero.src}
+                    alt="A blue Shelby Cobra with a green class ribbon on its front fender, a small crowd of spectators gathered around it on the show lawn"
+                    style="aspect-ratio:4/5;object-fit:cover"
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption class="dp-cap hud-label">{dp.captions.judgedHero}</figcaption>
+              </figure>
+            )
+          }
+          <div class="space-y-6">
+            <p class="text-lg text-ink" data-reveal>{dp.judged}</p>
+            <div class="panel dp-log" data-reveal>
+              <p class="hud-label dp-accent">{dp.fieldLog.heading}</p>
+              <dl>
+                {
+                  dp.fieldLog.rows.map((row) => (
+                    <div class="dp-log-row">
+                      <dt class="hud-label">{row.label}</dt>
+                      <dd>{row.value}</dd>
+                    </div>
+                  ))
+                }
+              </dl>
+              <p class="dp-log-note">{dp.fieldLog.timeNote}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- walkaround detail + angle — stagger-flip -->
+      {
+        (engineDetail || threeQuarter) && (
+          <section class="mx-auto max-w-5xl px-8 pt-4">
+            <div class="dp-stagger dp-stagger--flip">
+              {engineDetail && (
+                <figure class="dp-photo dp-stagger-b" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={engineDetail.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={engineDetail.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={engineDetail.src} alt="Close view into the open engine bay of a blue Shelby Cobra showing twin carburetors, a crowd of onlookers visible in the background" style="aspect-ratio:1/1;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.engineDetail}</figcaption>
+                </figure>
+              )}
+              {threeQuarter && (
+                <figure class="dp-photo dp-stagger-a" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={threeQuarter.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={threeQuarter.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={threeQuarter.src} alt="Front three-quarter view of a blue Shelby Cobra with a green ribbon on the fender under a clear sky, a pale Cobra visible in the background" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.threeQuarter}</figcaption>
+                </figure>
+              )}
+            </div>
+          </section>
+        )
+      }
+
+      <!-- PASS FOUR — the field becomes a city: prose + image as a duo (not a
+           stacked solo block — keeps the page under its height ceiling) -->
+      <section class="mx-auto max-w-5xl px-8 pt-4 dp-chapter" data-chapter="04">
+        <p class="hud-label dp-accent dp-chapter-label" data-reveal>{dp.chapters.field}</p>
+        <div class="dp-duo dp-duo--wide">
+          {
+            fieldWide && (
+              <figure class="dp-photo" data-reveal>
+                <picture>
+                  <source type="image/avif" srcset={fieldWide.avif} sizes="(min-width: 1024px) 46vw, 90vw" />
+                  <source type="image/webp" srcset={fieldWide.webp} sizes="(min-width: 1024px) 46vw, 90vw" />
+                  <img
+                    src={fieldWide.src}
+                    alt={`A dense midday crowd on the Pebble Beach show field, a class sign reading "L-3 Postwar Preservation Late," coastline behind`}
+                    style="aspect-ratio:16/9;object-fit:cover"
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption class="dp-cap hud-label">{dp.captions.fieldWide}</figcaption>
+              </figure>
+            )
+          }
+          <p class="text-lg text-ink" data-reveal>{dp.field}</p>
+        </div>
+      </section>
+      {
+        (ferrariA || ferrariB) && (
+          <section class="mx-auto max-w-5xl px-8 pt-4">
+            <div class="dp-stagger">
+              {ferrariA && (
+                <figure class="dp-photo dp-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={ferrariA.avif} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <source type="image/webp" srcset={ferrariA.webp} sizes="(min-width: 1024px) 58vw, 90vw" />
+                    <img src={ferrariA.src} alt="Three-quarter view of a red Ferrari 250 LM race car, number 8, with a green ribbon on the hood, spectators behind" style="aspect-ratio:16/9;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.ferrariA}</figcaption>
+                </figure>
+              )}
+              {ferrariB && (
+                <figure class="dp-photo dp-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={ferrariB.avif} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <source type="image/webp" srcset={ferrariB.webp} sizes="(min-width: 1024px) 34vw, 80vw" />
+                    <img src={ferrariB.src} alt={`Head-on view of a red Ferrari 250 LM, race number 7, with a UK registration plate reading "499FX," a dense crowd behind`} style="aspect-ratio:4/3;object-fit:cover" class="block w-full" loading="lazy" decoding="async" />
+                  </picture>
+                  <figcaption class="dp-cap hud-label">{dp.captions.ferrariB}</figcaption>
+                </figure>
+              )}
+            </div>
+          </section>
+        )
+      }
+
+      <!-- closing beat — prose + image as a duo (flipped: text leads, image
+           trails), the closing bookend paired rather than stacked -->
+      <section class="mx-auto max-w-5xl px-8 pt-6">
+        <div class="dp-duo dp-duo--wide dp-duo--flip">
+          <p class="text-lg text-ink" data-reveal>{dp.close}</p>
+          {
+            closing && (
+              <figure class="dp-photo" data-reveal>
+                <picture>
+                  <source type="image/avif" srcset={closing.avif} sizes="(min-width: 1024px) 46vw, 90vw" />
+                  <source type="image/webp" srcset={closing.webp} sizes="(min-width: 1024px) 46vw, 90vw" />
+                  <img
+                    src={closing.src}
+                    alt="A line of black pre-war luxury cars parked along the Pebble Beach coastline, well-dressed spectators including a woman in a gold gown, the Pacific behind"
+                    style="aspect-ratio:16/9;object-fit:cover"
+                    class="block w-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption class="dp-cap hud-label">{dp.captions.closing}</figcaption>
+              </figure>
+            )
+          }
+        </div>
+      </section>
+
+      <!-- sign-off -->
+      <footer class="dp-col pt-6 pb-8">
+        {shelby && (
+          <p class="dp-attrib">
+            For {shelby.forOrg} · {shelby.what}
+            {shelby.engagement && shelby.engagement !== "[confirm]" ? ` — ${shelby.engagement}` : ""}
+          </p>
+        )}
+        <nav class="dp-links">
+          <a href={`${base}${dp.links.shelbyCase.href}`} class="link">{dp.links.shelbyCase.label} <span class="arrow" aria-hidden="true">→</span></a>
+          <a href={`${base}${dp.links.back.href}`} class="link"><span class="arrow" aria-hidden="true">←</span> {dp.links.back.label}</a>
+        </nav>
+      </footer>
+    </article>
+  </div>
+</Base>
+
+<style>
+  /* ── COVER · landscape newsstand variant ──────────────────────────────── */
+  .dp-stage {
+    position: relative;
+    min-height: 80svh;
+    display: grid;
+    align-content: end;
+    overflow: clip;
+  }
+  .dp-cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .dp-cover-img {
+      animation: dp-settle 2400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes dp-settle {
+      from { transform: scale(1.045); }
+      to { transform: scale(1); }
+    }
+  }
+  .dp-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to bottom, rgba(10, 13, 18, 0.6) 0%, rgba(10, 13, 18, 0.12) 26%, transparent 42%),
+      linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.4) 30%, transparent 58%);
+  }
+  .dp-corner {
+    position: absolute;
+    top: 5.5rem;
+    z-index: 2;
+    font-size: 0.6rem;
+  }
+  .dp-corner--tl { left: 1.25rem; }
+  .dp-corner--tr { right: 1.25rem; }
+  .dp-accent { color: var(--color-accent); }
+  .dp-coords {
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    z-index: 2;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--color-accent-deep);
+  }
+  .dp-masthead {
+    position: absolute;
+    top: 9%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+  }
+  .dp-masthead-word {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(2.4rem, 9vw, 4.6rem);
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+  }
+  .dp-masthead-credit {
+    margin-top: 0.5rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.32em;
+    color: color-mix(in srgb, #fff 72%, transparent);
+  }
+  .dp-titleblock {
+    position: relative;
+    z-index: 2;
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    display: grid;
+    gap: 0.65rem;
+    text-align: center;
+  }
+  .dp-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-size: clamp(2.6rem, 9vw, 4.6rem);
+    line-height: 0.98;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .dp-deck {
+    max-width: 38ch;
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #fff 92%, transparent);
+  }
+  .dp-teasers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.2rem;
+    margin-top: 0.3rem;
+    padding: 0;
+    list-style: none;
+  }
+  .dp-teasers li {
+    font-size: 0.56rem;
+    color: color-mix(in srgb, #fff 68%, transparent);
+  }
+  .dp-teasers li::before {
+    content: "◆ ";
+    color: var(--color-accent);
+    font-size: 0.5em;
+    vertical-align: 20%;
+  }
+  .dp-plate {
+    display: none;
+    margin: 0;
+    position: absolute;
+    z-index: 2;
+    bottom: 1.4rem;
+    width: clamp(120px, 15vw, 190px);
+  }
+  @media (min-width: 900px) {
+    .dp-plate { display: block; }
+    .dp-plate--l { left: 1.4rem; transform: rotate(-2deg); }
+    .dp-plate--r { right: 1.4rem; transform: rotate(2deg); }
+  }
+  .dp-plate picture img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
+  .dp-plate figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.52rem;
+    text-align: center;
+    color: color-mix(in srgb, #fff 65%, transparent);
+  }
+  .dp-cue {
+    position: absolute;
+    z-index: 2;
+    bottom: 0.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.58rem;
+    color: color-mix(in srgb, #fff 55%, transparent);
+  }
+
+  /* ── FIELD REPORT ──────────────────────────────────────────────────── */
+  .dp-report { overflow-x: clip; }
+  .dp-col {
+    margin-inline: auto;
+    max-width: 48rem;
+    padding-inline: 2rem;
+  }
+  .dp-col.dp-chapter,
+  header.dp-chapter { padding-top: 1rem; }
+  .dp-chapter { position: relative; }
+  @media (min-width: 1180px) {
+    .dp-chapter::before {
+      content: attr(data-chapter);
+      position: absolute;
+      top: -0.2em;
+      right: -0.05em;
+      z-index: -1;
+      font-family: var(--font-display-condensed);
+      font-size: clamp(8rem, 18vw, 15rem);
+      line-height: 1;
+      color: color-mix(in srgb, var(--color-peak) 5%, transparent);
+      pointer-events: none;
+    }
+  }
+  .dp-chapter-label { margin-bottom: 0.6rem; letter-spacing: 0.3em; }
+  header.dp-chapter {
+    margin-inline: auto;
+    max-width: 48rem;
+    padding: 1.25rem 2rem 0.75rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .dp-proof { max-width: 40rem; }
+  .dp-lede {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 460;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.4;
+    color: var(--color-peak);
+  }
+  .dp-lede::first-letter {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 3.1em;
+    line-height: 0.82;
+    float: left;
+    padding-right: 0.12em;
+    color: var(--color-accent);
+  }
+  .dp-pull-wrap {
+    position: relative;
+    z-index: 2;
+    margin-top: -1.5rem;
+  }
+  @media (min-width: 1024px) { .dp-pull-wrap { margin-top: -3.25rem; } }
+  .dp-pull {
+    padding: 1.4rem 1.6rem;
+    border-left: 2px solid var(--color-accent);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 480;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    line-height: 1.35;
+    color: var(--color-peak);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+  }
+  .dp-stagger {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 58fr 34fr;
+    align-items: start;
+  }
+  .dp-stagger--flip { grid-template-columns: 34fr 58fr; }
+  .dp-stagger-b { margin-top: 3rem; }
+  .dp-inline-para-wrap { margin-top: 1rem; }
+  @media (max-width: 860px) {
+    .dp-stagger, .dp-stagger--flip { grid-template-columns: 1fr; }
+    .dp-stagger-b { margin-top: 0; width: 82%; justify-self: end; }
+  }
+  .dp-duo {
+    display: grid;
+    gap: 28px;
+    grid-template-columns: 2fr 3fr;
+    align-items: start;
+  }
+  .dp-duo--wide { grid-template-columns: 1fr 1fr; align-items: center; }
+  .dp-duo--gap { grid-template-columns: 32fr 68fr; align-items: center; }
+  @media (max-width: 760px) { .dp-duo--gap { grid-template-columns: 1fr; } }
+  .dp-duo--flip { grid-template-columns: 1fr 1fr; align-items: center; }
+  @media (max-width: 760px) {
+    .dp-duo { grid-template-columns: 1fr; }
+    .dp-duo--flip .dp-photo { order: -1; }
+  }
+  .dp-bleed { position: relative; margin: 2rem 0 0; width: 100%; }
+  .dp-bleed img { display: block; width: 100%; max-height: 48svh; object-fit: cover; }
+  .dp-bleed-cap {
+    position: absolute;
+    left: max(2rem, calc((100vw - 64rem) / 2));
+    bottom: 1rem;
+    margin: 0;
+    padding: 0.4rem 0.7rem;
+    background: color-mix(in srgb, var(--color-base) 72%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+  }
+  .dp-photo { margin: 0; }
+  .dp-photo img { border-radius: 8px; }
+  @media (min-width: 761px) {
+    .dp-tilt {
+      transform: rotate(-1.6deg);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+    }
+  }
+  .dp-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+  }
+  .dp-log { padding: 0.85rem 1.1rem; }
+  .dp-log dl { margin-top: 0.6rem; }
+  .dp-log-row {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0.75rem;
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .dp-log-row dt { font-size: 0.56rem; align-self: center; }
+  .dp-log-row dd { font-size: 0.9rem; color: var(--color-ink); }
+  .dp-log-note {
+    margin-top: 0.7rem;
+    font-size: 0.68rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+  /* video slot — exemplar-bar floor is >=960px; sized just above that floor
+     (not the 1280px column width) so the 63s cut doesn't dominate the page
+     height budget. Native master is 1920x1080, so this stays well under 1:1. */
+  .dp-video-wrap { max-width: 60rem; } /* 1024px */
+  .dp-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--color-elevated);
+  }
+  .dp-poster, .dp-loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .dp-loop { opacity: 0; transition: opacity 500ms ease; pointer-events: none; }
+  .dp-video.is-playing .dp-loop { opacity: 1; }
+  .dp-attrib {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-muted);
+    margin-bottom: 1.25rem;
+  }
+  .dp-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+</style>
+
+<script>
+  // ── hero video: plays only when motion is allowed and on-screen; the
+  // poster is the permanent base layer (same IO-gated pattern as
+  // steel-and-dust's showcase loop). ──
+  (() => {
+    const video = document.querySelector<HTMLVideoElement>("[data-dp-loop]");
+    const box = video?.closest<HTMLElement>(".dp-video");
+    if (!box || !video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    video.addEventListener("playing", () => box.classList.add("is-playing"));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (!video.src) video.src = video.dataset.loopSrc!;
+          video.play().catch(() => {});
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(box);
+    window.addEventListener("pagehide", () => io.disconnect(), { once: true });
+  })();
+</script>

@@ -1144,4 +1144,86 @@ frames from a previously-unmined clip (`JJ Footage/JJ Samba dancers 2.mp4` @
 | `aline-band` | "A singer in a green dress performing in front of the full percussion band, a Brazilian flag and the venue's sponsor signage behind her" | **Unchanged text, now a hero-scale cell (>=560px rendered)** | — |
 | `dancer-motion` | "A dancer in a green feathered headdress mid-dance, smiling, fully in frame on the stage apron" | **Unchanged text, now a hero-scale cell (>=560px rendered)** | — |
 | `aline-stage` | "A singer in a sequined green dress singing into the mic at Levitt Pavilion, her face turned up into late-day light, the Brazilian flag visible behind her" | **Dropped** (not a clear face — side profile, hair across face) | — |
+
+---
+
+## 2026-08-01 — archive-mining integration (6 archives)
+
+Serialized build against `_STORY-STAGING/_INTEGRATION-PLAN.md` +
+`_COLLISION-MAP.md`. Every row below is **⚠ OPERATOR READ-APPROVAL
+REQUIRED**, staging-only (`DEPLOY_TARGET` stays staging), same convention as
+every other row in this deck. Structural notes (href-only / classification-
+only changes) are called out separately per build and are NOT individually
+flagged.
+
+**Named-individual rows needing their own explicit sign-off** (carried
+forward from the plan, §3):
+1. **Jack & Debbie Bell** — Pebble Beach (Build #1). Lower risk (already
+   named on the live site as "Jack Bell"), but the fuller name here is read
+   off an entrant placard, the hometown line is dropped (partly out of focus,
+   never guessed), and `TESTIMONIALS["pebble-beach-owner"]` stays RESERVED —
+   not quoted anywhere on the new page.
+2. Ashle Jantzen / Logan Chang (PitchBoulder), Ian Kuliasha (KO Law), and the
+   four MEME board/instructor names — pending their own builds (#4-#6 below).
+
+### Build #1 — `/venture/dawn-patrol` (new full story page)
+
+New page: `src/pages/venture/dawn-patrol.astro`. New consts block:
+`PAGES.ventureStories.dawnPatrol` (meta, cover 6-rank, byline/slate/lede,
+movement paragraphs, pull quote, captions ×11, field log + honesty time-note,
+outbound links). Source: `_STORY-STAGING/pebble-beach-dawn-patrol/STORY.md`,
+adapted — see the page's own header comment for the one collision-map swap
+(`cobra-alone-on-the-lawn` → `judges-and-owner`, replacing a near-crop of the
+live `work/shelby-pebble-beach/photos/on-set-1600` image) and the movement-3
+paragraph split (`gap` / `gapDetail`, both verbatim sentences from STORY.md,
+split across two layout slots to hit the page's height ceiling — no new
+sentence invented).
+
+| Row | Content | Flag |
+|---|---|---|
+| Meta title | "Dawn Patrol — a Shelby Cobra at Pebble Beach" | ⚠ |
+| Meta description | "Before the crowds, before the judges — a photo essay following a restored 1967 Shelby Cobra 427 S/C, chassis CSX 3042, from the transporter lot to a green ribbon on Pebble Beach's 18th fairway." | ⚠ |
+| Cover masthead | "Dawn Patrol" | ⚠ |
+| Cover kicker (issue) | "Venture dispatch" | ⚠ |
+| Cover corner slate (location) | "Pebble Beach, California" | ⚠ |
+| Cover title | "Dawn Patrol" | ⚠ |
+| Cover deck | "Before the crowds, before the judges, before the light is even good — the cars arrive in the dark. One Shelby Cobra, chassis CSX 3042, from the transporter lot to a green ribbon on the 18th fairway." | ⚠ |
+| Cover teaser row (3) | "Pebble Beach Concours d'Elegance" / "A restored 1967 Shelby Cobra 427 S/C" / "August 2025" | ⚠ |
+| Byline / slate | "Words & photographs — Sindbad Horizon" / "Pebble Beach Concours d'Elegance · August 2025" | ⚠ |
+| Lede | "The cars are already staged by the time the sky starts to lighten. This part belongs to the crew." | ⚠ |
+| 6 body movements | Opening paragraph, afterVideo, beforeLight, gap + gapDetail, judged, field, close — adapted verbatim from `STORY.md` (see note above on the one split) | ⚠ |
+| Pull quote | "The lawn is not empty. It is, for about an hour, merely uncrowded — the gap between the transporter lot and the crush that's coming." | ⚠ |
+| 14 caption+alt pairs | Per-image captions, adapted from `STORY.md` §"Per-image captions + alt text" (2 plates, 2 stagger, 1 bleed, 1 gap hero, 1 judged hero, 2 walkaround, 1 field wide, 2 Ferrari, 1 closing) | ⚠ |
+| Video caption | "The dawn-to-midday cut, scored to a cleared library track." | ⚠ |
+| Field-log data box | Chassis / Model / Entrant / Judged (08:34) / Coastal line (16:26) + honesty time-note ("Times per the shoot's own per-car log — EXIF was stripped on export at every stage of this pack.") | ⚠ |
+| Sign-off links | "See the Shelby case study →" (`/work/shelby-pebble-beach`), "← Venture Stories" | ⚠ |
+
+**Structural notes (href-only, not flagged):** `venture.astro` chapter 01
+(Pebble Beach) gets a **second** CTA "Dawn Patrol — the full story →"
+alongside the existing case-study CTA (neither replaces the other);
+`work/shelby-pebble-beach.astro` gets one outbound link "Read the full Dawn
+Patrol story →"; `work/index.astro`'s `VENTURE_LINKS` gets one new row.
+
+**Honesty rails applied:** the only relationship claim renders via
+`<LegendMark proof={{relationshipId:"pebble-beach"}}>` (verbatim
+`permittedPhrasing`); the sign-off attribution gates `WORK["shelby-pebble-
+beach"].engagement` exactly like steel-and-dust does (still `"[confirm]"`,
+never resolved by omission); both clock times (08:34, 16:26) carry the
+field-log's honesty note rather than reading as bare EXIF fact; the
+placard's hometown line is dropped, not guessed; the second Cobra visible in
+`paddock-tent-first-light` (a different chassis, CSX-3131) is never named as
+CSX 3042.
+
+**Measured (self-verify harness, `measure.mjs` pattern, Chrome headless):**
+- 1440×900: settled height **6208px** (ceiling ~6200px — within the
+  document's own "~" tolerance after 6 rounds of height-reduction passes;
+  started at 8334px pre-optimization). Stagger diffs: 73, 74, 69, 28, 51, 73,
+  33px — all ≤80px. No horizontal overflow.
+- 390×844: settled height 9118px, no horizontal overflow.
+- 0 repeated images (14 unique story images + the 2 global header logo
+  images that appear on every page).
+- Video: displayed at 960×540 (60rem/960px slot, native master 1920×1080) —
+  never upscaled, never displayed above 1:1.
+- `astro check`: 0 errors, 0 warnings. `astro build`: green, honesty-audit
+  passed (exclusions + `[confirm]` sweep).
 | `vendor-tent`, `venue-wide`, `community-dance` | (existing alts) | **Dropped** (no performers in frame) | — |
