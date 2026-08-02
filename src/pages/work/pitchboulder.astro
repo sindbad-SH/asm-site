@@ -137,7 +137,7 @@ const WEDNESDAY_ROOM = {
   heading: "What two years of showing up looks like.",
   paragraphs: [
     `Most weeks, it starts the same way: a projector screen at the front of a Boulder Chamber meeting room, a "Follow Us!" slide with four QR codes, and someone standing at the podium while the last few chairs fill in. Then the slide changes, and for the next hour a rotation of founders gets a few minutes each to make their case to whoever showed up that Wednesday.`,
-    "On disk, that adds up to dated session folders for roughly every Wednesday from mid-January through late July 2026, and — further back — three more from the first week of September 2024. Two years of the same room, recorded practically every time it met.",
+    "On disk, that adds up to dated session folders for nearly every Wednesday from the first week of January through late July 2026, and — further back — three more from the first week of September 2024. Two years of the same room, recorded practically every time it met.",
     `Most weeks the room hears from someone new. Not always — one May session carried a slide titled, plainly, "Alumni Update": a founder named Ashle Jantzen, back to report on Leyden Space, a company she'd apparently already introduced to this room once before.`,
   ],
   // v2 additions. ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only.
@@ -148,33 +148,63 @@ const WEDNESDAY_ROOM = {
 };
 
 /**
- * THE 2026 SEASON — company names come from the delivered session recordings in
- * E:\Pitch Boulder\2026 Recordings (one named master per Wednesday), never from
- * memory. `href` links the sessions he actually wrote up, and those write-ups
- * live on LinkedIn — this page deliberately does NOT rehost them. Each URL was
- * matched by date: his recaps say "last Wednesday", so a post dated e.g.
- * 2026-03-09 maps to the 2026-03-04 session. Verified against the post archive
- * at C:\builds\asm\LINKEDIN-POSTS.md. Sessions with no write-up on file carry
- * no link; sessions whose export had no company name are resolved from the
- * recap where one exists (Jul 1 / Jul 8 / Jul 22) and left blank where none
- * does (Jun 24) rather than guessed.
+ * THE 2026 SEASON — v2 (2026-08-02), rebuilt against Meetup as ground truth.
+ *
+ * The operator flagged two problems with the v1 ledger: (a) most sessions
+ * carried no LinkedIn link even though he'd covered "just about all these",
+ * and (b) some company names looked wrong — he suspected the source was his
+ * own inconsistent folder naming. Both were right.
+ *
+ * COMPANY NAMES + DATES now come from PitchBoulder's own Meetup event history
+ * (meetup.com/pitchboulder/events/past/ — the org's authoritative record),
+ * not from the 2026 Recordings folder names, which turned out to have real
+ * errors: "PJ Pickup Play" was the recording labeled with presenter PJ
+ * Bullock's initials folded into the company name (it's just "Pickup Play");
+ * "Hummingbird AI" was a mishearing/mistyping of the actual company, "Humming
+ * Agent AI". Meetup also revealed TWO SESSIONS MISSING ENTIRELY from the old
+ * ledger (Jan 7 — TS MEDICAL LLC, Feb 11 — Antelope Recovery) and confirmed a
+ * date error: Jun 24 was Arkana Therapeutics (the last session at Galvanize
+ * before the room moved to the Library), NOT Jul 1, which was actually a
+ * different company, Lucent — the old ledger had mapped one LinkedIn post to
+ * the wrong Wednesday.
+ *
+ * LINKS were re-harvested by scrolling his own LinkedIn profile (shares feed)
+ * end to end, READ-ONLY, rather than relying on LinkedIn's own content search
+ * — which does not reliably index a user's own historical posts (confirmed:
+ * it returned zero results for "PickleMatch" and "eating quarters", both
+ * verbatim phrases from posts that demonstrably exist on his profile). Each
+ * post's date is decoded from its activity URN, not estimated from "2mo ago"
+ * labels. `href` links the sessions he actually wrote up; those write-ups
+ * live on LinkedIn and are deliberately not rehosted here. Sessions with no
+ * write-up found carry no link — see the per-row notes below for which ones
+ * were confirmed absent vs. simply not yet located.
  */
 const LI = "https://www.linkedin.com/feed/update/urn:li:activity:";
 const LEDGER = [
-  { d: "Jan 14", co: "Career Ops" },
-  { d: "Jan 21", co: "PJ Pickup Play" },
-  { d: "Jan 28", co: "Hummingbird AI" },
-  { d: "Feb 4", co: "Sagittarius Logistics" },
+  // No write-up found for this one — a season-opener gap, not a search miss.
+  { d: "Jan 7", co: "TS Medical" },
+  { d: "Jan 14", co: "Career Ops", href: `${LI}7417649901003567104/` },
+  { d: "Jan 21", co: "Pickup Play", href: `${LI}7421599560583790592/` },
+  { d: "Jan 28", co: "Humming Agent AI", href: `${LI}7424134565239087104/` },
+  { d: "Feb 4", co: "Sagittarius Logistics", href: `${LI}7426671239802343424/` },
+  // Only mentioned as "scouting next Wednesday" inside the Feb 4 post above —
+  // no dedicated write-up of its own, so it stays unlinked rather than
+  // pointing at a post that isn't really about it.
+  { d: "Feb 11", co: "Antelope Recovery" },
   { d: "Feb 18", co: "Origami Motion", href: `${LI}7431744706184720384/` },
   { d: "Feb 25", co: "NeuroGeneces", href: `${LI}7434666417595142144/` },
   { d: "Mar 4", co: "Actuate", href: `${LI}7436803006056185856/` },
   { d: "Mar 11", co: "Aika", href: `${LI}7439339729952604161/` },
   { d: "Mar 18", co: "OncoPatch", href: `${LI}7441876452704268288/` },
-  { d: "Mar 25", co: "PickleMatch" },
+  { d: "Mar 25", co: "PickleMatch", href: `${LI}7444413168413663232/` },
+  // Post confirmed to exist (a coin-payment device pitch, "the most
+  // overlooked revenue in America... quietly eating quarters") but its
+  // permalink wasn't recovered this pass — LinkedIn unmounts far-scrolled
+  // posts from the DOM and its own search doesn't index post text.
   { d: "Apr 1", co: "PixelPay" },
-  { d: "Apr 8", co: "Retrocycle" },
-  { d: "Apr 15", co: "Amplified Space" },
-  { d: "Apr 22", co: "Pristino Labs" },
+  { d: "Apr 8", co: "Retrocycle", href: `${LI}7449486603942789120/` },
+  { d: "Apr 15", co: "Amplified Space", href: `${LI}7452023347694997504/` },
+  { d: "Apr 22", co: "Pristino Labs", href: `${LI}7454560105531875329/` },
   { d: "Apr 29", co: "Perlion", href: `${LI}7457096795706478592/` },
   { d: "May 6", co: "PEMPal", href: `${LI}7459980841486569472/` },
   { d: "May 13", co: "Momease Solutions", href: `${LI}7462155048475611136/` },
@@ -183,8 +213,13 @@ const LEDGER = [
   { d: "Jun 3", co: "Angld.AI", href: `${LI}7469765230886125569/` },
   { d: "Jun 10", co: "Veery", href: `${LI}7472301932305334272/` },
   { d: "Jun 17", co: "Nobility Space", href: `${LI}7474838710073851904/` },
-  { d: "Jun 24", co: "—" },
-  { d: "Jul 1", co: "Arkana Therapeutics", href: `${LI}7477399943255699456/` },
+  // v1 had this blank and misattributed the Jul 1 slot below to Arkana.
+  // Meetup confirms Jun 24 (Arkana) was the LAST session at Galvanize; the
+  // room moved to the Boulder Public Library starting Jul 1 — matching his
+  // own post's line about "the final PitchBoulder at Galvanize."
+  { d: "Jun 24", co: "Arkana Therapeutics", href: `${LI}7477399943255699456/` },
+  // No write-up found — this is the company v1 wrongly had under Jun 24.
+  { d: "Jul 1", co: "Lucent" },
   { d: "Jul 8", co: "GIFD", href: `${LI}7482844808185683968/` },
   { d: "Jul 22", co: "AquaPuck", href: `${LI}7487934806463369216/` },
 ] as const;
@@ -331,7 +366,7 @@ const LEDGER = [
           ))}
         </ol>
         <p class="wr-ledger-note">
-          Sixteen of these have a write-up. They're on LinkedIn, where the room already is —
+          Twenty-four of these have a write-up. They're on LinkedIn, where the room already is —
           arrows open them there.
         </p>
       </div>
