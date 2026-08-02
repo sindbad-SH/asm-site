@@ -147,6 +147,21 @@ already in `consts.ts`. No new visible copy.
 
 ---
 
+## Added 2026-08-02 (second pass)
+
+| # | Where | Proposed |
+|---|---|---|
+| D48 | Case section label, site-wide | **The film** (was "The commercial" on PitchBoulder; Shelby already said "The film") |
+
+**Rationale (his own framing):** one label for every produced piece — ad, recap reel, or
+visual story — and readers infer from the body copy what each engagement was. The Outcome
+paragraph still says "The commercial now runs as PitchBoulder's primary website asset," so
+the fact isn't hidden; the label just stops advertising it.
+
+**Withdrawn this pass:** D22/D23 (Crew Call — event unannounced, artwork pulled from the
+site AND from public/). The MEME roster rows changed to "Who teaches the workshops" with
+exact titles per meme.ngo/meet-the-team — see the page, not the earlier table.
+
 ## Still open, separate from copy
 
 1. **Season list layout.** It's still the most box-shaped thing on the page. A prototype

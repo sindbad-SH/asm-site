@@ -24,6 +24,10 @@ interface Props {
   base: string;
   /** Real video id for the commercial once supplied (S3); [confirm] until then. */
   commercialVideoId?: string;
+  /** Facade poster for the produced-film embed — a frame FROM the film itself,
+   *  self-hosted (the facade never fetches i.ytimg.com). Without it the slot
+   *  renders as an empty topo-lines box, which reads as a bare link. */
+  commercialPoster?: string;
   /** Full-film YouTube embed id (Shelby case §2.6). Optional — rendered as a
    *  second embed under the commercial slot when supplied. */
   fullFilmVideoId?: string;
@@ -70,6 +74,7 @@ const {
   study,
   base,
   commercialVideoId,
+  commercialPoster,
   fullFilmVideoId,
   hookPoster,
   hookSources = [],
@@ -259,10 +264,16 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     {
       (commercialVideoId || !fullFilmVideoId) && (
         <div class="case-chapter__inner space-y-3">
-          <p class="hud-label">The commercial</p>
+          {/* 2026-08-02 (operator): one label for every produced piece across the
+              site — "The film" — whether the engagement was an ad, a recap reel,
+              or a visual story. The body copy still says what each one WAS
+              ("produced their commercial"); the label stops advertising it.
+              Shelby already used "The film", so this unifies, not forks. */}
+          <p class="hud-label">The film</p>
           <YouTubeEmbed
             videoId={commercialVideoId}
-            title="The commercial"
+            poster={commercialPoster}
+            title="The film"
             placeholderLabel="COMMERCIAL — YouTube embed, click-to-load facade (S3). Supply the video id; full video is never self-hosted (§4)."
           />
         </div>
