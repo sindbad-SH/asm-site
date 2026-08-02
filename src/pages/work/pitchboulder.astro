@@ -178,6 +178,9 @@ const WEDNESDAY_ROOM = {
  * live on LinkedIn and are deliberately not rehosted here. Sessions with no
  * write-up found carry no link — see the per-row notes below for which ones
  * were confirmed absent vs. simply not yet located.
+ *
+ * PixelPay's permalink (Apr 1) was the one this pass couldn't recover by
+ * scrolling — the operator supplied it directly on 2026-08-02.
  */
 const LI = "https://www.linkedin.com/feed/update/urn:li:activity:";
 const LEDGER = [
@@ -197,11 +200,7 @@ const LEDGER = [
   { d: "Mar 11", co: "Aika", href: `${LI}7439339729952604161/` },
   { d: "Mar 18", co: "OncoPatch", href: `${LI}7441876452704268288/` },
   { d: "Mar 25", co: "PickleMatch", href: `${LI}7444413168413663232/` },
-  // Post confirmed to exist (a coin-payment device pitch, "the most
-  // overlooked revenue in America... quietly eating quarters") but its
-  // permalink wasn't recovered this pass — LinkedIn unmounts far-scrolled
-  // posts from the DOM and its own search doesn't index post text.
-  { d: "Apr 1", co: "PixelPay" },
+  { d: "Apr 1", co: "PixelPay", href: `${LI}7446949863168266240/` },
   { d: "Apr 8", co: "Retrocycle", href: `${LI}7449486603942789120/` },
   { d: "Apr 15", co: "Amplified Space", href: `${LI}7452023347694997504/` },
   { d: "Apr 22", co: "Pristino Labs", href: `${LI}7454560105531875329/` },
@@ -366,7 +365,7 @@ const LEDGER = [
           ))}
         </ol>
         <p class="wr-ledger-note">
-          Twenty-four of these have a write-up. They're on LinkedIn, where the room already is —
+          Twenty-five of these have a write-up. They're on LinkedIn, where the room already is —
           arrows open them there.
         </p>
       </div>
