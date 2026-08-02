@@ -2586,17 +2586,25 @@
   color: var(--color-accent) !important;
 }
 
-/* Hidden ONLY under html.js — no-JS users always see everything (KEEP port). */
+/* Hidden ONLY under html.js — no-JS users always see everything (KEEP port).
+   2026-08-01 BUGFIX: this used the `transform` shorthand, whose selector
+   (0,3,1) outranks every Astro-scoped editorial rotation (0,1,0) — and each of
+   those rotated elements also carries data-reveal. Result: all seven authored
+   tilts on the site (steel-and-dust .sd-plate--l/--r/.sd-tilt, vybe
+   .vy-plate--l/--r/.vy-tilt, dawn-patrol .dp-tilt) computed to a pure
+   translate and NEVER rendered their rotation, in either state. Using the
+   individual `translate` property instead composites with `transform` rather
+   than replacing it, so the reveal offset and the page's rotation coexist. */
 html.js [data-reveal] {
   opacity: 0;
-  transform: translateY(28px); /* DIRECTION §1.1 P3 — y 28px → 0 */
+  translate: 0 28px; /* DIRECTION §1.1 P3 — y 28px → 0 */
   transition:
     opacity var(--dur-arrival) var(--ease-arrival) var(--reveal-delay),
-    transform var(--dur-arrival) var(--ease-arrival) var(--reveal-delay);
+    translate var(--dur-arrival) var(--ease-arrival) var(--reveal-delay);
 }
 html.js [data-reveal].is-revealed {
   opacity: 1;
-  transform: none;
+  translate: none;
 }
 
 /* Masked-line headline reveal: wrap each line, child rises out of the mask. */
@@ -2676,7 +2684,16 @@ html.js .contour-draw.is-revealed path {
 /* ── Reduced motion: contours static, marker a fixed dot, all content shown
       (binding fallback, §3.3). ── */
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-reveal],
+  /* [data-reveal] now offsets via `translate`, so it must be reset via
+     `translate` — resetting `transform` here would both leave the 28px offset
+     in place AND re-kill the authored rotations (same specificity trap fixed
+     above). A static rotation is layout, not motion, so it correctly survives
+     reduced motion. */
+  html.js [data-reveal] {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
   html.js .line-mask > *,
   html.js .contour-draw path {
     opacity: 1;

@@ -213,7 +213,7 @@ const LEDGER = [
 
       {
         wrHero && (
-          <figure class="wr-hero">
+          <figure class="wr-hero wr-wide">
             <picture>
               <source type="image/avif" srcset={wrHero.avif} sizes="(max-width: 760px) 100vw, 46rem" />
               <source type="image/webp" srcset={wrHero.webp} sizes="(max-width: 760px) 100vw, 46rem" />
@@ -244,7 +244,7 @@ const LEDGER = [
 
       {
         (wrOrigamiTitle || wrPerlionTitle) && (
-          <div class="wr-duo">
+          <div class="wr-duo wr-wide">
             {wrOrigamiTitle && (
               <figure class="wr-duo-fig">
                 <picture>
@@ -294,7 +294,7 @@ const LEDGER = [
     <div class="wr-inner">
       {/* v2 — the human beat: text left, close portrait right, deliberately
           the smallest-scale image on the page after the widest one. */}
-      <div class="wr-aside">
+      <div class="wr-aside wr-wide">
         <p class="wr-para">{WEDNESDAY_ROOM.afterPitch}</p>
         {wrAfter && (
           <figure class="wr-aside-fig">
@@ -401,7 +401,29 @@ const LEDGER = [
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
-  .wr-mid { max-width: 26rem; }
+  /* 2026-08-01 — breaking the single measure. Measured against
+     /adventure/steel-and-dust, this chapter had ONE block left-edge (x=272)
+     and TWO block widths, where the anchor page has three of each. That is the
+     mechanism behind "it's just a bunch of squares and boxes … the text
+     uniformly fits to the photo": text and media were literally the same box.
+     The anchor solves it by running two measures at once — a 704px text column
+     with media overhanging it by 128px per side. `.wr-wide` is that overhang;
+     the 46rem/~78ch reading measure is correct and does NOT change. */
+  .wr-wide {
+    --over: 12rem;
+    width: calc(100% + var(--over));
+    margin-inline: calc(var(--over) / -2);
+    max-width: 100vw;
+  }
+  @media (max-width: 900px) {
+    .wr-wide { --over: 0rem; }
+  }
+  /* right-aligned so it opens a THIRD left edge instead of stacking on the
+     same one as everything else */
+  .wr-mid {
+    max-width: 26rem;
+    justify-self: end;
+  }
   .wr-cap {
     margin-top: 0.5rem;
     font-family: var(--font-mono);
@@ -409,11 +431,19 @@ const LEDGER = [
     letter-spacing: 0.1em;
     color: var(--color-ink-muted);
   }
+  /* Was `1fr 1fr` with both children 1:1 and baselines aligned — i.e. the two
+     identical squares the operator named. Now the anchor page's own ratio
+     (58fr/34fr ≈ 1.71:1) with the light side dropped, so the pair reads as one
+     composed beat rather than a row of tiles. */
   .wr-duo {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.1rem;
+    grid-template-columns: 1.62fr 1fr;
+    gap: 1.4rem;
     margin: 0.3rem 0;
+    align-items: start;
+  }
+  .wr-duo-fig:nth-child(2) {
+    margin-top: 2.75rem;
   }
   .wr-duo-fig img {
     display: block;
@@ -424,14 +454,20 @@ const LEDGER = [
   }
   @media (max-width: 560px) {
     .wr-duo { grid-template-columns: 1fr; }
+    .wr-duo-fig:nth-child(2) { margin-top: 0; }
   }
 
   /* ── v2 beats ─────────────────────────────────────────────────────────── */
-  /* the one edge-to-edge band — breaks the 46rem column entirely */
+  /* The one edge-to-edge band. 2026-08-01 BUGFIX: this was documented as 100vw
+     but measured 1232px at x=24 — `width:100%` resolves against `.wr`, which
+     carries 1.5rem of padding, so it never reached the viewport and the page
+     had ZERO true bleeds. Now it escapes any centred ancestor. */
   .wr-bleed {
     position: relative;
     margin: 2.5rem 0;
-    width: 100%;
+    width: 100vw;
+    max-width: 100vw;
+    margin-inline: calc(50% - 50vw);
   }
   .wr-bleed img {
     display: block;
@@ -532,6 +568,16 @@ const LEDGER = [
     font-size: 0.7em;
     opacity: 0.55;
     vertical-align: 0.15em;
+  }
+  /* the 16 outbound rows measured 23.8px tall — under the 44px tap minimum.
+     Padding out and pulling the margin back keeps the visual rhythm identical
+     while giving thumbs something to hit. */
+  @media (max-width: 760px) {
+    .wr-ledger-link {
+      display: inline-block;
+      padding-block: 0.68rem;
+      margin-block: -0.68rem;
+    }
   }
   .wr-ledger-note {
     margin-top: 0.85rem;
