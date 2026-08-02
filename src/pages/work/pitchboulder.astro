@@ -180,7 +180,10 @@ const WEDNESDAY_ROOM = {
  * were confirmed absent vs. simply not yet located.
  *
  * PixelPay's permalink (Apr 1) was the one this pass couldn't recover by
- * scrolling — the operator supplied it directly on 2026-08-02.
+ * scrolling — the operator supplied it directly on 2026-08-02. Lucent's
+ * (Jul 1) was supplied the same day: from that session on, coverage posts
+ * began moving to the ASM company page rather than his personal profile, so
+ * future harvests must scroll BOTH feeds.
  */
 const LI = "https://www.linkedin.com/feed/update/urn:li:activity:";
 const LEDGER = [
@@ -217,8 +220,10 @@ const LEDGER = [
   // room moved to the Boulder Public Library starting Jul 1 — matching his
   // own post's line about "the final PitchBoulder at Galvanize."
   { d: "Jun 24", co: "Arkana Therapeutics", href: `${LI}7477399943255699456/` },
-  // No write-up found — this is the company v1 wrongly had under Jun 24.
-  { d: "Jul 1", co: "Lucent" },
+  // This is the company v1 wrongly had under Jun 24. Its write-up exists but
+  // was the first one published from the ASM company page instead of his
+  // personal profile — which is why personal-feed harvests kept missing it.
+  { d: "Jul 1", co: "Lucent", href: `${LI}7480274435866800128/` },
   { d: "Jul 8", co: "GIFD", href: `${LI}7482844808185683968/` },
   { d: "Jul 22", co: "AquaPuck", href: `${LI}7487934806463369216/` },
 ] as const;
@@ -365,7 +370,7 @@ const LEDGER = [
           ))}
         </ol>
         <p class="wr-ledger-note">
-          Twenty-five of these have a write-up. They're on LinkedIn, where the room already is —
+          Twenty-six of these have a write-up. They're on LinkedIn, where the room already is —
           arrows open them there.
         </p>
       </div>
