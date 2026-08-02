@@ -35,7 +35,11 @@ const M = String.raw`E:\Makeshift\MEME`;
 const PICKS = {
   "bofsb-portrait": `${M}\\01 - Active Events\\Business of Show Business (2026-08-15)\\FLYERS - FINAL\\bofsb_v2-cover_portrait_1080x1350.png`,
   "bofsb-wide": `${M}\\01 - Active Events\\Business of Show Business (2026-08-15)\\FLYERS - FINAL\\bofsb_v2-cover_linkedin_1200x628.png`,
-  "crewcall-portrait": `${M}\\01 - Active Events\\Crew Call (2026)\\FLYERS - FINAL\\crewcall_v2-desk_portrait_1080x1350.png`,
+  // Crew Call is NOT baked (2026-08-02, operator): the flyers exist but the
+  // event has not been announced. Publishing artwork for an unannounced client
+  // event front-runs MEME's own announcement — and anything under public/ is
+  // fetchable on the live site whether or not a page references it. Add it back
+  // only once the event is public.
   "pitch-quorum-sheet": `${M}\\01 - Active Events\\On-Demand Programs\\Pitch Quorum\\FLYERS - FINAL\\pitch-quorum_ondemand_portrait_1080x1350.png`,
   "market-fresh-sheet": `${M}\\01 - Active Events\\On-Demand Programs\\Market Fresh\\FLYERS - FINAL\\market-fresh_ondemand_portrait_1080x1350.png`,
 };

@@ -105,9 +105,16 @@ function media(rel: string) {
  * Program facts (dates, venue, instructor, format) are quoted from the
  * campaign copy packs in that repo, which are the approved event copy.
  */
+/**
+ * 2026-08-02 (operator): only campaigns for programs that are ACTUALLY LIVE may
+ * appear here. Crew Call was pulled — its flyers are built but the event has
+ * not been announced, and showing unannounced client material as portfolio
+ * both front-runs MEME's own announcement and misrepresents what is running.
+ * The three that remain are live: Business of Show Business (Sat Aug 15) and
+ * the two year-round on-demand programs.
+ */
 const campaign = (slug: string) => pair(`venture/meme/${slug}-1600`) ?? pair(`venture/meme/${slug}-900`);
 const bofsbPortrait = campaign("bofsb-portrait");
-const crewcallPortrait = campaign("crewcall-portrait");
 const pitchQuorumSheet = campaign("pitch-quorum-sheet");
 const marketFreshSheet = campaign("market-fresh-sheet");
 
@@ -131,14 +138,6 @@ const CAMPAIGN = {
       alt: "A magazine-cover-style flyer headed MEME, reading The Business of Show Business, with a portrait of instructor Nick C. Goins Jr., the date Sat Aug 15, and a QR code.",
     },
     {
-      media: () => crewcallPortrait,
-      slug: "crewcall-portrait",
-      label: "Crew Call",
-      meta: "Two workshops · one day · one instructor",
-      note: "A double-bill call sheet for the PA and Script Supervisor workshops — the on-set roles most people learn the hard way. Instructor: Adam Smestad.",
-      alt: "A flyer styled as a film call sheet reading CREW CALL, listing The PA Workshop and Script Supervisor Workshop with instructor Adam Smestad.",
-    },
-    {
       media: () => pitchQuorumSheet,
       slug: "pitch-quorum-sheet",
       label: "Pitch Quorum",
@@ -159,10 +158,31 @@ const CAMPAIGN = {
     "Rendered from the campaign repo, five formats per program plus animated cuts. Registration links and any co-brand sign-off stay MEME's call.",
 };
 
-const ROSTER = [
-  { key: "nick", name: "Nick Goins", role: "Executive Director — runs Pitch Quorum and Market Fresh himself.", alt: "Close portrait of Nick Goins wearing a plaid flat cap, black t-shirt, looking directly at camera." },
-  { key: "steve", name: "Steve Borne", role: "Teaches the two-part sound workshop — setting a shoot up for success on location, and what happens to that audio in post.", alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background." },
-  { key: "adam", name: "Adam Smestad", role: "Teaches the production-assistant and script-supervisor workshops — the on-set roles most people learn by getting yelled at until they figure it out.", alt: "Studio portrait of Adam Smestad, bald, short beard, smiling, black blazer, gray backdrop." },
+/**
+ * 2026-08-02 CORRECTION (operator-directed, verified against
+ * https://www.meme.ngo/meet-the-team):
+ *
+ * This grid previously ran as an unlabelled roster of Nick Goins + Steve Borne
+ * + Adam Smestad, which read as "the MEME team". It is not. MEME's own team
+ * page lists FIVE people — Nick C. Goins Jr (Executive Director & Founder),
+ * Amber MacPherson (Board Chair & Admin), and three Members At-Large: Eric
+ * Abramson, Shaun Michael Ellis, and Sindbad. Borne and Smestad appear
+ * nowhere on it; they are working professionals who have TAUGHT workshops.
+ * Presenting a guest instructor as organisational leadership overstates their
+ * relationship to the nonprofit and misrepresents its actual governance.
+ *
+ * So the section is now explicitly "who teaches the workshops", the titles are
+ * exact, and the copy points at MEME's own team page for the team itself. The
+ * team is described in prose (above) rather than pictured, because the
+ * remaining headshots are not clean: Amber MacPherson's carries a visible
+ * "April O'Hare Photography" watermark with credit unconfirmed, and there is
+ * no Shaun Michael Ellis portrait on file at all. A half-complete leadership
+ * grid would be worse than none.
+ */
+const INSTRUCTORS = [
+  { key: "nick", name: "Nick C. Goins Jr", role: "Executive Director & Founder. Teaches the flagship programs — Pitch Quorum and Market Fresh — himself.", alt: "Close portrait of Nick C. Goins Jr wearing a plaid flat cap, black t-shirt, looking directly at camera." },
+  { key: "steve", name: "Steve Borne", role: "Has taught the two-part sound workshop — setting a shoot up for success on location, and what happens to that audio in post.", alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background." },
+  { key: "adam", name: "Adam Smestad", role: "Has taught the production-assistant and script-supervisor workshops — the on-set roles most people learn by getting yelled at until they figure it out.", alt: "Studio portrait of Adam Smestad, bald, short beard, smiling, black blazer, gray backdrop." },
 ] as const;
 
 // ── THE ARTICLE (all new sentences — see the approval note above) ──
@@ -180,9 +200,15 @@ const ARTICLE = {
     // Build #6 — new roster paragraph, first person (matches this page's
     // established voice), names the instructors the roster grid below
     // pictures. Facts: Playbook Appendix + MEME_OnePager.html, matching.
-    "Per MEME's own program materials, Nick Goins runs the organization as Executive Director and teaches its flagship programs himself, and the rest of the working roster is taught by people with real credits behind them — Steve Borne runs the sound workshop, and Adam Smestad teaches the on-set roles most people learn the hard way.",
+    // 2026-08-02 correction (operator): the previous version blurred MEME's
+    // TEAM with the people who teach its workshops. Per meme.ngo/meet-the-team
+    // the team is five: Nick C. Goins Jr (Executive Director & Founder), Amber
+    // MacPherson (Board Chair & Admin), and three Members At-Large — Eric
+    // Abramson, Shaun Michael Ellis, and me. Steve Borne and Adam Smestad have
+    // taught workshops; they are NOT on the team page, and the copy must not
+    // imply they are.
+    "Nick C. Goins Jr founded MEME and runs it as Executive Director; Amber MacPherson chairs the board. Alongside me there are two other Members At-Large, Eric Abramson and Shaun Michael Ellis. The workshops themselves are taught by working professionals brought in for them — which is the point, since the whole idea is to put people in front of the ones already doing the job.",
     "It runs on the same instinct as everything else this studio makes: a StorySmith's read on what an audience will feel, and a market strategist's read on who that audience actually is.",
-    "The cinematic drone work over Switzerland and Italy, the founders met around the Boulder startup scene, and this role at MEME are one practice — pointed at the same question: whose story is this, and who is it for?",
   ],
   ctas: [
     { label: "About the organization →", href: "https://www.meme.ngo", external: true },
@@ -253,7 +279,7 @@ const ARTICLE = {
           unequal scale — the lead flyer runs large beside its own spec block,
           the three others drop to a smaller rank underneath. */}
       {
-        (bofsbPortrait || crewcallPortrait || pitchQuorumSheet || marketFreshSheet) && (
+        (bofsbPortrait || pitchQuorumSheet || marketFreshSheet) && (
           <section class="meme-campaign" aria-label="Campaign work for MEME">
             <p class="hud-label meme-kicker">{CAMPAIGN.kicker}</p>
             <h2 class="meme-h2">{CAMPAIGN.heading}</h2>
@@ -303,9 +329,11 @@ const ARTICLE = {
           Amber MacPherson's headshot is cut (unconfirmed photo-credit
           watermark) and the AFM 2017 photo is cut (rights unresolved) —
           see the header note. Native-resolution images, not upscaled. */}
-      <div class="meme-roster" data-reveal aria-label="The roster">
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading + note (staging-only). */}
+      <p class="hud-label meme-kicker" data-reveal>Who teaches the workshops</p>
+      <div class="meme-roster" data-reveal aria-label="Workshop instructors">
         {
-          ROSTER.map((r) => {
+          INSTRUCTORS.map((r) => {
             const shot = memeShots[r.key as keyof typeof memeShots];
             return shot ? (
               <figure class="meme-roster-card">
@@ -322,6 +350,10 @@ const ARTICLE = {
           })
         }
       </div>
+      <p class="meme-footnote" data-reveal>
+        Instructors are working professionals brought in to teach a session — not MEME's
+        board. The organisation's team is listed on its own site.
+      </p>
 
       <nav class="meme-ctas" data-reveal>
         {
@@ -502,12 +534,17 @@ const ARTICLE = {
      sheet, not a cover) so it takes the wide track, and the two sibling
      program sheets sit narrower with a dropped baseline. A flat repeat(3,1fr)
      here would rebuild the uniform-tile grid this whole overhaul removed. */
+  /* two siblings now (Crew Call pulled — unannounced), so the ratio is the
+     house 1.62:1 rather than the old three-across. Still unequal on purpose:
+     a 1fr 1fr pair is the "two identical squares" shape being removed
+     everywhere else on the site. */
   .meme-wall {
     display: grid;
-    grid-template-columns: 1.24fr 0.92fr 0.92fr;
-    gap: 1.1rem;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1.6rem;
     margin-top: 0.6rem;
     align-items: start;
+    max-width: 46rem;
   }
   .meme-wall-fig {
     margin: 0;
@@ -516,10 +553,7 @@ const ARTICLE = {
     align-content: start;
   }
   .meme-wall-fig:nth-child(2) {
-    margin-top: 1.6rem;
-  }
-  .meme-wall-fig:nth-child(3) {
-    margin-top: 3rem;
+    margin-top: 2.2rem;
   }
   .meme-wall-fig img {
     display: block;
@@ -564,14 +598,11 @@ const ARTICLE = {
   @media (max-width: 780px) {
     .meme-lead { grid-template-columns: 1fr; }
     .meme-lead-fig { max-width: 22rem; }
-    .meme-wall { grid-template-columns: 1.1fr 0.9fr; }
-    .meme-wall-fig:nth-child(2) { margin-top: 2rem; }
-    .meme-wall-fig:nth-child(3) { margin-top: 0; }
+    .meme-wall-fig:nth-child(2) { margin-top: 1.4rem; }
   }
   @media (max-width: 520px) {
     .meme-wall { grid-template-columns: 1fr; }
-    .meme-wall-fig:nth-child(2),
-    .meme-wall-fig:nth-child(3) { margin-top: 0; }
+    .meme-wall-fig:nth-child(2) { margin-top: 0; }
   }
 
   /* Build #6 — roster grid, 3 headshot cards. P5: scale-dropped to a
