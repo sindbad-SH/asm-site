@@ -184,11 +184,11 @@ export const POSTCARDS: readonly Postcard[] = [
     ],
     photos: [
       { slug: "festival-set", alt: "Nordic Daughter performing under the festival tent at the Scandinavian Midsummer Festival — the singer with arms raised, the drummer and guitarist beside her, Nordic flags overhead" },
-      { slug: "formation", alt: "Dancers in flowing black dresses kneeling and gathered on the wooden stage, Nordic flags hanging behind them and the festival crowd seated on the grass" },
+      { slug: "formation", alt: "All five dancers in flowing black dresses and pale face paint moving together across the wooden stage, Nordic flags and the crowd behind them" },
       { slug: "motion", alt: "A dancer in black mid-turn on the stage, teal fabric trailing from her arms as the troupe moves around her" },
       { slug: "closeup", alt: "Dancers in black with pale face paint gathered close together on the stage, one reaching a hand skyward" },
       { slug: "overview", alt: "A wide view over the festival's white vendor tents, a Danish flag flying above the market and the Golden foothills behind" },
-      { slug: "stalls", alt: "A vendor stall crowded with medieval-style goblets and drinkware, shoppers browsing under the tent" },
+      { slug: "stalls", alt: "A market row stall selling hats and pewter goblets, a dense crowd of festivalgoers browsing the tables in the sun" },
       { slug: "parasols", alt: "A vendor tent hung with patterned parasols, a crowd of festivalgoers browsing the tables beneath them" },
       { slug: "festival-strings", alt: "Nordic Daughter's violinist and keyboardist performing on the festival stage, the festival grounds and Nordic flags visible behind them" },
     ],

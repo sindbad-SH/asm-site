@@ -71,7 +71,7 @@ const contextImage = pbMedia("context-followus-1600.webp") ?? `${base}/media/wor
 const contextAlt =
   "The PitchBoulder room from the back — attendees at long tables, the host on the mic, and the session's “Follow Us!” slide with its QR codes on both projector screens.";
 const contextCaption = "The room, and the slide that closes every session — May 20, 2026.";
-const askThumbSrc = pbMedia("ask-thumb-900.webp");
+const askThumbSrc = pbMedia("ask-thumb-1600.webp");
 const askThumb = askThumbSrc
   ? {
       src: askThumbSrc,
@@ -97,9 +97,15 @@ const wrDir = join(process.cwd(), "public", "media", "work", "pitchboulder", "we
 function wrShot(slug: string) {
   if (!existsSync(join(wrDir, `${slug}-900.avif`))) return undefined;
   const url = (w: number, ext: string) => `${base}/media/work/pitchboulder/wednesday-room/${slug}-${w}.${ext}`;
+  // origami-title's source is a native 1080x1080 square (see
+  // scripts/make-pitchboulder-wednesday-room-v3.mjs) — too small to bake a
+  // real downscale-only 1600w file, so that width is only requested when it
+  // actually exists on disk (audit-fixes-2026-08-02: was a dead srcset entry
+  // pointing at a file that was never generated).
+  const has1600 = existsSync(join(wrDir, `${slug}-1600.avif`));
   return {
-    avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
-    webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
+    avif: has1600 ? `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w` : `${url(900, "avif")} 900w`,
+    webp: has1600 ? `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w` : `${url(900, "webp")} 900w`,
     src: url(900, "webp"),
   };
 }
