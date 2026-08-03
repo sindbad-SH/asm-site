@@ -1,61 +1,64 @@
 ---
 /**
  * Venture story · SeriesFest 2026 "Soul Power ABA Premiere" — built on the P12.8
- * pilot pattern (seriesfest-2026.astro). Mono slate, mixed-face headline, native-
- * aspect collage, SeriesFest LegendMark near the top.
+ * pilot pattern (seriesfest-2026.astro). Mono slate, mixed-face headline,
+ * SeriesFest LegendMark near the top.
  *
  * Honestly small: per the operator's _ABOUT.md this is a small, candid premiere-
  * night set, so this recap runs short — the premiere wall and the screening room.
  * HONESTY: the only status claim is the SeriesFest LegendMark (tier `attended`),
  * rendered near the top from consts — verbatim. Attendance ≠ affiliation.
+ *
+ * AUDIT-FIX (2026-08-03, design pass): rebuilt from the flat 6-col "editorial
+ * wall" grid onto afm-2025.astro's Movement template — see seriesfest-2026.astro
+ * for the fuller account. Unlike its siblings, this folder's seven frames were
+ * each a genuinely different moment already (no near-duplicates to collapse) —
+ * the fix here is purely captions + pacing: every image now sits beside the
+ * paragraph it's closest to in spirit, with an honest, generic caption, instead
+ * of all seven running at the same small grid scale.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import sharp from "sharp";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const STORY = "seriesfest-2026-soul-power";
 const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
 
-async function aspectOf(file: string): Promise<string | undefined> {
-  try {
-    const { width, height } = await sharp(file).metadata();
-    return width && height ? `${width} / ${height}` : undefined;
-  } catch {
-    return undefined;
-  }
-}
 async function shot(slug: string, alt: string) {
   const webp900 = join(mediaDir, `${slug}-900.webp`);
   if (!existsSync(webp900)) return undefined;
   const url = (w: number, ext: string) => `${base}/media/venture/${STORY}/${slug}-${w}.${ext}`;
   return {
     alt,
-    ar: await aspectOf(webp900),
     avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
     webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
     fallback: url(900, "webp"),
   };
 }
 
-const [hero, ...gallery] = await Promise.all([
-  shot("hero", "The premiere step-and-repeat and signage wall at the Soul Power ABA premiere."),
-  shot("backdrop-arrivals", "The branded premiere wall as attendees arrive."),
-  shot("backdrop-wall", "The branded SeriesFest premiere backdrop."),
-  shot("screening", "A film playing on the screen in the theater."),
-  shot("backdrop-signage", "The premiere signage wall at the theater."),
-  shot("backdrop-lobby", "The premiere backdrop by the theater lobby."),
-  shot("screening-house", "The screening-room house at the premiere."),
-].map((p) => p));
-
-const spans = [3, 3, 2, 2, 3, 3];
+const hero = await shot("hero", "Two arrivals posed at the SeriesFest and Sie FilmCenter step-and-repeat, a boom mic and camera crew working the red carpet.");
+const screening = await shot("screening", "The Soul Power: The Legend of the American Basketball Association titlecard, the Q&A panel seated below it.");
+const backdropArrivals = await shot("backdrop-arrivals", "An ABA-jerseyed guest being interviewed on the red carpet, the SeriesFest and Sie FilmCenter backdrop behind.");
+const backdropLobby = await shot("backdrop-lobby", "A press scrum working the step-and-repeat, cameras and boom mics raised.");
+const backdropSignage = await shot("backdrop-signage", "A group posing with a basketball at the branded backdrop, a vintage ABA jersey poster visible at the edge of the lobby.");
+const backdropWall = await shot("backdrop-wall", "Two guests posed at the SeriesFest premiere wall, Denver Film and Sie FilmCenter branding beside them.");
+const screeningHouse = await shot("screening-house", "The house filling in before the screening, the Soul Power titlecard still lit on the big screen.");
 
 const seriesRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "seriesfest",
 );
+
+const PULL = "It isn't about grizzly bears and guys with wigs — it's much deeper than that. It's real.";
+const CAPTIONS = {
+  screening: "The Q&A, right after the credits.",
+  backdropArrivals: "An ABA jersey on the red carpet — the legends were in the room too.",
+  backdropLobby: "The press line, working the arrivals.",
+  backdropDuo: "The lobby, before and after the screening.",
+  screeningHouse: "The house filling in, the titlecard still up.",
+};
 
 const meta = {
   title: "SeriesFest 2026 · Soul Power ABA Premiere — a venture story",
@@ -88,7 +91,7 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style={`--ar:${hero.ar}`} loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:38% 55%" loading="eager" decoding="async" />
         </picture>
       </figure>
     )}
@@ -108,55 +111,130 @@ const meta = {
           Season-12 line + dates.
       Named people are only those he publicly named at this public screening.
     -->
-    <section class="vs-prose" data-reveal>
-      <p>
-        The NBA didn't just evolve — it was forced to change by a league that
-        played above the rim while the rest of the world was still on the floor.
-        We joined SeriesFest at the Sie FilmCenter for the screening and Q&amp;A of
-        Soul Power: The Legend of the American Basketball Association, the new
-        Prime Video and Amazon MGM Studios sports series.
-      </p>
-      <p>
-        This wasn't a nostalgia trip. As moderator Vic Lombardi put it, the ABA
-        isn't about grizzly bears and guys with wigs — it's much deeper than that,
-        it's real.
-      </p>
-      <p>
-        Executive producer George Karl named the urgency behind the series
-        plainly: they made it to shine a light on these players while there's
-        still time — we're getting older, and time is passing. EP Brett Goldberg
-        described the years spent refining it, refusing to make it anything but
-        extraordinary and soulful.
-      </p>
-      <p>
-        The Denver karma of it: in the making, the team found the world's largest
-        collection of ABA content — more than 60,000 images, held by Arthur
-        Hundhausen and Alex Tonkinson — five minutes from the theater. And ABA
-        legends Ralph Simpson and Chuck Williams traced how the league's
-        entertainment instinct, the three-point line and ball movement, forced the
-        NBA to evolve.
-      </p>
-      <p>
-        Colorado's film scene is having a massive year, and this premiere was a
-        perfect warmup for the main event — SeriesFest Season 12, back in Denver
-        May 6–10, 2026. SeriesFest, Sie FilmCenter, Denver, Colorado, February 18,
-        2026.
-      </p>
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>
+          The NBA didn't just evolve — it was forced to change by a league that
+          played above the rim while the rest of the world was still on the floor.
+          We joined SeriesFest at the Sie FilmCenter for the screening and Q&amp;A of
+          Soul Power: The Legend of the American Basketball Association, the new
+          Prime Video and Amazon MGM Studios sports series.
+        </p>
+      </div>
     </section>
 
-    <section class="vs-gallery" aria-label="SeriesFest 2026 Soul Power premiere — frames">
-      {gallery.map((g, i) =>
-        g ? (
-          <figure class="vs-card" style={`--span:${spans[i] ?? 2}`} data-reveal data-reveal-stagger="70">
-            <picture>
-              <source type="image/avif" srcset={g.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-              <source type="image/webp" srcset={g.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-              <img src={g.fallback} alt={g.alt} style={`--ar:${g.ar}`} loading="lazy" decoding="async" />
-            </picture>
-          </figure>
-        ) : null,
-      )}
+    {screening && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={screening.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={screening.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={screening.fallback} alt={screening.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.screening}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>
+          This wasn't a nostalgia trip. As moderator Vic Lombardi put it, the ABA
+          isn't about grizzly bears and guys with wigs — it's much deeper than that,
+          it's real.
+        </p>
+      </div>
     </section>
+
+    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
+
+    <div class="vs-duo" data-reveal>
+      {backdropLobby && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={backdropLobby.avif} sizes="(max-width: 760px) 100vw, 30rem" />
+            <source type="image/webp" srcset={backdropLobby.webp} sizes="(max-width: 760px) 100vw, 30rem" />
+            <img src={backdropLobby.fallback} alt={backdropLobby.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:70% 45%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.backdropLobby}</figcaption>
+        </figure>
+      )}
+      <div class="vs-prose vs-prose--inrow">
+        <p>
+          Executive producer George Karl named the urgency behind the series
+          plainly: they made it to shine a light on these players while there's
+          still time — we're getting older, and time is passing. EP Brett Goldberg
+          described the years spent refining it, refusing to make it anything but
+          extraordinary and soulful.
+        </p>
+      </div>
+    </div>
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>
+          The Denver karma of it: in the making, the team found the world's largest
+          collection of ABA content — more than 60,000 images, held by Arthur
+          Hundhausen and Alex Tonkinson — five minutes from the theater. And ABA
+          legends Ralph Simpson and Chuck Williams traced how the league's
+          entertainment instinct, the three-point line and ball movement, forced the
+          NBA to evolve.
+        </p>
+      </div>
+    </section>
+
+    {(backdropArrivals || backdropSignage) && (
+      <figure class="vs-diptych" data-reveal>
+        <div class="vs-diptych-row">
+          {backdropArrivals && (
+            <picture>
+              <source type="image/avif" srcset={backdropArrivals.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={backdropArrivals.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={backdropArrivals.fallback} alt={backdropArrivals.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 45%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+          {backdropSignage && (
+            <picture>
+              <source type="image/avif" srcset={backdropSignage.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={backdropSignage.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={backdropSignage.fallback} alt={backdropSignage.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:42% 55%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+        </div>
+        <figcaption class="vs-cap">{CAPTIONS.backdropArrivals}</figcaption>
+      </figure>
+    )}
+
+    {backdropWall && (
+      <figure class="vs-closer" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={backdropWall.avif} sizes="(max-width: 760px) 100vw, 34rem" />
+          <source type="image/webp" srcset={backdropWall.webp} sizes="(max-width: 760px) 100vw, 34rem" />
+          <img src={backdropWall.fallback} alt={backdropWall.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:38% 40%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.backdropDuo}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p class="vs-close">
+          Colorado's film scene is having a massive year, and this premiere was a
+          perfect warmup for the main event — SeriesFest Season 12, back in Denver
+          May 6–10, 2026. SeriesFest, Sie FilmCenter, Denver, Colorado, February 18,
+          2026.
+        </p>
+      </div>
+    </section>
+
+    {screeningHouse && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={screeningHouse.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={screeningHouse.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={screeningHouse.fallback} alt={screeningHouse.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.screeningHouse}</figcaption>
+      </figure>
+    )}
 
     <section class="vs-foot">
       <a href={`${base}/venture`} class="link"><span class="arrow" aria-hidden="true">←</span> Venture</a>
@@ -170,7 +248,7 @@ const meta = {
     min-height: 100svh;
     padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
     display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
+    gap: clamp(2rem, 4vw, 3.25rem);
     max-width: 90rem;
     margin-inline: auto;
   }
@@ -234,10 +312,22 @@ const meta = {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
   }
 
+  .vs-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
+  .vs-movement {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+  }
   .vs-prose {
     max-width: 44rem;
     display: grid;
@@ -245,32 +335,98 @@ const meta = {
     font-size: clamp(1.05rem, 1.5vw, 1.3rem);
     line-height: 1.6;
     color: color-mix(in srgb, var(--color-ink) 92%, transparent);
-    justify-self: center;
+  }
+  .vs-prose--inrow {
+    max-width: none;
+  }
+  .vs-close {
+    font-style: italic;
   }
 
-  .vs-gallery {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: clamp(0.6rem, 1.4vw, 1.1rem);
-    align-items: start;
-  }
-  .vs-card {
-    grid-column: span var(--span, 2);
+  .vs-fullbeat {
     margin: 0;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
+    max-width: 56rem;
+    width: 100%;
+    justify-self: center;
   }
-  .vs-card img {
+  .vs-fullbeat img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
-    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+    border-radius: 6px;
   }
-  .vs-card:hover img {
-    transform: scale(1.03);
+
+  .vs-widest {
+    margin: 0;
+    width: 100%;
+  }
+  .vs-widest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-pull {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding-inline: 1rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+    line-height: 1.3;
+    text-align: center;
+    color: var(--color-peak);
+  }
+
+  .vs-duo {
+    display: grid;
+    grid-template-columns: 22rem 1fr;
+    gap: clamp(1.2rem, 3vw, 2.6rem);
+    align-items: center;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-duo-fig {
+    margin: 0;
+  }
+  .vs-duo-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-diptych {
+    margin: 0;
+    max-width: 54rem;
+    width: 100%;
+  }
+  .vs-diptych-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .vs-diptych img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-closer {
+    margin: 0;
+    max-width: 30rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-closer img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
   }
 
   .vs-foot {
@@ -281,12 +437,11 @@ const meta = {
   }
 
   @media (max-width: 760px) {
-    .vs-line--push { transform: none; }
-    .vs-gallery { grid-template-columns: repeat(2, 1fr); }
-    .vs-card { grid-column: span 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .vs-card img { transition: none; }
-    .vs-card:hover img { transform: none; }
+    .vs-line--push {
+      transform: none;
+    }
+    .vs-duo {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -1,68 +1,77 @@
 ---
 /**
  * Venture story · SeriesFest 2026 "Fashion in Focus" — built on the P12.8 pilot
- * pattern (seriesfest-2026.astro). Mono slate, mixed-face headline, native-aspect
- * collage, SeriesFest LegendMark near the top.
+ * pattern (seriesfest-2026.astro). Mono slate, mixed-face headline,
+ * SeriesFest LegendMark near the top.
  *
  * HONESTY: the only status claim is the SeriesFest LegendMark (tier `attended`),
  * rendered near the top from consts — verbatim, never upgraded. The prose is the
  * operator's OWN words (see the read-approval block). Attendance ≠ affiliation.
+ *
+ * AUDIT-FIX (2026-08-03, design pass): rebuilt from the flat 6-col "editorial
+ * wall" grid onto afm-2025.astro's Movement template — see seriesfest-2026.astro
+ * for the fuller account. This folder's strongest frame (panel-stage — the
+ * on-screen titlecard literally reads "Fashion in Focus, Honoring Costume
+ * Designer Molly Rogers") was previously running at the SAME small grid scale
+ * as every other tile; it now leads its own movement at full width, matched to
+ * the paragraphs that are actually ABOUT that masterclass. garment-rack (whose
+ * screen reads "SeriesFest: Season 12, May 6–10, 2026") now sits beside the
+ * closing paragraph that names those same dates — the same "caption only
+ * asserts what's legible in frame" discipline as every other rebuilt page.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import sharp from "sharp";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const STORY = "seriesfest-2026-fashion-in-focus";
 const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
 
-async function aspectOf(file: string): Promise<string | undefined> {
-  try {
-    const { width, height } = await sharp(file).metadata();
-    return width && height ? `${width} / ${height}` : undefined;
-  } catch {
-    return undefined;
-  }
-}
 async function shot(slug: string, alt: string) {
   const webp900 = join(mediaDir, `${slug}-900.webp`);
   if (!existsSync(webp900)) return undefined;
   const url = (w: number, ext: string) => `${base}/media/venture/${STORY}/${slug}-${w}.${ext}`;
   return {
     alt,
-    ar: await aspectOf(webp900),
     avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
     webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
     fallback: url(900, "webp"),
   };
 }
 
-const [hero, ...gallery] = await Promise.all([
-  shot("hero", "The SeriesFest-branded step-and-repeat backdrop at the Fashion in Focus event."),
-  shot("panel-stage", "A panel seated on stage with microphones before the branded screen."),
-  shot("podium-host", "A host at the SeriesFest-branded podium."),
-  shot("garment-display", "A garment on display at the fashion event."),
-  shot("garment-rack", "Garments and gowns displayed at the event."),
-  shot("step-and-repeat", "The branded SeriesFest backdrop."),
-  shot("podium-speaker", "A speaker presenting at the podium."),
-  shot("panel-mics", "A seated panel on stage with microphones."),
-  shot("podium-address", "A host addressing the room from the stage."),
-  shot("venue-detail", "The event venue interior with lit staging."),
-].map((p) => p));
-
-const spans = [3, 3, 2, 2, 2, 3, 3, 2, 2];
+const hero = await shot("hero", "The Fashion in Focus title screen at The Cable Center, a blue coat on a mannequin staged beside the podium, the runway audience seated behind.");
+const venueDetail = await shot("venue-detail", "The Cable Center's atrium, a model on the runway, tiered seating rising on both sides.");
+const garmentDisplay = await shot("garment-display", "A model mid-stride on the runway, a long white cape trailing behind her.");
+const panelStage = await shot("panel-stage", "The Fashion in Focus titlecard reading Honoring Costume Designer Molly Rogers, three panelists seated below beside a mannequin in a blue coat.");
+const podiumHost = await shot("podium-host", "A host at the podium beside the blue-coat mannequin, the MM · Amber Fries · Garbarini sponsor screen behind.");
+const garmentRack = await shot("garment-rack", "A host at the podium, a SeriesFest: Season 12 announcement lit up on the screen beside her.");
+const panelMics = await shot("panel-mics", "Two people embracing on stage after the honoring, the audience watching from below.");
 
 const seriesRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "seriesfest",
 );
 
+const KICKERS = {
+  m1: "A dual celebration",
+  m2: "The masterclass",
+  m3: "Beyond the runway",
+};
+const PULL = "Costume design is the nervous system of a character — the narrative forged before a single line of dialogue is spoken.";
+const CAPTIONS = {
+  venueDetail: "The Cable Center's atrium, filled out for the runway.",
+  garmentDisplay: "More than forty looks crossed this floor.",
+  panelStage: "Honoring Molly Rogers — the masterclass, mid-conversation.",
+  podiumHost: "The Matthew Morris Salon & Skincare anniversary, marked from the same stage.",
+  garmentRack: "The next chapter, already on screen — Season 12, May 6–10.",
+  panelMics: "The honoring, closed out with an embrace.",
+};
+
 const meta = {
   title: "SeriesFest 2026 · Fashion in Focus — a venture story",
   description:
-    "SeriesFest 2026 Fashion in Focus in Denver, Colorado — a fashion and style panel with the branded stage, garment displays, and host moments, from a weekend of relationship-building attendance.",
+    "SeriesFest 2026 Fashion in Focus in Denver, Colorado — a runway, a masterclass with costume designer Molly Rogers, and a salon's 20th anniversary, from a weekend of relationship-building attendance.",
 };
 ---
 
@@ -90,7 +99,7 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style={`--ar:${hero.ar}`} loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 62%" loading="eager" decoding="async" />
         </picture>
       </figure>
     )}
@@ -108,64 +117,146 @@ const meta = {
       installation detail from his own SeriesFest "Soul Power" post (Mar 2026).
       Named people are only those he publicly named/thanked; no escalation.
     -->
-    <section class="vs-prose" data-reveal>
-      <p>
-        Earlier this month we went on a scouting mission to The Cable Center in
-        Denver, gathering intelligence from the intersection of fashion and
-        episodic narrative at SeriesFest's Fashion in Focus. The evening was a
-        dual celebration: the twentieth anniversary of Matthew Morris Salon
-        &amp; Skincare, one of Denver's creative hubs, and an honoring of
-        Emmy-winning costume designer Molly Rogers — a room filled out by a
-        runway show of more than forty models and costume installations.
-      </p>
-      <p>
-        Read as a StorySmith, the vanguard work of costume design is the
-        nervous system of a character — the narrative forged before a single
-        line of dialogue is spoken. Rogers, the visionary behind The Devil Wears
-        Prada, Sex and the City, and And Just Like That…, shared masterclass-level
-        insight into how that happens.
-      </p>
-      <p>
-        She spoke about vintage sourcing as fresh blood — the thing that keeps a
-        character's wardrobe unique rather than static or generic. And she
-        recounted the structural power of performance: how Meryl Streep stayed in
-        character as Miranda Priestly even between takes, so the withering
-        intensity of the famous cerulean monologue was earned on set.
-      </p>
-      <p>
-        The third thread was the danger of the sequel — the high-frequency
-        pressure of continuing a beloved narrative, where you balance
-        generational evolution against the fierce expectations of a global
-        audience.
-      </p>
-      <p>
-        Beyond the fabric, the evening reinforced that beauty is not the false
-        reality of social-media filters but a vehicle for genuine confidence. As
-        Matthew Morris put it, a salon remains one of the last places for
-        courageous, creative conversations between people who might never
-        otherwise meet.
-      </p>
-      <p>
-        The main exploration begins soon: SeriesFest Season 12 returns to Denver
-        May 6–10, 2026. Our thanks to the SeriesFest team for welcoming a
-        StoryScout into the room. Fashion in Focus, The Cable Center, Denver,
-        Colorado, March 7, 2026.
-      </p>
+    <!-- MOVEMENT 1 · A DUAL CELEBRATION -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m1}</p>
+      <div class="vs-prose">
+        <p>
+          Earlier this month we went on a scouting mission to The Cable Center in
+          Denver, gathering intelligence from the intersection of fashion and
+          episodic narrative at SeriesFest's Fashion in Focus. The evening was a
+          dual celebration: the twentieth anniversary of Matthew Morris Salon
+          &amp; Skincare, one of Denver's creative hubs, and an honoring of
+          Emmy-winning costume designer Molly Rogers — a room filled out by a
+          runway show of more than forty models and costume installations.
+        </p>
+      </div>
     </section>
 
-    <section class="vs-gallery" aria-label="SeriesFest 2026 Fashion in Focus — frames">
-      {gallery.map((g, i) =>
-        g ? (
-          <figure class="vs-card" style={`--span:${spans[i] ?? 2}`} data-reveal data-reveal-stagger="70">
-            <picture>
-              <source type="image/avif" srcset={g.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-              <source type="image/webp" srcset={g.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-              <img src={g.fallback} alt={g.alt} style={`--ar:${g.ar}`} loading="lazy" decoding="async" />
-            </picture>
-          </figure>
-        ) : null,
-      )}
+    {venueDetail && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={venueDetail.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={venueDetail.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={venueDetail.fallback} alt={venueDetail.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.venueDetail}</figcaption>
+      </figure>
+    )}
+
+    {garmentDisplay && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={garmentDisplay.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={garmentDisplay.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={garmentDisplay.fallback} alt={garmentDisplay.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:38% 45%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.garmentDisplay}</figcaption>
+      </figure>
+    )}
+
+    <!-- MOVEMENT 2 · THE MASTERCLASS -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m2}</p>
+      <div class="vs-prose">
+        <p>
+          Read as a StorySmith, the vanguard work of costume design is the
+          nervous system of a character — the narrative forged before a single
+          line of dialogue is spoken. Rogers, the visionary behind The Devil Wears
+          Prada, Sex and the City, and And Just Like That…, shared masterclass-level
+          insight into how that happens.
+        </p>
+      </div>
     </section>
+
+    {panelStage && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={panelStage.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={panelStage.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={panelStage.fallback} alt={panelStage.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:50% 78%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.panelStage}</figcaption>
+      </figure>
+    )}
+
+    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>
+          She spoke about vintage sourcing as fresh blood — the thing that keeps a
+          character's wardrobe unique rather than static or generic. And she
+          recounted the structural power of performance: how Meryl Streep stayed in
+          character as Miranda Priestly even between takes, so the withering
+          intensity of the famous cerulean monologue was earned on set.
+        </p>
+        <p>
+          The third thread was the danger of the sequel — the high-frequency
+          pressure of continuing a beloved narrative, where you balance
+          generational evolution against the fierce expectations of a global
+          audience.
+        </p>
+      </div>
+    </section>
+
+    <!-- MOVEMENT 3 · BEYOND THE RUNWAY -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m3}</p>
+      <div class="vs-thumbrow">
+        <div class="vs-prose vs-prose--inrow">
+          <p>
+            Beyond the fabric, the evening reinforced that beauty is not the false
+            reality of social-media filters but a vehicle for genuine confidence. As
+            Matthew Morris put it, a salon remains one of the last places for
+            courageous, creative conversations between people who might never
+            otherwise meet.
+          </p>
+        </div>
+        {podiumHost && (
+          <figure class="vs-thumb">
+            <picture>
+              <source type="image/avif" srcset={podiumHost.avif} sizes="200px" />
+              <source type="image/webp" srcset={podiumHost.webp} sizes="200px" />
+              <img src={podiumHost.fallback} alt={podiumHost.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:35% 60%" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.podiumHost}</figcaption>
+          </figure>
+        )}
+      </div>
+    </section>
+
+    <div class="vs-duo" data-reveal>
+      <div class="vs-prose vs-prose--inrow">
+        <p class="vs-close">
+          The main exploration begins soon: SeriesFest Season 12 returns to Denver
+          May 6–10, 2026. Our thanks to the SeriesFest team for welcoming a
+          StoryScout into the room. Fashion in Focus, The Cable Center, Denver,
+          Colorado, March 7, 2026.
+        </p>
+      </div>
+      {garmentRack && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={garmentRack.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+            <source type="image/webp" srcset={garmentRack.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+            <img src={garmentRack.fallback} alt={garmentRack.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:62% 42%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.garmentRack}</figcaption>
+        </figure>
+      )}
+    </div>
+
+    {panelMics && (
+      <figure class="vs-closer" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={panelMics.avif} sizes="(max-width: 760px) 100vw, 40rem" />
+          <source type="image/webp" srcset={panelMics.webp} sizes="(max-width: 760px) 100vw, 40rem" />
+          <img src={panelMics.fallback} alt={panelMics.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:62% 40%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.panelMics}</figcaption>
+      </figure>
+    )}
 
     <section class="vs-foot">
       <a href={`${base}/venture`} class="link"><span class="arrow" aria-hidden="true">←</span> Venture</a>
@@ -179,7 +270,7 @@ const meta = {
     min-height: 100svh;
     padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
     display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
+    gap: clamp(2rem, 4vw, 3.25rem);
     max-width: 90rem;
     margin-inline: auto;
   }
@@ -243,10 +334,27 @@ const meta = {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
   }
 
+  .vs-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
+  .vs-movement {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+  }
+  .vs-kicker {
+    justify-self: center;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-accent) 82%, transparent);
+  }
   .vs-prose {
     max-width: 44rem;
     display: grid;
@@ -254,32 +362,99 @@ const meta = {
     font-size: clamp(1.05rem, 1.5vw, 1.3rem);
     line-height: 1.6;
     color: color-mix(in srgb, var(--color-ink) 92%, transparent);
-    justify-self: center;
+  }
+  .vs-prose--inrow {
+    max-width: none;
+  }
+  .vs-close {
+    font-style: italic;
   }
 
-  .vs-gallery {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: clamp(0.6rem, 1.4vw, 1.1rem);
-    align-items: start;
-  }
-  .vs-card {
-    grid-column: span var(--span, 2);
+  .vs-fullbeat {
     margin: 0;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
+    max-width: 52rem;
+    width: 100%;
+    justify-self: center;
   }
-  .vs-card img {
+  .vs-fullbeat img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
-    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+    border-radius: 6px;
   }
-  .vs-card:hover img {
-    transform: scale(1.03);
+
+  .vs-widest {
+    margin: 0;
+    width: 100%;
+  }
+  .vs-widest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-thumbrow {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    align-items: start;
+    max-width: 58rem;
+    width: 100%;
+  }
+  .vs-thumb {
+    margin: 0;
+  }
+  .vs-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-pull {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding-inline: 1rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+    line-height: 1.3;
+    text-align: center;
+    color: var(--color-peak);
+  }
+
+  .vs-duo {
+    display: grid;
+    grid-template-columns: 1fr 22rem;
+    gap: clamp(1.2rem, 3vw, 2.6rem);
+    align-items: center;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-duo-fig {
+    margin: 0;
+  }
+  .vs-duo-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-closer {
+    margin: 0;
+    max-width: 34rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-closer img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
   }
 
   .vs-foot {
@@ -290,12 +465,20 @@ const meta = {
   }
 
   @media (max-width: 760px) {
-    .vs-line--push { transform: none; }
-    .vs-gallery { grid-template-columns: repeat(2, 1fr); }
-    .vs-card { grid-column: span 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .vs-card img { transition: none; }
-    .vs-card:hover img { transform: none; }
+    .vs-line--push {
+      transform: none;
+    }
+    .vs-thumbrow {
+      grid-template-columns: 1fr;
+    }
+    .vs-thumb {
+      max-width: 200px;
+    }
+    .vs-duo {
+      grid-template-columns: 1fr;
+    }
+    .vs-duo-fig {
+      order: 2;
+    }
   }
 </style>

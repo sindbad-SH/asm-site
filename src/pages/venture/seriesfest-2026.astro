@@ -9,60 +9,63 @@
  * status claim is the SeriesFest LegendMark (tier `attended`), rendered near the
  * top from consts — verbatim, never upgraded. The prose is the operator's OWN
  * words (see the read-approval block below). Attendance ≠ affiliation.
+ *
+ * AUDIT-FIX (2026-08-03, design pass): rebuilt from the flat 6-col "editorial
+ * wall" grid onto afm-2025.astro's Movement template — the house standard per
+ * the operator's own consistency complaint (seriesfest-2026 was judged
+ * visibly less-crafted than its sibling afm-2025 despite identical source
+ * material). Same repeating unit: heading/kicker → paragraphs → a captioned
+ * image beat at a deliberate scale → pull quote at the pacing midpoint →
+ * more movements → a quiet closer. EVERY image below now carries a caption;
+ * none did before. The six dispatch paragraphs are UNCHANGED verbatim (his
+ * own LinkedIn voice — see the sourcing note lower down); only their grouping
+ * and the images placed alongside them changed. Eight previously-unused
+ * baked photos (commit 1936f35: opening-night-mingle, press-scrum,
+ * panel-behind-the-deals, panel-indie-tv-risk, panel-littleton-road,
+ * awards-podium-embrace, brunch-patio-crowd, awards-ceremony-group) now ship;
+ * three that were pixel/moment-near-duplicates of a chosen frame (soiree-mic
+ * vs. soiree-room; panel-bookstore vs. panel-behind-the-deals; step-and-
+ * repeat vs. the branded frames already carried by the other beats) are
+ * deliberately left unused, same no-silent-caps rule afm-2025 documents.
+ * Captions describe only what's legible in frame (a session's own on-screen
+ * title, a stats slide's own numbers) — never asserted as the SPECIFIC named
+ * session a paragraph describes unless the on-screen signage says so; that
+ * keeps every caption honest even where a photo and a paragraph sit side by
+ * side without being the same moment.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import sharp from "sharp";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const STORY = "seriesfest-2026";
 const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
 
-// Native pixel ratio read at BUILD TIME (Tableaux.astro pattern) so each card
-// takes the image's own aspect — never forced into a hardcoded box.
-async function aspectOf(file: string): Promise<string | undefined> {
-  try {
-    const { width, height } = await sharp(file).metadata();
-    return width && height ? `${width} / ${height}` : undefined;
-  } catch {
-    return undefined;
-  }
-}
-// Resolve a pick's two-width avif+webp set (build-time gated: a card renders
-// only when its exports shipped). srcset carries 900w + 1600w.
 async function shot(slug: string, alt: string) {
   const webp900 = join(mediaDir, `${slug}-900.webp`);
   if (!existsSync(webp900)) return undefined;
   const url = (w: number, ext: string) => `${base}/media/venture/${STORY}/${slug}-${w}.${ext}`;
   return {
     alt,
-    ar: await aspectOf(webp900),
     avif: `${url(900, "avif")} 900w, ${url(1600, "avif")} 1600w`,
     webp: `${url(900, "webp")} 900w, ${url(1600, "webp")} 1600w`,
     fallback: url(900, "webp"),
   };
 }
 
-// Gallery order + honest, non-identifying alt text (scenes, never named people).
-const [hero, ...gallery] = await Promise.all([
-  shot("hero", "SeriesFest Soirée main stage — two lit screens carry the 2026 branding over the speakers."),
-  shot("soiree-room", "The Soirée room: the lit stage with the seated audience in front."),
-  shot("panel-bookstore", "A festival panel of five seated on stage before a SeriesFest backdrop, audience watching."),
-  shot("screening-golden-groves", "A festival screening — a film title on the big screen above the panel."),
-  shot("stage-stats", "A presentation on the big screen, festival figures over the SeriesFest branding."),
-  shot("podium-duo", "Two hosts speaking at the SeriesFest-branded podium."),
-  shot("press-scrum", "The SeriesFest step-and-repeat wall with photographers and press gathered in front."),
-  shot("screening-raul-seixas", "A cinema screening under the SeriesFest marquee, hosts at the front of the house."),
-  shot("step-and-repeat", "The branded SeriesFest wall at the festival entrance."),
-  shot("soiree-mic", "A speaker with a microphone on the Soirée stage, the crowd below."),
-].map((p) => p));
-
-// Card spans (6-col desktop grid) — the mixed-size collage. Square frames at
-// different scales read as an editorial wall, crop-free (all picks are 1:1).
-const spans = [3, 3, 2, 2, 2, 3, 3, 2, 2];
+const hero = await shot("hero", "SeriesFest Soirée main stage — two lit screens carry the 2026 branding over the speakers.");
+const openingMingle = await shot("opening-night-mingle", "A small group talking in front of the SeriesFest 2026 sponsor wall on opening night.");
+const pressScrum = await shot("press-scrum", "Photographers and press gathered in front of the branded SeriesFest step-and-repeat.");
+const screeningGoldenGroves = await shot("screening-golden-groves", "An official-selection pilot on the big screen, a panel seated below for the post-screening Q&A.");
+const panelBehindTheDeals = await shot("panel-behind-the-deals", "A panel of six on stage at a bookstore venue, the screen behind reading Behind the Deals: Agents & Managers.");
+const panelIndieTvRisk = await shot("panel-indie-tv-risk", "A panel of five, the screen behind reading State of Indie TV: Risk, Innovation & Opportunity.");
+const panelLittletonRoad = await shot("panel-littleton-road", "A panel of four, the screen behind reading Impact in TV: Littleton Road Productions.");
+const soireeRoom = await shot("soiree-room", "The Soirée stage under the 2026 titlecard, a host and pianist performing in front of the seated dinner crowd.");
+const awardsPodiumEmbrace = await shot("awards-podium-embrace", "Two people at the SeriesFest podium, mid-embrace, the branded screen behind them.");
+const brunchPatioCrowd = await shot("brunch-patio-crowd", "A crowd gathered on a sunlit patio at a SeriesFest weekend gathering.");
+const awardsCeremonyGroup = await shot("awards-ceremony-group", "A lineup of Season 12 honorees on stage, the Awards Ceremony titlecard lit up behind them.");
 
 // The SeriesFest proof line — imported from consts, rendered VERBATIM. This is
 // the only status claim on the page (tier `attended`), and it sits up top.
@@ -70,10 +73,27 @@ const seriesRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "seriesfest",
 );
 
+const KICKERS = {
+  m1: "Opening night",
+  m2: "The panels",
+  m3: "The Soirée",
+};
+const PULL = "Two kinds of showrunner exist — those who delegate and trust their people, and those who hoard information. The first kind makes better shows.";
+const CAPTIONS = {
+  openingMingle: "Opening night — the mingle before the first screening.",
+  pressScrum: "The press line, working the step-and-repeat.",
+  screeningGoldenGroves: "An official-selection pilot, mid Q&A.",
+  sessionsTrio: "Three of the week's sessions — Behind the Deals, State of Indie TV, and Impact in TV.",
+  soireeRoom: "The Soirée stage, the dinner crowd below.",
+  awardsPodiumEmbrace: "A moment at the podium, mid-program.",
+  brunchPatioCrowd: "Sunday's patio brunch, the weekend winding down.",
+  awardsCeremonyGroup: "The week's honorees, on stage together, one more time.",
+};
+
 const meta = {
   title: "SeriesFest 2026 — a venture story",
   description:
-    "SeriesFest 2026 in Denver, Colorado — festival main stage, screenings, and host and speaker moments, from a weekend of relationship-building attendance.",
+    "SeriesFest 2026 in Denver, Colorado — festival main stage, screenings, panels, and the Soirée, from a weekend of relationship-building attendance.",
 };
 ---
 
@@ -82,23 +102,18 @@ const meta = {
     <section class="vs-head">
       <a href={`${base}/venture`} class="link vs-back"><span class="arrow" aria-hidden="true">←</span> Venture</a>
 
-      <!-- mono slate — event name · dates · location.
-           ⚠ OPERATOR READ-APPROVAL REQUIRED — slate date corrected from "May 7–8"
+      <!-- ⚠ OPERATOR READ-APPROVAL REQUIRED — slate date corrected from "May 7–8"
            to "May 6–10, 2026" (source: his own SeriesFest Season 12 Opening
            Night + Day 3/4/5 dispatch posts, which all state the festival ran
            May 6–10, 2026). FLAG: the prior date appears to have been a
            placeholder; confirm before publish. Staging-only until read. -->
       <p class="hud-label vs-slate" data-reveal>SeriesFest · May 6–10, 2026 · Denver, CO</p>
 
-      <!-- editorial headline in the two Venture voices (DM Sans caps × Fraunces
-           italic) — the event identity only, no claim carried by the type -->
       <h1 class="vs-headline" data-reveal>
         <span class="vs-line">SERIESFEST</span>
         <span class="vs-line vs-line--push"><span class="vs-turn">Denver,</span> 2026</span>
       </h1>
 
-      <!-- the honest framing, up top: SeriesFest is tier `attended`. VERBATIM
-           from consts via LegendMark — never paraphrased, never upgraded. -->
       {seriesRoom && (
         <div class="vs-proof" data-reveal>
           <LegendMark proof={seriesRoom.proof} />
@@ -111,7 +126,7 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style={`--ar:${hero.ar}`} loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 55%" loading="eager" decoding="async" />
         </picture>
       </figure>
     )}
@@ -133,67 +148,203 @@ const meta = {
       Named people are only those he publicly named at these public sessions;
       reporting who was on stage, not claiming any relationship.
     -->
-    <section class="vs-prose" data-reveal>
-      <p>
-        Opening night, and it is always a joy to step back into this room.
-        Co-founders Randi Kleiner and Kaily Smith have built something rare in
-        Denver: an episodic-storytelling community where creators, audiences, and
-        industry actually share the same air.
-      </p>
-      <p>
-        We went on a scouting mission to the Sie FilmCenter for the first-look
-        screening of The Four Seasons Season 2, followed by a live Q&amp;A with
-        co-showrunner Tracey Wigfield and stars Marco Calvani and Kerri
-        Kenney-Silver. We asked the panel about the inverse of character
-        development — across a show where each season covers four in-show seasons,
-        how do they decide what stays unchanged? Kerri's answer: the people who
-        knew you before still pull you back. (She called the question a plant. No
-        foliage was involved.)
-      </p>
-      <p>
-        The NBC100 drama-writers panel — David Greenwalt, Arika Mittman, and David
-        Schulner — got at what a showrunner actually does: hire great people, get
-        out of their way, and evangelize what the show IS to every department so
-        everyone builds toward the same vision. Two kinds exist, they said — those
-        who delegate and trust their people, and those who hoard information. The
-        first kind makes better shows.
-      </p>
-      <p>
-        At the Soirée, the festival's signature gala, the inaugural Visionary
-        Award went to John J. Sie — cable pioneer, founder of Starz, and the man
-        whose foundation built the Sie FilmCenter where most of the festival
-        happens. Real visionaries build the conditions for the next generation.
-        Full circle.
-      </p>
-      <p>
-        The back half of the week turned to the business of the craft. Susan
-        Rovner and Jana Winograde, both former network executives, walked through
-        aTwist — a vertical-microseries platform producing sixty to ninety minutes
-        for around $200K a series. Set that against premium TV's $8M-per-episode
-        average and the whole risk equation flips.
-      </p>
-      <p>
-        By the final day, a counter-thesis kept surfacing: as the synthetic
-        proliferates, the value of real human encounters only increases. A week of
-        screenings, panels, and pitches collapsed into one room of relationships
-        that carry forward — and SeriesFest's programming runs year-round, all the
-        way to Season 13. SeriesFest, Denver, Colorado, May 6–10, 2026.
-      </p>
+    <!-- MOVEMENT 1 · OPENING NIGHT -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m1}</p>
+      <div class="vs-prose">
+        <p>
+          Opening night, and it is always a joy to step back into this room.
+          Co-founders Randi Kleiner and Kaily Smith have built something rare in
+          Denver: an episodic-storytelling community where creators, audiences, and
+          industry actually share the same air.
+        </p>
+      </div>
     </section>
 
-    <section class="vs-gallery" aria-label="SeriesFest 2026 — festival frames">
-      {gallery.map((g, i) =>
-        g ? (
-          <figure class="vs-card" style={`--span:${spans[i] ?? 2}`} data-reveal data-reveal-stagger="70">
+    {openingMingle && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={openingMingle.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={openingMingle.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={openingMingle.fallback} alt={openingMingle.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 58%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.openingMingle}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-thumbrow">
+        <div class="vs-prose vs-prose--inrow">
+          <p>
+            We went on a scouting mission to the Sie FilmCenter for the first-look
+            screening of The Four Seasons Season 2, followed by a live Q&amp;A with
+            co-showrunner Tracey Wigfield and stars Marco Calvani and Kerri
+            Kenney-Silver. We asked the panel about the inverse of character
+            development — across a show where each season covers four in-show seasons,
+            how do they decide what stays unchanged? Kerri's answer: the people who
+            knew you before still pull you back. (She called the question a plant. No
+            foliage was involved.)
+          </p>
+        </div>
+        {screeningGoldenGroves && (
+          <figure class="vs-thumb">
             <picture>
-              <source type="image/avif" srcset={g.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-              <source type="image/webp" srcset={g.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-              <img src={g.fallback} alt={g.alt} style={`--ar:${g.ar}`} loading="lazy" decoding="async" />
+              <source type="image/avif" srcset={screeningGoldenGroves.avif} sizes="200px" />
+              <source type="image/webp" srcset={screeningGoldenGroves.webp} sizes="200px" />
+              <img src={screeningGoldenGroves.fallback} alt={screeningGoldenGroves.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
             </picture>
+            <figcaption class="vs-cap">{CAPTIONS.screeningGoldenGroves}</figcaption>
           </figure>
-        ) : null,
-      )}
+        )}
+      </div>
     </section>
+
+    {pressScrum && (
+      <figure class="vs-closer" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={pressScrum.avif} sizes="(max-width: 760px) 100vw, 40rem" />
+          <source type="image/webp" srcset={pressScrum.webp} sizes="(max-width: 760px) 100vw, 40rem" />
+          <img src={pressScrum.fallback} alt={pressScrum.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.pressScrum}</figcaption>
+      </figure>
+    )}
+
+    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
+
+    <!-- MOVEMENT 2 · THE PANELS -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m2}</p>
+      <div class="vs-prose">
+        <p>
+          The NBC100 drama-writers panel — David Greenwalt, Arika Mittman, and David
+          Schulner — got at what a showrunner actually does: hire great people, get
+          out of their way, and evangelize what the show IS to every department so
+          everyone builds toward the same vision. Two kinds exist, they said — those
+          who delegate and trust their people, and those who hoard information. The
+          first kind makes better shows.
+        </p>
+        <p>
+          The back half of the week turned to the business of the craft. Susan
+          Rovner and Jana Winograde, both former network executives, walked through
+          aTwist — a vertical-microseries platform producing sixty to ninety minutes
+          for around $200K a series. Set that against premium TV's $8M-per-episode
+          average and the whole risk equation flips.
+        </p>
+      </div>
+    </section>
+
+    {(panelBehindTheDeals || panelIndieTvRisk || panelLittletonRoad) && (
+      <figure class="vs-triptych" data-reveal>
+        <div class="vs-triptych-row">
+          {panelBehindTheDeals && (
+            <picture>
+              <source type="image/avif" srcset={panelBehindTheDeals.avif} sizes="(max-width: 760px) 33vw, 16rem" />
+              <source type="image/webp" srcset={panelBehindTheDeals.webp} sizes="(max-width: 760px) 33vw, 16rem" />
+              <img src={panelBehindTheDeals.fallback} alt={panelBehindTheDeals.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:50% 65%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+          {panelIndieTvRisk && (
+            <picture>
+              <source type="image/avif" srcset={panelIndieTvRisk.avif} sizes="(max-width: 760px) 33vw, 16rem" />
+              <source type="image/webp" srcset={panelIndieTvRisk.webp} sizes="(max-width: 760px) 33vw, 16rem" />
+              <img src={panelIndieTvRisk.fallback} alt={panelIndieTvRisk.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:50% 78%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+          {panelLittletonRoad && (
+            <picture>
+              <source type="image/avif" srcset={panelLittletonRoad.avif} sizes="(max-width: 760px) 33vw, 16rem" />
+              <source type="image/webp" srcset={panelLittletonRoad.webp} sizes="(max-width: 760px) 33vw, 16rem" />
+              <img src={panelLittletonRoad.fallback} alt={panelLittletonRoad.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:50% 72%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+        </div>
+        <figcaption class="vs-cap">{CAPTIONS.sessionsTrio}</figcaption>
+      </figure>
+    )}
+
+    <!-- MOVEMENT 3 · THE SOIRÉE -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m3}</p>
+      <div class="vs-prose">
+        <p>
+          At the Soirée, the festival's signature gala, the inaugural Visionary
+          Award went to John J. Sie — cable pioneer, founder of Starz, and the man
+          whose foundation built the Sie FilmCenter where most of the festival
+          happens. Real visionaries build the conditions for the next generation.
+          Full circle.
+        </p>
+      </div>
+    </section>
+
+    {soireeRoom && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={soireeRoom.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={soireeRoom.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={soireeRoom.fallback} alt={soireeRoom.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 52%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.soireeRoom}</figcaption>
+      </figure>
+    )}
+
+    <div class="vs-duo" data-reveal>
+      {awardsPodiumEmbrace && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={awardsPodiumEmbrace.avif} sizes="(max-width: 760px) 100vw, 30rem" />
+            <source type="image/webp" srcset={awardsPodiumEmbrace.webp} sizes="(max-width: 760px) 100vw, 30rem" />
+            <img src={awardsPodiumEmbrace.fallback} alt={awardsPodiumEmbrace.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:22% 42%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.awardsPodiumEmbrace}</figcaption>
+        </figure>
+      )}
+      <div class="vs-prose vs-prose--inrow">
+        {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new transitional sentence (not
+            one of the six sourced dispatch paragraphs above); purely a bridge
+            to the podium-embrace image, asserts no new named fact. Staging-
+            only until read. */}
+        <p>
+          The back half of the week belonged to the business of the craft as much
+          as the ceremony — a gala built on the same relationships the whole
+          festival runs on.
+        </p>
+      </div>
+    </div>
+
+    {brunchPatioCrowd && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={brunchPatioCrowd.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={brunchPatioCrowd.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={brunchPatioCrowd.fallback} alt={brunchPatioCrowd.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.brunchPatioCrowd}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p class="vs-close">
+          By the final day, a counter-thesis kept surfacing: as the synthetic
+          proliferates, the value of real human encounters only increases. A week of
+          screenings, panels, and pitches collapsed into one room of relationships
+          that carry forward — and SeriesFest's programming runs year-round, all the
+          way to Season 13. SeriesFest, Denver, Colorado, May 6–10, 2026.
+        </p>
+      </div>
+    </section>
+
+    {awardsCeremonyGroup && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={awardsCeremonyGroup.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={awardsCeremonyGroup.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={awardsCeremonyGroup.fallback} alt={awardsCeremonyGroup.alt} style="aspect-ratio:12/5;object-fit:cover;object-position:50% 84%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.awardsCeremonyGroup}</figcaption>
+      </figure>
+    )}
 
     <section class="vs-foot">
       <a href={`${base}/venture`} class="link"><span class="arrow" aria-hidden="true">←</span> Venture</a>
@@ -207,7 +358,7 @@ const meta = {
     min-height: 100svh;
     padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
     display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
+    gap: clamp(2rem, 4vw, 3.25rem);
     max-width: 90rem;
     margin-inline: auto;
   }
@@ -225,8 +376,6 @@ const meta = {
     color: color-mix(in srgb, var(--color-peak) 72%, transparent);
   }
 
-  /* the two Venture voices — DM Sans grotesque caps × Fraunces italic turn
-     (same roles as entertainment.astro's im-headline / im-turn) */
   .vs-headline {
     font-family: var(--font-sans);
     font-weight: 400;
@@ -260,7 +409,6 @@ const meta = {
     max-width: 42rem;
   }
 
-  /* hero — the lead frame, native aspect, hairline map-inset feel */
   .vs-hero {
     margin: 0;
     max-width: 78rem;
@@ -274,10 +422,28 @@ const meta = {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
   }
 
+  /* the shared caption voice — small mono, directly under the image */
+  .vs-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
+  .vs-movement {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+  }
+  .vs-kicker {
+    justify-self: center;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-accent) 82%, transparent);
+  }
   .vs-prose {
     max-width: 44rem;
     display: grid;
@@ -285,34 +451,123 @@ const meta = {
     font-size: clamp(1.05rem, 1.5vw, 1.3rem);
     line-height: 1.6;
     color: color-mix(in srgb, var(--color-ink) 92%, transparent);
-    justify-self: center;
+  }
+  .vs-prose--inrow {
+    max-width: none;
+  }
+  .vs-close {
+    font-style: italic;
   }
 
-  /* mixed-size collage — 6-col grid, square frames at different scales,
-     crop-free (each card holds the image's native --ar). */
-  .vs-gallery {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: clamp(0.6rem, 1.4vw, 1.1rem);
-    align-items: start;
-  }
-  .vs-card {
-    grid-column: span var(--span, 2);
+  /* full-width single beat — contained, unframed */
+  .vs-fullbeat {
     margin: 0;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-peak) 14%, transparent);
-    background: var(--color-elevated);
+    max-width: 60rem;
+    width: 100%;
+    justify-self: center;
   }
-  .vs-card img {
+  .vs-fullbeat img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ar, 1 / 1);
-    object-fit: cover;
-    transition: transform var(--dur-hover, 180ms) var(--ease-swift, ease);
+    border-radius: 6px;
   }
-  .vs-card:hover img {
-    transform: scale(1.03);
+
+  /* the page's widest beat — edge-to-edge of the page grid, no frame */
+  .vs-widest {
+    margin: 0;
+    width: 100%;
+  }
+  .vs-widest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* text with a small ~200px related thumbnail riding beside it */
+  .vs-thumbrow {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    align-items: start;
+    max-width: 58rem;
+    width: 100%;
+  }
+  .vs-thumb {
+    margin: 0;
+  }
+  .vs-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* the one full-width pull quote — bold, own line, no panel, no overlap */
+  .vs-pull {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding-inline: 1rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 560;
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+    line-height: 1.3;
+    text-align: center;
+    color: var(--color-peak);
+  }
+
+  /* three-across session strip — small equal tiles, one shared caption */
+  .vs-triptych {
+    margin: 0;
+    max-width: 60rem;
+    width: 100%;
+  }
+  .vs-triptych-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .vs-triptych img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* image + text duo rows */
+  .vs-duo {
+    display: grid;
+    grid-template-columns: 22rem 1fr;
+    gap: clamp(1.2rem, 3vw, 2.6rem);
+    align-items: center;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-duo-fig {
+    margin: 0;
+  }
+  .vs-duo-fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* the small quiet closer */
+  .vs-closer {
+    margin: 0;
+    max-width: 40rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-closer img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
   }
 
   .vs-foot {
@@ -323,13 +578,17 @@ const meta = {
   }
 
   @media (max-width: 760px) {
-    .vs-line--push { transform: none; }
-    .vs-gallery { grid-template-columns: repeat(2, 1fr); }
-    /* every card takes one of two columns on mobile (spans collapse) */
-    .vs-card { grid-column: span 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .vs-card img { transition: none; }
-    .vs-card:hover img { transform: none; }
+    .vs-line--push {
+      transform: none;
+    }
+    .vs-duo {
+      grid-template-columns: 1fr;
+    }
+    .vs-thumbrow {
+      grid-template-columns: 1fr;
+    }
+    .vs-thumb {
+      max-width: 200px;
+    }
   }
 </style>
