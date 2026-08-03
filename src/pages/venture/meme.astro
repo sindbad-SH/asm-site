@@ -240,6 +240,61 @@ const PROGRAMS_INTRO = {
 };
 
 /**
+ * MEME-POLISH-2026-08-03 ROUND 3 — NOCOVA (operator, verbatim: "one of the
+ * biggest things to include"). Verified facts ONLY from
+ * https://www.meme.ngo/nocova (fetched 2026-08-03) — nothing below goes past
+ * what that page itself says:
+ *   - Full name: Northern Colorado Visual Arts. Meme.ngo's own description:
+ *     "a community-driven organization that operates as the social arm of
+ *     MEME, providing a platform for professionals to network, collaborate,
+ *     and share ideas."
+ *   - FREE community-networking meetups for film/TV professionals. The
+ *     operator's own correction: call it "community networking," not a
+ *     workshop. This is the one deliberate exception to this round's
+ *     free-language sweep (see the note above PROGRAMS_INTRO) — meme.ngo's
+ *     own page states these meetups ARE free, so "free" is accurate HERE
+ *     and only here.
+ *   - Boulder venues incl. Rosetta Hall and the St. Julien Hotel lobby.
+ *   - Mission wording (quoted verbatim below): fosters "creativity,
+ *     knowledge-sharing, and expertise utilization in the Colorado Film and
+ *     Television industry."
+ *   - Participation: the NOCOVA Facebook Group / Page carries the schedule.
+ * Frequency is deliberately kept SOFT and evergreen, per the operator's
+ * direction: "usually at least twice a month" is his own attributed usage,
+ * not a verified meme.ngo fact, so it's softened further to "usually a
+ * couple of times a month" and never paired with a specific date or venue —
+ * same evergreen rule as the program catalog above.
+ *
+ * No NOCOVA photography exists anywhere: a parallel mining pass over MEME's
+ * social accounts came back empty (their socials carry flyers only, no event
+ * photography). So this section is built to stand ENTIRELY photo-less — a
+ * venue/frequency card fills the visual slot instead — while still leaving
+ * the door open for real photos with zero markup changes later: drop
+ * `nocova-meetup-1` (and optionally `-2`) `-900`/`-1600` `.avif`/`.webp`
+ * files into public/media/venture/meme/ and the photo slot activates itself
+ * via the same existence-gated `pair()` helper the roster/program art
+ * already uses. See the NOCOVA-PHOTOS integration comment in the markup
+ * below.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every sentence in NOCOVA below is new
+ * copy, staging-only until read.
+ */
+const nocovaShots = ["nocova-meetup-1", "nocova-meetup-2"]
+  .map((slug) => pair(`venture/meme/${slug}`))
+  .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+const NOCOVA = {
+  kicker: "MEME's social arm",
+  heading: "NOCOVA — the room outside the workshop.",
+  paragraphs: [
+    "Northern Colorado Visual Arts (NOCOVA) is a community-driven organization that operates as MEME's own social arm — a platform for film and TV professionals to network, collaborate, and share ideas, run as community networking rather than another workshop.",
+    `Meme.ngo describes NOCOVA's mission as fostering "creativity, knowledge-sharing, and expertise utilization in the Colorado Film and Television industry." In practice that means free, recurring meetups — usually a couple of times a month — at Boulder venues that have included Rosetta Hall and the St. Julien Hotel lobby.`,
+  ],
+  note: "Schedule and location for the next one are posted on the NOCOVA Facebook Group and Page.",
+  cta: { label: "More at meme.ngo/nocova →", href: "https://www.meme.ngo/nocova" },
+};
+
+/**
  * MEME-POLISH-2026-08-03 REROSTER (operator-directed, verbatim): "There were
  * other teachers and people involved in the organization" from the prior
  * build's TEAM/INSTRUCTOR_CREDITS split is now cut back down, on the
@@ -515,6 +570,55 @@ const ARTICLE = {
         </div>
 
         <p class="meme-footnote">{PROGRAMS_INTRO.footnote}</p>
+      </section>
+
+      {/* MEME-POLISH-2026-08-03 ROUND 3 — NOCOVA, MEME's social arm. Its own
+          distinct, lighter moment (operator: "it can look/feel lighter than
+          the workshops") — a translucent card in place of a photo, since none
+          exist yet (see the NOCOVA const's header comment). ⚠ OPERATOR
+          READ-APPROVAL REQUIRED — every sentence below is new copy,
+          staging-only until read. */}
+      <section class="meme-nocova" aria-label="NOCOVA — MEME's social arm" data-reveal>
+        <p class="hud-label meme-kicker">{NOCOVA.kicker}</p>
+        <div class="meme-nocova-grid">
+          <div class="meme-nocova-copy">
+            <h2 class="meme-h2">{NOCOVA.heading}</h2>
+            {NOCOVA.paragraphs.map((p) => <p class="meme-para">{p}</p>)}
+            <p class="meme-footnote">{NOCOVA.note}</p>
+            <a href={NOCOVA.cta.href} class="link" target="_blank" rel="noopener">
+              {NOCOVA.cta.label}
+            </a>
+          </div>
+
+          {/* NOCOVA-PHOTOS: integration point — drop nocova-meetup-1 (and
+              optionally -2) -900/-1600 .avif/.webp files into
+              public/media/venture/meme/ to swap the venue card below for 1-2
+              real photos; no other code changes needed (existence-gated via
+              pair(), same helper the roster/program art already uses). */}
+          {
+            nocovaShots.length > 0 ? (
+              <div class="meme-nocova-photos">
+                {nocovaShots.map((shot) => (
+                  <figure class="meme-nocova-photo">
+                    <picture>
+                      {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+                      <img src={shot.webp ?? shot.avif} alt="A NOCOVA community-networking meetup." loading="lazy" decoding="async" />
+                    </picture>
+                  </figure>
+                ))}
+              </div>
+            ) : (
+              <aside class="meme-nocova-card">
+                <p class="hud-label meme-nocova-card-kicker">Usually found at</p>
+                <ul class="meme-nocova-venues">
+                  <li>Rosetta Hall</li>
+                  <li>The St. Julien Hotel lobby</li>
+                </ul>
+                <p class="meme-nocova-freq">Recurring — usually a couple of times a month.</p>
+              </aside>
+            )
+          }
+        </div>
       </section>
 
       {/* MEME-POLISH-2026-08-03 REROSTER — the people, in two tiers: founders
@@ -797,6 +901,90 @@ const ARTICLE = {
     margin: 0.55rem 0 0;
     letter-spacing: 0.18em;
     color: var(--color-ink-muted, #8a9a96);
+  }
+
+  /* ── MEME-POLISH-2026-08-03 ROUND 3 · NOCOVA ─────────────────────────────
+     Its own distinct, lighter moment (operator: "it can look/feel lighter
+     than the workshops") — an asymmetric copy/aside split (58/34, same
+     proportion as the site's other staggers), with a translucent light card
+     standing in for a photo (none exist yet). */
+  .meme-nocova {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0.6rem 0 0.4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .meme-nocova-grid {
+    display: grid;
+    grid-template-columns: 58fr 34fr;
+    gap: 1.75rem;
+    align-items: start;
+    margin-top: 0.4rem;
+  }
+  .meme-nocova-copy {
+    display: grid;
+    gap: 0.9rem;
+  }
+  /* the lighter card: a translucent off-dark panel (not the page's own flat
+     navy) plus a cyan accent kicker — the "social arm feels lighter than a
+     workshop" cue, in place of a photo until one exists. */
+  .meme-nocova-card {
+    margin-top: 2.2rem;
+    padding: 1.4rem 1.5rem;
+    background: color-mix(in srgb, #ffffff 8%, transparent);
+    border: 1px solid color-mix(in srgb, #ffffff 18%, transparent);
+    border-radius: 10px;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .meme-nocova-card-kicker {
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, #38f8ec 82%, transparent);
+  }
+  .meme-nocova-venues {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.25rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #f2f4f8;
+  }
+  .meme-nocova-freq {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, #eef2f5 62%, transparent);
+  }
+  /* future state once real photos land (see the NOCOVA-PHOTOS integration
+     comment in the markup) — a small stacked column beside the copy. */
+  .meme-nocova-photos {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 2.2rem;
+  }
+  .meme-nocova-photo {
+    margin: 0;
+  }
+  .meme-nocova-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+  }
+  @media (max-width: 640px) {
+    .meme-nocova-grid {
+      grid-template-columns: 1fr;
+    }
+    .meme-nocova-card,
+    .meme-nocova-photos {
+      margin-top: 1.2rem;
+    }
   }
 
   /* MEME-POLISH-2026-08-03 REROSTER — down from a 5+2 team/instructor split
