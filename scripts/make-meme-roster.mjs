@@ -14,6 +14,15 @@
  * Source photos are small (native 500x500–854x1280) — capped at native
  * resolution rather than upscaled, per the miner's own disclosed deviation
  * from the standard 900/1600 convention.
+ *
+ * MEME-STICKLER-2026-08-03: `nick-goins-portrait` REMOVED from this script's
+ * PICKS — re-running this file no longer touches Nick's roster photo. The
+ * plain-resize "Nick Goins Headshot.jpg" it used to bake has zero headroom
+ * above his hat in the native file (pixel-verified), so the operator's
+ * stickler-round fix swapped his photo entirely and bakes it via an
+ * .extract() crop, which doesn't fit this script's resize-only loop. See
+ * scripts/fix-meme-roster-crops-2026-08-03.mjs — that is now the source of
+ * truth for nick-goins-portrait-640.{avif,webp}.
  */
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
@@ -26,7 +35,6 @@ const WEBP = { quality: 82 };
 
 // slug -> { file, widths } — widths capped at (or below) native resolution.
 const PICKS = {
-  "nick-goins-portrait": { file: "Nick Goins Headshot.jpg", widths: [640] },
   "steve-borne-portrait": { file: "Steve Borne Headshot 1.png", widths: [700, 854] },
   "adam-smestad-portrait": { file: "Adam Headshot.png", widths: [620] },
 };

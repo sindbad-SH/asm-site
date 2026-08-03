@@ -335,6 +335,16 @@ const NOCOVA = {
  * Nick's non-square 640x480 source and the new square crops all render
  * identically) — no more text-only orphan slots, which was the other half of
  * the operator's "spots where things just don't fit" complaint.
+ *
+ * MEME-STICKLER-2026-08-03 (operator: "Amber and Eric's photos aren't really
+ * focused well — they cut off a good chunk of their head"): all five crops
+ * re-baked as exact SQUARES via scripts/fix-meme-roster-crops-2026-08-03.mjs
+ * (not left to the live CSS object-fit:cover to auto-center-crop a non-square
+ * file), so every crop shown here is exactly what was viewed and verified.
+ * Amber and Eric recropped from the same sources. Adam and Steve checked
+ * against the live crop and already passed — untouched. Nick's crop swaps to
+ * a different source photo entirely (see that script's header note) because
+ * the previously-used one has zero headroom in the native file.
  */
 const ROSTER_LEADS = [
   {
@@ -342,7 +352,14 @@ const ROSTER_LEADS = [
     name: "Nick C. Goins Jr",
     role: "Executive Director & Founder.",
     bio: "Has worked in the film industry in various capacities since making his first feature at 16 — critic, writer, director, producer, graphic artist. Teaches MEME's flagship Pitch Quorum and Market Fresh programs himself.",
-    alt: "Close portrait of Nick C. Goins Jr wearing a plaid flat cap, black t-shirt, looking directly at camera.",
+    // MEME-STICKLER-2026-08-03: photo swapped (see scripts/fix-meme-roster-crops-2026-08-03.mjs
+    // header note) — the previously-used plaid-cap photo has zero headroom
+    // above his hat in the native source (pixel-verified), failing the
+    // operator's "full head + breathing room" standard with no honest crop
+    // fix available. ⚠ OPERATOR READ-APPROVAL REQUIRED — this is a different
+    // photo of Nick (navy flat cap, white shirt, from the same cleared
+    // source folder), not just a recrop.
+    alt: "Close portrait of Nick C. Goins Jr wearing a navy flat cap, white shirt, looking directly at camera.",
   },
   {
     key: "amber",
