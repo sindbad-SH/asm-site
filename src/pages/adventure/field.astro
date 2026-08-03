@@ -58,12 +58,17 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
 
 // P12.6 — the micro travel stories (data-driven from the fieldNotes
 // collection; the operator grows the wall by adding a markdown file).
+// 2026-08-03 design audit — "madonna-di-campiglio" (3 real vertical photos,
+// filed and live) was missing from this list entirely, so the sort below
+// silently pushed it to last place by default instead of a chosen spot.
+// Seated here next to its fellow Trentino/Dolomites entry, castel-toblino.
 const WALL_ORDER = [
   "matterhorn-zermatt",
   "bellagio",
   "flatirons-chautauqua",
   "crans-montana",
   "castel-toblino",
+  "madonna-di-campiglio",
   "eldorado-springs",
   "lac-de-tseuzier",
   "varenna-lake-como",

@@ -39,18 +39,47 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
+// Slug → gallery media map (moved up from the field-teaser section below,
+// 2026-08-03 — the dispatch-stream thumbnails added that same pass need it
+// earlier in the file; see the note left in the field-teaser section).
+const TEASER_WIDTHS = {
+  landscape: [800, 1400, 2200],
+  vertical: [800, 1120, 1600],
+} as const;
+function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
+  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
+  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
+  const widths = TEASER_WIDTHS[orientation];
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
+  };
+}
+
 // PUB-A (2026-07-27) — the field-notes DISPATCH STREAM: every published note,
 // newest first, surfaced directly on this index page (per ACTION-PLAN.md —
 // "story index framing, not services"). Same source + filter as Nav.astro's
 // dropdown (non-draft notes that carry photos), so the two can never drift.
+//
+// DESIGN AUDIT (2026-08-03) — this was a bare 11-row text list (index + title
+// + date, no imagery) sandwiched between the GlobeHero above and the heavily
+// art-directed Territory map below — the exact "dead trough" pattern flagged
+// site-wide. Fix: each row now carries a lead thumbnail, reusing the SAME
+// gallery export every field note already has (galleryMedia() above). No new
+// media, no new page.
 const dispatchStream = (await getCollection("fieldNotes", ({ data }) => !data.draft))
   .filter((n) => n.data.photos && n.data.photos.length > 0)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .map((n) => ({
-    id: n.id,
-    title: n.data.title,
-    date: n.data.date,
-  }));
+  .map((n) => {
+    const lead = n.data.photos![0]!;
+    return {
+      id: n.id,
+      title: n.data.title,
+      date: n.data.date,
+      media: galleryMedia(lead.slug, lead.orientation),
+    };
+  });
 const dispatchDateFmt = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -328,21 +357,14 @@ const postcards = POSTCARDS.map((pc) => ({
  * strip of the wall's three lead frames as the visual invitation. Same data
  * source (the fieldNotes collection), so the teaser can never drift from the
  * wall it points at.
+ *
+ * TEASER_WIDTHS + galleryMedia() moved up to right after the `href` helper
+ * near the top of this file (2026-08-03) — the dispatch-stream thumbnails
+ * added that same pass call galleryMedia() too, and call it earlier in the
+ * file than this comment; `const TEASER_WIDTHS` doesn't hoist the way a
+ * `function` declaration does, so leaving it here threw "Cannot access
+ * 'TEASER_WIDTHS' before initialization" at request time. See it there now.
  * ───────────────────────────────────────────────────────────────────────── */
-const TEASER_WIDTHS = {
-  landscape: [800, 1400, 2200],
-  vertical: [800, 1120, 1600],
-} as const;
-function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
-  const g = join(process.cwd(), "public", "media", "adventure", "gallery");
-  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
-  const widths = TEASER_WIDTHS[orientation];
-  return {
-    avif: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.avif ${w}w`).join(", "),
-    webp: widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.webp ${w}w`).join(", "),
-    src: `${base}/media/adventure/gallery/${slug}-800.webp`,
-  };
-}
 const TEASER_ORDER = ["matterhorn-zermatt", "bellagio", "flatirons-chautauqua"];
 const teaserStories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
   .filter((n) => TEASER_ORDER.includes(n.id) && n.data.photos && n.data.photos.length > 0)
@@ -402,6 +424,15 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
               <li class="dispatch-row" data-reveal data-reveal-stagger="40">
                 <a href={`${base}/field-notes/${d.id}`} class="dispatch-link">
                   <span class="dispatch-no hud-label" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  {d.media && (
+                    <span class="dispatch-thumb">
+                      <picture>
+                        <source type="image/avif" srcset={d.media.avif} sizes="56px" />
+                        <source type="image/webp" srcset={d.media.webp} sizes="56px" />
+                        <img src={d.media.src} alt="" loading="lazy" decoding="async" />
+                      </picture>
+                    </span>
+                  )}
                   <span class="dispatch-title">{d.title}</span>
                   <span class="dispatch-date hud-label">{dispatchDateFmt.format(d.date)}</span>
                 </a>
@@ -882,10 +913,15 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 </Base>
 
 <style>
-  /* ── PUB-A · the dispatch stream — a plain numbered list of every Field
-     Notes entry, replacing the retired hire-the-operator panel. Space Mono
-     index + date, serif title, hairline row dividers; the whole row is the
-     link (matches the site's .signpost-link affordance on home). ── */
+  /* ── PUB-A · the dispatch stream — a numbered list of every Field Notes
+     entry, replacing the retired hire-the-operator panel. Space Mono index
+     + date, serif title, hairline row dividers; the whole row is the link
+     (matches the site's .signpost-link affordance on home).
+     2026-08-03 design audit — this was a bare text list (no imagery) right
+     between the hero and the art-directed Territory map, the site's own
+     named "dead trough" pattern. Each row now carries a lead thumbnail
+     (dispatch-thumb) pulled from the same gallery bake every field note
+     already has — align-items moves from baseline to center to seat it. ── */
   .dispatch-list {
     list-style: none;
     margin: 0.5rem 0 0;
@@ -900,9 +936,9 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   }
   .dispatch-link {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 1rem;
-    padding: 0.85rem 0.1rem;
+    padding: 0.6rem 0.1rem;
     text-decoration: none;
     color: inherit;
     transition: color var(--dur-hover, 160ms) var(--ease-swift);
@@ -914,6 +950,27 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   .dispatch-no {
     flex: none;
     color: var(--color-ink-muted, #8a9a96);
+  }
+  .dispatch-thumb {
+    flex: none;
+    display: block;
+    width: 3.5rem;
+    height: 3.5rem;
+    overflow: hidden;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+  }
+  .dispatch-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.92) brightness(0.94);
+    transition: filter var(--dur-hover, 180ms) var(--ease-swift, ease);
+  }
+  .dispatch-link:hover .dispatch-thumb img,
+  .dispatch-link:focus-visible .dispatch-thumb img {
+    filter: saturate(1) brightness(1);
   }
   .dispatch-title {
     flex: 1 1 auto;

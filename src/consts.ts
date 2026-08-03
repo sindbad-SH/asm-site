@@ -1397,13 +1397,20 @@ export const PAGES = {
 
   // ---- ADVENTURE (§1.3) — P29: now ALSO the adventure-production SALES page
   // (largely drone filming): samples + its own day-rate pricing + booking.
+  // 2026-08-03 design audit — that framing is STALE: the later Round 5/PUB-A
+  // notes below (search "A1b") removed the hire/day-rate/booking block from
+  // this page's actual body — it's a story index now, with one soft "Book a
+  // call" line at the close. `meta.description` still promised "day rates,
+  // samples, and direct booking" as if that were the page's main content;
+  // rewritten to match what the page actually shows (territory, field notes,
+  // festival/Vybe stories, postcards, the Amazing Aerial licensing note).
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, hero.eyebrow, hire block, and
   // the production handoff are NEW copy (staging-only until read).
   adventure: {
     meta: {
       title: "Adventure Stories — Drone & Aerial Production | Boulder, Colorado",
       description:
-        "Cinematic drone and aerial production, plus expedition photo & film from the places hardest to reach. FAA Part 107 licensed (US), international shoots welcome — day rates, samples, and direct booking.",
+        "Expedition and adventure coverage — photo and film — from the Alps, Colorado's Front Range, and wherever the story leads. Field notes, postcards, and aerial work licensed through Amazing Aerial Agency.",
     },
     hero: {
       eyebrow: "Adventure Stories — Drone & Aerial Production",
