@@ -233,6 +233,32 @@ const LEDGER = [
   { d: "Jul 8", co: "GIFD", href: `${LI}7482844808185683968/` },
   { d: "Jul 22", co: "AquaPuck", href: `${LI}7487934806463369216/` },
 ] as const;
+
+/**
+ * LAYOUT-OVERHAUL, audit-fixes-2026-08-02 — the ledger's flat 28-row table was
+ * flagged as the site's single flattest, most undifferentiated block, sitting
+ * right at the reader's lowest-attention point (bottom of a long page). Two
+ * pure display groupings over the SAME rows above — no new facts, nothing
+ * reordered, nothing invented:
+ *   1. Chunk the 28 rows into 7 month groups (derived from each row's own
+ *      date string) so the list reads as scannable chapters, not one wall.
+ *   2. Surface the two counts already stated in prose (28 Wednesdays, 26 with
+ *      a write-up) as a small stat lockup up top, instead of only a sentence
+ *      buried after the list.
+ * PICTURED_ABOVE cross-references the two companies (Origami Motion, Perlion)
+ * whose own pitch photos already ran earlier in this chapter — a callback,
+ * not a new claim.
+ */
+type LedgerRow = (typeof LEDGER)[number];
+const LEDGER_MONTHS: { month: string; rows: LedgerRow[] }[] = [];
+for (const row of LEDGER) {
+  const month = row.d.split(" ")[0];
+  const lastGroup = LEDGER_MONTHS[LEDGER_MONTHS.length - 1];
+  if (lastGroup && lastGroup.month === month) lastGroup.rows.push(row);
+  else LEDGER_MONTHS.push({ month, rows: [row] });
+}
+const LEDGER_LINKED_COUNT = LEDGER.filter((s) => "href" in s && s.href).length;
+const PICTURED_ABOVE = new Set(["Origami Motion", "Perlion"]);
 ---
 
 <Base title={study.meta.title} description={study.meta.description}>
@@ -357,27 +383,56 @@ const LEDGER = [
       {/* v3: the closing photograph was REMOVED, not replaced — see the note at
           the top of this file. The chapter now closes on the season list. */}
 
-      {/* THE SEASON — the scale claim, itemised, linking out to the write-ups. */}
+      {/* THE SEASON — the scale claim, itemised, linking out to the write-ups.
+          LAYOUT-OVERHAUL: a stat lockup + month-chaptered lists replace the
+          single flat 28-row table (see the frontmatter note above LEDGER_MONTHS). */}
       <p class="wr-para">{WEDNESDAY_ROOM.ledgerIntro}</p>
       <div class="wr-ledger" aria-label="PitchBoulder 2026 season — who presented">
-        <p class="hud-label wr-ledger-head">The 2026 season</p>
-        <ol class="wr-ledger-list">
-          {LEDGER.map((s) => (
-            <li class={s.co === "—" ? "wr-ledger-row wr-ledger-row--blank" : "wr-ledger-row"}>
-              <span class="wr-ledger-date">{s.d}</span>
-              {"href" in s && s.href ? (
-                <a class="wr-ledger-co wr-ledger-link" href={s.href} target="_blank" rel="noopener">
-                  {s.co} <span class="wr-ledger-out" aria-hidden="true">↗</span>
-                </a>
-              ) : (
-                <span class="wr-ledger-co">{s.co}</span>
-              )}
-            </li>
-          ))}
-        </ol>
+        <div class="wr-ledger-top">
+          <p class="hud-label wr-ledger-head">The 2026 season</p>
+          <div class="wr-ledger-stats" role="group" aria-label="Season totals">
+            <div class="wr-stat">
+              <span class="wr-stat-num">{LEDGER.length}</span>
+              <span class="wr-stat-label">Wednesdays</span>
+            </div>
+            <div class="wr-stat">
+              <span class="wr-stat-num">{LEDGER_LINKED_COUNT}</span>
+              <span class="wr-stat-label">Write-ups</span>
+            </div>
+            <div class="wr-stat">
+              <span class="wr-stat-num">Jan–Jul</span>
+              <span class="wr-stat-label">One season</span>
+            </div>
+          </div>
+        </div>
+        {
+          LEDGER_MONTHS.map((group) => (
+            <div class="wr-ledger-month">
+              <p class="hud-label wr-ledger-month-label">
+                {group.month} <span class="wr-ledger-month-count">· {group.rows.length}</span>
+              </p>
+              <ol class="wr-ledger-list">
+                {group.rows.map((s) => (
+                  <li class={`wr-ledger-row${PICTURED_ABOVE.has(s.co) ? " wr-ledger-row--pictured" : ""}`}>
+                    <span class="wr-ledger-date">{s.d}</span>
+                    {"href" in s && s.href ? (
+                      <a class="wr-ledger-co wr-ledger-link" href={s.href} target="_blank" rel="noopener">
+                        {s.co} <span class="wr-ledger-out" aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span class="wr-ledger-co">{s.co}</span>
+                    )}
+                    {PICTURED_ABOVE.has(s.co) && (
+                      <span class="wr-ledger-pic hud-label" aria-hidden="true">pictured above ↑</span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
         <p class="wr-ledger-note">
-          Twenty-six of these have a write-up. They're on LinkedIn, where the room already is —
-          arrows open them there.
+          Arrows open the write-up on LinkedIn — that's where the room already is.
         </p>
       </div>
 
@@ -562,10 +617,65 @@ const LEDGER = [
     border-radius: 8px;
     background: color-mix(in srgb, var(--color-base) 45%, transparent);
   }
+  /* header row — kicker + a small "by the numbers" stat lockup (the same two
+     counts formerly buried in a sentence below the list, now the reader's
+     first read of this panel) */
+  .wr-ledger-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-hairline) 70%, transparent);
+  }
   .wr-ledger-head {
     letter-spacing: 0.24em;
     color: color-mix(in srgb, var(--color-accent) 82%, transparent);
-    margin-bottom: 0.7rem;
+  }
+  .wr-ledger-stats {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .wr-stat {
+    display: grid;
+    gap: 0.15rem;
+    text-align: right;
+  }
+  .wr-stat-num {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+    line-height: 1;
+    color: var(--color-peak);
+    white-space: nowrap;
+  }
+  .wr-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    white-space: nowrap;
+  }
+  @media (max-width: 480px) {
+    .wr-ledger-stats { gap: 1.1rem; }
+    .wr-stat { text-align: left; }
+  }
+
+  /* month groups — the 28 rows chunked into 7 scannable chapters instead of
+     one flat table (LAYOUT-OVERHAUL, audit-fixes-2026-08-02) */
+  .wr-ledger-month + .wr-ledger-month {
+    margin-top: 1rem;
+  }
+  .wr-ledger-month-label {
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+    margin-bottom: 0.15rem;
+  }
+  .wr-ledger-month-count {
+    opacity: 0.6;
   }
   .wr-ledger-list {
     display: grid;
@@ -596,8 +706,17 @@ const LEDGER = [
     font-size: 0.95rem;
     color: var(--color-peak);
   }
-  .wr-ledger-row--blank .wr-ledger-co {
-    color: var(--color-ink-muted);
+  /* the two companies already pictured earlier in this chapter — a callback,
+     not a new fact */
+  .wr-ledger-row--pictured .wr-ledger-co {
+    color: var(--color-accent);
+  }
+  .wr-ledger-pic {
+    grid-column: 2;
+    margin-top: -0.15rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--color-accent) 75%, transparent);
   }
   /* linked sessions — the write-up lives on LinkedIn, so these leave the site */
   .wr-ledger-link {

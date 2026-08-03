@@ -16,6 +16,22 @@
  * their URLs stay exactly as published. `PAGES.work.caseStudies` (used by
  * work/pitchboulder.astro and work/shelby-pebble-beach.astro) is untouched.
  *
+ * DESIGN PASS (audit-fixes-2026-08-02): the page was a bare two-column text
+ * link list — no images, and no way to tell a flagship case study from a
+ * one-line placeholder record. Now three honest tiers, by weight:
+ *   1. Story CARDS — a real thumbnail + title, for every page that actually
+ *      exists. Every image below is the SAME hero/poster the destination page
+ *      already ships (reused, not new — no new photo claims, just a visible
+ *      preview of what's already live there).
+ *   2. Slim INDEX/text links — "every story, in one index" jumps to /adventure
+ *      and /venture, plus any linked-but-imageless entry (Makeshift Film
+ *      Group, dev-gated). These aren't stories themselves, so they don't get
+ *      a card.
+ *   3. Muted RECORD text — PNUMIX: no case page exists, so it stays a plain
+ *      line, never a link, never a card (nothing to click through to).
+ * No new relationship or fact claims — same titles, same hrefs, same honesty
+ * ledger as before; only real, already-published imagery was added.
+ *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every visible string on this page is
  * new (staging-only until read); logged in COPY-DECK-A.md. Link labels that
  * are copied VERBATIM from their own destination page are noted inline.
@@ -29,52 +45,122 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // is actually live, so this index never links to a page that bounces back.
 const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
 
-const ADVENTURE_LINKS = [
-  { label: "Adventure Stories — the index", href: "/adventure" },
-  // title copied VERBATIM from its own page.
-  { label: "Steel & Dust — Field Notes No. 01", href: "/adventure/steel-and-dust" },
-  { label: "The Field — every location, Field Notes dispatch stream", href: "/adventure/field" },
-  { label: "Top shots with Amazing Aerial — the highlights reel", href: "/work/amazing-aerial" },
-] as const;
+type StoryCard = { title: string; href: string; avif: string; webp: string; alt: string };
 
-const VENTURE_LINKS = [
-  { label: "Venture Stories — the index", href: "/venture" },
+// The index-jump: not a story, so it never gets card treatment — a plain
+// slim link, distinct from every real story below it.
+const ADVENTURE_INDEX = { label: "Every Adventure story, in one index", href: "/adventure" };
+
+const ADVENTURE_CARDS: StoryCard[] = [
   // title copied VERBATIM from its own page.
-  { label: "A restored Shelby at Pebble Beach", href: "/work/shelby-pebble-beach" },
-  // Build #1 (2026-08-01 archive-mining integration) — the new full story page.
-  // AUDIT-FIX (2026-08-03): label was "Dawn Patrol — a Shelby Cobra at Pebble
-  // Beach", which after the Concours reframe both mislabelled this page (it is
-  // now the whole-day Concours story, with Dawn Patrol as its opening movement)
-  // and duplicated the Shelby line directly above it — two archive rows both
-  // reading "a Shelby at Pebble Beach". Relabelled from the destination page's
-  // own slate, VERBATIM, per this list's existing convention (no new copy).
-  { label: "Pebble Beach Concours d'Elegance", href: "/venture/dawn-patrol" },
-  { label: "PitchBoulder — coverage, recaps & the commercial", href: "/work/pitchboulder" },
-  // Build #2 (2026-08-01 archive-mining integration) — the new hub page.
-  // AUDIT-FIX (2026-08-02): /work/seriesfest is RETIRED (redirects here —
-  // see astro.config.mjs). Its "SeriesFest, in depth" line is removed
-  // rather than repointed: repointing it would just duplicate this line,
-  // same destination under a second label — the exact duplicate-IA bug
-  // this pass exists to fix.
-  { label: "SeriesFest — the same air, 2025–2026", href: "/venture/seriesfest" },
-  { label: "American Film Market 2025 — a venture story", href: "/venture/afm-2025" },
-  { label: "MEME — a venture story", href: "/venture/meme" },
-  { label: "A startup workshop series, on camera — KO Law", href: "/venture/ko-law-workshops" },
-  { label: "The agency that takes our aerials to market — Amazing Aerial", href: "/venture/amazing-aerial" },
-  { label: "Gigs Go Green", href: "/work/gigs-go-green" },
-  { label: "Vybe", href: "/work/vybe" },
-  ...(PUBLISH_MFG ? [{ label: "A film venture, taking shape — Makeshift Film Group", href: "/venture/makeshift-film-group" }] : []),
-] as const;
+  {
+    title: "Steel & Dust — Field Notes No. 01",
+    href: "/adventure/steel-and-dust",
+    avif: `${base}/media/work/knights-of-mayhem/poster.avif`,
+    webp: `${base}/media/work/knights-of-mayhem/poster.webp`,
+    alt: "Overhead aerial triptych of full-contact jousting at the Colorado Medieval Festival",
+  },
+  {
+    title: "The Field — every location, Field Notes dispatch stream",
+    href: "/adventure/field",
+    avif: `${base}/media/adventure/fieldboard/matterhorn-hero-900.avif`,
+    webp: `${base}/media/adventure/fieldboard/matterhorn-hero-900.webp`,
+    alt: "The Matterhorn above the Zermatt valley, its pyramid summit under a wisp of cloud",
+  },
+  {
+    title: "Top shots with Amazing Aerial — the highlights reel",
+    href: "/work/amazing-aerial",
+    avif: `${base}/media/work/amazing-aerial/tile.avif`,
+    webp: `${base}/media/work/amazing-aerial/tile.webp`,
+    alt: "Overhead aerial of a small wooded island in turquoise water, the Amazing Aerial mark overlaid",
+  },
+];
+
+const VENTURE_INDEX = { label: "Every Venture story, in one index", href: "/venture" };
+
+const VENTURE_CARDS: StoryCard[] = [
+  // title copied VERBATIM from its own page.
+  {
+    title: "A restored Shelby at Pebble Beach",
+    href: "/work/shelby-pebble-beach",
+    avif: `${base}/media/work/shelby-pebble-beach/tile.avif`,
+    webp: `${base}/media/work/shelby-pebble-beach/tile.webp`,
+    alt: "The restored blue 1967 Shelby Cobra 427, hood raised, on the show lawn at Pebble Beach",
+  },
+  {
+    title: "Pebble Beach Concours d'Elegance",
+    href: "/venture/dawn-patrol",
+    avif: `${base}/media/venture/dawn-patrol/hero-900.avif`,
+    webp: `${base}/media/venture/dawn-patrol/hero-900.webp`,
+    alt: "The show field at the Pebble Beach Concours d'Elegance, cars and crowds under a clear sky",
+  },
+  {
+    title: "PitchBoulder — coverage, recaps & the commercial",
+    href: "/work/pitchboulder",
+    avif: `${base}/media/venture/pitchboulder/hero-900.avif`,
+    webp: `${base}/media/venture/pitchboulder/hero-900.webp`,
+    alt: "The PitchBoulder room at Galvanize, a full house watching a founder pitch",
+  },
+  {
+    title: "SeriesFest — the same air, 2025–2026",
+    href: "/venture/seriesfest",
+    avif: `${base}/media/venture/seriesfest/s12-red-carpet-panel-900.avif`,
+    webp: `${base}/media/venture/seriesfest/s12-red-carpet-panel-900.webp`,
+    alt: "Six people posing on the SeriesFest red carpet in front of a step-and-repeat",
+  },
+  {
+    title: "American Film Market 2025 — a venture story",
+    href: "/venture/afm-2025",
+    avif: `${base}/media/venture/afm-2025/hero-900.avif`,
+    webp: `${base}/media/venture/afm-2025/hero-900.webp`,
+    alt: "A panel discussion on stage at the American Film Market 2025",
+  },
+  {
+    title: "MEME — a venture story",
+    href: "/venture/meme",
+    avif: `${base}/media/venture/meme/meme-poster.avif`,
+    webp: `${base}/media/venture/meme/meme-poster.webp`,
+    alt: "The MEME — Makeshift Entertainment Media Education — title card",
+  },
+  {
+    title: "A startup workshop series, on camera — KO Law",
+    href: "/venture/ko-law-workshops",
+    avif: `${base}/media/venture/ko-law-workshops/hero-900.avif`,
+    webp: `${base}/media/venture/ko-law-workshops/hero-900.webp`,
+    alt: "Two presenters lead a KO Law startup workshop in front of a seated audience",
+  },
+  {
+    title: "The agency that takes our aerials to market — Amazing Aerial",
+    href: "/venture/amazing-aerial",
+    avif: `${base}/media/adventure/gallery/lac-de-tseuzier-01-800.avif`,
+    webp: `${base}/media/adventure/gallery/lac-de-tseuzier-01-800.webp`,
+    alt: "Aerial of the turquoise Lac de Tseuzier reservoir in the Swiss Alps, the Amazing Aerial mark overlaid",
+  },
+  {
+    title: "Gigs Go Green",
+    href: "/work/gigs-go-green",
+    avif: `${base}/media/work/gigs-go-green/hero.avif`,
+    webp: `${base}/media/work/gigs-go-green/hero.webp`,
+    alt: "Aerial of a large solar array in a green landscape, from the Hero X Solar film",
+  },
+  {
+    title: "Vybe",
+    href: "/work/vybe",
+    avif: `${base}/media/work/vybe/hero.avif`,
+    webp: `${base}/media/work/vybe/hero.webp`,
+    alt: "Golden-hour aerial of the 2023 Vybe outdoor festival beside a pond, colorful canopies below",
+  },
+];
 
 // PUB-E (2026-07-27, Directive PUB-E) — Gigs Go Green + PNUMIX were REMOVED
 // from /venture's index (operator ruling: "commercials are not stories");
 // per the directive, "Their pages stay live and listed in /work archive
 // only." Gigs Go Green already had a case page and is listed above
-// (VENTURE_LINKS). PNUMIX has NO case page (WORK_ARCHIVE never set an
-// `href` for it — it was a display-only tile from the start), so it's
-// listed here as a plain text record rather than a link — nothing to link
-// to. `href` is optional; unset entries render as plain text.
-const VENTURE_ARCHIVE_LINKS: readonly { label: string; href?: string }[] = [
+// (VENTURE_CARDS). PNUMIX has NO case page (WORK_ARCHIVE never set an
+// `href` for it — it was a display-only tile from the start), so it stays a
+// plain text record below rather than a card or a link — nothing to link
+// to, and no image exists for it (never fabricate one for a placeholder).
+const VENTURE_RECORDS: readonly { label: string }[] = [
   { label: "PNUMIX — Paranormal Palace (2024)" },
 ] as const;
 ---
@@ -93,45 +179,73 @@ const VENTURE_ARCHIVE_LINKS: readonly { label: string; href?: string }[] = [
 
   <section class="archive-grid mx-auto max-w-5xl border-t border-hairline p-8">
     <div class="archive-col" data-reveal>
-      <h2 class="text-2xl font-bold">Adventure Stories</h2>
-      <ul class="archive-list">
+      <div class="archive-col-head">
+        <h2 class="text-2xl font-bold">Adventure Stories</h2>
+        <a href={`${base}${ADVENTURE_INDEX.href}`} class="archive-index-link">
+          {ADVENTURE_INDEX.label} <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="archive-cards">
         {
-          ADVENTURE_LINKS.map((l) => (
-            <li>
-              <a href={`${base}${l.href}`} class="link">
-                {l.label}
-              </a>
-            </li>
+          ADVENTURE_CARDS.map((c) => (
+            <a href={`${base}${c.href}`} class="card archive-card">
+              <figure class="map-inset archive-card-media">
+                <picture>
+                  <source type="image/avif" srcset={c.avif} />
+                  <source type="image/webp" srcset={c.webp} />
+                  <img src={c.webp} alt={c.alt} loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+              <h3 class="card-title">{c.title}</h3>
+            </a>
           ))
         }
-      </ul>
+      </div>
     </div>
+
     <div class="archive-col" data-reveal>
-      <h2 class="text-2xl font-bold">Venture Stories</h2>
-      <ul class="archive-list">
+      <div class="archive-col-head">
+        <h2 class="text-2xl font-bold">Venture Stories</h2>
+        <a href={`${base}${VENTURE_INDEX.href}`} class="archive-index-link">
+          {VENTURE_INDEX.label} <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="archive-cards">
         {
-          VENTURE_LINKS.map((l) => (
-            <li>
-              <a href={`${base}${l.href}`} class="link">
-                {l.label}
-              </a>
-            </li>
+          VENTURE_CARDS.map((c) => (
+            <a href={`${base}${c.href}`} class="card archive-card">
+              <figure class="map-inset archive-card-media">
+                <picture>
+                  <source type="image/avif" srcset={c.avif} />
+                  <source type="image/webp" srcset={c.webp} />
+                  <img src={c.webp} alt={c.alt} loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+              <h3 class="card-title">{c.title}</h3>
+            </a>
           ))
         }
         {
-          VENTURE_ARCHIVE_LINKS.map((l) =>
-            l.href ? (
-              <li>
-                <a href={`${base}${l.href}`} class="link">
-                  {l.label}
-                </a>
-              </li>
-            ) : (
-              <li class="archive-list-text">{l.label}</li>
-            ),
+          PUBLISH_MFG && (
+            <a href={`${base}/venture/makeshift-film-group`} class="archive-index-link archive-index-link--block">
+              A film venture, taking shape — Makeshift Film Group <span class="arrow" aria-hidden="true">→</span>
+            </a>
           )
         }
-      </ul>
+      </div>
+
+      {
+        VENTURE_RECORDS.length > 0 && (
+          <div class="archive-records">
+            <p class="hud-label archive-records-label">Not yet its own story</p>
+            <ul class="archive-records-list">
+              {VENTURE_RECORDS.map((l) => (
+                <li class="archive-list-text">{l.label}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
     </div>
   </section>
 </Base>
@@ -151,12 +265,104 @@ const VENTURE_ARCHIVE_LINKS: readonly { label: string; href?: string }[] = [
     gap: 1rem;
     align-content: start;
   }
-  .archive-list {
+  .archive-col-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1.25rem;
+  }
+
+  /* the index-jump — not a story, so it reads as a plain slim link, never a
+     card; the visual weight difference from .archive-card below IS the
+     flagship-vs-record distinction the page was missing. */
+  .archive-index-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .archive-index-link .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .archive-index-link:hover,
+  .archive-index-link:focus-visible {
+    color: var(--color-accent);
+  }
+  .archive-index-link:hover .arrow,
+  .archive-index-link:focus-visible .arrow {
+    transform: translateX(4px);
+  }
+  .archive-index-link--block {
+    display: flex;
+    white-space: normal;
+    padding: 0.5rem 0.1rem;
+  }
+
+  /* story cards — a real thumbnail (the destination's own hero, reused) +
+     title, laid out as a compact row so a narrow archive column still reads
+     as a proper preview rather than a cramped vertical tile. */
+  .archive-cards {
+    display: grid;
+    gap: 0.6rem;
+  }
+  .archive-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.55rem;
+    text-decoration: none;
+  }
+  .archive-card-media {
+    flex: 0 0 auto;
+    width: 5.25rem;
+    margin: 0;
+    padding: 0.2rem;
+    overflow: clip;
+  }
+  .archive-card-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .archive-card .card-title {
+    margin: 0;
+    line-height: 1.25;
+  }
+  @media (max-width: 420px) {
+    .archive-card-media {
+      width: 4rem;
+    }
+  }
+
+  /* the placeholder record — no page, no image, no click; deliberately the
+     quietest thing on the page. */
+  .archive-records {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-hairline);
+  }
+  .archive-records-label {
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+    margin-bottom: 0.4rem;
+  }
+  .archive-records-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.65rem;
+    gap: 0.4rem;
   }
   .archive-list-text {
     color: var(--color-ink-muted, #8a9a96);
