@@ -80,9 +80,21 @@ async function clusterShotsFor(slug: string) {
   const posterPath = join(wildDir, "matterhorn-loop-poster.avif");
   const hasLoop =
     slug === "wild" && existsSync(join(wildDir, "matterhorn-loop.mp4")) && existsSync(posterPath);
+  // AUDIT-FIX (2026-08-03, entry/utility design audit): industry's original
+  // "valley" shot was a SeriesFest step-and-repeat photo the site owner
+  // appears in (visually confirmed against the owner's own reference photo —
+  // long dark hair, dark bandana, sunglasses pushed up, waistcoat, lanyard).
+  // Hard rule: the operator never appears in coverage photography. Replaced
+  // with a clean SeriesFest Season 11 Awards Ceremony frame (no owner, no
+  // posed step-and-repeat photo-op) under a new slug — see
+  // scripts/make-industry-valley-fix.mjs. The old industry/cluster/valley.*
+  // pair is no longer referenced; valley.webp could not be deleted this
+  // session (Windows holds a memory-mapped section on every .webp in this
+  // folder for the life of the shared dev server process) and sits orphaned
+  // on disk — delete it once the dev server is next restarted.
   const [peak, valley, lake, ridge] = await Promise.all([
     clusterShot(slug, "peak"),
-    clusterShot(slug, "valley"),
+    clusterShot(slug, slug === "industry" ? "valley2" : "valley"),
     clusterShot(slug, "lake"),
     clusterShot(slug, "ridge"),
   ]);
