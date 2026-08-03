@@ -243,13 +243,29 @@ const partnerRail: { href: string; slate: string; title: string; mediaSlug?: str
   { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes our aerials to market." },
   ...mfgCard,
 ];
-function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?: string }) {
+function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?: string; objectPosition?: string }) {
   // PUB-A — a card's media slug is `mediaSlug` when set (a /work/* href, or
   // any href that shouldn't drive its own media path), else derived from a
   // /venture/<slug> href exactly as before.
   const slug = c.mediaSlug ? c.mediaSlug : c.href.replace(/^\/venture\//, "");
   const ghostKey = c.href.replace(/^\/(venture|work)\//, "");
-  return { ...c, slug, img: bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`)), ghost: railGhosts[ghostKey] };
+  const img = bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`));
+  const ghost = railGhosts[ghostKey];
+  // AUDIT-FIX (2026-08-03) — hardening: the PitchBoulder card used to render
+  // a ghost mark instead of its (real, existing) photo because its /work/*
+  // href doesn't match the /venture/-only slug derivation above, and it went
+  // unnoticed because railGhosts happened to have a "pitchboulder" entry too
+  // — a future card with neither a resolvable image NOR a railGhosts fallback
+  // would render a totally blank box with no signal at all. Fail the build
+  // instead of shipping that silently.
+  if (!img && !ghost) {
+    throw new Error(
+      `venture.astro toRailCard: "${c.href}" has no media at public/media/venture/${slug}/hero-900.{avif,webp} ` +
+        `and no railGhosts["${ghostKey}"] fallback — it would silently render as a blank rail card. ` +
+        `Fix by adding a correct mediaSlug, baking the missing hero-900 pair, or adding a railGhosts entry.`,
+    );
+  }
+  return { ...c, slug, img, ghost };
 }
 const collectionCards = VENTURE_COLLECTIONS.map((coll) => ({
   ...coll,
@@ -599,7 +615,7 @@ const GROUNDS = {
                         {c.img ? (
                           <picture>
                             {c.img.avif && <source srcset={c.img.avif} type="image/avif" />}
-                            <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" />
+                            <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" style={c.objectPosition ? `object-position:${c.objectPosition}` : undefined} />
                           </picture>
                         ) : (
                           <span class="im-rail-ghost">{c.ghost ?? ""}</span>
@@ -645,7 +661,7 @@ const GROUNDS = {
                     {c.img ? (
                       <picture>
                         {c.img.avif && <source srcset={c.img.avif} type="image/avif" />}
-                        <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" />
+                        <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" style={c.objectPosition ? `object-position:${c.objectPosition}` : undefined} />
                       </picture>
                     ) : (
                       <span class="im-rail-ghost">{c.ghost ?? ""}</span>

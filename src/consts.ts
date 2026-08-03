@@ -912,7 +912,16 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
 // its feature chapter in venture.astro) — so it stays feature-only.
 // ---------------------------------------------------------------------------
 
-export type CollectionStory = { href: string; slate: string; title: string; mediaSlug?: string };
+export type CollectionStory = {
+  href: string;
+  slate: string;
+  title: string;
+  mediaSlug?: string;
+  /** CSS object-position for the rail card's hero-900 face, to keep the real
+   *  subject in the crop (the card box is 16:10) — same convention as
+   *  WorkItem.objectPosition above. */
+  objectPosition?: string;
+};
 
 export type VentureCollection = {
   id: string;
@@ -934,11 +943,27 @@ export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
         href: "/work/pitchboulder",
         slate: "PITCHBOULDER · BOULDER, COLORADO",
         title: "PitchBoulder — coverage, recaps & the commercial",
+        // AUDIT-FIX (2026-08-03): this card's href is /work/pitchboulder, which
+        // toRailCard()'s default `href.replace(/^\/venture\//, "")` slug
+        // derivation (venture.astro) doesn't match — the card was silently
+        // falling back to the "PITCH" ghost mark instead of a real photo,
+        // even though PitchBoulder has plenty of event photography. mediaSlug
+        // points it at a fresh bake instead: public/media/venture/
+        // pitchboulder/hero-{900,1600} via scripts/
+        // make-pitchboulder-venture-card.mjs (the same operator-approved
+        // "whole room" frame already used as work/pitchboulder.astro's own
+        // hero, re-cropped to this card's 16:10 box).
+        mediaSlug: "pitchboulder",
       },
       {
         href: "/venture/ko-law-workshops",
         slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
         title: "A startup workshop series, on camera.",
+        // AUDIT-FIX (2026-08-03): default center-crop of the native-square
+        // hero left too much exposed ceiling/lighting truss above the
+        // branded screen (operator: "needs to be recentered ... too much
+        // ceiling"). Pushed down to frame the screen + presenters + crowd.
+        objectPosition: "50% 60%",
       },
     ],
   },
@@ -963,11 +988,23 @@ export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
         slate: "SeriesFest · Denver, Colorado",
         title: "SeriesFest, in depth.",
         mediaSlug: "seriesfest-2026",
+        // AUDIT-FIX (2026-08-03): default center-crop of the native-square
+        // hero showed mostly exposed ceiling truss above the branded SOIRÉE
+        // screens (operator: "the images there are not good and centered").
+        // Pushed down to frame both screens + the speaker instead.
+        objectPosition: "50% 68%",
       },
       {
         href: "/venture/afm-2025",
         slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
         title: "American Film Market 2025 — a venture story",
+        // AUDIT-FIX (2026-08-03): same operator complaint as SeriesFest above.
+        // Direction matches the object-position already tuned for this exact
+        // photo on its own page (venture/afm-2025.astro's hero — see that
+        // file's CROP NOTE: "subjects in the lower band, ~55-68% down"); this
+        // card's box is a different ratio (16:10 vs that page's 16:9) so it
+        // gets its own tuned value.
+        objectPosition: "50% 60%",
       },
     ],
   },
