@@ -6,14 +6,17 @@
  * production root alike (the war-game Move 2.2 base-prefix trap).
  */
 import Base from "../layouts/Base.astro";
+import { NAV } from "../consts";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const links = [
-  { label: "Home", href: "/" },
-  { label: "Forge the Saga", href: "/forge-the-saga" },
-  { label: "Adventure", href: "/adventure" },
-  { label: "Work", href: "/work" },
-] as const;
+// AUDIT-FIX (2026-08-03): this list used to be its own hand-copied array
+// (Home / Forge the Saga / Adventure / Work) and had drifted out of sync with
+// the site's real structure since the publication restructure — it offered a
+// way back into Adventure Stories but not Venture Stories at all, the site's
+// other whole story column. Now built from NAV (the same single source the
+// header uses), so a 404 always offers a way back into both columns and can
+// never go stale again; "Home" is prepended since NAV itself doesn't include it.
+const links = [{ label: "Home", href: "/" }, ...NAV] as const;
 ---
 
 <Base title="404 — off the map">

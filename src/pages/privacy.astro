@@ -43,10 +43,19 @@ import { SITE } from "../consts";
 
     <div class="space-y-2">
       <h2 class="text-xl font-bold">Contact</h2>
+      {/* AUDIT-FIX (2026-08-03): this used to describe the old lead-gen
+          contact form's data flow, but that form was retired (PUB-B,
+          2026-07-27) — /contact is a mailto link now, and the only form left
+          on the site is the newsletter signup (FollowTheStories), which is
+          real but not yet live (no provider chosen — see that component's own
+          DISABLED-STATE CONTRACT). Rewritten to describe what's actually
+          here. ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence
+          (staging-only until read). */}
       <p class="text-ink">
-        If you email us, we have your email — that's it, and we use it to reply. The contact form,
-        once live, sends your name, email, and message to a form-handling service solely so it
-        reaches our inbox; nothing else is done with it.
+        If you email us, we have your email — that's it, and we use it to reply. The newsletter
+        signup ("Follow the Stories," in the footer and at /contact) isn't live yet; once it is, it
+        will send only your email address to whichever provider we've picked, solely so we can send
+        you new dispatches. Nothing else is collected, and you can unsubscribe anytime.
       </p>
     </div>
 
