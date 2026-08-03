@@ -482,7 +482,7 @@ const ARTICLE = {
             {PROGRAMS.filter((p) => p.track === "pitch-market").map((c) => {
               const m = programCard(c.slug);
               return m ? (
-                <figure class="meme-program-card">
+                <figure class={`meme-program-card meme-program-card--${c.rank}`}>
                   <picture>
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
@@ -502,7 +502,7 @@ const ARTICLE = {
             {PROGRAMS.filter((p) => p.track === "on-set").map((c) => {
               const m = programCard(c.slug);
               return m ? (
-                <figure class="meme-program-card">
+                <figure class={`meme-program-card meme-program-card--${c.rank}`}>
                   <picture>
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
@@ -526,25 +526,33 @@ const ARTICLE = {
               text now says the photo carries the quote. Still excludes the
               operator, who attended. Date claim (December 2025) is from the
               recording's own file metadata (2025-12-03).
+              ROUND 3 (operator: "let the Carpenter figure sit asymmetrically
+              against text"): the photo moves from a plain centered figure
+              with a caption below it to a tilted, asymmetric duo — a wide
+              photo column (68%) beside a narrow caption column (32%),
+              same 58/34-family split the rest of the site's staggers use.
+              Caption text is UNCHANGED, only its position moved.
               ⚠ OPERATOR READ-APPROVAL REQUIRED — the one-line caption below
               is new visible copy (staging-only until read). */}
-          <figure class="meme-room">
-            <picture>
-              <source
-                srcset={`${base}/media/venture/meme/carpenter-room-900.avif 900w, ${base}/media/venture/meme/carpenter-room-1440.avif 1440w`}
-                type="image/avif"
-              />
-              <img
-                src={`${base}/media/venture/meme/carpenter-room-900.webp`}
-                srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
-                sizes="(min-width: 900px) 820px, 100vw"
-                alt={`Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen; white text composited over the room's left wall carries his quote: "People get hung up — should I buy this expensive camera? No. Use the cheaper camera, but get a good mic."`}
-                loading="lazy"
-                decoding="async"
-                width="1440"
-                height="1080"
-              />
-            </picture>
+          <figure class="meme-room-duo" data-reveal>
+            <div class="meme-room">
+              <picture>
+                <source
+                  srcset={`${base}/media/venture/meme/carpenter-room-900.avif 900w, ${base}/media/venture/meme/carpenter-room-1440.avif 1440w`}
+                  type="image/avif"
+                />
+                <img
+                  src={`${base}/media/venture/meme/carpenter-room-900.webp`}
+                  srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
+                  sizes="(min-width: 900px) 460px, 100vw"
+                  alt={`Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen; white text composited over the room's left wall carries his quote: "People get hung up — should I buy this expensive camera? No. Use the cheaper camera, but get a good mic."`}
+                  loading="lazy"
+                  decoding="async"
+                  width="1440"
+                  height="1080"
+                />
+              </picture>
+            </div>
             <figcaption class="hud-label meme-room-cap">Inside The Carpenter Not the Tools, December 2025 session</figcaption>
           </figure>
         </div>
@@ -557,7 +565,7 @@ const ARTICLE = {
             {PROGRAMS.filter((p) => p.track === "sound").map((c) => {
               const m = programCard(c.slug);
               return m ? (
-                <figure class="meme-program-card">
+                <figure class={`meme-program-card meme-program-card--${c.rank}`}>
                   <picture>
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
@@ -842,17 +850,44 @@ const ARTICLE = {
   }
   /* MEME-POLISH-2026-08-03: cards went from 1440x900 flyer-shaped to 1080x1350
      (4:5) poster-shaped ("film-festival section cards, not flyers" — operator).
-     A poster reads oddly stretched full-width on a wide screen, so each card
-     gets a max-width and centers itself in its grid cell rather than filling it. */
+     ROUND 3 (operator: "a lot of rectangles... I like that asymmetry layout
+     we've had on other pages" — steel-and-dust.astro / vybe.astro's staggers):
+     flex-wrap replaces the equal-cell grid so each card can carry its own
+     `rank`-driven width, and the "b" rank drops onto a lower baseline — the
+     same dropped-baseline stagger device those pages use for photo pairs,
+     applied here to card scale instead. Uneven row totals naturally wrap
+     (2-up/1-down or similar) rather than forcing 3 equal boxes every time. */
   .meme-program-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-    gap: 1.3rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem 1.75rem;
   }
   .meme-program-card {
     margin: 0;
-    max-width: 21rem;
-    margin-inline: auto;
+    width: 13rem;
+  }
+  .meme-program-card--lead {
+    width: 16.5rem;
+  }
+  .meme-program-card--b {
+    width: 13.5rem;
+    margin-top: 3rem; /* the dropped-baseline stagger */
+  }
+  .meme-program-card--solo {
+    width: 15rem;
+  }
+  @media (max-width: 640px) {
+    .meme-program-card,
+    .meme-program-card--lead,
+    .meme-program-card--solo {
+      width: min(70vw, 15rem);
+    }
+    .meme-program-card--b {
+      width: min(70vw, 15rem);
+      margin-top: 0;
+    }
   }
   .meme-program-card img {
     display: block;
@@ -878,15 +913,22 @@ const ARTICLE = {
     color: color-mix(in srgb, #eef2f5 55%, transparent);
   }
   /* CARPENTER-RECORDING-SEGMENT — the one photographic moment in the programs
-     section: a real frame from inside the workshop. Sits full-width under the
-     On-Set Craft grid, max-width capped so it reads as a figure, not a hero.
-     Same border/shadow voice as the program cards.
+     section: a real frame from inside the workshop.
      MEME-POLISH-2026-08-03: the quote is now composited INTO the photo
      (scripts/make-carpenter-room.mjs), so the separate blockquote styles are
-     retired — just a one-line caption below. */
+     retired — just a one-line caption below.
+     ROUND 3 — the figure sits asymmetrically against text now (operator ask):
+     a wide tilted photo column beside a narrow caption column, rather than a
+     centered figure with a caption stacked below it. */
+  .meme-room-duo {
+    margin: 1.4rem 0 0;
+    display: grid;
+    grid-template-columns: 68fr 32fr;
+    gap: 1.4rem;
+    align-items: end;
+  }
   .meme-room {
-    margin: 1.4rem auto 0;
-    max-width: 51.25rem; /* 820px — matches the sizes attr */
+    transform: rotate(-1deg);
   }
   .meme-room img {
     display: block;
@@ -898,9 +940,21 @@ const ARTICLE = {
   }
   .meme-room-cap {
     display: block;
-    margin: 0.55rem 0 0;
+    padding-bottom: 0.35rem;
     letter-spacing: 0.18em;
     color: var(--color-ink-muted, #8a9a96);
+  }
+  @media (max-width: 760px) {
+    .meme-room-duo {
+      grid-template-columns: 1fr;
+    }
+    .meme-room {
+      transform: none;
+    }
+    .meme-room-cap {
+      padding-bottom: 0;
+      margin-top: 0.55rem;
+    }
   }
 
   /* ── MEME-POLISH-2026-08-03 ROUND 3 · NOCOVA ─────────────────────────────
@@ -1003,8 +1057,12 @@ const ARTICLE = {
     max-width: 36rem;
     width: 100%;
   }
+  /* ROUND 3 — a small "vary section rhythm" touch: Nick's column runs
+     slightly wider than Amber's (founder/ED, teaches the two flagship
+     programs above) rather than a strict 50/50 split. Photo crop is
+     object-fit:cover, so the uneven column widths crop nothing. */
   .meme-roster--leads {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 61fr 39fr;
     max-width: 26rem;
   }
   .meme-roster--instructors {
