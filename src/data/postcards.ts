@@ -88,6 +88,30 @@
  * postcard, per the operator's 2026-07-31 direction (see adventure.astro's
  * VYBE section and src/pages/adventure/vybe.astro).
  *
+ * ⚠ 2026-08-02 REFRAME (operator direct review) — "The photos are pretty
+ * much of the whole festival and not just of Nordic Daughter. I thought the
+ * whole point is we were going to make the piece largely focusing on the
+ * Scandinavian mid-December festival and then FEATURING Nordic Daughter —
+ * but the header is Nordic Daughter." (The festival is actually mid-JUNE,
+ * per the verified date below — "mid-December" appears to be a slip in the
+ * verbal note; the June 14-16, 2024 date is unchanged and still correct.)
+ * The 07-31 merge already made the PARAGRAPHS festival-first (dance stage +
+ * vendor row + Nordic Daughter's set, in that order); what still read as
+ * band-only was the `title` — the single biggest thing on the page (the
+ * PostcardCover H1) — which stayed "Nordic Daughter" through the merge. No
+ * photos were pulled or swapped (they were already correct: 4 dance-troupe +
+ * 2 vendor-row + 2 Nordic-Daughter-performing, i.e. genuinely festival-wide
+ * with the band as one part) — only `title` and `location` changed below, so
+ * the header now matches what the piece and its photos have actually always
+ * been. Old: title "Nordic Daughter", location led with the festival name
+ * but still read like Nordic Daughter's own tour-stop postcard. New: title
+ * "The Scandinavian Midsummer Festival" (the festival is the subject),
+ * location now names the venue plus "featuring Nordic Daughter" (the
+ * verified fact that's still true and still worth surfacing high). Every
+ * paragraph, the pull-quote, the photo set, and the `related` cross-link to
+ * Something for Tomorrow are unchanged — all already festival-first / already
+ * true.
+ *
  * Photo convention: each photo's `slug` resolves an existence-gated export
  * at public/media/adventure/postcards/<postcard-slug>/<photo-slug>-<width>.{avif,webp}
  * (baked by scripts/make-postcards.mjs) — matching the site's other
@@ -148,9 +172,9 @@ export type Postcard = {
 export const POSTCARDS: readonly Postcard[] = [
   {
     slug: "nordic-daughter",
-    title: "Nordic Daughter",
+    title: "The Scandinavian Midsummer Festival",
     date: "2024-06-16",
-    location: "Scandinavian Midsummer Festival · Parfet Park, Golden, Colorado",
+    location: "Parfet Park, Golden, Colorado — featuring Nordic Daughter",
     paragraphs: [
       "I spent the closing day of the Scandinavian Midsummer Festival's first year in Golden wandering Parfet Park with a camera — a dance stage on one side of the grounds, a row of vendor tents on the other, and Nordic Daughter playing a set under one of the festival tents that same weekend. That's how I first met them.",
       "On the dance stage, a troupe in flowing black dresses, trailing teal fabric off their arms, worked through a slow, deliberate routine on the plywood boards. A few of the dancers wore pale, ghost-white face paint. The crowd sat in folding chairs and on blankets right up to the stage edge, tents and Nordic flags at their backs.",
