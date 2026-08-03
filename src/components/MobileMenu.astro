@@ -40,10 +40,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       {PRIMARY_CTA.label}
     </a>
     <p class="fs-menu-item hud-label mt-8" style={`--stagger-delay: ${(NAV.length + 1) * 55}ms`}>
-      <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+      <a href={`mailto:${SITE.email}`} class="link email-link">{SITE.email}</a>
     </p>
   </nav>
 </div>
+
+<style>
+  /* AUDIT-FIX (2026-08-03): the wrapping <p class="hud-label"> is uppercase +
+     tracked by design (the row's voice), and that transform was inheriting
+     into the email link itself — an emailed address rendered in ALL CAPS
+     reads as a mistake and is less recognizable than its real casing. Reset
+     the transform on the address only; the row keeps its hud-label rhythm. */
+  .email-link {
+    text-transform: none;
+  }
+</style>
 
 <script>
   const menu = document.getElementById("fs-menu");

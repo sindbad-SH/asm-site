@@ -2168,9 +2168,14 @@
   }
   .temper-stage {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    /* AUDIT-FIX (2026-08-03): these 5 stage names are real content (the
+       method's own vocabulary, previewed on home) rather than a decorative
+       index — 0.65rem/10.4px was under comfortable reading size for tracked
+       caps. Bumped one step; tracking eased to match so it doesn't feel
+       looser at the larger size. */
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.1em;
     color: var(--color-ink-muted);
     opacity: 0;
   }

@@ -173,6 +173,14 @@ const p = PAGES.contact;
   .ct-pill--mail {
     font-size: 0.92rem;
     padding: 1rem 1.9rem;
+    /* AUDIT-FIX (2026-08-03): this is the page's primary action and its
+       label is a real email address, not a short button phrase — the base
+       .ct-pill's uppercase (fine for "BOOK A CALL"-style labels) turned it
+       into "SINDBAD@ADVENTURESTORYTELLINGMEDIA.COM", which reads worse and
+       is less recognizable than the address's real case. Every other email
+       on the site (footer, privacy, terms, licensing) already renders
+       lower-case; this is the one place it didn't. */
+    text-transform: none;
   }
 
   /* the action canvas — stone, contour line, one big move */

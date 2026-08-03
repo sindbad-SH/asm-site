@@ -135,7 +135,10 @@ const FOOTER_NAV: readonly FooterNavItem[] = [
   }
   .footer-buyer {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    /* AUDIT-FIX (2026-08-03): this is the plain-language decode of each nav
+       item — the one thing here a visitor actually needs to read. 0.62rem
+       (9.92px) was sub-10px; bumped to the site's standard hud-label size. */
+    font-size: 0.7rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: color-mix(in srgb, currentColor 62%, transparent);

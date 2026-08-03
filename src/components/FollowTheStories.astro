@@ -116,7 +116,9 @@ const fieldId = `fts-email${compact ? "-compact" : ""}`;
   .fts-note {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    /* AUDIT-FIX (2026-08-03): explains why the button is disabled — real
+       content, not a label. 0.68rem (10.88px) was sub-11px; bumped slightly. */
+    font-size: 0.74rem;
     letter-spacing: 0.06em;
     color: color-mix(in srgb, var(--color-ink-muted) 85%, transparent);
   }
