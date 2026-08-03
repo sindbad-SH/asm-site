@@ -66,6 +66,13 @@ const pair = (relBase: string) => {
 // PitchBoulder chapter media (E3, the primary proof anchor; Round 5 — renders as chapter 02, after Pebble Beach)
 const pbPoster = pair("work/pitchboulder/hook-poster");
 const pbLoop = media("work/pitchboulder/loop.mp4"); // P21b — hover-video on the landscape video card
+// Photo-quality audit (2026-08-02): hook-poster was doing double duty — the
+// collage video-card poster ABOVE and the YouTube-embed facade poster below
+// were the exact same file, so this chapter repeated one photograph twice.
+// The embed facade now gets its own frame: room-about, a full-room wide shot
+// from the Wednesday Room chapter (already live on /work/pitchboulder), so
+// the two PitchBoulder media beats on this page read as two different rooms.
+const pbEmbedPoster = pair("work/pitchboulder/wednesday-room/room-about-1600");
 // The restored Shelby chapter media (WORK item; proof = pebble-beach room; Round 5 — LEADS as chapter 01, the magnum opus).
 // Round 3 lane call: the Pebble Beach piece is VENTURE — corporate/private-
 // client event coverage (a commissioned owner story shot at a business event),
@@ -87,9 +94,12 @@ const pbLoop = media("work/pitchboulder/loop.mp4"); // P21b — hover-video on t
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
 const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
-const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-900");
-const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-900");
-const shEngine = pair("work/shelby-pebble-beach/photos/engine-900"); // P21b — engine-bay detail
+// Photo-quality audit (2026-08-02): these three were shipping the -900 tier
+// even though the -1600 export already exists on disk for each (same source
+// photo, just sharper) — bumped to match shOnSet/shLawn below.
+const shDawn = pair("work/shelby-pebble-beach/photos/dawn-flare-1600");
+const shHeritage = pair("work/shelby-pebble-beach/photos/heritage-1600");
+const shEngine = pair("work/shelby-pebble-beach/photos/engine-1600"); // P21b — engine-bay detail
 const shLawn = pair("work/shelby-pebble-beach/photos/lawn-1600"); // P21b — elevated crowd + coastline
 const shLoop = media("work/shelby-pebble-beach/loop.mp4"); // P13c — hover-video on the wide card
 // mtime cache-bust (same mechanism as PortalHero/Tableaux) so a returning
@@ -490,7 +500,7 @@ const GROUNDS = {
             videoId={pbCommercialId}
             title="The PitchBoulder commercial"
             placeholderLabel="PITCHBOULDER COMMERCIAL — click-to-load embed."
-            poster={pbPoster ? (pbPoster.webp ?? pbPoster.avif) : undefined}
+            poster={pbEmbedPoster ? (pbEmbedPoster.webp ?? pbEmbedPoster.avif) : (pbPoster ? (pbPoster.webp ?? pbPoster.avif) : undefined)}
             class="im-pb-embed"
           />
           {/* P12.6b — the unmissable story CTA (operator: the old links were
