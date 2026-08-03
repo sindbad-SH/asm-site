@@ -78,6 +78,7 @@ const loop = existsSync(join(loopDir, "meme-loop.mp4"))
 //    rights-flagged and not used either (see below).
 const memeShots = {
   nick: pair("venture/meme/nick-goins-portrait-640"),
+  amber: pair("venture/meme/amber-macpherson-portrait-700"),
   steve: pair("venture/meme/steve-borne-portrait-854"),
   adam: pair("venture/meme/adam-smestad-portrait-620"),
   eric: pair("venture/meme/eric-abramson-portrait-700"),
@@ -131,41 +132,59 @@ const PROGRAM_TRACKS = {
   sound: { label: "Sound", color: "#38f8ec" },
 } as const;
 
+/**
+ * MEME-POLISH-2026-08-03 — card redesign (operator: cards were "pretty basic
+ * and hard to read" at the ~300px they actually render at in this grid). The
+ * baked image now carries ONLY kicker/title/instructor (see
+ * scripts/make-meme-evergreen.mjs); the course description moves off the
+ * image entirely into real HTML text below each card — `desc`, a ONE-SENTENCE
+ * shortened version of the description this page shipped before, still
+ * faithful to the same xlsx source.
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every `desc` below is new, shortened
+ * copy, staging-only until read.
+ */
 const PROGRAMS = [
   {
     slug: "pitch-quorum",
     track: "pitch-market",
-    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    desc: "A free introduction to pitching a feature film to investors, plus deeper Beginner and Advanced sessions on querying and the documents behind a pitch — mostly remote, with an in-person practice session.",
   },
   {
     slug: "market-fresh",
     track: "pitch-market",
-    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    desc: "A free introduction, then a multi-session remote program on preparing for a film market — what to expect, how to work it, and the follow-through after.",
   },
   {
     slug: "business-of-show-business",
     track: "pitch-market",
-    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    desc: "A workshop on the state of the film industry from a business perspective — the practical side of filmmaking that founders don't usually get taught anywhere.",
   },
   {
     slug: "pa-workshop",
     track: "on-set",
-    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, with a workshop description and instructor credit to Adam Smestad.",
+    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
+    desc: "An in-person workshop for new and experienced production assistants alike, covering the basics of the job and hard-won tips from time actually spent on set.",
   },
   {
     slug: "script-supervisor",
     track: "on-set",
-    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, with a workshop description and instructor credit to Adam Smestad.",
+    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
+    desc: "An in-person workshop on the basics of script supervising — continuity, script-supervising notes, and how to build a career doing it.",
   },
   {
     slug: "carpenter",
     track: "on-set",
-    alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, with a workshop description and instructor credit to Eric Abramson.",
+    alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, instructor credit to Eric Abramson.",
+    desc: "A free in-person workshop on getting started as a filmmaker with what you already have, rather than being intimidated by expensive gear.",
   },
   {
     slug: "sound-workshop",
     track: "sound",
-    alt: "An evergreen MEME program card reading Sound Workshop, Sound track, with a description of the two-part workshop and instructor credit to Steve Borne.",
+    alt: "An evergreen MEME program card reading Sound Workshop, Sound track, instructor credit to Steve Borne.",
+    desc: "A two-part series on production sound — setting a shoot up for success on location, then what happens to that audio in post.",
   },
 ] as const;
 
@@ -178,33 +197,48 @@ const PROGRAMS_INTRO = {
 };
 
 /**
- * 2026-08-03 EVERGREEN REBUILD (operator-directed): this grid previously
- * shipped as "who teaches the workshops" — 3 instructors, deliberately NOT
- * labelled as the team (see the 2026-08-02 correction preserved below, which
- * is still the reason Borne and Smestad are kept separate from the team
- * tier). The operator's direction now is to show the FULLER roster: "There
- * were other teachers and people involved in the organization — the fuller
- * roster should appear," while also not repeating a headshot: "I don't need
- * to see the exact same picture of Nick's head side by side."
+ * MEME-POLISH-2026-08-03 REROSTER (operator-directed, verbatim): "There were
+ * other teachers and people involved in the organization" from the prior
+ * build's TEAM/INSTRUCTOR_CREDITS split is now cut back down, on the
+ * operator's explicit call — he feels weird listing himself, and Shaun goes
+ * with the same cut: "the roster should [be] founders + instructors, not the
+ * full board." Sindbad Horizon and Shaun Michael Ellis are REMOVED from this
+ * roster entirely.
  *
- * So this is now two tiers. TEAM = the five people on MEME's own team page
- * (meme.ngo/meet-the-team, re-verified 2026-08-03), each row picturing that
- * person exactly once and crediting what they teach where applicable (Nick,
- * Eric). INSTRUCTOR_CREDITS = the working professionals confirmed as
- * instructors in the xlsx who are NOT on the team page (Adam, Steve) — shown
- * once, below, rather than duplicated in the team tier.
+ * SCOPE RULE (read this before adding anyone back): this roster shows
+ * MEME's FOUNDERS and its WORKSHOP INSTRUCTORS — not the full board, not
+ * every Member At-Large. Sindbad's own MEME relationship (Member At-Large,
+ * Strategic Liaison and Scout) already renders elsewhere on this page — the
+ * article prose above, and the LegendMark proof block — and that is
+ * deliberately where it stays. A future pass should NOT "helpfully" re-add
+ * the full team page here; that was tried, and reverted, on 2026-08-03.
  *
- * Eric Abramson's photo is new this build (scripts/make-meme-evergreen.mjs,
- * cropped from his only photo on file — a work selfie that also shows an
- * unrelated interview subject in the background; the crop excludes that
- * person entirely). Amber MacPherson's two headshots (color + B/W) both
- * carry a visible "April O'Hare Photography" watermark with the credit
- * unconfirmed — same flag the prior build raised — so her row stays
- * text-only, like Shaun Michael Ellis (no photo on file at all). Sindbad's
- * row carries no photo by house rule and keeps the locked, modest phrasing:
- * "Member At-Large, MEME."
+ * Two tiers, both pictured now (operator: "Amber's photo goes IN"):
+ *
+ * ROSTER_LEADS — Nick C. Goins Jr and Amber MacPherson, "the ones who
+ * founded this thing" (operator, verbatim) — Nick as Executive Director &
+ * Founder, Amber as Board Chair & Administrator and, per meme.ngo's own
+ * bio copy, a co-founder alongside him. (meme.ngo's wording names the
+ * company both titles sit inside; this site's build rules forbid printing
+ * that name — see scripts/audit-lib.mjs's FORBIDDEN_TERMS — so it's omitted
+ * here without changing any other fact, same treatment Nick's bio already
+ * got in the prior build.)
+ *
+ * ROSTER_INSTRUCTORS — Eric Abramson, Adam Smestad, Steve Borne, the working
+ * professionals confirmed as instructors in the xlsx. Every bio traces to
+ * that sheet's "Instructor Bio" column, MEME's own meet-the-team wording, or
+ * (Eric only) the Carpenter transcript facts already used elsewhere on this
+ * page — no invented color. Per the operator (knows Eric and Adam
+ * personally, has never met Steve): Steve's line is the most strictly
+ * sourced of the three, pulled straight from the xlsx with no embellishment.
+ *
+ * All five now carry a photo, cropped to the same 1:1 ratio (the page's
+ * existing .meme-roster-card img is `aspect-ratio:1/1; object-fit:cover`, so
+ * Nick's non-square 640x480 source and the new square crops all render
+ * identically) — no more text-only orphan slots, which was the other half of
+ * the operator's "spots where things just don't fit" complaint.
  */
-const TEAM = [
+const ROSTER_LEADS = [
   {
     key: "nick",
     name: "Nick C. Goins Jr",
@@ -212,19 +246,23 @@ const TEAM = [
     bio: "Has worked in the film industry in various capacities since making his first feature at 16 — critic, writer, director, producer, graphic artist. Teaches MEME's flagship Pitch Quorum and Market Fresh programs himself.",
     alt: "Close portrait of Nick C. Goins Jr wearing a plaid flat cap, black t-shirt, looking directly at camera.",
   },
-  { key: null, name: "Amber MacPherson", role: "Board Chair & Admin.", bio: null, alt: null },
+  {
+    key: "amber",
+    name: "Amber MacPherson",
+    role: "Board Chair & Administrator.",
+    bio: "Co-founded the company behind MEME alongside Nick, and serves as the organization's Board Chair and Administrator.",
+    alt: "Portrait of Amber MacPherson, long wavy brown hair, smiling, black top, dark blue background.",
+    photoCredit: "April O'Hare Photography",
+  },
+] as const;
+
+const ROSTER_INSTRUCTORS = [
   {
     key: "eric",
     name: "Eric Abramson",
-    role: "Member At-Large.",
-    bio: "A filmmaker and firefighter — documentary, music video, and live-event work aired on outlets including MTV, ESPN, and PBS, alongside years fighting wildland fires across the American West. Teaches The Carpenter Not the Tools.",
+    bio: "Teaches The Carpenter Not the Tools. A filmmaker and firefighter — documentary, music video, and live-event work aired on outlets including MTV, ESPN, and PBS, alongside years fighting wildland fires across the American West.",
     alt: "Eric Abramson on a shoot, wearing a ballcap and headphones, camera and monitor visible beside him.",
   },
-  { key: null, name: "Shaun Michael Ellis", role: "Member At-Large. Producer and screenwriter.", bio: null, alt: null },
-  { key: null, name: "Sindbad Horizon", role: "Member At-Large, MEME.", bio: null, alt: null },
-] as const;
-
-const INSTRUCTOR_CREDITS = [
   {
     key: "adam",
     name: "Adam Smestad",
@@ -351,6 +389,7 @@ const ARTICLE = {
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
                   </picture>
+                  <figcaption class="meme-program-desc">{c.desc}</figcaption>
                 </figure>
               ) : null;
             })}
@@ -370,6 +409,7 @@ const ARTICLE = {
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
                   </picture>
+                  <figcaption class="meme-program-desc">{c.desc}</figcaption>
                 </figure>
               ) : null;
             })}
@@ -380,11 +420,16 @@ const ARTICLE = {
               real footage of; mined in E:\Makeshift\MEME\_CARPENTER-MINED).
               Quote is VERBATIM from the transcript (part1, 00:23:31-00:23:42),
               light filler cleanup only, source + timestamp preserved there for
-              verification. Still: scripts/make-carpenter-room.mjs — the crop
-              excludes the operator, who attended. Date claim (December 2025) is
-              from the recording's own file metadata (2025-12-03).
-              ⚠ OPERATOR READ-APPROVAL REQUIRED — quote selection + caption are
-              new visible copy (staging-only until read). */}
+              verification.
+              MEME-POLISH-2026-08-03: the quote is now COMPOSITED into the
+              photo itself (scripts/make-carpenter-room.mjs), filling the
+              frame's dead-space left third like a magazine cover — the
+              separate blockquote below the image is retired, and the alt
+              text now says the photo carries the quote. Still excludes the
+              operator, who attended. Date claim (December 2025) is from the
+              recording's own file metadata (2025-12-03).
+              ⚠ OPERATOR READ-APPROVAL REQUIRED — the one-line caption below
+              is new visible copy (staging-only until read). */}
           <figure class="meme-room">
             <picture>
               <source
@@ -395,22 +440,14 @@ const ARTICLE = {
                 src={`${base}/media/venture/meme/carpenter-room-900.webp`}
                 srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
                 sizes="(min-width: 900px) 820px, 100vw"
-                alt="Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen"
+                alt={`Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen; white text composited over the room's left wall carries his quote: "People get hung up — should I buy this expensive camera? No. Use the cheaper camera, but get a good mic."`}
                 loading="lazy"
                 decoding="async"
                 width="1440"
                 height="1080"
               />
             </picture>
-            <blockquote class="meme-room-quote">
-              <p>
-                &ldquo;People get hung up &mdash; should I buy this expensive camera? No. Use the
-                cheaper camera, but get a good mic.&rdquo;
-              </p>
-              <footer class="hud-label meme-room-credit">
-                Eric Abramson &middot; The Carpenter Not the Tools &middot; December 2025 session
-              </footer>
-            </blockquote>
+            <figcaption class="hud-label meme-room-cap">Inside The Carpenter Not the Tools, December 2025 session</figcaption>
           </figure>
         </div>
 
@@ -427,6 +464,7 @@ const ARTICLE = {
                     {m.avif && <source srcset={m.avif} type="image/avif" />}
                     <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
                   </picture>
+                  <figcaption class="meme-program-desc">{c.desc}</figcaption>
                 </figure>
               ) : null;
             })}
@@ -436,45 +474,44 @@ const ARTICLE = {
         <p class="meme-footnote">{PROGRAMS_INTRO.footnote}</p>
       </section>
 
-      {/* 2026-08-03 EVERGREEN REBUILD — the people, in two tiers: MEME's own
-          team (each pictured once, credited with what they teach where the
-          xlsx confirms it), then the working professionals confirmed as
-          instructors who are NOT on the team page. See the header note above
-          TEAM for the Amber MacPherson photo-rights flag and the Sindbad
-          house rule. */}
+      {/* MEME-POLISH-2026-08-03 REROSTER — the people, in two tiers: founders
+          (Nick + Amber, both pictured), then instructors (Eric, Adam, Steve).
+          See the header note above ROSTER_LEADS for the scope rule (why
+          Shaun/Sindbad are gone) and the Amber photo-crop/credit note. */}
       {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading + bio copy below,
-          staging-only until read. */}
+          staging-only until read. Roster SCOPE RULE: founders + instructors
+          only — see the header comment above ROSTER_LEADS before adding
+          anyone else here. */}
       <p class="hud-label meme-kicker" data-reveal>The people</p>
       <h2 class="meme-h2" data-reveal>Who's actually behind it.</h2>
 
-      <p class="hud-label meme-track-label" data-reveal>The team</p>
-      <div class="meme-roster" data-reveal aria-label="MEME's team">
+      <p class="hud-label meme-track-label" data-reveal>Founders</p>
+      <div class="meme-roster meme-roster--leads" data-reveal aria-label="MEME's founders">
         {
-          TEAM.map((p) => {
-            const shot = p.key ? memeShots[p.key as keyof typeof memeShots] : undefined;
-            return (
-              <figure class:list={["meme-roster-card", { "meme-roster-card--text": !shot }]}>
-                {shot && (
-                  <picture>
-                    {shot.avif && <source srcset={shot.avif} type="image/avif" />}
-                    <img src={shot.webp ?? shot.avif} alt={p.alt!} loading="lazy" decoding="async" />
-                  </picture>
-                )}
+          ROSTER_LEADS.map((p) => {
+            const shot = memeShots[p.key as keyof typeof memeShots];
+            return shot ? (
+              <figure class="meme-roster-card">
+                <picture>
+                  {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+                  <img src={shot.webp ?? shot.avif} alt={p.alt} loading="lazy" decoding="async" />
+                </picture>
                 <figcaption>
                   <span class="meme-roster-name">{p.name}</span>
                   <span class="meme-roster-role">{p.role}</span>
-                  {p.bio && <span class="meme-roster-bio">{p.bio}</span>}
+                  <span class="meme-roster-bio">{p.bio}</span>
+                  {"photoCredit" in p && <span class="meme-roster-credit">Photo: {p.photoCredit}</span>}
                 </figcaption>
               </figure>
-            );
+            ) : null;
           })
         }
       </div>
 
-      <p class="hud-label meme-track-label" data-reveal>Also teaching</p>
-      <div class="meme-roster meme-roster--instructors" data-reveal aria-label="Other MEME workshop instructors, not on the team page">
+      <p class="hud-label meme-track-label" data-reveal>Instructors</p>
+      <div class="meme-roster meme-roster--instructors" data-reveal aria-label="MEME's workshop instructors">
         {
-          INSTRUCTOR_CREDITS.map((p) => {
+          ROSTER_INSTRUCTORS.map((p) => {
             const shot = memeShots[p.key as keyof typeof memeShots];
             return shot ? (
               <figure class="meme-roster-card">
@@ -492,8 +529,9 @@ const ARTICLE = {
         }
       </div>
       <p class="meme-footnote" data-reveal>
-        The team is MEME's own (meme.ngo/meet-the-team); instructors are working
-        professionals brought in to teach a session, not the board.
+        Founders and instructors shown here; the wider Member At-Large board
+        (including my own role) isn't repeated in this roster — see the article
+        above.
       </p>
 
       <nav class="meme-ctas" data-reveal>
@@ -655,13 +693,19 @@ const ARTICLE = {
     letter-spacing: 0.22em;
     color: color-mix(in srgb, var(--track-color, var(--color-accent, #38f8ec)) 82%, transparent);
   }
+  /* MEME-POLISH-2026-08-03: cards went from 1440x900 flyer-shaped to 1080x1350
+     (4:5) poster-shaped ("film-festival section cards, not flyers" — operator).
+     A poster reads oddly stretched full-width on a wide screen, so each card
+     gets a max-width and centers itself in its grid cell rather than filling it. */
   .meme-program-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-    gap: 1.1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.3rem;
   }
   .meme-program-card {
     margin: 0;
+    max-width: 21rem;
+    margin-inline: auto;
   }
   .meme-program-card img {
     display: block;
@@ -671,15 +715,28 @@ const ARTICLE = {
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   }
+  /* the description, OFF the image now — real HTML text, selectable, readable
+     at any size (the whole point of the redesign: the image no longer carries
+     a body paragraph that turns to mush at card scale). */
+  .meme-program-desc {
+    margin-top: 0.55rem;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, #eef2f5 68%, transparent);
+  }
   .meme-footnote {
     font-size: 0.72rem;
     line-height: 1.5;
     color: color-mix(in srgb, #eef2f5 55%, transparent);
   }
   /* CARPENTER-RECORDING-SEGMENT — the one photographic moment in the programs
-     section: a real frame from inside the workshop, quote underneath. Sits
-     full-width under the On-Set Craft grid, max-width capped so it reads as a
-     figure, not a hero. Same border/shadow voice as the program cards. */
+     section: a real frame from inside the workshop. Sits full-width under the
+     On-Set Craft grid, max-width capped so it reads as a figure, not a hero.
+     Same border/shadow voice as the program cards.
+     MEME-POLISH-2026-08-03: the quote is now composited INTO the photo
+     (scripts/make-carpenter-room.mjs), so the separate blockquote styles are
+     retired — just a one-line caption below. */
   .meme-room {
     margin: 1.4rem auto 0;
     max-width: 51.25rem; /* 820px — matches the sizes attr */
@@ -692,30 +749,21 @@ const ARTICLE = {
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   }
-  .meme-room-quote {
-    margin: 0.9rem 0 0;
-    padding: 0 0.2rem;
-  }
-  .meme-room-quote p {
-    margin: 0;
-    font-family: var(--font-serif, "Fraunces Variable", serif);
-    font-style: italic;
-    font-size: 1.06rem;
-    line-height: 1.55;
-    color: color-mix(in srgb, #eef2f5 88%, transparent);
-  }
-  .meme-room-credit {
+  .meme-room-cap {
     display: block;
-    margin-top: 0.45rem;
+    margin: 0.55rem 0 0;
     letter-spacing: 0.18em;
-    color: color-mix(in srgb, #eef2f5 52%, transparent);
+    color: var(--color-ink-muted, #8a9a96);
   }
 
-  /* 2026-08-03 EVERGREEN REBUILD — roster grid grown from 3 headshots to the
-     full team tier (5, one text-only row per missing/unconfirmed photo) plus
-     a second, narrower instructor tier (2). Still a masthead/contributors
-     block (~11rem cells, centered), deliberately smaller than a gallery so it
-     reads as credits, not imagery. */
+  /* MEME-POLISH-2026-08-03 REROSTER — down from a 5+2 team/instructor split
+     (with 3 text-only placeholder rows) to 2 founders + 3 instructors, EVERY
+     row now pictured (Amber's photo added, Shaun/Sindbad removed — see the
+     ROSTER_LEADS header comment for the scope rule). No more text-only
+     placeholder cards: uniform photo treatment throughout fixes the layout
+     raggedness the operator flagged ("spots where things just don't fit").
+     Founders get a slightly larger 2-up row (they're the leads); instructors
+     stay the smaller 3-up row below. Both use the same 1:1 crop ratio. */
   .meme-roster {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -724,9 +772,12 @@ const ARTICLE = {
     max-width: 36rem;
     width: 100%;
   }
-  .meme-roster--instructors {
+  .meme-roster--leads {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 24rem;
+    max-width: 26rem;
+  }
+  .meme-roster--instructors {
+    max-width: 36rem;
   }
   .meme-roster-card {
     margin: 0;
@@ -740,21 +791,6 @@ const ARTICLE = {
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-  }
-  /* text-only rows (Amber, Shaun, Sindbad — see the TEAM header note for why
-     no photo) get a bordered placeholder the same footprint as a photo card,
-     so the grid rhythm holds without faking imagery that doesn't exist. */
-  .meme-roster-card--text figcaption {
-    aspect-ratio: 1 / 1;
-    border: 1px dashed color-mix(in srgb, #ffffff 18%, transparent);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0.9rem;
-    gap: 0.3rem;
   }
   .meme-roster-card figcaption {
     display: grid;
@@ -776,8 +812,17 @@ const ARTICLE = {
     line-height: 1.45;
     color: color-mix(in srgb, #eef2f5 62%, transparent);
   }
+  /* attribution for the one licensed/credited photo in this roster (Amber's,
+     shot by April O'Hare Photography) — cropping the source's own watermark
+     out and printing this line instead is the honest way to use it. */
+  .meme-roster-credit {
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, #eef2f5 45%, transparent);
+  }
   @media (max-width: 640px) {
     .meme-roster { grid-template-columns: 1fr 1fr; }
+    .meme-roster--leads { grid-template-columns: 1fr 1fr; }
   }
 
   .meme-ctas {

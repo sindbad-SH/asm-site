@@ -1,33 +1,49 @@
 #!/usr/bin/env node
 /**
- * make-meme-evergreen.mjs — 2026-08-03. Bakes the media for the /venture/meme
- * EVERGREEN rebuild (operator: stop shipping the dated campaign flyers —
- * "if we do another Business of Show Business it'll work the same way. Same
- * for Pitch Quorum and Market Fresh" — and show the fuller roster, not just
- * Nick's headshot again).
+ * make-meme-evergreen.mjs — 2026-08-03, REBUILT the same day per operator
+ * polish-round review (branch meme-polish-2026-08-03): the first cut of these
+ * cards was "pretty basic and hard to read" — designed like full-size posters
+ * (kicker + title + a 4-line body paragraph + instructor + org footer) that
+ * render at ~300px wide in the page's card grid, where the paragraph turns to
+ * mush and the old photo-textured ghost-M watermark reads as murky noise.
+ *
+ * Card-scale redesign: ON the image now is ONLY kicker (small, track color),
+ * the program TITLE (big, Anton, dominant — the card IS the title), and the
+ * instructor name (small, italic). No body paragraph, no org footer line on
+ * the image. The description moved OFF the image entirely — it's real HTML
+ * text under each card in meme.astro now (PROGRAMS[].desc), selectable and
+ * readable at any size. The watermark is no longer a photo crop of MEME's
+ * logo mark (that was the "muddy photo texture") — it's now a single flat
+ * Anton "M" glyph in the track's own color at very low opacity: a solid
+ * geometric shape, not a photo.
+ *
+ * Poster aspect (1080x1350, 4:5) replaces the old 1440x900 flyer-shaped
+ * canvas — the operator's ask was "film-festival section cards, not flyers."
  *
  * Two kinds of output, both into public/media/venture/meme/:
  *
- * 1. PROGRAM CARDS (program-<slug>-<w>.{avif,webp}) — clean typographic/
- *    branded cards, built from the site's OWN fonts (Anton/Fraunces/DM Sans —
- *    the same three the page already uses) plus a crop of MEME's own
- *    filmstrip-M logo mark (E:\Makeshift\MEME\...\Logos\MEME - Cropped.jpg)
- *    as a faint corner watermark. NOT the dated flyers — no dates, times,
- *    venues, or prices anywhere on these; that's the whole point of the
- *    rebuild. Rendered via @resvg/resvg-js (sharp/librsvg does not honor
- *    embedded @font-face — verified empirically before writing this) at 2x
- *    for crisp type, then downsampled through sharp like every other bake.
+ * 1. PROGRAM CARDS (program-<slug>-<w>.{avif,webp}) — built from the site's
+ *    OWN fonts (Anton/Fraunces/DM Sans, the same three the page already
+ *    uses). NOT the dated flyers — no dates, times, venues, or prices
+ *    anywhere on these; that's the whole point of the rebuild. Rendered via
+ *    @resvg/resvg-js (sharp/librsvg does not honor embedded @font-face —
+ *    verified empirically before writing this) at 2x for crisp type, then
+ *    downsampled through sharp like every other bake.
  *
- * 2. TWO NEW ROSTER HEADSHOTS (eric-abramson-portrait-700, cropped from the
- *    only Eric Abramson photo on file, a work selfie that has a second,
- *    unrelated person — an interview subject — visible in the background;
- *    cropped tight to Eric's face/head so that person never appears).
- *    Amber MacPherson's two headshots (color + B/W) are NOT baked here: both
- *    carry a visible "April O'Hare Photography" watermark with the credit
- *    unconfirmed, same rights flag the previous build already raised. Her
- *    roster entry stays text-only, same as Shaun Michael Ellis (no photo on
- *    file at all) and Sindbad (house rule: never his photo in event/roster
- *    imagery).
+ * 2. ROSTER HEADSHOTS — eric-abramson-portrait-700 (cropped from the only
+ *    Eric Abramson photo on file, a work selfie that has a second, unrelated
+ *    person — an interview subject — visible in the background; cropped
+ *    tight to Eric's face/head so that person never appears), PLUS (new in
+ *    the 2026-08-03 polish round, operator's explicit ask — "Amber's photo
+ *    goes IN") amber-macpherson-portrait-700, cropped from her color
+ *    headshot. That source carries an "April O'Hare Photography" watermark
+ *    confined to the top-left corner; the crop starts below/right of it
+ *    (face centered, plenty of headroom, watermark fully excluded) and the
+ *    page prints a visible "Photo: April O'Hare Photography" credit line —
+ *    cropping the mark + printing the credit is the honest way to use it.
+ *    Shaun Michael Ellis and Sindbad are no longer on this roster at all (see
+ *    the scope-rule comment on ROSTER_LEADS in meme.astro) — not a photo
+ *    question, they've been removed from the list entirely.
  *
  * Font conversion: resvg-js's font loader wants real .ttf/.otf on disk and
  * (verified empirically) does NOT reliably read the family name out of the
@@ -75,14 +91,7 @@ for (const [key, src] of Object.entries(FONT_SRC)) {
 const FONT_FILES = Object.values(fontOut);
 console.log(`▸ fonts converted → ${fontDir}`);
 
-// ── 2. brand-asset crops (raw MEME materials — logo mark + Eric's only photo) ──
-const memeMarkBuf = await sharp(join(MEME_ROOT, "Logos", "MEME - Cropped.jpg"))
-  .extract({ left: 15, top: 5, width: 320, height: 465 })
-  .png()
-  .toBuffer();
-const memeMarkDataUri = `data:image/png;base64,${memeMarkBuf.toString("base64")}`;
-
-// ── 3. text layout helpers ──
+// ── 2. text layout helpers ──
 function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -115,82 +124,35 @@ const TRACKS = {
 };
 
 // ── 5. the seven evergreen program cards ──
-// Every fact below is paraphrased from E:\Makeshift\MEME\05 - Source Docs from
-// MEME\MEME Marketing.xlsx ("Instructor & Program Details" + "2026 Programs")
-// and MEME Programatic Overview.pdf — never the dated Zeffy/flyer copy, and
-// never mentioning "Makeshift Film Group" (forbidden term, see audit-lib.mjs).
+// Title + instructor only — every fact traces to the same source as before
+// (E:\Makeshift\MEME\05 - Source Docs from MEME\MEME Marketing.xlsx, never
+// the dated Zeffy/flyer copy, never "Makeshift Film Group" — forbidden term,
+// see audit-lib.mjs). The one-sentence descriptions now live as real HTML
+// text in meme.astro's PROGRAMS array (below the card, not on it).
 const CARDS = [
-  {
-    slug: "pitch-quorum",
-    track: "pitch-market",
-    title: ["Pitch Quorum"],
-    titleSize: 112,
-    body: "A free introduction to pitching a feature film to investors, then Beginner and Advanced sessions that go deeper into querying and the documents behind a pitch. Mostly remote, with an in-person session to practice pitching in front of classmates.",
-    instructor: "Nick C. Goins Jr.",
-  },
-  {
-    slug: "market-fresh",
-    track: "pitch-market",
-    title: ["Market Fresh"],
-    titleSize: 112,
-    body: "A free introduction, then a multi-session remote program on how to prepare for a film market — what to expect, how to work it once you're there, and the follow-through after.",
-    instructor: "Nick C. Goins Jr.",
-  },
-  {
-    slug: "business-of-show-business",
-    track: "pitch-market",
-    title: ["The Business of", "Show Business"],
-    titleSize: 88,
-    body: "A workshop on the state of the film industry from a business perspective — the practical side of filmmaking that founders don't usually get taught anywhere.",
-    instructor: "Nick C. Goins Jr.",
-  },
-  {
-    slug: "pa-workshop",
-    track: "on-set",
-    title: ["PA Workshop"],
-    titleSize: 112,
-    body: "An in-person workshop for new and experienced production assistants alike: the basics of the job, what makes a PA stand out and get rehired, and hard-won tips from time actually spent on set.",
-    instructor: "Adam Smestad",
-  },
-  {
-    slug: "script-supervisor",
-    track: "on-set",
-    title: ["Script Supervisor", "Workshop"],
-    titleSize: 88,
-    body: "An in-person workshop on the basics of script supervising — continuity, script-supervising notes, the skill set, and how to build a career doing it.",
-    instructor: "Adam Smestad",
-  },
-  {
-    slug: "carpenter",
-    track: "on-set",
-    title: ["The Carpenter Not", "the Tools"],
-    titleSize: 88,
-    body: "A free in-person workshop on how to get started as a filmmaker with what you already have. Expensive gear is easy to get intimidated by — it shouldn't be what holds you back.",
-    instructor: "Eric Abramson",
-  },
-  {
-    slug: "sound-workshop",
-    track: "sound",
-    title: ["Sound Workshop"],
-    titleSize: 112,
-    body: "A two-part series on production sound. Part one sets a shoot up for success on location — mic placement, a sound plan, timecode, formats, metadata. Part two covers what happens to that audio in post — scheduling, spotting notes, the mix, delivery.",
-    instructor: "Steve Borne",
-  },
+  { slug: "pitch-quorum", track: "pitch-market", title: ["Pitch Quorum"], titleSize: 168, instructor: "Nick C. Goins Jr." },
+  { slug: "market-fresh", track: "pitch-market", title: ["Market Fresh"], titleSize: 160, instructor: "Nick C. Goins Jr." },
+  { slug: "business-of-show-business", track: "pitch-market", title: ["The Business", "of Show", "Business"], titleSize: 108, instructor: "Nick C. Goins Jr." },
+  { slug: "pa-workshop", track: "on-set", title: ["PA Workshop"], titleSize: 150, instructor: "Adam Smestad" },
+  { slug: "script-supervisor", track: "on-set", title: ["Script", "Supervisor"], titleSize: 130, instructor: "Adam Smestad" },
+  { slug: "carpenter", track: "on-set", title: ["The Carpenter", "Not the Tools"], titleSize: 110, instructor: "Eric Abramson" },
+  { slug: "sound-workshop", track: "sound", title: ["Sound", "Workshop"], titleSize: 155, instructor: "Steve Borne" },
 ];
 
-const W = 1440,
-  H = 900,
+// Poster aspect (4:5) — "film-festival section cards, not flyers" (operator).
+const W = 1080,
+  H = 1350,
   SCALE = 2;
-const MARGIN = 90;
+const MARGIN = 82;
 
 function buildCardSvg(card) {
   const track = TRACKS[card.track];
-  const titleY = 260;
-  const titleDy = card.titleSize * 1.05;
-  const bodyStartY = card.title.length > 1 ? 470 : 420;
-  const bodyLines = wrap(card.body, 58);
-  const bodyDy = 46;
-  const footerY = H - 80;
+  const nLines = card.title.length;
+  const titleDy = Math.round(card.titleSize * 1.08);
+  // vertically balance the title block regardless of line count so the card
+  // reads the same "weight" whether it's 1 line or 3
+  const titleStartY = Math.round(H / 2 - ((nLines - 1) * titleDy) / 2 + card.titleSize * 0.34);
+  const instructorY = H - 132;
 
   return `<svg width="${W * SCALE}" height="${H * SCALE}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -200,20 +162,19 @@ function buildCardSvg(card) {
     </linearGradient>
   </defs>
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
-  <rect width="${W}" height="10" fill="${track.color}"/>
-  <image href="${memeMarkDataUri}" x="${W - 300}" y="${H - 430}" width="230" height="335" opacity="0.16"/>
-  <text x="${MARGIN}" y="112" font-family="DM Sans" font-size="28" letter-spacing="4" fill="${track.color}">${esc(track.label)}</text>
-  <text x="${MARGIN}" y="${titleY}" font-family="Anton" font-size="${card.titleSize}" fill="#f2f4f8">${tspans(card.title, MARGIN, titleY, titleDy)}</text>
-  <text x="${MARGIN}" y="${bodyStartY}" font-family="DM Sans" font-size="32" fill="#eef2f5" fill-opacity="0.88">${tspans(bodyLines, MARGIN, bodyStartY, bodyDy)}</text>
-  <text x="${MARGIN}" y="${footerY}" font-family="Fraunces" font-style="italic" font-size="32" fill="${track.color}">${esc("— " + card.instructor)}</text>
-  <text x="${MARGIN}" y="${H - 34}" font-family="Space Mono" font-size="20" letter-spacing="3" fill="#8a9a96">${esc("MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION")}</text>
+  <rect width="${W}" height="12" fill="${track.color}"/>
+  <!-- flat geometric M — a solid glyph shape, not a photo crop, kept very faint -->
+  <text x="${W + 40}" y="${H + 40}" font-family="Anton" font-size="900" fill="${track.color}" fill-opacity="0.07" text-anchor="end">M</text>
+  <text x="${MARGIN}" y="150" font-family="DM Sans" font-size="26" letter-spacing="5" fill="${track.color}">${esc(track.label)}</text>
+  <text x="${MARGIN}" y="${titleStartY}" font-family="Anton" font-size="${card.titleSize}" fill="#f6f8fb">${tspans(card.title, MARGIN, titleStartY, titleDy)}</text>
+  <text x="${MARGIN}" y="${instructorY}" font-family="Fraunces" font-style="italic" font-size="38" fill="${track.color}">${esc("— " + card.instructor)}</text>
 </svg>`;
 }
 
 await mkdir(OUT_DIR, { recursive: true });
 
-const CARD_AVIF = { quality: 55, effort: 5 }; // flyer-style dense type — matches make-meme-campaign.mjs
-const CARD_WEBP = { quality: 78, effort: 5 };
+const CARD_AVIF = { quality: 58, effort: 5 };
+const CARD_WEBP = { quality: 80, effort: 5 };
 const WIDTHS = [900, 1600];
 
 console.log(`\n▸ meme evergreen program cards → public/media/venture/meme/`);
@@ -249,6 +210,27 @@ if (existsSync(ericSrc)) {
   console.log(`  ✓ eric-abramson-portrait-700  (cropped from the on-set selfie, background subject excluded)`);
 } else {
   console.error(`  ✖ missing source: ${ericSrc}`);
+  process.exitCode = 1;
+}
+
+// ── 7. Amber MacPherson roster headshot — crop starts below/right of the
+//    "April O'Hare Photography" watermark (confined to the top-left corner
+//    of the 500x500 source), face-centered, plenty of headroom. Credit line
+//    prints visibly on the page (meme.astro) rather than being silently cropped
+//    away without attribution.
+const amberSrc = join(MEME_ROOT, "Photos", "Amber MacPherson Color Headshot.jpg");
+if (existsSync(amberSrc)) {
+  const PHOTO_AVIF = { quality: 55, effort: 5 };
+  const PHOTO_WEBP = { quality: 82 };
+  const base = sharp(amberSrc)
+    .rotate()
+    .extract({ left: 30, top: 78, width: 422, height: 422 })
+    .resize({ width: 700 });
+  await base.clone().avif(PHOTO_AVIF).toFile(join(OUT_DIR, "amber-macpherson-portrait-700.avif"));
+  await base.clone().webp(PHOTO_WEBP).toFile(join(OUT_DIR, "amber-macpherson-portrait-700.webp"));
+  console.log(`  ✓ amber-macpherson-portrait-700  (cropped below the April O'Hare Photography watermark, face centered)`);
+} else {
+  console.error(`  ✖ missing source: ${amberSrc}`);
   process.exitCode = 1;
 }
 
