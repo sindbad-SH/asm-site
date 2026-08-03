@@ -128,6 +128,51 @@ const CREDIT_LINES = ["ERIC ABRAMSON \u00B7 THE CARPENTER", "NOT THE TOOLS \u00B
 const CREDIT_Y = 838;
 const CREDIT_DY = 30;
 
+// ── PORT 2026-08-03 (branch meme-cards-kit-2026-08-03): corner ticks + gold
+//    tag, ported from the "MEME Program Card Kit" exploration board's
+//    Treatment B ("Corner ticks + gold tag") — harvested from Claude Design
+//    project 513a4587-7791-40c6-8125-b73dfce117bb, viewed via Present mode
+//    (the DesignSync MCP used for prior kit harvests was unavailable this
+//    session, so this is redrawn from the rendered reference + the kit's own
+//    measured numbers, not copied from source markup). Four quiet gate-mark
+//    corner ticks (55% white, decorative — an L-bracket in each corner of the
+//    frame) plus a small navy-on-gold tag reading "IN THE ROOM" (kit-measured
+//    11.3:1 contrast — the same navy/gold pair the kit uses for its gold
+//    on-navy labels, reversed). The tag sits top-right, clear of the quote
+//    column (which occupies the left 660px) and clear of every face — this
+//    frame's people are lower/center-right, well below the tag's y-range.
+//    The kit's own exploration board used a placeholder demo quote marked
+//    PLACEHOLDER COPY — NEVER PUBLISH; that quote is never used here — the
+//    existing verbatim Eric quote, credit, logo mark, and scrim above are
+//    left exactly as they were.
+const TICK_LEN = 34,
+  TICK_INSET = 22,
+  TICK_STROKE = 3,
+  TICK_COLOR = "#FFFFFF",
+  TICK_OPACITY = 0.55;
+function cornerTick(x, y, dx, dy) {
+  // dx/dy = +1/-1 direction the two arms extend from the corner point (x,y)
+  return `<path d="M ${x} ${y + dy * TICK_LEN} L ${x} ${y} L ${x + dx * TICK_LEN} ${y}" fill="none" stroke="${TICK_COLOR}" stroke-opacity="${TICK_OPACITY}" stroke-width="${TICK_STROKE}" stroke-linecap="round"/>`;
+}
+const cornerTicksSvg = [
+  cornerTick(TICK_INSET, TICK_INSET, 1, 1), // top-left
+  cornerTick(W - TICK_INSET, TICK_INSET, -1, 1), // top-right
+  cornerTick(TICK_INSET, H - TICK_INSET, 1, -1), // bottom-left
+  cornerTick(W - TICK_INSET, H - TICK_INSET, -1, -1), // bottom-right
+].join("");
+
+// Navy-on-gold tag — MEME kit tokens (colors.css): --navy:#011D4C, --gold:#FED302.
+const TAG_NAVY = "#011D4C";
+const TAG_GOLD = "#FED302";
+const TAG_LABEL = "IN THE ROOM";
+const TAG_W = 214,
+  TAG_H = 46,
+  TAG_X = W - 70 - TAG_W, // top-right, clear of the quote column and every face
+  TAG_Y = 34,
+  TAG_R = 6;
+const tagSvg = `<rect x="${TAG_X}" y="${TAG_Y}" width="${TAG_W}" height="${TAG_H}" rx="${TAG_R}" fill="${TAG_GOLD}"/>
+  <text x="${TAG_X + TAG_W / 2}" y="${TAG_Y + TAG_H / 2 + 6}" font-family="Space Mono" font-size="17" letter-spacing="2.4" fill="${TAG_NAVY}" text-anchor="middle">${esc(TAG_LABEL)}</text>`;
+
 const overlaySvg = `<svg width="${W * SCALE}" height="${H * SCALE}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="scrim" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
@@ -139,6 +184,8 @@ const overlaySvg = `<svg width="${W * SCALE}" height="${H * SCALE}" viewBox="0 0
   <rect x="0" y="0" width="${SCRIM_W}" height="${H}" fill="url(#scrim)"/>
   <text x="${MARGIN}" y="${QUOTE_Y}" font-family="Fraunces" font-style="italic" font-size="${QUOTE_SIZE}" fill="#f7f9fb">${tspans(quoteLines, MARGIN, QUOTE_Y, QUOTE_DY)}</text>
   <text x="${MARGIN}" y="${CREDIT_Y}" font-family="Space Mono" font-size="16" letter-spacing="3.2" fill="#f7f9fb" fill-opacity="0.78">${tspans(CREDIT_LINES, MARGIN, CREDIT_Y, CREDIT_DY)}</text>
+  ${cornerTicksSvg}
+  ${tagSvg}
 </svg>`;
 
 const resvg = new Resvg(overlaySvg, { font: { fontFiles: FONT_FILES, loadSystemFonts: false, defaultFontFamily: "Space Mono" } });
