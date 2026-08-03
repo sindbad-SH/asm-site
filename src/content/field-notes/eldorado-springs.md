@@ -16,6 +16,12 @@ photos:
   - slug: eldorado-springs-01
     orientation: landscape
     alt: Red sandstone walls of Eldorado Canyon with pine slopes and the creek below
+  - slug: eldorado-springs-02
+    orientation: vertical
+    alt: South Boulder Creek and the canyon road threading between red sandstone walls at Eldorado Canyon
+  - slug: eldorado-springs-03
+    orientation: vertical
+    alt: The Eldorado Springs resort and its pool at the mouth of the canyon, the village road beyond
 license: true
 ---
 
