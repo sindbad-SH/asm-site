@@ -193,31 +193,77 @@ const overlayPng = resvg.render().asPng();
 const overlayNative = await sharp(overlayPng).resize({ width: W, height: H }).png().toBuffer();
 
 // ── ROUND 3 corner mark: crop the M glyph out of MEME's own cleanest lockup,
-//    reduce it to a low-opacity white silhouette (grayscale+normalize as a
-//    luminance → alpha mask), place it in the empty top-left wall area. ──
+//    reduce it to a low-opacity white silhouette, place it in the empty
+//    top-left wall area. ──
 const LOGO_SRC = join("E:", "Makeshift", "MEME", "05 - Source Docs from MEME", "Logos", "MEME - Cropped.jpg");
 const LOGO_GLYPH_CROP = { left: 20, top: 0, width: 320, height: 462 }; // just the M, not the wordmark below it
-const LOGO_W = 150; // rendered width against the native 1440x1080 frame
+// MEME-STICKLER-2026-08-03 (operator: "the MEME logo in the top-left is too
+// transparent, everything is kind of small") — scaled up from 150px to 240px
+// (in the 1440-wide frame; still clears the quote block, whose first line
+// starts at y≈484, and the corner tick inset at x=22/y=22) and opacity raised
+// from 0.5 to 0.88 so it reads as deliberate branding at a glance rather than
+// a barely-there watermark, at the ~700px display size the card actually
+// renders at on the page.
+//
+// MASKING METHOD CHANGED at the same time: the old greyscale+normalise
+// luminance mask made the M read as patchy/broken once it was this much
+// bigger and more opaque — the source art is a PHOTO-TEXTURED filmstrip (see
+// the file itself: little colour thumbnail frames and black sprocket bars
+// inside the M's strokes), so plenty of pixels *inside* the M are just as
+// dark as the navy background around it, and a pure-luminance mask makes
+// those pixels transparent too, leaving holes in the letterform. Fixed with
+// a chroma-distance mask instead: sample the flat navy background color from
+// the crop's corners, then key on each pixel's COLOR DISTANCE from that
+// background (thresholded 55→95, picked by histogram — background pixels
+// including the faint diamond quilting pattern all fall under ~60, the M's
+// own content starts above that) rather than raw brightness. That reads the
+// M as one solid shape regardless of what's bright or dark inside its
+// strokes — verified by compositing the resulting mask over a plain dark
+// swatch before using it here.
+const LOGO_W = 240; // rendered width against the native 1440x1080 frame
 const LOGO_X = 54,
   LOGO_Y = 42; // clears the quote block (first line lands at y≈484)
-const LOGO_OPACITY = 0.5; // quiet — a mark, not a watermark
+const LOGO_OPACITY = 0.88; // deliberate branding mark, not a faint watermark
+const CHROMA_LO = 55,
+  CHROMA_HI = 95;
 
 async function buildLogoOverlay() {
-  const glyphCrop = await sharp(LOGO_SRC).extract(LOGO_GLYPH_CROP).toBuffer();
-  const { data: mask, info } = await sharp(glyphCrop)
-    .resize({ width: LOGO_W })
-    .greyscale()
-    .normalise()
+  const { data: rgb, info } = await sharp(LOGO_SRC)
+    .extract(LOGO_GLYPH_CROP)
     .raw()
     .toBuffer({ resolveWithObject: true });
-  const rgba = Buffer.alloc(info.width * info.height * 4);
-  for (let i = 0; i < info.width * info.height; i++) {
+  const n = info.width * info.height;
+  // background sample: average of the four corners (all confirmed flat navy)
+  const corners = [0, info.width - 1, (info.height - 1) * info.width, n - 1];
+  let br = 0,
+    bg = 0,
+    bb = 0;
+  for (const c of corners) {
+    br += rgb[c * 3];
+    bg += rgb[c * 3 + 1];
+    bb += rgb[c * 3 + 2];
+  }
+  br /= corners.length;
+  bg /= corners.length;
+  bb /= corners.length;
+
+  const rgba = Buffer.alloc(n * 4);
+  for (let i = 0; i < n; i++) {
+    const dr = rgb[i * 3] - br,
+      dg = rgb[i * 3 + 1] - bg,
+      db = rgb[i * 3 + 2] - bb;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    const t = Math.min(1, Math.max(0, (dist - CHROMA_LO) / (CHROMA_HI - CHROMA_LO)));
     rgba[i * 4] = 255;
     rgba[i * 4 + 1] = 255;
     rgba[i * 4 + 2] = 255;
-    rgba[i * 4 + 3] = Math.round(mask[i] * LOGO_OPACITY);
+    rgba[i * 4 + 3] = Math.round(t * 255 * LOGO_OPACITY);
   }
-  return { buffer: rgba, width: info.width, height: info.height };
+  const resized = await sharp(rgba, { raw: { width: info.width, height: info.height, channels: 4 } })
+    .resize({ width: LOGO_W })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  return { buffer: resized.data, width: resized.info.width, height: resized.info.height };
 }
 const logo = await buildLogoOverlay();
 
