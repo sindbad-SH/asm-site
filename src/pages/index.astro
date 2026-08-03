@@ -85,9 +85,16 @@ const heroTurn = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(
     <h2 class="text-2xl font-bold" data-reveal>{p.proof.heading}</h2>
     <p data-reveal>{p.proof.intro}</p>
     <!-- Testimonial blockquote gains a contour rule that draws in on reveal
-         (R3.6c H4). -->
+         (R3.6c H4). AUDIT-FIX (2026-08-03): showProof was left at its
+         default (true), so the testimonial printed its own embedded
+         PitchBoulder citation ("The primary proof anchor.") immediately
+         above the tiered list below, whose own first row is also
+         "pitchboulder" — the same citation appeared twice back-to-back.
+         venture.astro's own E3 already documents and avoids this exact
+         collision (showProof={false} "to avoid a back-to-back duplicate");
+         home just hadn't applied it. -->
     <div class="proof-quote" data-reveal>
-      <Testimonial testimonialId={p.proof.testimonialId} />
+      <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
     </div>
     <!-- Legend rows: 40ms stagger (kept) + each symbol fires ONE survey-ping as
          its row reveals — the honesty device pings onto the map (R3.6c H4). -->

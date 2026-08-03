@@ -180,9 +180,28 @@ export const PILLARS: readonly Pillar[] = [
 export const COPY = {
   hero: {
     kicker: "Every story, taken as far as it goes.",
-    headline: "The StorySmith. We forge stories for the wild, the market, and the industry.",
+    // AUDIT-FIX (2026-08-03): the turn (everything after "The StorySmith.",
+    // which index.astro discards and never renders — see its P14a comment)
+    // used to read "We forge stories for the wild, the market, and the
+    // industry": three service verticals, the pre-publication-pivot framing.
+    // It never caught up to PUB-A/PUB-B (2026-07-27), which repointed the
+    // whole site to TWO story columns (nav caps at Adventure Stories/Venture
+    // Stories; Forge the Saga dropped to a footer-only method page) — so the
+    // one sentence a first-time visitor reads first was still describing an
+    // agency with three client verticals, not the publication the rest of the
+    // site now is. Rewritten to say plainly what this is, naming the same two
+    // columns the nav uses. ⚠ OPERATOR READ-APPROVAL REQUIRED — new sentence
+    // (staging-only until read).
+    headline: "The StorySmith. A publication of Adventure Stories and Venture Stories.",
+    // AUDIT-FIX (2026-08-03): "on the trail, in the boardroom, on set" was the
+    // matching three-bucket callback (trail/boardroom/set ~ wild/market/
+    // industry) to the same retired three-vertical framing above — "on set"
+    // was entertainment's bucket before /entertainment retired into /venture.
+    // Collapsed to the two buckets the site actually runs on now. Same voice,
+    // same claim, one clause shorter. ⚠ OPERATOR READ-APPROVAL REQUIRED —
+    // revised sentence (staging-only until read).
     subline:
-      "Sindbad Horizon — Boulder, Colorado. We find the truest version of a story and forge it into something people feel: on the trail, in the boardroom, on set.",
+      "Sindbad Horizon — Boulder, Colorado. We find the truest version of a story and forge it into something people feel: on the trail, and in the boardroom.",
     // P29 buyer-language pairing — one plain line under the hero so a cold
     // buyer decodes the offer in seconds. ⚠ OPERATOR READ-APPROVAL REQUIRED —
     // new visible copy (staging-only until read).
@@ -190,8 +209,15 @@ export const COPY = {
     // three middot-separated HUD fragments) so it reads cleanly now that
     // index.astro promotes it out of .hud-label into body-text scale — see
     // that file. Same words/facts; only case and separators changed.
+    // AUDIT-FIX (2026-08-03): the words themselves were still a services menu
+    // ("Drone & aerial production, corporate storytelling & market research")
+    // — exactly the agency framing the rest of the site had already moved
+    // away from. Reworded to the same length/rhythm/facts (still concrete:
+    // drone work, founder/industry storytelling, Boulder, worldwide) but as
+    // what the publication covers, not what's for sale. ⚠ OPERATOR
+    // READ-APPROVAL REQUIRED — revised sentence (staging-only until read).
     buyerLine:
-      "Drone & aerial production, corporate storytelling & market research — Boulder, Colorado, working worldwide",
+      "Drone and expedition photography, founder and industry storytelling — Boulder, Colorado, working worldwide",
     globeCaption: "Where the stories are told", // LOCKED — see GLOBE below
   },
   anchors: {
