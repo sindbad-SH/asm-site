@@ -42,7 +42,13 @@ const VENTURE_LINKS = [
   // title copied VERBATIM from its own page.
   { label: "A restored Shelby at Pebble Beach", href: "/work/shelby-pebble-beach" },
   // Build #1 (2026-08-01 archive-mining integration) — the new full story page.
-  { label: "Dawn Patrol — a Shelby Cobra at Pebble Beach", href: "/venture/dawn-patrol" },
+  // AUDIT-FIX (2026-08-03): label was "Dawn Patrol — a Shelby Cobra at Pebble
+  // Beach", which after the Concours reframe both mislabelled this page (it is
+  // now the whole-day Concours story, with Dawn Patrol as its opening movement)
+  // and duplicated the Shelby line directly above it — two archive rows both
+  // reading "a Shelby at Pebble Beach". Relabelled from the destination page's
+  // own slate, VERBATIM, per this list's existing convention (no new copy).
+  { label: "Pebble Beach Concours d'Elegance", href: "/venture/dawn-patrol" },
   { label: "PitchBoulder — coverage, recaps & the commercial", href: "/work/pitchboulder" },
   // Build #2 (2026-08-01 archive-mining integration) — the new hub page.
   // AUDIT-FIX (2026-08-02): /work/seriesfest is RETIRED (redirects here —
