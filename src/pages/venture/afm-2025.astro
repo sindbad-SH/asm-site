@@ -70,8 +70,17 @@ const hero = await shot("hero", "An AFM Sessions panel on the blue AFM-branded s
 const panelStage = await shot("panel-stage", "Panelists on stools with microphones on the AFM stage.");
 const podiumSpeaker = await shot("podium-speaker", "A speaker presenting at the podium during a session.");
 const stepAndRepeat = await shot("step-and-repeat", "The blue AFM-branded step-and-repeat backdrop.");
-const panelMics = await shot("panel-mics", "A session panel seated with microphones.");
-const podiumLectern = await shot("podium-lectern", "A speaker at the lectern during an AFM session.");
+// AUDIT-FIX (2026-08-03): the diptych below illustrates Movement 3's own
+// paragraph about "the indie-action-films panel presented by FLIP Creative" —
+// it previously showed panel-mics + podium-lectern, two GENERIC session
+// photos that didn't depict that panel at all, and panel-mics was also a
+// near-duplicate of the hero photo above (same five panelists, same moment,
+// just a wider crop) — a repeat a scrolling reader would clock. Swapped for
+// panel-independent-action + panel-address-stage: two angles of the SAME
+// four-person panel (standing moderator + three seated panelists), which
+// finally makes the text and the photo agree, and retires the hero repeat.
+const panelIndieAction = await shot("panel-independent-action", "A moderator addresses a seated panel of three, a caption slide visible on a side screen, during an AFM Sessions panel.");
+const panelAddress = await shot("panel-address-stage", "The same panel from further back, the full AFM-branded stage and a seated panel of three in view.");
 const panelSeated = await shot("panel-seated", "A seated panel on the AFM stage.");
 
 // The AFM proof line — imported from consts, rendered VERBATIM. This is the only
@@ -113,7 +122,7 @@ const CAPTIONS = {
   panelSeated: "The seated panel, mid-session.",
   podiumSpeaker: "A session speaker at the podium.",
   stepAndRepeat: "Between sessions, off the stage.",
-  panelsDiptych: "Panels and podiums, in rotation all week.",
+  panelsDiptych: "The indie-action-films panel, two angles.",
   venueCenturyPlaza: "The Fairmont Century Plaza at night — the market fills the building for a week.",
   stageBeforeDoors: "Before doors: a blue-lit stage and rows of empty seats.",
   pavilionCinecitta: "Cinecittà's pavilion banner — “your studio in Italy.”",
@@ -289,21 +298,21 @@ const meta = {
           the real point — the relationships are the infrastructure.
         </p>
       </div>
-      {(panelMics || podiumLectern) && (
+      {(panelIndieAction || panelAddress) && (
         <figure class="vs-diptych">
           <div class="vs-diptych-row">
-            {panelMics && (
+            {panelIndieAction && (
               <picture>
-                <source type="image/avif" srcset={panelMics.avif} sizes="(max-width: 760px) 50vw, 26rem" />
-                <source type="image/webp" srcset={panelMics.webp} sizes="(max-width: 760px) 50vw, 26rem" />
-                <img src={panelMics.fallback} alt={panelMics.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 60%" loading="lazy" decoding="async" />
+                <source type="image/avif" srcset={panelIndieAction.avif} sizes="(max-width: 760px) 50vw, 26rem" />
+                <source type="image/webp" srcset={panelIndieAction.webp} sizes="(max-width: 760px) 50vw, 26rem" />
+                <img src={panelIndieAction.fallback} alt={panelIndieAction.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
               </picture>
             )}
-            {podiumLectern && (
+            {panelAddress && (
               <picture>
-                <source type="image/avif" srcset={podiumLectern.avif} sizes="(max-width: 760px) 50vw, 26rem" />
-                <source type="image/webp" srcset={podiumLectern.webp} sizes="(max-width: 760px) 50vw, 26rem" />
-                <img src={podiumLectern.fallback} alt={podiumLectern.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+                <source type="image/avif" srcset={panelAddress.avif} sizes="(max-width: 760px) 50vw, 26rem" />
+                <source type="image/webp" srcset={panelAddress.webp} sizes="(max-width: 760px) 50vw, 26rem" />
+                <img src={panelAddress.fallback} alt={panelAddress.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
               </picture>
             )}
           </div>
