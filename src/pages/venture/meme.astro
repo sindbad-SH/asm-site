@@ -143,55 +143,98 @@ const PROGRAM_TRACKS = {
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every `desc` below is new, shortened
  * copy, staging-only until read.
  */
+// MEME-POLISH-2026-08-03 ROUND 3 — COMPOSITION (operator: "a lot of
+// rectangles... I like that asymmetry layout we've had on other pages," citing
+// steel-and-dust.astro / vybe.astro's staggered two-ups). `rank` is a pure
+// layout hint (no copy change) consumed by the card markup below to vary
+// each card's scale/offset per track, same device those pages use for their
+// photo staggers: "lead" = larger scale (the flagship/first program in its
+// track), "b" = the dropped-baseline stagger partner, "plain"/"solo" = the
+// smaller companion or a lone track's single card. See `.meme-program-card--*`
+// in the stylesheet below.
 const PROGRAMS = [
   {
     slug: "pitch-quorum",
     track: "pitch-market",
+    rank: "lead",
     alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
-    desc: "A free introduction to pitching a feature film to investors, plus deeper Beginner and Advanced sessions on querying and the documents behind a pitch — mostly remote, with an in-person practice session.",
+    desc: "An introduction to pitching a feature film to investors, plus deeper Beginner and Advanced sessions on querying and the documents behind a pitch — mostly remote, with an in-person practice session.",
   },
   {
     slug: "market-fresh",
     track: "pitch-market",
+    rank: "b",
     alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
-    desc: "A free introduction, then a multi-session remote program on preparing for a film market — what to expect, how to work it, and the follow-through after.",
+    desc: "An introduction, then a multi-session remote program on preparing for a film market — what to expect, how to work it, and the follow-through after.",
   },
   {
     slug: "business-of-show-business",
     track: "pitch-market",
+    rank: "plain",
     alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
     desc: "A workshop on the state of the film industry from a business perspective — the practical side of filmmaking that founders don't usually get taught anywhere.",
   },
   {
     slug: "pa-workshop",
     track: "on-set",
+    rank: "lead",
     alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
     desc: "An in-person workshop for new and experienced production assistants alike, covering the basics of the job and hard-won tips from time actually spent on set.",
   },
   {
     slug: "script-supervisor",
     track: "on-set",
+    rank: "b",
     alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
     desc: "An in-person workshop on the basics of script supervising — continuity, script-supervising notes, and how to build a career doing it.",
   },
   {
     slug: "carpenter",
     track: "on-set",
+    rank: "plain",
     alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, instructor credit to Eric Abramson.",
-    desc: "A free in-person workshop on getting started as a filmmaker with what you already have, rather than being intimidated by expensive gear.",
+    desc: "An in-person workshop on getting started as a filmmaker with what you already have, rather than being intimidated by expensive gear.",
   },
   {
     slug: "sound-workshop",
     track: "sound",
+    rank: "solo",
     alt: "An evergreen MEME program card reading Sound Workshop, Sound track, instructor credit to Steve Borne.",
     desc: "A two-part series on production sound — setting a shoot up for success on location, then what happens to that audio in post.",
   },
 ] as const;
 
+/**
+ * MEME-POLISH-2026-08-03 ROUND 3 — FREE-LANGUAGE SWEEP (operator, verbatim):
+ * "Remove any 'free' language on any of these courses... there were free
+ * testing/sample events related to those... but ultimately they are meant
+ * to be paid things... they are through a nonprofit where they're always
+ * meant to be affordable, but they're not always free." Four instances found
+ * on this page, all in program `desc` copy or the intro body below — every
+ * one just DROPS the cost claim rather than restating it in the
+ * affordable-through-a-nonprofit register, since none of these sentences
+ * actually needed a cost mention to describe what the workshop teaches:
+ *   - pitch-quorum desc: "A free introduction to pitching..." → "An
+ *     introduction to pitching..."
+ *   - market-fresh desc: "A free introduction, then a multi-session..." →
+ *     "An introduction, then a multi-session..."
+ *   - carpenter desc: "A free in-person workshop on getting started..." →
+ *     "An in-person workshop on getting started..."
+ *   - PROGRAMS_INTRO.body: "...sometimes at the Boulder library, sometimes
+ *     free." → "...sometimes at the Boulder library." (clause dropped, not
+ *     reworded)
+ * NOCOVA below is the one deliberate exception — its meetups genuinely ARE
+ * free per meme.ngo's own page, so "free" is correct there and only there.
+ * The baked program-card art (make-meme-evergreen.mjs) never carried "free"
+ * on the image itself — only kicker/title/instructor render there — so no
+ * re-bake was needed for this sweep.
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — the three `desc` edits above and the
+ * intro-body edit below are revised copy, staging-only until read.
+ */
 const PROGRAMS_INTRO = {
   kicker: "The programs",
   heading: "The workshops, not the flyer.",
-  body: "MEME runs the same handful of workshops most years — sometimes remote, sometimes at the Boulder library, sometimes free. What follows is the shape of the catalog rather than any single term's schedule: what each program actually covers, and who's usually teaching it.",
+  body: "MEME runs the same handful of workshops most years — sometimes remote, sometimes at the Boulder library. What follows is the shape of the catalog rather than any single term's schedule: what each program actually covers, and who's usually teaching it.",
   footnote:
     "Programs run on a rotating schedule. Current dates, cost, and registration live at meme.ngo — this page is the catalog, not the calendar.",
 };

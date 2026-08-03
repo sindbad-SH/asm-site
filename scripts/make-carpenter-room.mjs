@@ -15,6 +15,27 @@
 // image is retired in meme.astro; the image alt text now says the quote is
 // carried on the photo.
 //
+// ROUND 3 (2026-08-03, meme-polish-2026-08-03) — operator: "stick the MEME
+// logo in the top-left corner — there's still a little dead space and it's a
+// good spot for branding." The top-left corner (above where the quote text
+// starts at y=520) sits on a plain beige acoustic-panel wall — genuinely
+// empty. Source: E:\Makeshift\MEME\05 - Source Docs from MEME\Logos\, picked
+// "MEME - Cropped.jpg" over the square "MEME.jpg" — same M-glyph-plus-
+// wordmark lockup, but without the "A NOT-FOR-PROFIT COMPANY" tagline baked
+// into the square version, so it's the cleaner mark to crop from. Only the
+// M glyph itself is used (the filmstrip M, not the spelled-out wordmark
+// underneath it) — at corner-badge scale a full wordmark just turns to text
+// mush, and the M alone is already the site's own shorthand for MEME (same
+// glyph as the page's ghost "M E M E" backdrop motif).
+//
+// The glyph's source art is a busy multicolor filmstrip (little orange/blue
+// clip thumbnails) — composited at full color it would fight the room's own
+// mixed warm/cool lighting, the same "muddy photo texture" problem the
+// evergreen program cards already hit and fixed by going flat/mono (see
+// make-meme-evergreen.mjs's card watermark). Same fix here: grayscale +
+// contrast-normalize the crop into a luminance mask, then paint that mask as
+// a plain WHITE shape at low opacity — a quiet flat mark, not a photo.
+//
 // INK DIRECTION TESTED (both, per operator instruction) — measured against the
 // actual pixels of the text region (x:0-620, y:0-1080 of the 1440x1080 source),
 // WCAG relative-luminance contrast ratio:
@@ -124,10 +145,45 @@ const resvg = new Resvg(overlaySvg, { font: { fontFiles: FONT_FILES, loadSystemF
 const overlayPng = resvg.render().asPng();
 const overlayNative = await sharp(overlayPng).resize({ width: W, height: H }).png().toBuffer();
 
+// ── ROUND 3 corner mark: crop the M glyph out of MEME's own cleanest lockup,
+//    reduce it to a low-opacity white silhouette (grayscale+normalize as a
+//    luminance → alpha mask), place it in the empty top-left wall area. ──
+const LOGO_SRC = join("E:", "Makeshift", "MEME", "05 - Source Docs from MEME", "Logos", "MEME - Cropped.jpg");
+const LOGO_GLYPH_CROP = { left: 20, top: 0, width: 320, height: 462 }; // just the M, not the wordmark below it
+const LOGO_W = 150; // rendered width against the native 1440x1080 frame
+const LOGO_X = 54,
+  LOGO_Y = 42; // clears the quote block (first line lands at y≈484)
+const LOGO_OPACITY = 0.5; // quiet — a mark, not a watermark
+
+async function buildLogoOverlay() {
+  const glyphCrop = await sharp(LOGO_SRC).extract(LOGO_GLYPH_CROP).toBuffer();
+  const { data: mask, info } = await sharp(glyphCrop)
+    .resize({ width: LOGO_W })
+    .greyscale()
+    .normalise()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const rgba = Buffer.alloc(info.width * info.height * 4);
+  for (let i = 0; i < info.width * info.height; i++) {
+    rgba[i * 4] = 255;
+    rgba[i * 4 + 1] = 255;
+    rgba[i * 4 + 2] = 255;
+    rgba[i * 4 + 3] = Math.round(mask[i] * LOGO_OPACITY);
+  }
+  return { buffer: rgba, width: info.width, height: info.height };
+}
+const logo = await buildLogoOverlay();
+
 // sharp applies resize() BEFORE composite() regardless of call order in the
 // chain, so compositing at native size and only THEN resizing needs two
 // separate pipelines: bake the full-res composite once, resize from there.
-const composited = await sharp(SRC).rotate().composite([{ input: overlayNative, left: 0, top: 0 }]).toBuffer();
+const composited = await sharp(SRC)
+  .rotate()
+  .composite([
+    { input: logo.buffer, raw: { width: logo.width, height: logo.height, channels: 4 }, left: LOGO_X, top: LOGO_Y },
+    { input: overlayNative, left: 0, top: 0 },
+  ])
+  .toBuffer();
 
 for (const width of [900, 1440]) {
   const base = sharp(composited).resize({ width, withoutEnlargement: true });
