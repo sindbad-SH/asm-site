@@ -29,3 +29,7 @@ Thumbs.db
 _measure-results.json
 _wf-judge-out/
 _wf-hero-out/
+
+# Old industry-cluster frame (operator appears); untracked 2026-08-03,
+# local file Windows-locked by the dev server — delete after a restart.
+public/media/home/industry/cluster/valley.webp
