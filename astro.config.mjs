@@ -11,13 +11,33 @@ import honestyAudit from "./integrations/honesty-audit.mjs";
 // Cutover:            DEPLOY_TARGET=production -> https://adventurestorytellingmedia.com/
 
 const isProduction = process.env.DEPLOY_TARGET === "production";
+const base = isProduction ? "/" : "/asm-site";
 
 export default defineConfig({
   site: isProduction
     ? "https://adventurestorytellingmedia.com"
     : "https://sindbad-sh.github.io",
-  base: isProduction ? "/" : "/asm-site",
+  base,
   trailingSlash: "ignore",
+  // AUDIT-FIX (2026-08-02) — /work/seriesfest retired: it duplicated
+  // /venture/seriesfest, a separately-designed hub for the identical four
+  // SeriesFest dispatch pages, and /venture/seriesfest is the newer, better-
+  // built one. Every known internal inbound was repointed (src/consts.ts
+  // PAGES.ventureStories.seriesfestHub.links.moreHref, src/pages/work/
+  // index.astro, src/data/territory.ts's Denver node) — this redirect is the
+  // safety net for any bookmark or external link to the old URL.
+  //
+  // Astro's `redirects` destination is a literal path, NOT run back through
+  // `base` the way every in-template href on this site is (`${base}${href}`,
+  // per BASE_URL convention) — verified by inspecting the built output: an
+  // unprefixed destination produced `<meta http-equiv="refresh"
+  // content="0;url=/venture/seriesfest">` with no `/asm-site`, a 404 on the
+  // GitHub Pages staging deploy. Prefixing manually here matches every other
+  // internal link's convention and is correct for both staging and the
+  // eventual production cutover (base "/" -> no double slash).
+  redirects: {
+    "/work/seriesfest": `${base === "/" ? "" : base}/venture/seriesfest`,
+  },
   build: {
     // Inline all CSS into each page: removes the render-blocking stylesheet
     // round-trip from the FCP critical path (§4). Total CSS is ~25KB gz —

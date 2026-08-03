@@ -85,8 +85,10 @@ export const TERRITORY: readonly TerritoryCountry[] = [
     //
     // Round 5 (2026-07-21) — TWO COVERAGE PLACES join the Colorado cluster,
     // sourced from the site's own published coverage (never invented):
-    //   · Denver — SeriesFest coverage (/work/seriesfest; the venture dispatch
-    //     pages carry the frames). ⚠ OPERATOR-CONFIRM: surfacing Denver as a
+    //   · Denver — SeriesFest coverage (/venture/seriesfest; the venture
+    //     dispatch pages carry the frames). AUDIT-FIX (2026-08-02): repointed
+    //     from /work/seriesfest, which is now retired/redirected — see
+    //     astro.config.mjs. ⚠ OPERATOR-CONFIRM: surfacing Denver as a
     //     territory dot is a new presentation of an existing claim.
     //   · Loveland — the Colorado Medieval Festival feature on /adventure.
     //     ⚠ OPERATOR-CONFIRM: same — existing story, new dot.
@@ -94,7 +96,7 @@ export const TERRITORY: readonly TerritoryCountry[] = [
     // anywhere in the territory treatment (no-count rule: growing bodies of
     // work are never numerized).
     locations: [
-      { name: "Denver", outings: 1, kind: "coverage", href: "/work/seriesfest", linkLabel: "See the coverage" },
+      { name: "Denver", outings: 1, kind: "coverage", href: "/venture/seriesfest", linkLabel: "See the coverage" },
       { name: "Loveland", outings: 1, kind: "coverage", href: "/adventure#festival", linkLabel: "See the story" },
       { name: "Boulder", outings: 4 },
       { name: "Lake County", outings: 3 },

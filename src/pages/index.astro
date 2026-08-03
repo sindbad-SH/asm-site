@@ -38,10 +38,15 @@ const heroTurn = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(
       <span class="portal-headline-lead">{heroLead}</span>
       {heroTurn && <span class="portal-headline-turn">{heroTurn}</span>}
     </h1>
-    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:180ms">{COPY.hero.subline}</p>
-    <!-- P29 buyer-language pairing: one plain line so a cold buyer decodes the
-         offer in seconds (COPY.hero.buyerLine, ⚠ flagged in consts). -->
-    <p class="hud-label" data-portal-arrive style="--arrive-delay:230ms">{COPY.hero.buyerLine}</p>
+    <!-- AUDIT-FIX (2026-08-02): buyerLine promoted out of .hud-label (was
+         0.7rem/uppercase/0.22em-tracked — effectively invisible, the one
+         line that actually answers "what is this") into the same readable
+         body scale as the subline below it, and moved ahead of it so the
+         plain factual answer is the second thing a visitor reads after the
+         H1, before the more poetic subline (COPY.hero.buyerLine, ⚠ flagged
+         in consts). -->
+    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:180ms">{COPY.hero.buyerLine}</p>
+    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:230ms">{COPY.hero.subline}</p>
     <!-- P29 — the hero CTA is PRIMARY_CTA (label + href travel together; the
          signpost paths below were reordered money-first and no longer lead
          with the forge). -->

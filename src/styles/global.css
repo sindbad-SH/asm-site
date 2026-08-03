@@ -41,7 +41,7 @@
   --color-elevated: #1c2530; /* cards, panels */
   --color-hairline: rgba(255, 255, 255, 0.06); /* panel hairlines */
   --color-accent: #38f8ec; /* SCARCE — see discipline above */
-  --color-accent-deep: #1e8f8a; /* resting contours & linework */
+  --color-accent-deep: #1e908a; /* resting contours & linework — AUDIT-FIX 2026-08-02: +1 green channel (was #1e8f8a). That color on --color-base measured 4.49:1 for .signpost-no/.legend-mark text, just under WCAG AA's 4.5:1; this nudge clears it (4.54:1) with an imperceptible hue shift. */
   --color-peak: #c9d6da; /* headings, summit contours (logo peaks) */
   --color-ink: #e8e8e8;
   --color-ink-muted: #8a9a96;

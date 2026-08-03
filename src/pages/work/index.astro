@@ -45,8 +45,12 @@ const VENTURE_LINKS = [
   { label: "Dawn Patrol — a Shelby Cobra at Pebble Beach", href: "/venture/dawn-patrol" },
   { label: "PitchBoulder — coverage, recaps & the commercial", href: "/work/pitchboulder" },
   // Build #2 (2026-08-01 archive-mining integration) — the new hub page.
+  // AUDIT-FIX (2026-08-02): /work/seriesfest is RETIRED (redirects here —
+  // see astro.config.mjs). Its "SeriesFest, in depth" line is removed
+  // rather than repointed: repointing it would just duplicate this line,
+  // same destination under a second label — the exact duplicate-IA bug
+  // this pass exists to fix.
   { label: "SeriesFest — the same air, 2025–2026", href: "/venture/seriesfest" },
-  { label: "SeriesFest, in depth", href: "/work/seriesfest" },
   { label: "American Film Market 2025 — a venture story", href: "/venture/afm-2025" },
   { label: "MEME — a venture story", href: "/venture/meme" },
   { label: "A startup workshop series, on camera — KO Law", href: "/venture/ko-law-workshops" },

@@ -10,9 +10,23 @@
  * Licensing, drops Industry Stories, reorders — without touching the header
  * or the shared consts. Identity line now reads "Founded by {SITE.person}"
  * (byline convention) instead of the former persona line. FollowTheStories
- * (compact) mounts above the trust row + Book a call — the publication's own
- * funnel leads; Book a call stays, demoted. FAA line + "Fly the world" are
- * untouched.
+ * (compact) mounts above the footer nav — the publication's own funnel leads.
+ *
+ * AUDIT-FIX (2026-08-02) — identity-ambiguity pass: this footer used to ship
+ * FOUR consulting surfaces on every page — the FOOTER_NAV "Forge the Saga"
+ * item (plus its "Consulting — research + production" sub-label), a bordered/
+ * glowing "Book a call" .btn, and a four-line trust/logistics row (FAA
+ * license, response time, base, travel) staged beside that button. The
+ * owner's ACTION-PLAN.md permits "one quiet link" to the consulting practice
+ * — not zero, but not four either. Reduced to that one: the FOOTER_NAV text
+ * entry survives (same quiet visual weight as About/Contact/Licensing); the
+ * Book a call button and the trust row are removed. SITE.trust / SITE.
+ * bookACall stay defined in consts.ts (other pages still use them) — only
+ * this footer's rendering of them is cut. Also adds an "All Stories" entry
+ * so /work — and the two flagship case studies it lists (PitchBoulder,
+ * Shelby/Pebble Beach) — is reachable from every page without a 5th item in
+ * the capped NAV. FAA line's underlying fact (SITE.trust.drone) and "Fly the
+ * world" are untouched.
  */
 import { SITE } from "../consts";
 import FollowTheStories from "./FollowTheStories.astro";
@@ -33,10 +47,16 @@ const socialEntries = Object.entries(SITE.socials) as [string, string][];
 // /entertainment — src/pages/entertainment.astro was renamed to venture.astro
 // concurrently by another in-flight change; this footer targets the live
 // route so the link never 404s, independent of when consts.ts NAV catches up.
+// AUDIT-FIX (2026-08-02) — added "All Stories" -> /work: the flat archive
+// (every Adventure + Venture story, including the two flagship case studies,
+// PitchBoulder and Shelby/Pebble Beach) had no inbound link from primary
+// chrome anywhere on the site. This is that link, without adding a 5th item
+// to the capped 4-item NAV in consts.ts.
 type FooterNavItem = { label: string; href: string; buyer?: string };
 const FOOTER_NAV: readonly FooterNavItem[] = [
   { label: "Adventure Stories", buyer: "Drone & aerial production", href: "/adventure" },
   { label: "Venture Stories", buyer: "Corporate storytelling & research", href: "/venture" },
+  { label: "All Stories", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Contact", buyer: "Book a call", href: "/contact" },
   { label: "Licensing", buyer: "Commercial & editorial licensing", href: "/licensing" },
@@ -98,23 +118,12 @@ const FOOTER_NAV: readonly FooterNavItem[] = [
     </ul>
   </div>
   <!-- PUB-C — the publication's own funnel leads: Follow the Stories mounts
-       here, above the trust row + Book a call (services stay present, quiet). -->
+       here, above the footer nav. AUDIT-FIX (2026-08-02): the trust row +
+       Book a call button that used to follow this block are removed — see
+       the file-header comment; the one surviving consulting surface is the
+       quiet "Forge the Saga" entry in the footer nav above. -->
   <div class="footer-follow mx-auto mt-8 max-w-5xl border-t border-hairline pt-6">
     <FollowTheStories compact />
-  </div>
-
-  <!-- P29 — sitewide trust row (SITE.trust — P30 copy rules in consts.ts) +
-       the direct booking link, so every page terminates on a call-to-action
-       with the logistics answered beside it. PUB-C: demoted below Follow the
-       Stories — publication first, services quiet — but still present. -->
-  <div class="footer-trust mx-auto mt-6 flex max-w-5xl flex-wrap items-center justify-between gap-4 border-t border-hairline pt-5">
-    <ul class="footer-trust-list">
-      <li>{SITE.trust.drone}</li>
-      <li>{SITE.trust.response}</li>
-      <li>{SITE.trust.base}</li>
-      <li>{SITE.trust.travel}</li>
-    </ul>
-    <a href={SITE.bookACall} class="btn" rel="noopener">Book a call</a>
   </div>
 </footer>
 
@@ -130,23 +139,5 @@ const FOOTER_NAV: readonly FooterNavItem[] = [
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: color-mix(in srgb, currentColor 62%, transparent);
-  }
-  .footer-trust-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-  .footer-trust-list li + li::before {
-    content: "·";
-    margin-inline: 0.6rem;
-    color: color-mix(in srgb, currentColor 55%, transparent);
   }
 </style>

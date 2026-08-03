@@ -186,8 +186,12 @@ export const COPY = {
     // P29 buyer-language pairing — one plain line under the hero so a cold
     // buyer decodes the offer in seconds. ⚠ OPERATOR READ-APPROVAL REQUIRED —
     // new visible copy (staging-only until read).
+    // AUDIT-FIX (2026-08-02): re-punctuated as one flowing sentence (was
+    // three middot-separated HUD fragments) so it reads cleanly now that
+    // index.astro promotes it out of .hud-label into body-text scale — see
+    // that file. Same words/facts; only case and separators changed.
     buyerLine:
-      "Drone & aerial production · Corporate storytelling & market research · Boulder, Colorado — working worldwide",
+      "Drone & aerial production, corporate storytelling & market research — Boulder, Colorado, working worldwide",
     globeCaption: "Where the stories are told", // LOCKED — see GLOBE below
   },
   anchors: {
@@ -205,7 +209,13 @@ export const COPY = {
     // PUB-A (2026-07-27) — href repointed from the retired /entertainment
     // route to /venture (the new venture-stories index); label unchanged.
     { label: "Corporate storytelling & market research — Venture Stories", href: "/venture" },
-    { label: "Both, end to end — Forge the Saga", href: "/forge-the-saga" },
+    // AUDIT-FIX (2026-08-02): "Both, end to end — Forge the Saga" named an
+    // internal product with no meaning to a first-time visitor. Relabeled to
+    // say what it IS, matching the "[what it is] — [destination]" pattern of
+    // the two items above (Forge the Saga is the site's one consulting
+    // engagement — research/strategy + production together; see
+    // FORGE_SERVICES[0] and PILLARS.consulting). href unchanged.
+    { label: "Strategy & production consulting — Forge the Saga", href: "/forge-the-saga" },
   ],
 } as const;
 
@@ -946,8 +956,9 @@ export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
       {
         // Build #2 (2026-08-01 archive-mining integration) — repointed from
         // /work/seriesfest to the new hub page per _INTEGRATION-PLAN.md §1.2
-        // "Links in": /work/seriesfest stays live (unretired), just no
-        // longer the card this rail points at.
+        // "Links in". AUDIT-FIX (2026-08-02): /work/seriesfest is now
+        // formally retired (redirects to /venture/seriesfest — see
+        // astro.config.mjs); this card already pointed at the right place.
         href: "/venture/seriesfest",
         slate: "SeriesFest · Denver, Colorado",
         title: "SeriesFest, in depth.",
@@ -2043,8 +2054,13 @@ export const PAGES = {
       coverImageSlug: "fashion-runway-crowd",
       coverAlt: "A model walks the runway at SeriesFest's Fashion in Focus, a full seated audience watching from both sides under the SeriesFest-branded wall.",
       links: {
-        moreLabel: "More about SeriesFest",
-        moreHref: "/work/seriesfest",
+        // AUDIT-FIX (2026-08-02): /work/seriesfest is retired (redirects to
+        // this very hub — see astro.config.mjs), so "More about SeriesFest"
+        // would have pointed the page at itself. Repointed to the flat
+        // all-stories archive so it stays a genuine "go elsewhere" link
+        // instead of a self-loop.
+        moreLabel: "The full archive",
+        moreHref: "/work",
         back: { label: "Venture Stories", href: "/venture" },
       },
     },
