@@ -296,7 +296,15 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
                shortened so there's slack even before the flex gap helps). -->
           <div class="vy-corners">
             <p class="vy-corner hud-label">Coverage</p>
-            <p class="vy-corner hud-label vy-accent">Denver, Colorado</p>
+            {/* AUDIT-FIX (2026-08-03) — was "Denver, Colorado", which read as a
+                shoot-location claim and contradicted this page's own facts of
+                record: the 2023 festival was in the Boulder area (see the lede
+                and the Field Log's Location row), and only the 2024 Boogie
+                Lights show was in Denver. Vybe is introduced in the first
+                sentence as a Denver collective, so the old slate was defensible
+                as an identity line — but a corner slate beside "Coverage" reads
+                as where this was shot. Both places, named honestly. */}
+            <p class="vy-corner hud-label vy-accent">Boulder area &amp; Denver, Colorado</p>
           </div>
 
           <!-- masthead in the sky band (FIX 3 — the rank the exemplar's
