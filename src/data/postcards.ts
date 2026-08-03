@@ -189,7 +189,7 @@ export const POSTCARDS: readonly Postcard[] = [
       { slug: "closeup", alt: "Dancers in black with pale face paint gathered close together on the stage, one reaching a hand skyward" },
       { slug: "overview", alt: "A wide view over the festival's white vendor tents, a Danish flag flying above the market and the Golden foothills behind" },
       { slug: "stalls", alt: "A market row stall selling hats and pewter goblets, a dense crowd of festivalgoers browsing the tables in the sun" },
-      { slug: "parasols", alt: "A vendor tent hung with patterned parasols, a crowd of festivalgoers browsing the tables beneath them" },
+      { slug: "parasols", alt: "Colorful patterned parasols hanging from a market tent's outer edge in full sun, blue sky and the Golden foothills above, a shopper browsing a table of pewter goblets behind them" },
       { slug: "festival-strings", alt: "Nordic Daughter's violinist and keyboardist performing on the festival stage, the festival grounds and Nordic flags visible behind them" },
     ],
     related: { slug: "something-for-tomorrow", label: "Jason Lycan's other band, Something for Tomorrow — see that story" },

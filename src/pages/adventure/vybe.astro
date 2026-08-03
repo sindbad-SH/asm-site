@@ -135,6 +135,43 @@
  * generically ("a band") — no name is verified in the source material, so
  * none is invented. The Chillsbury Doughboys' name IS verified (read
  * straight off the venue's own stage signage in frame).
+ * v6 (2026-08-03, audit-fixes-2026-08-02 branch) — the "band played on"
+ * full-bleed slot had THREE failed photo swaps behind it (see v5 above +
+ * two more rounds in fix-vybe-audit-2026-08-02.mjs /
+ * fix-vybe-crowd-sing-round2-2026-08-02.mjs). Root cause was never the
+ * photo — it was `.vy-bleed`: a 100vw/max-height:70svh/object-fit:cover box,
+ * and every available Sunday source frame (ground camera AND drone) is
+ * portrait once each clip's own rotation tag is honored, so cover-cropping
+ * into a wide-short band always left a thin, zoomed-in slice ("it just
+ * shows two people talking" — true: at 100vw that box was cropping to
+ * roughly y=507-924 of a 1920-tall source, landing on the balloon-arch
+ * onlookers, not the band). Operator's direction: stop forcing one photo
+ * into that shape, redesign the presentation instead.
+ *
+ * `.vy-bleed` is retired for this slot. In its place: a CONTAINED two-photo
+ * composition (`.vy-stagger--sunday`, an equal 1fr/1fr variant of the
+ * existing `.vy-stagger` grid — no new pattern, just a portrait-appropriate
+ * proportion since neither new source is landscape) inside the normal
+ * max-w-5xl column, each photo at a sane 4:5 crop:
+ *   - `festival-band-wide` (replaces `festival-crowd-sing`): DJI_0126.MP4 @
+ *     3.0s, not the previously-used 4.5s — a fresh 0.5s-step sharpness scan
+ *     found 3.0s objectively sharper, and the framing is better too (full
+ *     4-piece band, both balloon clusters, the two onlookers, all legible).
+ *   - `festival-dance-arch` (new): Cam B Sun/CLIP/C0057.MP4 @ 62.0s — not
+ *     either of the two previously-rejected timestamps (172.5s/173s, both
+ *     tight face zooms). A dense re-scan of the Sunday ground camera (every
+ *     2s across all 4 candidate clips, Laplacian-screened, every frame in
+ *     the winning window actually viewed) found six festivalgoers dancing
+ *     under the FULL rainbow balloon arch with no foreground obstruction —
+ *     the frame that actually delivers this chapter's own lede promise ("a
+ *     rainbow balloon arch over the gate"), which the old single photo
+ *     never did.
+ * Both sources are native portrait 1080x1920 at these timestamps, so the
+ * 4:5 crop needs no upscale past native resolution at the baked widths
+ * (800/1120) — fixes the "soft because stretched" half of the diagnosis
+ * too, not just the crop. Full reasoning + exact extract boxes:
+ * scripts/fix-vybe-band-played-on-2026-08-03.mjs.
+ *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every heading/paragraph/caption below
  * is new or revised copy (staging-only until read), matching this page's own
  * existing VYBE-section convention (copy authored inline, not routed through
@@ -187,12 +224,14 @@ const boogieRoom = photo("boogie-room", W.landscape);
 const boogieStage = photo("boogie-stage", W.verticalSm);
 const boogieChillsbury = photo("boogie-chillsbury-doughboys", W.wideSm);
 // FIX (v5): 3 newly-mined stills — see the header note for sourcing.
-// festivalCrowdSing takes the full-bleed flow-arts (dropped, out-of-focus)
-// used to occupy; festivalEmcee and festivalArmsUp backfill the two body
-// slots that used to double-book flowDuo/fireStaffSpin.
-const festivalCrowdSing = photo("festival-crowd-sing", [1120, 1600]);
+// festivalEmcee and festivalArmsUp backfill the two body slots that used to
+// double-book flowDuo/fireStaffSpin.
 const festivalEmcee = photo("festival-emcee", W.vertical);
 const festivalArmsUp = photo("festival-arms-up", W.vertical);
+// FIX (v6): the full-bleed slot flow-arts/festivalCrowdSing used to occupy
+// is retired (see header note) — replaced by a contained two-photo pair.
+const festivalBandWide = photo("festival-band-wide", W.verticalSm);
+const festivalDanceArch = photo("festival-dance-arch", W.verticalSm);
 
 // The hero reveal — re-mined 2026-07-31 (see header note), existence-gated,
 // poster-first, IO-gated, same contract as every other ambient loop on the
@@ -402,29 +441,52 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
         </blockquote>
       </div>
 
-      <!-- full-bleed band — a direct child of the article, breaks the frame.
-           FIX (v5): was flow-arts (out-of-focus LED-blur, per the critic's
-           second pass) — now festival-crowd-sing, a newly-mined sharp frame
-           and the strongest new still on the page (see header note). It's a
-           portrait 4:5 source in a wide/short box, so object-position is
-           biased up to keep the dancers' faces in frame rather than
-           default-centering into a leg/ground crop. -->
+      <!-- FIX (v6): was a full-bleed 100vw band (`.vy-bleed`) — three straight
+           photo swaps in that box all failed because every Sunday source is
+           portrait and the box was wide-short (see header note). Replaced
+           with a CONTAINED two-photo pair, each at its own sane 4:5 crop:
+           the band wide, then the dance-arch beat the chapter's lede already
+           promises and the old single photo never delivered. -->
       {
-        festivalCrowdSing && (
-          <figure class="vy-bleed" data-reveal>
-            <picture>
-              <source type="image/avif" srcset={festivalCrowdSing.avif} sizes="100vw" />
-              <source type="image/webp" srcset={festivalCrowdSing.webp} sizes="100vw" />
-              <img
-                src={festivalCrowdSing.src}
-                alt="A wide daylight view over the Sunday stage — the band mid-song, two more festivalgoers swaying together in front of them, balloon clusters and the cottonwood canopy overhead"
-                class="vy-bleed-img-top"
-                loading="lazy"
-                decoding="async"
-              />
-            </picture>
-            <figcaption class="vy-cap vy-bleed-cap hud-label">The band played on, under the cottonwoods — Sunday.</figcaption>
-          </figure>
+        (festivalBandWide || festivalDanceArch) && (
+          <section class="mx-auto max-w-5xl px-8 pt-4">
+            <div class="vy-stagger vy-stagger--sunday">
+              {festivalBandWide && (
+                <figure class="vy-photo vy-stagger-a" data-reveal>
+                  <picture>
+                    <source type="image/avif" srcset={festivalBandWide.avif} sizes="(min-width: 860px) 47vw, 90vw" />
+                    <source type="image/webp" srcset={festivalBandWide.webp} sizes="(min-width: 860px) 47vw, 90vw" />
+                    <img
+                      src={festivalBandWide.src}
+                      alt="An aerial view over the Sunday stage — the full band performing, two festivalgoers standing together near a rainbow balloon display, parked cars and cottonwood trees in the grounds beyond"
+                      style="aspect-ratio:4/5;object-fit:cover"
+                      class="block w-full"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">The band played on, under the cottonwoods — Sunday.</figcaption>
+                </figure>
+              )}
+              {festivalDanceArch && (
+                <figure class="vy-photo vy-stagger-b" data-reveal data-reveal-stagger="80">
+                  <picture>
+                    <source type="image/avif" srcset={festivalDanceArch.avif} sizes="(min-width: 860px) 47vw, 90vw" />
+                    <source type="image/webp" srcset={festivalDanceArch.webp} sizes="(min-width: 860px) 47vw, 90vw" />
+                    <img
+                      src={festivalDanceArch.src}
+                      alt="Several festivalgoers dancing together in the grass under a full rainbow balloon arch, cottonwoods and parked cars in the grounds beyond, Sunday afternoon"
+                      style="aspect-ratio:4/5;object-fit:cover"
+                      class="block w-full"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
+                  <figcaption class="vy-cap hud-label">Dancing under the balloon arch — Sunday.</figcaption>
+                </figure>
+              )}
+            </div>
+          </section>
         )
       }
 
@@ -1002,12 +1064,19 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
   .vy-stagger--flip {
     grid-template-columns: 34fr 58fr;
   }
+  /* FIX (v6): equal columns — unlike the other two staggers on this page,
+     neither Sunday photo here is landscape, so there's no wide/narrow pair
+     to lean into (that's the same mismatch that broke `.vy-bleed`). */
+  .vy-stagger--sunday {
+    grid-template-columns: 1fr 1fr;
+  }
   .vy-stagger-b {
     margin-top: 3rem;
   }
   @media (max-width: 860px) {
     .vy-stagger,
-    .vy-stagger--flip {
+    .vy-stagger--flip,
+    .vy-stagger--sunday {
       grid-template-columns: 1fr;
     }
     .vy-stagger-b {
@@ -1038,34 +1107,6 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
     line-height: 1.36;
     color: var(--color-peak);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
-  }
-  /* full-bleed band — a direct child of <article>, breaks the page frame */
-  .vy-bleed {
-    position: relative;
-    margin: 2rem 0 0;
-    width: 100%;
-  }
-  .vy-bleed img {
-    display: block;
-    width: 100%;
-    max-height: 70svh;
-    object-fit: cover;
-  }
-  /* festival-crowd-sing is a portrait 4:5 source filling a wide/short box —
-     bias the crop up toward the dancers' faces instead of default-centering
-     into legs/ground. */
-  .vy-bleed-img-top {
-    object-position: 50% 32%;
-  }
-  .vy-bleed-cap {
-    position: absolute;
-    left: max(2rem, calc((100vw - 64rem) / 2));
-    bottom: 1rem;
-    margin: 0;
-    padding: 0.4rem 0.7rem;
-    background: color-mix(in srgb, var(--color-base) 72%, transparent);
-    border-radius: 4px;
-    backdrop-filter: blur(4px);
   }
   /* the field-log movement — a tilted performer frame beside a facts panel */
   .vy-fieldlog {
