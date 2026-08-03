@@ -93,6 +93,57 @@
  * fonttools. So this script shells out to `python -c "...fontTools..."` the
  * same way make-icons.mjs already shells out to ffmpeg. Converted files land
  * in the OS temp dir and are deleted when the run ends.
+ *
+ * MEME-STICKLER-2026-08-03 — PHOTO-BACKED DUOTONE REBUILD (operator: "I was
+ * expecting overlay images over photos — those Facebook photos utilized in
+ * some way. I don't see any used at all"). The flat-navy-plus-geometric-motif
+ * design above is REPLACED for 6 of the 7 cards with a real photograph →
+ * heavy navy duotone → kit motif at low opacity as a texture accent → the
+ * same kicker/title/instructor type. Sources are OWNED MATERIAL ONLY — the
+ * operator was explicit that the Facebook-group finds are clearance-pending
+ * and must never ship:
+ *   - On-Set Craft (pa-workshop, script-supervisor, carpenter): 3 different
+ *     frames from the operator's own Carpenter-workshop recording
+ *     (E:\Makeshift\MEME\_CARPENTER-MINED\stills\, already operator-screened).
+ *     Only the `carpenter` card's alt text may say the photo is actually from
+ *     that workshop — it is. pa-workshop and script-supervisor use different
+ *     Carpenter-workshop frames purely as a stylized On-Set-Craft-track
+ *     texture; their alt text says so and does NOT claim to depict a PA or
+ *     Script Supervisor session (neither has any photography of its own yet).
+ *   - Pitch & Market (pitch-quorum, market-fresh, business-of-show-business):
+ *     3 different frames from the operator's own PitchBoulder photography
+ *     (E:\Pitch Boulder\Top photos for web build\_TIER 1 - TOP (make stories)\)
+ *     — a different program he films, used here only for generic "pitch-room
+ *     energy" texture. Alt text is explicit that these are stylized
+ *     backgrounds, not photos of MEME's own Pitch Quorum / Market Fresh /
+ *     Business of Show Business sessions.
+ *   - Sound: hunted the operator's own archives (Gigs Go Green, Pebble Beach
+ *     2025 BTS, the PitchBoulder 2026-01-28 recording-session photos) for a
+ *     genuine mic/recorder/mixing frame. Found none — those folders are
+ *     drone/pitch-room material, not sound-department photography. Per the
+ *     standing instruction ("an honest miss beats a fake fit"), the Sound
+ *     Workshop card stays exactly as it was: flat navy + the waveform motif,
+ *     no photo.
+ * Every chosen frame was screened against the operator's own reference photo
+ * (he attended both the Carpenter workshop and PitchBoulder) — none of the 6
+ * chosen frames show him. No frame repeats across cards (6 distinct source
+ * stills). No face is sliced by any crop — verified by direct crop preview
+ * before baking, same as the roster fixes in
+ * scripts/fix-meme-roster-crops-2026-08-03.mjs.
+ *
+ * DUOTONE MECHANICS: each source photo is cropped (face-safe, picked by eye)
+ * to the card's 4:5 canvas, converted to greyscale, then every pixel is
+ * lerped from the kit navy (#011D4C, shadows) to a desaturated light slate
+ * (#B9C4D6, highlights) by its own luminance — a real duotone gradient map,
+ * not a flat tint. That alone doesn't guarantee AA contrast for the white
+ * kicker/title/instructor type sitting on top of it (a duotone photo's
+ * highlight zones can land anywhere), so the type sits inside the same kind
+ * of dark gradient SCRIM already used for the Carpenter room photo elsewhere
+ * on this page (see make-carpenter-room.mjs) — measured below, at the exact
+ * pixels the text renders over, after the scrim: every card clears WCAG AA
+ * (4.5:1) for its white text. The kit's per-track motif is kept as a subtle
+ * accent (opacity dropped from the old flat-navy cards' 0.92 to 0.15 so it
+ * reads as texture, not competing with the photo).
  */
 import sharp from "sharp";
 import { Resvg } from "@resvg/resvg-js";
@@ -108,7 +159,6 @@ function path_resolve() {
   return dirname(dirname(fileURLToPath(import.meta.url))); // repo root
 }
 const OUT_DIR = join(ROOT, "public", "media", "venture", "meme");
-const MEME_ROOT = String.raw`E:\Makeshift\MEME\05 - Source Docs from MEME`;
 
 // ── 1. font conversion (woff2 → ttf via fonttools; resvg-js needs real files) ──
 // Anton (titles) + Montserrat Bold/Medium (kicker labels / instructor name) —
@@ -274,9 +324,28 @@ function motifWaveform(color) {
 // the dated Zeffy/flyer copy, never "Makeshift Film Group" — forbidden term,
 // see audit-lib.mjs). The one-sentence descriptions live as real HTML text
 // in meme.astro's PROGRAMS array (below the card, not on it).
+const PITCHBOULDER_ROOT = String.raw`E:\Pitch Boulder\Top photos for web build\_TIER 1 - TOP (make stories)`;
+const CARPENTER_STILLS = String.raw`E:\Makeshift\MEME\_CARPENTER-MINED\stills`;
+
 const CARDS = [
-  { slug: "pitch-quorum", track: "pitch-market", title: ["Pitch Quorum"], titleSize: 122, instructor: "Nick C. Goins Jr.", motif: (t) => motifSpotlightLedger(t.motif) },
-  { slug: "market-fresh", track: "pitch-market", title: ["Market Fresh"], titleSize: 122, instructor: "Nick C. Goins Jr.", motif: (t) => motifPulseRings(t.motif) },
+  {
+    slug: "pitch-quorum",
+    track: "pitch-market",
+    title: ["Pitch Quorum"],
+    titleSize: 122,
+    instructor: "Nick C. Goins Jr.",
+    motif: (t) => motifSpotlightLedger(t.motif),
+    photo: { file: join(PITCHBOULDER_ROOT, "20260506_091725.jpg") }, // presenter + screen, center-crop to 4:5
+  },
+  {
+    slug: "market-fresh",
+    track: "pitch-market",
+    title: ["Market Fresh"],
+    titleSize: 122,
+    instructor: "Nick C. Goins Jr.",
+    motif: (t) => motifPulseRings(t.motif),
+    photo: { file: join(PITCHBOULDER_ROOT, "20260506_091643.jpg") },
+  },
   {
     slug: "business-of-show-business",
     track: "pitch-market",
@@ -284,8 +353,20 @@ const CARDS = [
     titleSize: 76,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifLedgerArc(t.text, t.motif),
+    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090711.jpg") },
   },
-  { slug: "pa-workshop", track: "on-set", title: ["PA Workshop"], titleSize: 126, instructor: "Adam Smestad", motif: (t) => motifChevrons(t.motif) },
+  {
+    slug: "pa-workshop",
+    track: "on-set",
+    title: ["PA Workshop"],
+    titleSize: 126,
+    instructor: "Adam Smestad",
+    motif: (t) => motifChevrons(t.motif),
+    // face-safe manual crop (not center-crop): right two-thirds of the room,
+    // keeps the beanie'd attendee + the older instructor fully in frame,
+    // excludes the door/arm at the far right edge — see the header note.
+    photo: { file: join(CARPENTER_STILLS, "part2_00-07-30_attendee-engaged.jpg"), box: [486, 0, 864, 1080] },
+  },
   {
     slug: "script-supervisor",
     track: "on-set",
@@ -293,6 +374,10 @@ const CARDS = [
     titleSize: 72,
     instructor: "Adam Smestad",
     motif: (t) => motifMarkedPage(t.text),
+    // face-safe manual crop: left-center portion (teal accent wall + two
+    // attendees), stops well short of the blue-shirted instructor at the
+    // table's far end so his face is never at risk of being sliced.
+    photo: { file: join(CARPENTER_STILLS, "part1_00-45-00_group-expanded.jpg"), box: [250, 0, 864, 1080] },
   },
   {
     slug: "carpenter",
@@ -301,6 +386,11 @@ const CARDS = [
     titleSize: 80,
     instructor: "Eric Abramson",
     motif: (t) => motifToolCross(t.motif, t.text),
+    // the ONE card whose background is honestly captioned as actually from
+    // the workshop (meme.astro's alt text) — a different still than the big
+    // feature photo elsewhere on the page (make-carpenter-room.mjs), so nothing
+    // repeats. Left portion of the room: two attendees, faces fully in frame.
+    photo: { file: join(CARPENTER_STILLS, "part1_00-01-15_opening-group.jpg"), box: [0, 0, 864, 1080] },
   },
   {
     slug: "sound-workshop",
@@ -309,6 +399,9 @@ const CARDS = [
     titleSize: 90,
     instructor: "Steve Borne",
     motif: (t) => motifWaveform(t.motif),
+    // NO photo — see the header note: no genuine sound/gear/set frame exists
+    // in the operator's archives. Stays flat-navy + waveform motif, unchanged.
+    photo: null,
   },
 ];
 
@@ -317,9 +410,43 @@ const CARDS = [
 const W = 1080,
   H = 1350,
   SCALE = 2;
+
+// ── photo-backed duotone (MEME-STICKLER-2026-08-03) ──
+const DUOTONE_SHADOW = { r: 1, g: 29, b: 76 }; // #011D4C — the kit navy
+const DUOTONE_HIGHLIGHT = { r: 185, g: 196, b: 214 }; // #B9C4D6 — desaturated light slate
+
+async function buildDuotonePhoto(photo) {
+  let pipeline = sharp(photo.file).rotate();
+  if (photo.box) {
+    const [left, top, width, height] = photo.box;
+    pipeline = pipeline.extract({ left, top, width, height });
+  }
+  const { data, info } = await pipeline
+    .resize({ width: W * SCALE, height: H * SCALE, fit: "cover" })
+    .greyscale()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const n = info.width * info.height;
+  const rgb = Buffer.alloc(n * 3);
+  for (let i = 0; i < n; i++) {
+    const l = data[i] / 255;
+    rgb[i * 3] = Math.round(DUOTONE_SHADOW.r + (DUOTONE_HIGHLIGHT.r - DUOTONE_SHADOW.r) * l);
+    rgb[i * 3 + 1] = Math.round(DUOTONE_SHADOW.g + (DUOTONE_HIGHLIGHT.g - DUOTONE_SHADOW.g) * l);
+    rgb[i * 3 + 2] = Math.round(DUOTONE_SHADOW.b + (DUOTONE_HIGHLIGHT.b - DUOTONE_SHADOW.b) * l);
+  }
+  return sharp(rgb, { raw: { width: info.width, height: info.height, channels: 3 } }).png().toBuffer();
+}
 const MARGIN = 72;
 const TITLE_FLOOR = 72; // kit rule: program title never renders below this
 
+// MEME-STICKLER-2026-08-03: for a photo card, the SVG no longer paints the
+// navy background itself (the duotone photo IS the background, composited
+// underneath this layer by sharp) — it only paints the scrims, the low-
+// opacity motif accent, and the type. The scrims are the same device as the
+// Carpenter room photo's quote overlay elsewhere on this page (see
+// make-carpenter-room.mjs): a dark gradient wherever text sits, so contrast
+// is guaranteed no matter how bright that patch of the duotone happens to be
+// — measured after the fact against the actual rendered pixels (see below).
 function buildCardSvg(card) {
   const track = TRACKS[card.track];
   const titleSize = Math.max(card.titleSize, TITLE_FLOOR);
@@ -330,12 +457,46 @@ function buildCardSvg(card) {
   const titleStartY = titleLastY - (nLines - 1) * titleDy;
   const ruleY = titleStartY - titleSize * 0.8 - 22; // clears Anton's cap-height with margin
   const kickerY = MARGIN + 6 + 34;
+  const hasPhoto = Boolean(card.photo);
+
+  const background = hasPhoto ? "" : `<rect width="${W}" height="${H}" rx="12" fill="${NAVY}"/>`;
+  const motifOpacity = hasPhoto ? 0.15 : 0.92;
+  // top scrim clears the kicker/rule (y≈72-140); bottom scrim clears the
+  // title-through-instructor block (title blocks measured up to ~250px tall
+  // at most across all 7 cards, so starting the fade at H-500 leaves margin
+  // on every one, 1- or 2-line title alike, without hand-tuning per card).
+  // Contrast-MEASURED (see the header note): the first pass at these scrims
+  // (linear, top 0.68→0, bottom 0→0.86) left 2 of the 6 photo cards under
+  // AA at a bright patch of their own source photo (market-fresh's kicker
+  // sat over a snowy window; business-of-show-business's title sat over a
+  // lit whiteboard). Fixed by going darker overall AND non-linear — an early
+  // step up (steep near the text zone's own edge) rather than a slow fade —
+  // so the darkest values arrive before the text does instead of after it.
+  // Re-measured after this change: all 6 clear 4.5:1, most by a wide margin.
+  const scrims = hasPhoto
+    ? `<defs>
+        <linearGradient id="scrimTop" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#040912" stop-opacity="0.86"/>
+          <stop offset="0.55" stop-color="#040912" stop-opacity="0.5"/>
+          <stop offset="1" stop-color="#040912" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="scrimBottom" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#040912" stop-opacity="0"/>
+          <stop offset="0.35" stop-color="#040912" stop-opacity="0.6"/>
+          <stop offset="0.7" stop-color="#040912" stop-opacity="0.82"/>
+          <stop offset="1" stop-color="#040912" stop-opacity="0.94"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="${W}" height="260" fill="url(#scrimTop)"/>
+      <rect x="0" y="${H - 560}" width="${W}" height="560" fill="url(#scrimBottom)"/>`
+    : "";
 
   return `<svg width="${W * SCALE}" height="${H * SCALE}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${W}" height="${H}" rx="12" fill="${NAVY}"/>
+  ${background}
   <g clip-path="url(#cardClip)">
     <defs><clipPath id="cardClip"><rect width="${W}" height="${H}" rx="12"/></clipPath></defs>
-    <g opacity="0.92">${card.motif(track)}</g>
+    <g opacity="${motifOpacity}">${card.motif(track)}</g>
+    ${scrims}
     <rect x="${MARGIN}" y="${MARGIN}" width="64" height="6" rx="3" fill="${track.text}"/>
     <text x="${MARGIN}" y="${kickerY}" font-family="Montserrat" font-weight="700" font-size="26" letter-spacing="2.5" fill="${track.text}">${esc(track.label)}</text>
     <rect x="${MARGIN}" y="${ruleY}" width="56" height="4" rx="2" fill="${track.text}"/>
@@ -355,7 +516,13 @@ console.log(`\n▸ meme evergreen program cards → public/media/venture/meme/`)
 for (const card of CARDS) {
   const svg = buildCardSvg(card);
   const resvg = new Resvg(svg, { font: { fontFiles: FONT_FILES, loadSystemFonts: false, defaultFontFamily: "Montserrat" } });
-  const png = resvg.render().asPng();
+  const overlayPng = resvg.render().asPng();
+  // photo cards: composite the (background-transparent) text/scrim overlay
+  // over the duotone photo. Non-photo cards (sound-workshop): the overlay
+  // already IS the finished flat-navy card, same as before this rebuild.
+  const png = card.photo
+    ? await sharp(await buildDuotonePhoto(card.photo)).composite([{ input: overlayPng, left: 0, top: 0 }]).png().toBuffer()
+    : overlayPng;
   let bytes = 0;
   for (const w of WIDTHS) {
     const base = sharp(png).resize({ width: w });
@@ -369,44 +536,11 @@ for (const card of CARDS) {
   console.log(`  ✓ program-${card.slug.padEnd(28)} → ${(bytes / 1024).toFixed(0)}KB`);
 }
 
-// ── 6. Eric Abramson roster headshot — cropped tight to exclude the
-//    unrelated interview subject visible in the background of his only photo ──
-const ericSrc = join(MEME_ROOT, "Photos", "Eric Abramson.jpg");
-if (existsSync(ericSrc)) {
-  const PHOTO_AVIF = { quality: 55, effort: 5 };
-  const PHOTO_WEBP = { quality: 82 };
-  const base = sharp(ericSrc)
-    .rotate()
-    .extract({ left: 10, top: 560, width: 780, height: 780 })
-    .resize({ width: 700 });
-  await base.clone().avif(PHOTO_AVIF).toFile(join(OUT_DIR, "eric-abramson-portrait-700.avif"));
-  await base.clone().webp(PHOTO_WEBP).toFile(join(OUT_DIR, "eric-abramson-portrait-700.webp"));
-  console.log(`  ✓ eric-abramson-portrait-700  (cropped from the on-set selfie, background subject excluded)`);
-} else {
-  console.error(`  ✖ missing source: ${ericSrc}`);
-  process.exitCode = 1;
-}
-
-// ── 7. Amber MacPherson roster headshot — crop starts below/right of the
-//    "April O'Hare Photography" watermark (confined to the top-left corner
-//    of the 500x500 source), face-centered, plenty of headroom. Credit line
-//    prints visibly on the page (meme.astro) rather than being silently cropped
-//    away without attribution.
-const amberSrc = join(MEME_ROOT, "Photos", "Amber MacPherson Color Headshot.jpg");
-if (existsSync(amberSrc)) {
-  const PHOTO_AVIF = { quality: 55, effort: 5 };
-  const PHOTO_WEBP = { quality: 82 };
-  const base = sharp(amberSrc)
-    .rotate()
-    .extract({ left: 30, top: 78, width: 422, height: 422 })
-    .resize({ width: 700 });
-  await base.clone().avif(PHOTO_AVIF).toFile(join(OUT_DIR, "amber-macpherson-portrait-700.avif"));
-  await base.clone().webp(PHOTO_WEBP).toFile(join(OUT_DIR, "amber-macpherson-portrait-700.webp"));
-  console.log(`  ✓ amber-macpherson-portrait-700  (cropped below the April O'Hare Photography watermark, face centered)`);
-} else {
-  console.error(`  ✖ missing source: ${amberSrc}`);
-  process.exitCode = 1;
-}
+// Eric Abramson / Amber MacPherson roster headshots used to be baked here
+// (sections 6-7). MEME-STICKLER-2026-08-03: both re-cropped (Amber's clipped
+// her hair's crown; Eric's cut off his chin) and moved to
+// scripts/fix-meme-roster-crops-2026-08-03.mjs, which is now the source of
+// truth for both files — re-running this script no longer touches them.
 
 rmSync(fontDir, { recursive: true, force: true });
 console.log("");

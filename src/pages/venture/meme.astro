@@ -152,47 +152,58 @@ const PROGRAM_TRACKS = {
 // track), "b" = the dropped-baseline stagger partner, "plain"/"solo" = the
 // smaller companion or a lone track's single card. See `.meme-program-card--*`
 // in the stylesheet below.
+// MEME-STICKLER-2026-08-03: `alt` text below now also describes each card's
+// photo background — required by the honesty rule set alongside the
+// photo-backed duotone rebuild (scripts/make-meme-evergreen.mjs). Every card
+// but `carpenter` uses a stylized, heavily-duotoned photo that is NOT of the
+// named program's own session (Pitch & Market cards use the operator's
+// PitchBoulder photography; the other two On-Set Craft cards use different
+// frames from the same Carpenter-workshop recording as the carpenter card
+// itself) — so their alt text is explicit that the background is stylized/
+// abstract and does not depict that program. Only `carpenter`'s background
+// is honestly captioned as actually from that workshop. `sound-workshop`
+// carries no photo (see the script's header note) — its alt is unchanged.
 const PROGRAMS = [
   {
     slug: "pitch-quorum",
     track: "pitch-market",
     rank: "lead",
-    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Pitch Quorum session).",
     desc: "An introduction to pitching a feature film to investors, plus deeper Beginner and Advanced sessions on querying and the documents behind a pitch — mostly remote, with an in-person practice session.",
   },
   {
     slug: "market-fresh",
     track: "pitch-market",
     rank: "b",
-    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Market Fresh session).",
     desc: "An introduction, then a multi-session remote program on preparing for a film market — what to expect, how to work it, and the follow-through after.",
   },
   {
     slug: "business-of-show-business",
     track: "pitch-market",
     rank: "plain",
-    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr.",
+    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Business of Show Business session).",
     desc: "A workshop on the state of the film industry from a business perspective — the practical side of filmmaking that founders don't usually get taught anywhere.",
   },
   {
     slug: "pa-workshop",
     track: "on-set",
     rank: "lead",
-    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
+    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a stylized navy-duotone background photo (not a photo of a PA Workshop session).",
     desc: "An in-person workshop for new and experienced production assistants alike, covering the basics of the job and hard-won tips from time actually spent on set.",
   },
   {
     slug: "script-supervisor",
     track: "on-set",
     rank: "b",
-    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad.",
+    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a stylized navy-duotone background photo (not a photo of a Script Supervisor Workshop session).",
     desc: "An in-person workshop on the basics of script supervising — continuity, script-supervising notes, and how to build a career doing it.",
   },
   {
     slug: "carpenter",
     track: "on-set",
     rank: "plain",
-    alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, instructor credit to Eric Abramson.",
+    alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, instructor credit to Eric Abramson, over a stylized navy-duotone photo actually from that December 2025 workshop.",
     desc: "An in-person workshop on getting started as a filmmaker with what you already have, rather than being intimidated by expensive gear.",
   },
   {
