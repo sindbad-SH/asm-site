@@ -80,6 +80,7 @@ const memeShots = {
   nick: pair("venture/meme/nick-goins-portrait-640"),
   steve: pair("venture/meme/steve-borne-portrait-854"),
   adam: pair("venture/meme/adam-smestad-portrait-620"),
+  eric: pair("venture/meme/eric-abramson-portrait-700"),
 };
 function pair(relBase: string) {
   const avif = media(`${relBase}.avif`);
@@ -90,99 +91,152 @@ function media(rel: string) {
   return existsSync(join(process.cwd(), "public", "media", ...rel.split("/"))) ? `${base}/media/${rel}` : undefined;
 }
 /**
- * v3 (2026-08-01) — THE CAMPAIGN. This page previously shipped as a
- * typographic "bones" page on the stated grounds that no MEME imagery
- * existed. That was wrong: the operator BUILDS MEME's current campaign
- * artwork (E:\Makeshift\MEME — a code-rendered flyer family, five social
- * formats per program plus animated cuts, QR-gated), and those renders are
- * his own work product. They are now the page's evidence: what "Strategic
- * Liaison and Scout" looks like in practice is, among other things, the
- * poster that fills the room. Baked by scripts/make-meme-campaign.mjs.
+ * 2026-08-03 EVERGREEN REBUILD (operator-directed, branch
+ * meme-evergreen-2026-08-03). This section previously shipped THE CAMPAIGN —
+ * the operator's own dated flyer renders for one specific term's programs
+ * (Business of Show Business "Sat, Aug 15, 2026", the two on-demand sheets).
+ * Operator, verbatim: "that'll date a lot of it... less 'hey it's this day at
+ * this time at this location' and more 'here's what it is about usually'...
+ * if we do another Business of Show Business it'll work the same way. Same
+ * for Pitch Quorum and Market Fresh."
  *
- * HONESTY: these are HIS renders for MEME, shown as his work — the page
- * never claims authorship of MEME's brand, its programs, or its curriculum,
- * and it does not display MEME's own earlier materials as a "before".
- * Program facts (dates, venue, instructor, format) are quoted from the
- * campaign copy packs in that repo, which are the approved event copy.
+ * So the flyers are retired from this page — nothing was deleted from
+ * public/media/venture/meme/, this section just stops pointing at
+ * bofsb-portrait / pitch-quorum-sheet / market-fresh-sheet — and replaced
+ * with the evergreen program catalog: what each workshop covers and who
+ * teaches it, grouped into three tracks, illustrated with NEW card art
+ * (scripts/make-meme-evergreen.mjs) built from the site's own type (Anton /
+ * Fraunces / DM Sans) plus a crop of MEME's own filmstrip-M logo mark — no
+ * dates, times, venues, or prices anywhere on them.
+ *
+ * SOURCE: E:\Makeshift\MEME\05 - Source Docs from MEME\MEME Marketing.xlsx
+ * ("Instructor & Program Details" sheet — Course Description column, MEME's
+ * own words, paraphrased here into the evergreen register; "2026 Programs"
+ * sheet for the current catalog list) and MEME Programatic Overview.pdf
+ * (MEME's own evergreen-register catalog overview — used as the phrasing
+ * model: format/session facts kept, calendar dates dropped). Nick C. Goins
+ * Jr's bio field in that sheet names a company this site's build rules
+ * forbid printing (see scripts/audit-lib.mjs's forbidden-terms list) — that
+ * clause is omitted below without changing any other fact.
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every program description below is new,
+ * paraphrased copy, staging-only until read.
  */
-/**
- * 2026-08-02 (operator): only campaigns for programs that are ACTUALLY LIVE may
- * appear here. Crew Call was pulled — its flyers are built but the event has
- * not been announced, and showing unannounced client material as portfolio
- * both front-runs MEME's own announcement and misrepresents what is running.
- * The three that remain are live: Business of Show Business (Sat Aug 15) and
- * the two year-round on-demand programs.
- */
-const campaign = (slug: string) => pair(`venture/meme/${slug}-1600`) ?? pair(`venture/meme/${slug}-900`);
-const bofsbPortrait = campaign("bofsb-portrait");
-const pitchQuorumSheet = campaign("pitch-quorum-sheet");
-const marketFreshSheet = campaign("market-fresh-sheet");
+const bakedCard = (slug: string) => pair(`venture/meme/${slug}-1600`) ?? pair(`venture/meme/${slug}-900`);
+const programCard = (slug: string) => bakedCard(`program-${slug}`);
 
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy (staging-only until
-// read). Every program fact below is quoted from the approved copy packs in
-// E:\Makeshift\MEME (BofSB Aug-2026 pack; On-Demand PQ/MF pack).
-const CAMPAIGN = {
-  kicker: "The work",
-  heading: "Somebody has to fill the room.",
-  body: [
-    "A nonprofit workshop only works if people show up to it. That part isn't teaching — it's a poster, a date, a QR code that goes somewhere, and the same look holding across every format a platform will ask you for.",
-    "So that's the part I build. Each program gets a rendered flyer family — feed, portrait, story, link card, registration banner — plus a seven-second animated cut of each, generated from code rather than redrawn by hand, so a date change is a re-render instead of a redesign.",
-  ],
-  items: [
-    {
-      media: () => bofsbPortrait,
-      slug: "bofsb-portrait",
-      label: "The Business of Show Business",
-      meta: "Sat, Aug 15, 2026 · 1:00 PM · Mike's Camera, Boulder",
-      note: "A 90-minute in-person workshop on the state of the film industry from a business perspective, taught by producer Nick C. Goins Jr. Co-branded with the host venue.",
-      alt: "A magazine-cover-style flyer headed MEME, reading The Business of Show Business, with a portrait of instructor Nick C. Goins Jr., the date Sat Aug 15, and a QR code.",
-    },
-    {
-      media: () => pitchQuorumSheet,
-      slug: "pitch-quorum-sheet",
-      label: "Pitch Quorum",
-      meta: "Live session · remote or in person · scheduled on request",
-      note: "\u201CA great script doesn't get funded. A great pitch does.\u201D Packaging and pitching a film project to the people who fund films.",
-      alt: "A program sheet headed MEME with an ON DEMAND badge, reading A great script doesn't get funded — a great pitch does.",
-    },
-    {
-      media: () => marketFreshSheet,
-      slug: "market-fresh-sheet",
-      label: "Market Fresh",
-      meta: "Live session · remote or in person · scheduled on request",
-      note: "\u201CA badge isn't a strategy.\u201D What to prepare before a film market like AFM, who to meet there, and the follow-through afterwards.",
-      alt: "A program sheet headed MEME with an ON DEMAND badge, reading A badge isn't a strategy — walk in ready to work it.",
-    },
-  ],
+const PROGRAM_TRACKS = {
+  "pitch-market": { label: "Pitch & Market", color: "#e0a52c" },
+  "on-set": { label: "On-Set Craft", color: "#c9503f" },
+  sound: { label: "Sound", color: "#38f8ec" },
+} as const;
+
+const PROGRAMS = [
+  {
+    slug: "pitch-quorum",
+    track: "pitch-market",
+    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+  },
+  {
+    slug: "market-fresh",
+    track: "pitch-market",
+    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+  },
+  {
+    slug: "business-of-show-business",
+    track: "pitch-market",
+    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, with a workshop description and instructor credit to Nick C. Goins Jr.",
+  },
+  {
+    slug: "pa-workshop",
+    track: "on-set",
+    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, with a workshop description and instructor credit to Adam Smestad.",
+  },
+  {
+    slug: "script-supervisor",
+    track: "on-set",
+    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, with a workshop description and instructor credit to Adam Smestad.",
+  },
+  {
+    slug: "carpenter",
+    track: "on-set",
+    alt: "An evergreen MEME program card reading The Carpenter Not the Tools, On-Set Craft track, with a workshop description and instructor credit to Eric Abramson.",
+  },
+  {
+    slug: "sound-workshop",
+    track: "sound",
+    alt: "An evergreen MEME program card reading Sound Workshop, Sound track, with a description of the two-part workshop and instructor credit to Steve Borne.",
+  },
+] as const;
+
+const PROGRAMS_INTRO = {
+  kicker: "The programs",
+  heading: "The workshops, not the flyer.",
+  body: "MEME runs the same handful of workshops most years — sometimes remote, sometimes at the Boulder library, sometimes free. What follows is the shape of the catalog rather than any single term's schedule: what each program actually covers, and who's usually teaching it.",
   footnote:
-    "Rendered from the campaign repo, five formats per program plus animated cuts. Registration links and any co-brand sign-off stay MEME's call.",
+    "Programs run on a rotating schedule. Current dates, cost, and registration live at meme.ngo — this page is the catalog, not the calendar.",
 };
 
 /**
- * 2026-08-02 CORRECTION (operator-directed, verified against
- * https://www.meme.ngo/meet-the-team):
+ * 2026-08-03 EVERGREEN REBUILD (operator-directed): this grid previously
+ * shipped as "who teaches the workshops" — 3 instructors, deliberately NOT
+ * labelled as the team (see the 2026-08-02 correction preserved below, which
+ * is still the reason Borne and Smestad are kept separate from the team
+ * tier). The operator's direction now is to show the FULLER roster: "There
+ * were other teachers and people involved in the organization — the fuller
+ * roster should appear," while also not repeating a headshot: "I don't need
+ * to see the exact same picture of Nick's head side by side."
  *
- * This grid previously ran as an unlabelled roster of Nick Goins + Steve Borne
- * + Adam Smestad, which read as "the MEME team". It is not. MEME's own team
- * page lists FIVE people — Nick C. Goins Jr (Executive Director & Founder),
- * Amber MacPherson (Board Chair & Admin), and three Members At-Large: Eric
- * Abramson, Shaun Michael Ellis, and Sindbad. Borne and Smestad appear
- * nowhere on it; they are working professionals who have TAUGHT workshops.
- * Presenting a guest instructor as organisational leadership overstates their
- * relationship to the nonprofit and misrepresents its actual governance.
+ * So this is now two tiers. TEAM = the five people on MEME's own team page
+ * (meme.ngo/meet-the-team, re-verified 2026-08-03), each row picturing that
+ * person exactly once and crediting what they teach where applicable (Nick,
+ * Eric). INSTRUCTOR_CREDITS = the working professionals confirmed as
+ * instructors in the xlsx who are NOT on the team page (Adam, Steve) — shown
+ * once, below, rather than duplicated in the team tier.
  *
- * So the section is now explicitly "who teaches the workshops", the titles are
- * exact, and the copy points at MEME's own team page for the team itself. The
- * team is described in prose (above) rather than pictured, because the
- * remaining headshots are not clean: Amber MacPherson's carries a visible
- * "April O'Hare Photography" watermark with credit unconfirmed, and there is
- * no Shaun Michael Ellis portrait on file at all. A half-complete leadership
- * grid would be worse than none.
+ * Eric Abramson's photo is new this build (scripts/make-meme-evergreen.mjs,
+ * cropped from his only photo on file — a work selfie that also shows an
+ * unrelated interview subject in the background; the crop excludes that
+ * person entirely). Amber MacPherson's two headshots (color + B/W) both
+ * carry a visible "April O'Hare Photography" watermark with the credit
+ * unconfirmed — same flag the prior build raised — so her row stays
+ * text-only, like Shaun Michael Ellis (no photo on file at all). Sindbad's
+ * row carries no photo by house rule and keeps the locked, modest phrasing:
+ * "Member At-Large, MEME."
  */
-const INSTRUCTORS = [
-  { key: "nick", name: "Nick C. Goins Jr", role: "Executive Director & Founder. Teaches the flagship programs — Pitch Quorum and Market Fresh — himself.", alt: "Close portrait of Nick C. Goins Jr wearing a plaid flat cap, black t-shirt, looking directly at camera." },
-  { key: "steve", name: "Steve Borne", role: "Has taught the two-part sound workshop — setting a shoot up for success on location, and what happens to that audio in post.", alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background." },
-  { key: "adam", name: "Adam Smestad", role: "Has taught the production-assistant and script-supervisor workshops — the on-set roles most people learn by getting yelled at until they figure it out.", alt: "Studio portrait of Adam Smestad, bald, short beard, smiling, black blazer, gray backdrop." },
+const TEAM = [
+  {
+    key: "nick",
+    name: "Nick C. Goins Jr",
+    role: "Executive Director & Founder.",
+    bio: "Has worked in the film industry in various capacities since making his first feature at 16 — critic, writer, director, producer, graphic artist. Teaches MEME's flagship Pitch Quorum and Market Fresh programs himself.",
+    alt: "Close portrait of Nick C. Goins Jr wearing a plaid flat cap, black t-shirt, looking directly at camera.",
+  },
+  { key: null, name: "Amber MacPherson", role: "Board Chair & Admin.", bio: null, alt: null },
+  {
+    key: "eric",
+    name: "Eric Abramson",
+    role: "Member At-Large.",
+    bio: "A filmmaker and firefighter — documentary, music video, and live-event work aired on outlets including MTV, ESPN, and PBS, alongside years fighting wildland fires across the American West. Teaches The Carpenter Not the Tools.",
+    alt: "Eric Abramson on a shoot, wearing a ballcap and headphones, camera and monitor visible beside him.",
+  },
+  { key: null, name: "Shaun Michael Ellis", role: "Member At-Large. Producer and screenwriter.", bio: null, alt: null },
+  { key: null, name: "Sindbad Horizon", role: "Member At-Large, MEME.", bio: null, alt: null },
+] as const;
+
+const INSTRUCTOR_CREDITS = [
+  {
+    key: "adam",
+    name: "Adam Smestad",
+    bio: "Teaches the PA and Script Supervisor workshops. A writer, director, and producer who's worked more than 50 film, TV, and commercial sets — as a PA, and in the art department, camera department, sound, G&E, and craft services — after leaving a career in law in 2018.",
+    alt: "Studio portrait of Adam Smestad, bald, short beard, smiling, black blazer, gray backdrop.",
+  },
+  {
+    key: "steve",
+    name: "Steve Borne",
+    bio: "Teaches the two-part Sound Workshop. A film and TV sound designer for more than 35 years, with two Emmy awards for TV sound mixing, credits alongside directors from Harmony Korine to Robert Altman, and recording work with musicians including Jerry Garcia and Tom Petty.",
+    alt: "Portrait of Steve Borne, bald, glasses, gray beard, dark sweater, softly lit interior background.",
+  },
 ] as const;
 
 // ── THE ARTICLE (all new sentences — see the approval note above) ──
@@ -275,75 +329,125 @@ const ARTICLE = {
 
       <p class="meme-break" aria-hidden="true">✳</p>
 
-      {/* v3 — THE CAMPAIGN: the page's evidence. A poster wall at deliberately
-          unequal scale — the lead flyer runs large beside its own spec block,
-          the three others drop to a smaller rank underneath. */}
-      {
-        (bofsbPortrait || pitchQuorumSheet || marketFreshSheet) && (
-          <section class="meme-campaign" aria-label="Campaign work for MEME">
-            <p class="hud-label meme-kicker">{CAMPAIGN.kicker}</p>
-            <h2 class="meme-h2">{CAMPAIGN.heading}</h2>
-            {CAMPAIGN.body.map((p) => <p class="meme-para">{p}</p>)}
+      {/* 2026-08-03 EVERGREEN REBUILD — the program catalog, grouped into
+          three tracks, replacing the retired dated-campaign poster wall. */}
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading, intro, and program
+          card copy below, staging-only until read. */}
+      <section class="meme-programs" aria-label="MEME's program catalog">
+        <p class="hud-label meme-kicker">{PROGRAMS_INTRO.kicker}</p>
+        <h2 class="meme-h2">{PROGRAMS_INTRO.heading}</h2>
+        <p class="meme-para">{PROGRAMS_INTRO.body}</p>
 
-            {CAMPAIGN.items[0].media() && (
-              <div class="meme-lead">
-                <figure class="meme-lead-fig">
+        <div class="meme-track" data-track="pitch-market">
+          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["pitch-market"].color}`}>
+            {PROGRAM_TRACKS["pitch-market"].label}
+          </p>
+          <div class="meme-program-grid">
+            {PROGRAMS.filter((p) => p.track === "pitch-market").map((c) => {
+              const m = programCard(c.slug);
+              return m ? (
+                <figure class="meme-program-card">
                   <picture>
-                    {CAMPAIGN.items[0].media()!.avif && <source srcset={CAMPAIGN.items[0].media()!.avif} type="image/avif" />}
-                    <img src={CAMPAIGN.items[0].media()!.webp ?? CAMPAIGN.items[0].media()!.avif} alt={CAMPAIGN.items[0].alt} loading="lazy" decoding="async" />
+                    {m.avif && <source srcset={m.avif} type="image/avif" />}
+                    <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
                   </picture>
                 </figure>
-                <div class="meme-lead-body">
-                  <p class="hud-label meme-next">Next up</p>
-                  <p class="meme-item-label">{CAMPAIGN.items[0].label}</p>
-                  <p class="meme-item-meta">{CAMPAIGN.items[0].meta}</p>
-                  <p class="meme-item-note">{CAMPAIGN.items[0].note}</p>
-                </div>
-              </div>
-            )}
+              ) : null;
+            })}
+          </div>
+        </div>
 
-            <div class="meme-wall">
-              {CAMPAIGN.items.slice(1).map((it) => {
-                const m = it.media();
-                return m ? (
-                  <figure class="meme-wall-fig">
-                    <picture>
-                      {m.avif && <source srcset={m.avif} type="image/avif" />}
-                      <img src={m.webp ?? m.avif} alt={it.alt} loading="lazy" decoding="async" />
-                    </picture>
-                    <figcaption>
-                      <span class="meme-item-label">{it.label}</span>
-                      <span class="meme-item-meta">{it.meta}</span>
-                      <span class="meme-item-note">{it.note}</span>
-                    </figcaption>
-                  </figure>
-                ) : null;
-              })}
-            </div>
-            <p class="meme-footnote">{CAMPAIGN.footnote}</p>
-          </section>
-        )
-      }
+        <div class="meme-track" data-track="on-set">
+          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["on-set"].color}`}>
+            {PROGRAM_TRACKS["on-set"].label}
+          </p>
+          <div class="meme-program-grid">
+            {PROGRAMS.filter((p) => p.track === "on-set").map((c) => {
+              const m = programCard(c.slug);
+              return m ? (
+                <figure class="meme-program-card">
+                  <picture>
+                    {m.avif && <source srcset={m.avif} type="image/avif" />}
+                    <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              ) : null;
+            })}
+            <!-- CARPENTER-RECORDING-SEGMENT: integration point -->
+          </div>
+        </div>
 
-      {/* Build #6 — the roster grid: 3 clean headshots (Nick, Steve, Adam).
-          Amber MacPherson's headshot is cut (unconfirmed photo-credit
-          watermark) and the AFM 2017 photo is cut (rights unresolved) —
-          see the header note. Native-resolution images, not upscaled. */}
-      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading + note (staging-only). */}
-      <p class="hud-label meme-kicker" data-reveal>Who teaches the workshops</p>
-      <div class="meme-roster" data-reveal aria-label="Workshop instructors">
+        <div class="meme-track" data-track="sound">
+          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["sound"].color}`}>
+            {PROGRAM_TRACKS["sound"].label}
+          </p>
+          <div class="meme-program-grid">
+            {PROGRAMS.filter((p) => p.track === "sound").map((c) => {
+              const m = programCard(c.slug);
+              return m ? (
+                <figure class="meme-program-card">
+                  <picture>
+                    {m.avif && <source srcset={m.avif} type="image/avif" />}
+                    <img src={m.webp ?? m.avif} alt={c.alt} loading="lazy" decoding="async" />
+                  </picture>
+                </figure>
+              ) : null;
+            })}
+          </div>
+        </div>
+
+        <p class="meme-footnote">{PROGRAMS_INTRO.footnote}</p>
+      </section>
+
+      {/* 2026-08-03 EVERGREEN REBUILD — the people, in two tiers: MEME's own
+          team (each pictured once, credited with what they teach where the
+          xlsx confirms it), then the working professionals confirmed as
+          instructors who are NOT on the team page. See the header note above
+          TEAM for the Amber MacPherson photo-rights flag and the Sindbad
+          house rule. */}
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading + bio copy below,
+          staging-only until read. */}
+      <p class="hud-label meme-kicker" data-reveal>The people</p>
+      <h2 class="meme-h2" data-reveal>Who's actually behind it.</h2>
+
+      <p class="hud-label meme-track-label" data-reveal>The team</p>
+      <div class="meme-roster" data-reveal aria-label="MEME's team">
         {
-          INSTRUCTORS.map((r) => {
-            const shot = memeShots[r.key as keyof typeof memeShots];
+          TEAM.map((p) => {
+            const shot = p.key ? memeShots[p.key as keyof typeof memeShots] : undefined;
+            return (
+              <figure class:list={["meme-roster-card", { "meme-roster-card--text": !shot }]}>
+                {shot && (
+                  <picture>
+                    {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+                    <img src={shot.webp ?? shot.avif} alt={p.alt!} loading="lazy" decoding="async" />
+                  </picture>
+                )}
+                <figcaption>
+                  <span class="meme-roster-name">{p.name}</span>
+                  <span class="meme-roster-role">{p.role}</span>
+                  {p.bio && <span class="meme-roster-bio">{p.bio}</span>}
+                </figcaption>
+              </figure>
+            );
+          })
+        }
+      </div>
+
+      <p class="hud-label meme-track-label" data-reveal>Also teaching</p>
+      <div class="meme-roster meme-roster--instructors" data-reveal aria-label="Other MEME workshop instructors, not on the team page">
+        {
+          INSTRUCTOR_CREDITS.map((p) => {
+            const shot = memeShots[p.key as keyof typeof memeShots];
             return shot ? (
               <figure class="meme-roster-card">
                 <picture>
                   {shot.avif && <source srcset={shot.avif} type="image/avif" />}
-                  <img src={shot.webp ?? shot.avif} alt={r.alt} loading="lazy" decoding="async" />
+                  <img src={shot.webp ?? shot.avif} alt={p.alt} loading="lazy" decoding="async" />
                 </picture>
                 <figcaption>
-                  <span class="meme-roster-name">{r.name}</span>
-                  <span class="meme-roster-role">{r.role}</span>
+                  <span class="meme-roster-name">{p.name}</span>
+                  <span class="meme-roster-bio">{p.bio}</span>
                 </figcaption>
               </figure>
             ) : null;
@@ -351,8 +455,8 @@ const ARTICLE = {
         }
       </div>
       <p class="meme-footnote" data-reveal>
-        Instructors are working professionals brought in to teach a session — not MEME's
-        board. The organisation's team is listed on its own site.
+        The team is MEME's own (meme.ngo/meet-the-team); instructors are working
+        professionals brought in to teach a session, not the board.
       </p>
 
       <nav class="meme-ctas" data-reveal>
@@ -480,8 +584,12 @@ const ARTICLE = {
     color: color-mix(in srgb, #d9f2ec 45%, transparent);
     letter-spacing: 0;
   }
-  /* ── v3 · THE CAMPAIGN — poster wall at unequal rank ─────────────────── */
-  .meme-campaign {
+  /* ── 2026-08-03 EVERGREEN REBUILD · THE PROGRAM CATALOG ──────────────────
+     replaces the retired dated-flyer poster wall. Three tracks, each its own
+     small kicker (color set per-track via --track-color), cards laid out in
+     a simple responsive grid rather than the old unequal-rank poster wall —
+     a catalog reads as a catalog, not as a hierarchy of "next up". */
+  .meme-programs {
     display: grid;
     gap: 1.1rem;
     margin: 0.6rem 0 0.4rem;
@@ -501,113 +609,42 @@ const ARTICLE = {
     color: #f2f4f8;
     margin-bottom: 0.2rem;
   }
-  /* the lead: one flyer at full rank beside its own spec block */
-  .meme-lead {
+  .meme-track {
     display: grid;
-    grid-template-columns: 22rem 1fr;
-    gap: 1.8rem;
-    align-items: center;
+    gap: 0.7rem;
     margin-top: 0.5rem;
   }
-  .meme-lead-fig {
+  .meme-track-label {
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, var(--track-color, var(--color-accent, #38f8ec)) 82%, transparent);
+  }
+  .meme-program-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.1rem;
+  }
+  .meme-program-card {
     margin: 0;
   }
-  .meme-lead-fig img {
+  .meme-program-card img {
     display: block;
     width: 100%;
     height: auto;
     border-radius: 8px;
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.45);
-  }
-  .meme-lead-body {
-    display: grid;
-    gap: 0.35rem;
-    align-content: center;
-  }
-  .meme-next {
-    letter-spacing: 0.24em;
-    color: color-mix(in srgb, var(--color-accent, #38f8ec) 80%, transparent);
-  }
-  /* the wall: three subordinate flyers, deliberately a rank smaller than the
-     lead AND unequal to each other — Crew Call is a different animal (a call
-     sheet, not a cover) so it takes the wide track, and the two sibling
-     program sheets sit narrower with a dropped baseline. A flat repeat(3,1fr)
-     here would rebuild the uniform-tile grid this whole overhaul removed. */
-  /* two siblings now (Crew Call pulled — unannounced), so the ratio is the
-     house 1.62:1 rather than the old three-across. Still unequal on purpose:
-     a 1fr 1fr pair is the "two identical squares" shape being removed
-     everywhere else on the site. */
-  .meme-wall {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 1.6rem;
-    margin-top: 0.6rem;
-    align-items: start;
-    max-width: 46rem;
-  }
-  .meme-wall-fig {
-    margin: 0;
-    display: grid;
-    gap: 0.5rem;
-    align-content: start;
-  }
-  .meme-wall-fig:nth-child(2) {
-    margin-top: 2.2rem;
-  }
-  .meme-wall-fig img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
-  }
-  .meme-wall-fig figcaption {
-    display: grid;
-    gap: 0.2rem;
-  }
-  .meme-item-label {
-    font-family: var(--font-sans);
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #f2f4f8;
-  }
-  .meme-item-meta {
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    color: color-mix(in srgb, #eef2f5 62%, transparent);
-  }
-  .meme-item-note {
-    font-size: 0.82rem;
-    line-height: 1.45;
-    color: color-mix(in srgb, #eef2f5 72%, transparent);
-  }
-  .meme-lead-body .meme-item-label {
-    font-size: 1.25rem;
-  }
-  .meme-lead-body .meme-item-note {
-    font-size: 0.92rem;
-    max-width: 44ch;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   }
   .meme-footnote {
     font-size: 0.72rem;
     line-height: 1.5;
     color: color-mix(in srgb, #eef2f5 55%, transparent);
   }
-  @media (max-width: 780px) {
-    .meme-lead { grid-template-columns: 1fr; }
-    .meme-lead-fig { max-width: 22rem; }
-    .meme-wall-fig:nth-child(2) { margin-top: 1.4rem; }
-  }
-  @media (max-width: 520px) {
-    .meme-wall { grid-template-columns: 1fr; }
-    .meme-wall-fig:nth-child(2) { margin-top: 0; }
-  }
 
-  /* Build #6 — roster grid, 3 headshot cards. P5: scale-dropped to a
-     masthead/contributors block (~11rem cells, centered) — deliberately
-     smaller than a gallery so it reads as credits, not imagery. */
+  /* 2026-08-03 EVERGREEN REBUILD — roster grid grown from 3 headshots to the
+     full team tier (5, one text-only row per missing/unconfirmed photo) plus
+     a second, narrower instructor tier (2). Still a masthead/contributors
+     block (~11rem cells, centered), deliberately smaller than a gallery so it
+     reads as credits, not imagery. */
   .meme-roster {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -615,6 +652,10 @@ const ARTICLE = {
     margin: 0.4rem auto 0.2rem;
     max-width: 36rem;
     width: 100%;
+  }
+  .meme-roster--instructors {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 24rem;
   }
   .meme-roster-card {
     margin: 0;
@@ -628,6 +669,21 @@ const ARTICLE = {
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+  }
+  /* text-only rows (Amber, Shaun, Sindbad — see the TEAM header note for why
+     no photo) get a bordered placeholder the same footprint as a photo card,
+     so the grid rhythm holds without faking imagery that doesn't exist. */
+  .meme-roster-card--text figcaption {
+    aspect-ratio: 1 / 1;
+    border: 1px dashed color-mix(in srgb, #ffffff 18%, transparent);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.9rem;
+    gap: 0.3rem;
   }
   .meme-roster-card figcaption {
     display: grid;
@@ -643,6 +699,11 @@ const ARTICLE = {
     font-size: 0.78rem;
     line-height: 1.4;
     color: color-mix(in srgb, #eef2f5 70%, transparent);
+  }
+  .meme-roster-bio {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #eef2f5 62%, transparent);
   }
   @media (max-width: 640px) {
     .meme-roster { grid-template-columns: 1fr 1fr; }
