@@ -1,5 +1,39 @@
 # SITE COPY DECK — publication-v1 (merged, for operator read-approval)
 
+> ## ✅ READ-APPROVED — 2026-08-03 (blanket, the audit/design-pass batch)
+>
+> The operator read the consolidated review (`REVIEW-2026-08-03-design-pass.md`,
+> published as a review page) and approved, verbatim: **"in short I approve of
+> everything."** This covers every new sentence introduced by the 2026-08-02/03
+> audit + design pass (the 21-commit `audit-fixes-2026-08-02` batch, deployed to
+> staging 2026-08-03), specifically:
+> - Home hero: "A publication of Adventure Stories and Venture Stories." + the
+>   new subline ("...on the trail, and in the boardroom.") + the new buyer line
+>   ("Drone and expedition photography, founder and industry storytelling — ...")
+> - Signpost #3: "Strategy & production consulting — Forge the Saga"
+> - /adventure meta description (publication framing, replacing the services line)
+> - "The Film Industry" collection intro + the standalone-stories rail intro
+> - The Pebble Beach Concours reframe of /venture/dawn-patrol (title, deck, meta,
+>   "Opens with Dawn Patrol" teaser, "Movement one — Dawn Patrol, before light")
+> - PitchBoulder ledger stat labels ("Wednesdays" / "Write-ups" / "One season")
+>   and the "pictured above ↑" tags
+> - /work archive index labels ("Every … story, in one index", "Not yet its own
+>   story") and all card titles (verbatim reuses)
+> - The rewritten /privacy contact paragraph
+> - All new SeriesFest-dispatch captions + pull-quotes and the AFM "two angles"
+>   caption from the Movement-template rebuild
+> - The Vybe cover slate correction ("Boulder area & Denver, Colorado")
+>
+> He also ruled on the two open questions: **posed red-carpet/lineup photos are
+> fine as editorial coverage** (the "no posed step-and-repeat" rule was scoped to
+> the rejected AFM sponsor-party class, not a blanket ban), and the /venture MEME
+> rail card question is moot (the card was removed in the collections restructure;
+> MEME is feature-only now).
+>
+> In-code `⚠ OPERATOR READ-APPROVAL REQUIRED` flags dated 2026-08-02/03 from this
+> batch are superseded by this entry. Flags from EARLIER passes (PUB-A…E etc.)
+> keep whatever status they had — this approval covers only the batch above.
+
 Merges COPY-DECK-A.md (PUB-A, structure), COPY-DECK-B.md (PUB-B, the three
 narrative pages), COPY-DECK-C.md (PUB-C, monetization weave), the copy fixed
 directly by PUB-D (final QA pass), and the collections-architecture copy
