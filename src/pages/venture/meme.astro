@@ -373,8 +373,45 @@ const ARTICLE = {
                 </figure>
               ) : null;
             })}
-            <!-- CARPENTER-RECORDING-SEGMENT: integration point -->
           </div>
+
+          {/* CARPENTER-RECORDING-SEGMENT (2026-08-03) — from the operator's own
+              recording of the 2025-12-03 session (the first MEME event he has
+              real footage of; mined in E:\Makeshift\MEME\_CARPENTER-MINED).
+              Quote is VERBATIM from the transcript (part1, 00:23:31-00:23:42),
+              light filler cleanup only, source + timestamp preserved there for
+              verification. Still: scripts/make-carpenter-room.mjs — the crop
+              excludes the operator, who attended. Date claim (December 2025) is
+              from the recording's own file metadata (2025-12-03).
+              ⚠ OPERATOR READ-APPROVAL REQUIRED — quote selection + caption are
+              new visible copy (staging-only until read). */}
+          <figure class="meme-room">
+            <picture>
+              <source
+                srcset={`${base}/media/venture/meme/carpenter-room-900.avif 900w, ${base}/media/venture/meme/carpenter-room-1440.avif 1440w`}
+                type="image/avif"
+              />
+              <img
+                src={`${base}/media/venture/meme/carpenter-room-900.webp`}
+                srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
+                sizes="(min-width: 900px) 820px, 100vw"
+                alt="Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen"
+                loading="lazy"
+                decoding="async"
+                width="1440"
+                height="1080"
+              />
+            </picture>
+            <blockquote class="meme-room-quote">
+              <p>
+                &ldquo;People get hung up &mdash; should I buy this expensive camera? No. Use the
+                cheaper camera, but get a good mic.&rdquo;
+              </p>
+              <footer class="hud-label meme-room-credit">
+                Eric Abramson &middot; The Carpenter Not the Tools &middot; December 2025 session
+              </footer>
+            </blockquote>
+          </figure>
         </div>
 
         <div class="meme-track" data-track="sound">
@@ -638,6 +675,40 @@ const ARTICLE = {
     font-size: 0.72rem;
     line-height: 1.5;
     color: color-mix(in srgb, #eef2f5 55%, transparent);
+  }
+  /* CARPENTER-RECORDING-SEGMENT — the one photographic moment in the programs
+     section: a real frame from inside the workshop, quote underneath. Sits
+     full-width under the On-Set Craft grid, max-width capped so it reads as a
+     figure, not a hero. Same border/shadow voice as the program cards. */
+  .meme-room {
+    margin: 1.4rem auto 0;
+    max-width: 51.25rem; /* 820px — matches the sizes attr */
+  }
+  .meme-room img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  }
+  .meme-room-quote {
+    margin: 0.9rem 0 0;
+    padding: 0 0.2rem;
+  }
+  .meme-room-quote p {
+    margin: 0;
+    font-family: var(--font-serif, "Fraunces Variable", serif);
+    font-style: italic;
+    font-size: 1.06rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, #eef2f5 88%, transparent);
+  }
+  .meme-room-credit {
+    display: block;
+    margin-top: 0.45rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #eef2f5 52%, transparent);
   }
 
   /* 2026-08-03 EVERGREEN REBUILD — roster grid grown from 3 headshots to the
