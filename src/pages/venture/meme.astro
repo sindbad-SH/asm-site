@@ -502,8 +502,8 @@ const ARTICLE = {
         <h2 class="meme-h2">{PROGRAMS_INTRO.heading}</h2>
         <p class="meme-para">{PROGRAMS_INTRO.body}</p>
 
-        <div class="meme-track" data-track="pitch-market">
-          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["pitch-market"].color}`}>
+        <div class="meme-track" data-track="pitch-market" style={`--track-color:${PROGRAM_TRACKS["pitch-market"].color}`}>
+          <p class="hud-label meme-track-label">
             {PROGRAM_TRACKS["pitch-market"].label}
           </p>
           <div class="meme-program-grid">
@@ -522,8 +522,8 @@ const ARTICLE = {
           </div>
         </div>
 
-        <div class="meme-track" data-track="on-set">
-          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["on-set"].color}`}>
+        <div class="meme-track" data-track="on-set" style={`--track-color:${PROGRAM_TRACKS["on-set"].color}`}>
+          <p class="hud-label meme-track-label">
             {PROGRAM_TRACKS["on-set"].label}
           </p>
           <div class="meme-program-grid">
@@ -555,38 +555,45 @@ const ARTICLE = {
               operator, who attended. Date claim (December 2025) is from the
               recording's own file metadata (2025-12-03).
               ROUND 3 (operator: "let the Carpenter figure sit asymmetrically
-              against text"): the photo moves from a plain centered figure
-              with a caption below it to a tilted, asymmetric duo — a wide
-              photo column (68%) beside a narrow caption column (32%),
-              same 58/34-family split the rest of the site's staggers use.
-              Caption text is UNCHANGED, only its position moved.
+              against text"): the photo moved from a plain centered figure
+              to a tilted, asymmetric duo (68/32 split). Caption text is
+              UNCHANGED throughout every round, only its position has moved.
+              MEME-STICKLER-2026-08-03 (layout verdict, operator: "very
+              linear, a lot of boxes"): the duo is retired for the page's one
+              full-bleed moment — this is the obvious candidate (it's already
+              the page's single richest photo, quote + branding baked in) —
+              breaking past `.meme-inner`'s 46rem column via the same
+              viewport-breakout technique steel-and-dust.astro's `.sd-bleed`
+              uses (`left:50%; margin-left:-50vw; width:100vw`). The caption
+              now overlaps the photo's own bottom-left corner (sd-bleed-cap's
+              device: a small blurred pill sitting ON the image) instead of
+              living in a separate column — one of this pass's two
+              overlapping-element beats.
               ⚠ OPERATOR READ-APPROVAL REQUIRED — the one-line caption below
               is new visible copy (staging-only until read). */}
-          <figure class="meme-room-duo" data-reveal>
-            <div class="meme-room">
-              <picture>
-                <source
-                  srcset={`${base}/media/venture/meme/carpenter-room-900.avif 900w, ${base}/media/venture/meme/carpenter-room-1440.avif 1440w`}
-                  type="image/avif"
-                />
-                <img
-                  src={`${base}/media/venture/meme/carpenter-room-900.webp`}
-                  srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
-                  sizes="(min-width: 900px) 460px, 100vw"
-                  alt={`Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen; white text composited over the room's left wall carries his quote: "People get hung up — should I buy this expensive camera? No. Use the cheaper camera, but get a good mic."`}
-                  loading="lazy"
-                  decoding="async"
-                  width="1440"
-                  height="1080"
-                />
-              </picture>
-            </div>
+          <figure class="meme-room-bleed" data-reveal>
+            <picture>
+              <source
+                srcset={`${base}/media/venture/meme/carpenter-room-900.avif 900w, ${base}/media/venture/meme/carpenter-room-1440.avif 1440w`}
+                type="image/avif"
+              />
+              <img
+                src={`${base}/media/venture/meme/carpenter-room-900.webp`}
+                srcset={`${base}/media/venture/meme/carpenter-room-900.webp 900w, ${base}/media/venture/meme/carpenter-room-1440.webp 1440w`}
+                sizes="100vw"
+                alt={`Eric Abramson teaching The Carpenter Not the Tools, gesturing at the head of a long table as attendees listen; white text composited over the room's left wall carries his quote: "People get hung up — should I buy this expensive camera? No. Use the cheaper camera, but get a good mic."`}
+                loading="lazy"
+                decoding="async"
+                width="1440"
+                height="1080"
+              />
+            </picture>
             <figcaption class="hud-label meme-room-cap">Inside The Carpenter Not the Tools, December 2025 session</figcaption>
           </figure>
         </div>
 
-        <div class="meme-track" data-track="sound">
-          <p class="hud-label meme-track-label" style={`--track-color:${PROGRAM_TRACKS["sound"].color}`}>
+        <div class="meme-track" data-track="sound" style={`--track-color:${PROGRAM_TRACKS["sound"].color}`}>
+          <p class="hud-label meme-track-label">
             {PROGRAM_TRACKS["sound"].label}
           </p>
           <div class="meme-program-grid">
@@ -618,7 +625,7 @@ const ARTICLE = {
         <p class="hud-label meme-kicker">{NOCOVA.kicker}</p>
         <div class="meme-nocova-grid">
           <div class="meme-nocova-copy">
-            <h2 class="meme-h2">{NOCOVA.heading}</h2>
+            <h2 class="meme-h2 meme-h2--bold">{NOCOVA.heading}</h2>
             {NOCOVA.paragraphs.map((p) => <p class="meme-para">{p}</p>)}
             <p class="meme-footnote">{NOCOVA.note}</p>
             <a href={NOCOVA.cta.href} class="link" target="_blank" rel="noopener">
@@ -660,13 +667,18 @@ const ARTICLE = {
       {/* MEME-POLISH-2026-08-03 REROSTER — the people, in two tiers: founders
           (Nick + Amber, both pictured), then instructors (Eric, Adam, Steve).
           See the header note above ROSTER_LEADS for the scope rule (why
-          Shaun/Sindbad are gone) and the Amber photo-crop/credit note. */}
+          Shaun/Sindbad are gone) and the Amber photo-crop/credit note.
+          MEME-STICKLER-2026-08-03 (layout verdict) — wrapped in its own
+          <section> so it can carry a distinct ground tint (varied section
+          grounds device) and a quieter heading scale than NOCOVA's — the
+          typography scale-jump the layout verdict asked for. */}
       {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading + bio copy below,
           staging-only until read. Roster SCOPE RULE: founders + instructors
           only — see the header comment above ROSTER_LEADS before adding
           anyone else here. */}
+      <section class="meme-roster-section" aria-label="The people behind MEME">
       <p class="hud-label meme-kicker" data-reveal>The people</p>
-      <h2 class="meme-h2" data-reveal>Who's actually behind it.</h2>
+      <h2 class="meme-h2 meme-h2--quiet" data-reveal>Who's actually behind it.</h2>
 
       <p class="hud-label meme-track-label" data-reveal>Founders</p>
       <div class="meme-roster meme-roster--leads" data-reveal aria-label="MEME's founders">
@@ -716,6 +728,7 @@ const ARTICLE = {
         (including my own role) isn't repeated in this roster — see the article
         above.
       </p>
+      </section>
 
       <nav class="meme-ctas" data-reveal>
         {
@@ -848,11 +861,31 @@ const ARTICLE = {
      a simple responsive grid rather than the old unequal-rank poster wall —
      a catalog reads as a catalog, not as a hierarchy of "next up". */
   .meme-programs {
+    position: relative;
     display: grid;
     gap: 1.1rem;
     margin: 0.6rem 0 0.4rem;
     padding-top: 1.6rem;
     border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  /* MEME-STICKLER-2026-08-03 (layout verdict, "not one continuous navy
+     river") — VARIED SECTION GROUNDS: a full-viewport-width tonal wash sits
+     behind each major section via a ::before breakout (same left:50%/
+     margin-left:-50vw trick as the full-bleed photo above), so the page
+     reads as a sequence of rooms rather than one flat background. Kept
+     subtle (a few % mix) so it never fights the text; z-index:-1 stacks it
+     under `.meme-inner`'s content (z-index:1) but above `.meme-story`'s own
+     base fill and the ghost letterforms. */
+  .meme-programs::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    background: color-mix(in srgb, #0a1a28 100%, transparent);
   }
   .meme-kicker {
     letter-spacing: 0.26em;
@@ -866,6 +899,18 @@ const ARTICLE = {
     line-height: 1.15;
     color: #f2f4f8;
     margin-bottom: 0.2rem;
+  }
+  /* typography scale-jump (layout verdict): NOCOVA gets a bigger, bolder
+     heading (its own distinct, lighter moment); the roster section below it
+     answers with a quieter, smaller one — a rhythm instead of every h2
+     repeating the same size. */
+  .meme-h2--bold {
+    font-size: clamp(2.1rem, 4.6vw, 3.1rem);
+  }
+  .meme-h2--quiet {
+    font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+    font-style: normal;
+    font-weight: 500;
   }
   .meme-track {
     display: grid;
@@ -927,13 +972,22 @@ const ARTICLE = {
   }
   /* the description, OFF the image now — real HTML text, selectable, readable
      at any size (the whole point of the redesign: the image no longer carries
-     a body paragraph that turns to mush at card scale). */
+     a body paragraph that turns to mush at card scale).
+     MEME-STICKLER-2026-08-03 (layout verdict, "tighter integration of the
+     descriptions with their cards — caption-style rather than uniform text
+     blocks"): tightened to sit snug under the card (margin cut, a thin
+     track-colored rule standing in for the old flat gap) and set in italic
+     display type instead of plain body sans — reads as a photo caption, not
+     a second paragraph of body copy. */
   .meme-program-desc {
-    margin-top: 0.55rem;
-    font-family: var(--font-sans);
-    font-size: 0.82rem;
-    line-height: 1.5;
-    color: color-mix(in srgb, #eef2f5 68%, transparent);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid color-mix(in srgb, var(--track-color, #38f8ec) 55%, transparent);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #eef2f5 74%, transparent);
   }
   .meme-footnote {
     font-size: 0.72rem;
@@ -942,46 +996,46 @@ const ARTICLE = {
   }
   /* CARPENTER-RECORDING-SEGMENT — the one photographic moment in the programs
      section: a real frame from inside the workshop.
-     MEME-POLISH-2026-08-03: the quote is now composited INTO the photo
+     MEME-POLISH-2026-08-03: the quote is composited INTO the photo
      (scripts/make-carpenter-room.mjs), so the separate blockquote styles are
-     retired — just a one-line caption below.
-     ROUND 3 — the figure sits asymmetrically against text now (operator ask):
-     a wide tilted photo column beside a narrow caption column, rather than a
-     centered figure with a caption stacked below it. */
-  .meme-room-duo {
-    margin: 1.4rem 0 0;
-    display: grid;
-    grid-template-columns: 68fr 32fr;
-    gap: 1.4rem;
-    align-items: end;
+     retired — just a caption.
+     MEME-STICKLER-2026-08-03 (layout verdict) — the page's one FULL-BLEED
+     moment: the same viewport-breakout trick as steel-and-dust.astro's
+     .sd-bleed, escaping .meme-inner's 46rem column entirely. The caption
+     overlaps the image's own bottom-left corner (sd-bleed-cap's device) —
+     one of this pass's two overlapping-element beats. */
+  .meme-room-bleed {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    width: 100vw;
+    margin: 1.8rem -50vw 0;
   }
-  .meme-room {
-    transform: rotate(-1deg);
-  }
-  .meme-room img {
+  .meme-room-bleed img {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 8px;
-    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+    max-height: 74svh;
+    object-fit: cover;
   }
   .meme-room-cap {
+    position: absolute;
+    left: max(2rem, calc((100vw - 46rem) / 2 + 2rem));
+    bottom: 1rem;
     display: block;
-    padding-bottom: 0.35rem;
+    margin: 0;
+    padding: 0.4rem 0.7rem;
     letter-spacing: 0.18em;
-    color: var(--color-ink-muted, #8a9a96);
+    color: color-mix(in srgb, #f7f9fb 92%, transparent);
+    background: color-mix(in srgb, #060a12 68%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
   }
   @media (max-width: 760px) {
-    .meme-room-duo {
-      grid-template-columns: 1fr;
-    }
-    .meme-room {
-      transform: none;
-    }
     .meme-room-cap {
-      padding-bottom: 0;
-      margin-top: 0.55rem;
+      left: 1rem;
+      right: 1rem;
+      bottom: 0.7rem;
     }
   }
 
@@ -991,11 +1045,27 @@ const ARTICLE = {
      proportion as the site's other staggers), with a translucent light card
      standing in for a photo (none exist yet). */
   .meme-nocova {
+    position: relative;
     display: grid;
     gap: 0.6rem;
     margin: 0.6rem 0 0.4rem;
     padding-top: 1.6rem;
     border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  /* varied section grounds — NOCOVA's own wash, a shade LIGHTER/more teal
+     than the programs section above it (matches the operator's "it can
+     look/feel lighter than the workshops" note; see the ::before comment on
+     .meme-programs for the mechanism). */
+  .meme-nocova::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    background: color-mix(in srgb, #163449 100%, transparent);
   }
   .meme-nocova-grid {
     display: grid;
@@ -1010,15 +1080,26 @@ const ARTICLE = {
   }
   /* the lighter card: a translucent off-dark panel (not the page's own flat
      navy) plus a cyan accent kicker — the "social arm feels lighter than a
-     workshop" cue, in place of a photo until one exists. */
+     workshop" cue, in place of a photo until one exists.
+     MEME-STICKLER-2026-08-03 (layout verdict) — OVERLAPPING ELEMENT #2: the
+     card now rises on a negative margin so it visually crosses this
+     section's own top border/ground-tint boundary (the copy column's kicker
+     + heading sit in the other grid track, so nothing text-on-text
+     collides — verified by viewing the rendered page). Was +2.2rem
+     (pushed down to balance the taller copy column); the overlap direction
+     reverses that. */
   .meme-nocova-card {
-    margin-top: 2.2rem;
+    position: relative;
+    z-index: 1;
+    margin-top: -2.75rem;
     padding: 1.4rem 1.5rem;
     background: color-mix(in srgb, #ffffff 8%, transparent);
     border: 1px solid color-mix(in srgb, #ffffff 18%, transparent);
     border-radius: 10px;
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.5);
     display: grid;
     gap: 0.6rem;
+    backdrop-filter: blur(6px);
   }
   .meme-nocova-card-kicker {
     letter-spacing: 0.22em;
@@ -1067,6 +1148,31 @@ const ARTICLE = {
     .meme-nocova-photos {
       margin-top: 1.2rem;
     }
+  }
+
+  /* MEME-STICKLER-2026-08-03 (layout verdict) — the roster's own ground: a
+     shade DARKER/cooler than NOCOVA's wash above it, so the page's three
+     zones (workshops / social arm / people) each read as a distinct room.
+     Also carries its own top rule + padding, same rhythm as the other two
+     sections. */
+  .meme-roster-section {
+    position: relative;
+    margin: 0.6rem 0 0.4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    display: grid;
+    gap: 0.65rem;
+  }
+  .meme-roster-section::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    background: color-mix(in srgb, #081522 100%, transparent);
   }
 
   /* MEME-POLISH-2026-08-03 REROSTER — down from a 5+2 team/instructor split
