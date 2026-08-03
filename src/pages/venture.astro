@@ -42,7 +42,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
 import YouTubeEmbed from "../components/YouTubeEmbed.astro";
-import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_COLLECTIONS } from "../consts";
+import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_COLLECTIONS, VENTURE_STANDALONE_STORIES } from "../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -86,11 +86,17 @@ const pbEmbedPoster = pair("work/pitchboulder/wednesday-room/room-about-1600");
 // (no new export — reused, not re-cut): engine (an engine-bay DETAIL, hands at
 // work) + lawn (an elevated CROWD/CONTEXT frame — the Cobra, period-dressed
 // spectators, and the coastline). Five frames now, chosen to not repeat an angle.
-// PUB-E (2026-07-27, Directive PUB-E) — Pebble Beach stays FEATURE-ONLY.
-// Per the operator's own rule, a named collection needs at least two
-// stories; Pebble Beach is the only story in the "high craft" / luxury-event
-// space right now, so it does NOT get a VENTURE_COLLECTIONS entry. A "High
-// Craft / Luxury Events" collection is planned once a second story joins it.
+// PUB-E (2026-07-27, Directive PUB-E) — Pebble Beach's FEATURE stays exactly
+// as it was: this top-of-page chapter is still the SPECIFIC Shelby Cobra /
+// Jack Bell story, untouched by the 2026-08-03 restructure below. Per the
+// operator's own rule, a named collection needs at least two stories, so
+// this feature still does NOT get a VENTURE_COLLECTIONS entry of its own —
+// no "High Craft / Luxury Events" collection exists (still just one story in
+// that space). What DID change 2026-08-03: the OVERALL Concours d'Elegance
+// story (the reframed /venture/dawn-patrol — Dawn Patrol is now one movement
+// inside it, not the page's own title) rides the standalone-stories rail
+// further down this page (see VENTURE_STANDALONE_STORIES in consts.ts) —
+// same one-story reason, just resolved as a standalone card instead.
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
 const shOnSet = pair("work/shelby-pebble-beach/photos/on-set-1600");
@@ -202,47 +208,37 @@ const archive = WORK_ARCHIVE.filter((a) => a.lane === "venture" && !a.hideFromLa
 // letterforms, not new copy): the hero scatters STORY.
 const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories"
 
-// PUB-E (2026-07-27, Directive PUB-E) — the old single "more venture
-// stories" rail SPLITS into TWO NAMED COLLECTIONS (VENTURE_COLLECTIONS, in
-// consts — the operator's grouped story sections) plus a slim, ungrouped
-// PARTNER RAIL that keeps its prior "more venture stories" framing. slate +
-// title strings inside each collection are copied VERBATIM from each story's
-// own destination page (already operator-flagged there — reuse adds no new
-// copy); only the collection names + intros (in consts) and this rail's own
-// kicker/intro are new sentences.
+// RESTRUCTURED 2026-08-03 (operator decisions, /venture lower-section
+// restructure) — four changes from the PUB-E (2026-07-27) state:
+//  1. The Makeshift Film Group slot is DROPPED ENTIRELY, not just held from
+//     publish — no card, no ghost, no PUBLISH_MFG check on this page at all.
+//     Its own page (venture/makeshift-film-group.astro) and its
+//     audit-lib.mjs FORBIDDEN_TERMS gate are UNTOUCHED — this only removes
+//     the slot that used to link to it from here.
+//  2. Amazing Aerial is CUT from /venture entirely (its own page,
+//     /venture/amazing-aerial, stays live and reachable — just unlinked from
+//     this page). No replacement card takes its place.
+//  3 & 4. PitchBoulder and MEME no longer repeat in the collections below —
+//     both already lead the page as feature chapters (see VENTURE_COLLECTIONS
+//     in consts.ts for the full account, including how the resulting
+//     one-story "Founders & Pitch Rooms" collection was dissolved rather than
+//     padded or backfilled with a feature).
 //
-// Amazing Aerial stays here, ungrouped — per the directive, "the venture
-// rail (partner story upgrade planned later)", not yet folded into either
-// named collection. The held-from-publish film-venture card (unchanged from
-// its prior placement, same HELD-FROM-PUBLISH interlock) rides alongside it:
-// the directive doesn't name it into Collection A or B, so it stays where it
-// already was rather than being reassigned without operator direction.
+// What's left below the (now single) collection is genuinely two ungrouped
+// STANDALONE stories — KO Law and the reframed Pebble Beach Concours piece
+// (consts.ts VENTURE_STANDALONE_STORIES) — riding the same rail grammar the
+// old partner rail used, minus the "Collection ·" kicker treatment: real
+// stories, just not collection-grouped. slate + title are copied VERBATIM
+// from each story's own destination page, same convention as the collections
+// above.
 const railGhosts: Record<string, string> = {
-  "amazing-aerial": "AERIAL",
-  meme: "MEME",
-  pitchboulder: "PITCH",
-  "makeshift-film-group": "MAKESHIFT",
+  // Currently empty — every card left on this page (the one remaining
+  // collection + the two standalone stories) resolves a real hero-900 image.
+  // toRailCard() below still throws if a future card resolves to neither an
+  // image nor a ghostKey here — add an entry the day a story ships before
+  // its photography does (hardening added in commit df48f42; see that
+  // function's own comment below).
 };
-// The film-venture card mirrors its page's HELD-FROM-PUBLISH interlock (see
-// /venture/makeshift-film-group.astro): that page builds as a redirect until
-// the operator (1) updates the honesty ledger and (2) builds with
-// PUBLISH_MFG=true — so the card only renders under the SAME condition, else
-// its "Read the story" button would bounce visitors back to this page.
-const PUBLISH_MFG = import.meta.env.DEV || process.env.PUBLISH_MFG === "true";
-const mfgCard = PUBLISH_MFG
-  ? [
-      // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only until read.
-      // HONESTY NOTE: the entity's full name is a hard-excluded audit term
-      // (scripts/audit-lib.mjs FORBIDDEN_TERMS), so the visible slate + title
-      // deliberately avoid it; only the hyphenated href (audit-safe) carries
-      // the route. Operator to confirm the naming and whether that exclusion lifts.
-      { href: "/venture/makeshift-film-group", slate: "MAKESHIFT", title: "A film venture, taking shape." },
-    ]
-  : [];
-const partnerRail: { href: string; slate: string; title: string; mediaSlug?: string }[] = [
-  { href: "/venture/amazing-aerial", slate: "AMAZING AERIAL AGENCY · SINCE MID-2024", title: "The agency that takes our aerials to market." },
-  ...mfgCard,
-];
 function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?: string; objectPosition?: string }) {
   // PUB-A — a card's media slug is `mediaSlug` when set (a /work/* href, or
   // any href that shouldn't drive its own media path), else derived from a
@@ -271,7 +267,7 @@ const collectionCards = VENTURE_COLLECTIONS.map((coll) => ({
   ...coll,
   cards: coll.stories.map(toRailCard),
 }));
-const partnerCards = partnerRail.map(toRailCard);
+const standaloneCards = VENTURE_STANDALONE_STORIES.map(toRailCard);
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.
 // PUB-A — `hire` retired with the E1b services chapter; `archive` stays for
@@ -578,14 +574,17 @@ const GROUNDS = {
       </div>
     </section>
 
-    <!-- ═══ S4 · THE COLLECTIONS — PUB-E (2026-07-27, Directive PUB-E): the
-         old single "more venture stories" rail SPLITS into two NAMED,
-         operator-directed collections, each a grouped story section (still
-         the same user-driven carousel grammar — native overflow-x +
-         scroll-snap, zero-JS baseline, pointer-drag enhancement). A
-         collection can carry a story that's ALSO a feature above
-         (PitchBoulder leads Collection A) — the directive is explicit that's
-         allowed. ═══ -->
+    <!-- ═══ S4 · THE COLLECTIONS — PUB-E (2026-07-27) originally shipped TWO
+         NAMED, operator-directed collections here, each a grouped story
+         section, deliberately allowing a collection to carry a story that's
+         ALSO a feature above. RESTRUCTURED 2026-08-03 (operator decisions): a
+         feature must NOT repeat in the collections below it now — see
+         VENTURE_COLLECTIONS in consts.ts for the full account. Only ONE
+         collection survives this pass ("The Film Industry"); the dissolved
+         collection's leftover story (KO Law) and the reframed Pebble Beach
+         Concours piece render as STANDALONE cards in S4c below instead. Same
+         user-driven carousel grammar either way — native overflow-x +
+         scroll-snap, zero-JS baseline, pointer-drag enhancement. ═══ -->
     {
       collectionCards.map((coll, ci) => (
         <section class="im-sec im-rail-sec" data-im-section data-ground={ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB} style={`--sec-ground:${ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB}`}>
@@ -637,24 +636,29 @@ const GROUNDS = {
       ))
     }
 
-    <!-- ═══ S4c · THE VENTURE RAIL — the ungrouped partner rail (Amazing
-         Aerial + the held-from-publish film-venture card). PUB-E: Amazing
-         Aerial "stays on the venture rail (partner story upgrade planned
-         later)" per the directive — deliberately not folded into either named
-         collection above. ═══ -->
+    <!-- ═══ S4c · STANDALONE STORIES — 2026-08-03 restructure: this section
+         used to be the ungrouped partner rail (Amazing Aerial + the held-
+         from-publish film-venture card); both are gone now (see the comments
+         above `railGhosts`). Repurposed for KO Law + the reframed Pebble
+         Beach Concours piece — two real stories that don't have a second
+         story to be named a "collection" with (the operator's own >= 2 rule;
+         see VENTURE_STANDALONE_STORIES in consts.ts). Same rail grammar as a
+         collection above, minus the "Collection ·" kicker — that absence is
+         the visual tell that these are standalone. ═══ -->
     <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
-      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/intro carried over
-          unchanged from the prior single-rail copy, staging-only until read. */}
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker carried over unchanged
+          from the prior rail copy (staging-only until read); intro EDITED
+          2026-08-03 to describe standalone stories instead of partner orgs. */}
       <p class="hud-label im-kicker" data-reveal>More venture stories</p>
       <p class="im-turn im-rail-intro" data-reveal>
-        More of the rooms this work runs through — each one marked at exactly what it is.
+        More venture stories that stand on their own, outside any collection — each one marked at exactly what it is.
       </p>
 
       <div class="im-rail-wrap">
         <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
         <ul class="im-rail" data-im-rail>
           {
-            partnerCards.map((c) => (
+            standaloneCards.map((c) => (
               <li class="im-rail-card">
                 <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
                   <span class="im-rail-media">

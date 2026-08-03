@@ -886,30 +886,47 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// VENTURE_COLLECTIONS — PUB-E (2026-07-27, Directive PUB-E "collections
-// architecture"). Below /venture's three features (Pebble Beach / PitchBoulder
-// / MEME), the operator wants TWO NAMED collections — grouped story sections
-// that each collect their stories, including stories that are ALSO featured
-// elsewhere on the page (PitchBoulder leads Collection A even though it's
-// also a feature chapter). `slate` + `title` strings below are copied
-// VERBATIM from each story's own destination page (already flagged there —
-// reuse adds no new copy); only the collection `name` and `intro` are new
-// sentences on this page.
+// VENTURE_COLLECTIONS — RESTRUCTURED 2026-08-03 (operator decisions, /venture
+// lower-section restructure). PUB-E (2026-07-27) originally shipped TWO named
+// collections below /venture's three features (Pebble Beach / PitchBoulder /
+// MEME), deliberately allowing a collection to also carry a story that's
+// featured elsewhere on the page (PitchBoulder led Collection A even though
+// it was also a feature chapter).
 //
-// NAMES ARE PLACEHOLDERS — operator to confirm or rename:
-//   • Collection A: "Founders & Pitch Rooms" — the operator's own working
-//     name from the directive.
-//   • Collection B: "The Film Industry" — the operator's own working name;
-//     he offered "The Screen Trade" as an alternate to consider.
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — collection names + intro lines are new
-// copy (staging-only until read); logged in SITE-COPY-DECK-publication-v1.md.
+// The operator reversed that allowance this pass: a feature must not repeat
+// in the collections below it. Removing PitchBoulder from "Founders & Pitch
+// Rooms" and MEME from "The Film Industry" left the former with ONE story
+// (KO Law) — below the operator's own rule that a named collection needs
+// >= 2 stories (see the `stories` field comment on VentureCollection below),
+// so that collection is DISSOLVED rather than shipped as a one-story
+// "collection." "The Film Industry" keeps its 2 remaining stories (SeriesFest
+// + AFM) and is the only named collection this pass.
 //
-// Amazing Aerial deliberately does NOT join either collection — per the
-// directive it "stays on the venture rail (partner story upgrade planned
-// later)". Pebble Beach also does not get a collection: the operator's own
-// rule is a named collection needs >= 2 stories, and Pebble Beach is the
-// only story in its space (see the "High Craft / Luxury Events" comment on
-// its feature chapter in venture.astro) — so it stays feature-only.
+// KO Law is not padded into a fake collection, and no feature was
+// reintroduced to fill the empty slot — both explicitly ruled out. It renders
+// instead as a STANDALONE story card (VENTURE_STANDALONE_STORIES below),
+// alongside the reframed Pebble Beach Concours piece (formerly the narrower
+// "Dawn Patrol" — see the REFRAME note on PAGES.ventureStories.dawnPatrol).
+// Both ride venture.astro's ungrouped rail: same card grammar as a collection
+// below, just without the "Collection · NAME" kicker — that absence is the
+// visual tell that a story is standalone rather than grouped.
+//
+// `slate` + `title` strings below are copied VERBATIM from each story's own
+// destination page (already flagged there — reuse adds no new copy); only
+// the collection `name` and `intro` are new sentences on this page.
+//
+// NAME IS A PLACEHOLDER — operator to confirm or rename: "The Film Industry"
+// is the operator's own working name from the original directive; he offered
+// "The Screen Trade" as an alternate to consider.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — the collection's intro line was edited
+// this pass (see below); staging-only until read, logged in
+// SITE-COPY-DECK-publication-v1.md.
+//
+// Amazing Aerial and the Makeshift Film Group slot are GONE from /venture
+// entirely this pass (operator decisions) — see the comments above
+// venture.astro's standalone-stories rail for the full account. Neither ever
+// had a VENTURE_COLLECTIONS entry, so nothing here changes for them beyond
+// this note.
 // ---------------------------------------------------------------------------
 
 export type CollectionStory = {
@@ -929,55 +946,25 @@ export type VentureCollection = {
   name: string;
   /** ⚠ New sentence — operator read-approval required. */
   intro: string;
+  /** The operator's own rule: a named collection needs >= 2 stories, or it
+   *  isn't a "collection" — never pad it with a filler story, and never
+   *  reintroduce a feature that's already promoted elsewhere on the page to
+   *  fill a slot. A story with no second story to pair with belongs in
+   *  VENTURE_STANDALONE_STORIES instead. */
   stories: readonly CollectionStory[];
 };
 
 export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
   {
-    id: "founders-pitch-rooms",
-    name: "Founders & Pitch Rooms",
-    intro:
-      "Where founders take the stage — the pitch nights we cover, and the workshop series that gets them ready for one.",
-    stories: [
-      {
-        href: "/work/pitchboulder",
-        slate: "PITCHBOULDER · BOULDER, COLORADO",
-        title: "PitchBoulder — coverage, recaps & the commercial",
-        // AUDIT-FIX (2026-08-03): this card's href is /work/pitchboulder, which
-        // toRailCard()'s default `href.replace(/^\/venture\//, "")` slug
-        // derivation (venture.astro) doesn't match — the card was silently
-        // falling back to the "PITCH" ghost mark instead of a real photo,
-        // even though PitchBoulder has plenty of event photography. mediaSlug
-        // points it at a fresh bake instead: public/media/venture/
-        // pitchboulder/hero-{900,1600} via scripts/
-        // make-pitchboulder-venture-card.mjs (the same operator-approved
-        // "whole room" frame already used as work/pitchboulder.astro's own
-        // hero, re-cropped to this card's 16:10 box).
-        mediaSlug: "pitchboulder",
-      },
-      {
-        href: "/venture/ko-law-workshops",
-        slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
-        title: "A startup workshop series, on camera.",
-        // AUDIT-FIX (2026-08-03): default center-crop of the native-square
-        // hero left too much exposed ceiling/lighting truss above the
-        // branded screen (operator: "needs to be recentered ... too much
-        // ceiling"). Pushed down to frame the screen + presenters + crowd.
-        objectPosition: "50% 60%",
-      },
-    ],
-  },
-  {
     id: "film-industry",
     name: "The Film Industry",
+    // EDITED 2026-08-03 — MEME left this collection (it already leads the
+    // page as a feature chapter), so "the organization" no longer belongs in
+    // this list of what the collection covers.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — edited sentence, staging-only.
     intro:
-      "The industry side of the venture lane — the organization, the festival, and the market we keep a pulse on.",
+      "The industry side of the venture lane — the festival and the market we keep a pulse on.",
     stories: [
-      {
-        href: "/venture/meme",
-        slate: "MEME · MAKESHIFT ENTERTAINMENT MEDIA EDUCATION",
-        title: "MEME is where this lane starts.",
-      },
       {
         // Build #2 (2026-08-01 archive-mining integration) — repointed from
         // /work/seriesfest to the new hub page per _INTEGRATION-PLAN.md §1.2
@@ -1007,6 +994,42 @@ export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
         objectPosition: "50% 60%",
       },
     ],
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// VENTURE_STANDALONE_STORIES — 2026-08-03 (operator decisions). Real venture
+// stories that don't currently have a second story to be named a
+// "collection" with (the operator's own >= 2-per-collection rule — see the
+// VentureCollection.stories comment above). Same CollectionStory shape and
+// the same "slate + title copied VERBATIM from the story's own page"
+// convention as VENTURE_COLLECTIONS; rendered on venture.astro's ungrouped
+// standalone-stories rail (no "Collection · NAME" kicker).
+//
+//  • KO Law — relocated from the now-dissolved "Founders & Pitch Rooms"
+//    collection (PitchBoulder's departure left it with only KO Law). Copy
+//    unchanged from that entry.
+//  • The Pebble Beach Concours piece — the reframed /venture/dawn-patrol (see
+//    the REFRAME note on PAGES.ventureStories.dawnPatrol below). It doesn't
+//    get a "High Craft / Luxury Events"-style collection of its own either,
+//    for the identical one-story reason.
+// ---------------------------------------------------------------------------
+export const VENTURE_STANDALONE_STORIES: readonly CollectionStory[] = [
+  {
+    href: "/venture/ko-law-workshops",
+    slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
+    title: "A startup workshop series, on camera.",
+    // AUDIT-FIX (2026-08-03): default center-crop of the native-square
+    // hero left too much exposed ceiling/lighting truss above the
+    // branded screen (operator: "needs to be recentered ... too much
+    // ceiling"). Pushed down to frame the screen + presenters + crowd.
+    objectPosition: "50% 60%",
+  },
+  {
+    href: "/venture/dawn-patrol",
+    // Copied VERBATIM from PAGES.ventureStories.dawnPatrol.slate / .cover.title.
+    slate: "Pebble Beach Concours d'Elegance · August 2025",
+    title: "Pebble Beach Concours d'Elegance",
   },
 ] as const;
 
@@ -1918,22 +1941,43 @@ export const PAGES = {
     //    and is not stated here (dropped rather than guessed).
     //  - TESTIMONIALS["pebble-beach-owner"] (Jack & Debbie Bell) is RESERVED
     //    per operator — not quoted on this page.
+    // ⚠ 2026-08-03 REFRAME (operator decision, /venture restructure) —
+    // retitled from the specific "Dawn Patrol" framing to the OVERALL Pebble
+    // Beach Concours d'Elegance story, with Dawn Patrol demoted to naming
+    // Movement One (a segment inside the wider piece, not the whole piece's
+    // identity) — the same move already approved on /postcards/nordic-
+    // daughter (retitled from a band-titled page to the festival-titled page
+    // it always was, by changing header/framing while keeping the material).
+    //
+    // CHANGED: meta.title, meta.description, cover.masthead, cover.title,
+    // cover.deck, cover.teasers, chapters.before.
+    // UNCHANGED: byline, slate (already led with the event name — the
+    // material was always Concours-wide), lede, every paragraph, the pull
+    // quote, every caption, the field log, and both links — this was already
+    // a whole-day account (pre-dawn arrival at 05:49 through the coastal line
+    // at 16:26, per the shoot's own CAR-INDEX.csv); only the header undersold
+    // it.
+    // FACT CONSTRAINTS (unchanged): only CSX 3042 is a CONFIRMED car identity
+    // (CAR-INDEX.csv) — every other car stays TENTATIVE and unnamed as fact,
+    // as it already was; no attendance number, award, or quote is invented.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string touched by this note
+    // is new/edited copy, staging-only until read.
     dawnPatrol: {
       meta: {
-        title: "Dawn Patrol — a Shelby Cobra at Pebble Beach",
+        title: "Pebble Beach Concours d'Elegance — Dawn Patrol to a green ribbon",
         description:
-          "Before the crowds, before the judges — a photo essay following a restored 1967 Shelby Cobra 427 S/C, chassis CSX 3042, from the transporter lot to a green ribbon on Pebble Beach's 18th fairway.",
+          "A full day at the Pebble Beach Concours d'Elegance, opening with the pre-dawn Dawn Patrol arrival — a photo essay following a restored 1967 Shelby Cobra 427 S/C, chassis CSX 3042, from the transporter lot to a green ribbon on the 18th fairway.",
       },
       cover: {
-        masthead: "Dawn Patrol",
+        masthead: "Concours d'Elegance",
         credit: "Adventure Storytelling Media",
         issue: "Venture dispatch",
         location: "Pebble Beach, California",
         coords: "36.57° N · 121.97° W",
         storyLabel: "The cover story",
-        title: "Dawn Patrol",
-        deck: "Before the crowds, before the judges, before the light is even good — the cars arrive in the dark. One Shelby Cobra, chassis CSX 3042, from the transporter lot to a green ribbon on the 18th fairway.",
-        teasers: ["Pebble Beach Concours d'Elegance", "A restored 1967 Shelby Cobra 427 S/C", "August 2025"],
+        title: "Pebble Beach Concours d'Elegance",
+        deck: "A full day at the Concours d'Elegance — before the crowds, before the judges, before the light is even good, the cars arrive in the dark, and the lawn fills in from there. One Shelby Cobra, chassis CSX 3042, threads through it: the transporter lot to a green ribbon on the 18th fairway.",
+        teasers: ["Opens with Dawn Patrol", "A restored 1967 Shelby Cobra 427 S/C", "August 2025"],
         scrollCue: "Scroll for the story",
         plates: [
           { label: "Plate — the hood up", slug: "csx3042-head-on-hood-up" },
@@ -1949,7 +1993,7 @@ export const PAGES = {
       afterVideo:
         "A hundred yards on, past a second line of transporters, a tent marked CARS — Classic Automotive Relocation Services holds the International Entrant Pavilion, lit warm against the dawn outside. Inside: a scatter of postwar sedans, a pale blue Cobra parked nose-out, more cars queued at the flap waiting to be walked onto the field proper. Nobody here is posing for anything. It's a staging area doing its job.",
       chapters: {
-        before: "Movement one — before light",
+        before: "Movement one — Dawn Patrol, before light",
         gap: "Movement two — the gap",
         judged: "Movement three — judged",
         field: "Movement four — the field becomes a city",
