@@ -30,13 +30,23 @@
  */
 import { SITE } from "../consts";
 import FollowTheStories from "./FollowTheStories.astro";
+import SocialLinks from "./SocialLinks.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-// Widened to string: SITE is `as const`, so without this every url here is
-// narrowed to the literal union of the two currently-real links, and the
-// "[confirm]" guard below (for whenever a social gets added un-verified,
-// same convention as CaseStudy.astro's isPending) becomes a type error.
-const socialEntries = Object.entries(SITE.socials) as [string, string][];
+// 2026-08-04 — operator-directed: socials render as ICON BUTTONS (SocialLinks),
+// not bare words, and the footer now carries BOTH lanes: the ASM accounts
+// (SITE.socials) and Sindbad's personal accounts (the same verified roster
+// /about renders, plus the personal X held-account). Two labeled rows keep the
+// two-lane split legible instead of one undifferentiated icon soup.
+const asmSocialEntries = (Object.entries(SITE.socials) as [string, string][])
+  .filter(([, url]) => url !== "[confirm]")
+  .map(([platform, href]) => ({ platform, href }));
+const personalSocialEntries = [
+  { platform: "linkedin", href: "https://www.linkedin.com/in/sindbad-horizon-b19b4a264" },
+  { platform: "youtube", href: "https://www.youtube.com/@SindbadSightsAndStories" },
+  { platform: "instagram", href: "https://www.instagram.com/sindbad_sights_and_stories/" },
+  { platform: "tiktok", href: "https://www.tiktok.com/@sindbadsightsandstories" },
+];
 
 // ⚠ OPERATOR READ-APPROVAL REQUIRED — footer-only nav restructure for the
 // publication pivot (staging-only until read; see COPY-DECK-C.md). Labels
@@ -99,23 +109,10 @@ const FOOTER_NAV: readonly FooterNavItem[] = [
         }
       </ul>
     </nav>
-    <ul class="space-y-1.5">
-      {
-        socialEntries.map(([platform, url]) => (
-          <li>
-            {url === "[confirm]" ? (
-              <span aria-disabled="true" class="hud-label opacity-60">
-                {platform} [confirm]
-              </span>
-            ) : (
-              <a href={url} class="text-ink-muted capitalize hover:text-accent" rel="me noopener">
-                {platform}
-              </a>
-            )}
-          </li>
-        ))
-      }
-    </ul>
+    <div class="space-y-5">
+      <SocialLinks label="Adventure Storytelling Media" entries={asmSocialEntries} />
+      <SocialLinks label="Sindbad Horizon" entries={personalSocialEntries} />
+    </div>
   </div>
   <!-- PUB-C — the publication's own funnel leads: Follow the Stories mounts
        here, above the footer nav. AUDIT-FIX (2026-08-02): the trust row +

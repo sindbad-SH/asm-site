@@ -51,10 +51,17 @@ export const SITE = {
   bookACall: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting", // his binding pricing sheet + live site source
   socials: {
     youtube: "https://www.youtube.com/@AdventureStorytellingMedia", // verified channel
-    instagram: "https://www.instagram.com/adventurestorytellingmedia/", // operator roster 2026-07-04 — flag at staging review (account is young)
-    // tiktok: REMOVED — operator's own roster: "name may change"; re-add when he confirms the handle
-    // linkedin: REMOVED — no ASM company page could be verified (roster URL was truncated);
-    //           Sindbad's personal LinkedIn lives on /about instead, per his directive
+    instagram: "https://www.instagram.com/adventurestorytellingmedia/", // verified live 2026-07-30 (bio + site link set)
+    // 2026-08-04 — roster expanded to the accounts verified LIVE during the
+    // 2026-07-30 social sweep + the 2026-08-02 Substack launch (all bios/links
+    // confirmed on the public profiles; the old "name may change" TikTok
+    // caveat is resolved — @adventurestorytelling is the settled ASM handle).
+    tiktok: "https://www.tiktok.com/@adventurestorytelling",
+    x: "https://x.com/ADVSTmedia",
+    facebook: "https://www.facebook.com/profile.php?id=61569467219838", // ASM page (complete: cover, bio, links)
+    substack: "https://adventurestorytellingmedia.substack.com",
+    // linkedin: still no ASM company page — Sindbad's personal LinkedIn lives
+    //           in the footer's personal row + /about instead, per his directive
   },
   /**
    * GoatCounter site code for privacy-respecting analytics (no cookies, no
@@ -200,8 +207,14 @@ export const COPY = {
     // Collapsed to the two buckets the site actually runs on now. Same voice,
     // same claim, one clause shorter. ⚠ OPERATOR READ-APPROVAL REQUIRED —
     // revised sentence (staging-only until read).
+    // HOME-REFRESH (2026-08-04): dropped "— Boulder, Colorado" — the buyerLine
+    // that now renders immediately ABOVE this sentence (index.astro promoted it
+    // in the 08-02 audit) already ends "Boulder, Colorado, working worldwide",
+    // so the hero said the location twice in consecutive lines. "founder" takes
+    // the slot so the name still carries a role. Same claim otherwise.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised sentence (staging-only).
     subline:
-      "Sindbad Horizon — Boulder, Colorado. We find the truest version of a story and forge it into something people feel: on the trail, and in the boardroom.",
+      "Sindbad Horizon, founder. We find the truest version of a story and forge it into something people feel: on the trail, and in the boardroom.",
     // P29 buyer-language pairing — one plain line under the hero so a cold
     // buyer decodes the offer in seconds. ⚠ OPERATOR READ-APPROVAL REQUIRED —
     // new visible copy (staging-only until read).
@@ -242,6 +255,12 @@ export const COPY = {
     // engagement — research/strategy + production together; see
     // FORGE_SERVICES[0] and PILLARS.consulting). href unchanged.
     { label: "Strategy & production consulting — Forge the Saga", href: "/forge-the-saga" },
+    // HOME-REFRESH (2026-08-04): the flat archive (/work — every Adventure +
+    // Venture story incl. both flagship case studies) was reachable from the
+    // footer only; the home BODY never linked it. Fourth signpost closes that
+    // gap in the same "[what it is] — [destination]" pattern.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible label (staging-only).
+    { label: "Every story in one place — All Stories", href: "/work" },
   ],
 } as const;
 
