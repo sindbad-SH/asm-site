@@ -97,39 +97,81 @@
  * MEME-STICKLER-2026-08-03 — PHOTO-BACKED DUOTONE REBUILD (operator: "I was
  * expecting overlay images over photos — those Facebook photos utilized in
  * some way. I don't see any used at all"). The flat-navy-plus-geometric-motif
- * design above is REPLACED for 6 of the 7 cards with a real photograph →
+ * design above is REPLACED for 5 of the 7 cards with a real photograph →
  * heavy navy duotone → kit motif at low opacity as a texture accent → the
- * same kicker/title/instructor type. Sources are OWNED MATERIAL ONLY — the
- * operator was explicit that the Facebook-group finds are clearance-pending
- * and must never ship:
- *   - On-Set Craft (pa-workshop, script-supervisor, carpenter): 3 different
- *     frames from the operator's own Carpenter-workshop recording
- *     (E:\Makeshift\MEME\_CARPENTER-MINED\stills\, already operator-screened).
- *     Only the `carpenter` card's alt text may say the photo is actually from
- *     that workshop — it is. pa-workshop and script-supervisor use different
- *     Carpenter-workshop frames purely as a stylized On-Set-Craft-track
- *     texture; their alt text says so and does NOT claim to depict a PA or
- *     Script Supervisor session (neither has any photography of its own yet).
- *   - Pitch & Market (pitch-quorum, market-fresh, business-of-show-business):
- *     3 different frames from the operator's own PitchBoulder photography
- *     (E:\Pitch Boulder\Top photos for web build\_TIER 1 - TOP (make stories)\)
- *     — a different program he films, used here only for generic "pitch-room
- *     energy" texture. Alt text is explicit that these are stylized
- *     backgrounds, not photos of MEME's own Pitch Quorum / Market Fresh /
- *     Business of Show Business sessions.
- *   - Sound: hunted the operator's own archives (Gigs Go Green, Pebble Beach
- *     2025 BTS, the PitchBoulder 2026-01-28 recording-session photos) for a
- *     genuine mic/recorder/mixing frame. Found none — those folders are
- *     drone/pitch-room material, not sound-department photography. Per the
- *     standing instruction ("an honest miss beats a fake fit"), the Sound
- *     Workshop card stays exactly as it was: flat navy + the waveform motif,
- *     no photo.
- * Every chosen frame was screened against the operator's own reference photo
- * (he attended both the Carpenter workshop and PitchBoulder) — none of the 6
- * chosen frames show him. No frame repeats across cards (6 distinct source
- * stills). No face is sliced by any crop — verified by direct crop preview
- * before baking, same as the roster fixes in
+ * same kicker/title/instructor type.
+ *
+ * MEME-ARCHIVE-2026-08-03 (branch meme-archive-2026-08-03) — REAL MEME
+ * ARCHIVE REPLACES BORROWED PHOTOS. The sourcing this section used to
+ * describe (PitchBoulder photography standing in for Pitch & Market;
+ * Carpenter-workshop stills reused as generic On-Set-Craft texture for
+ * pa-workshop/script-supervisor) put OTHER programs' photography — one of
+ * them a different program entirely — on cards that name MEME's own
+ * programs. The operator was explicit that PitchBoulder photos must not
+ * appear on a MEME page. Every photo-backed card now uses MEME's own event
+ * archive (E:\Makeshift\MEME\05 - Source Docs from MEME\Photos\Archive
+ * moments\, MEME_ARCHIVE_ROOT below):
+ *   - market-fresh: "American Film Market photo.jfif", cropped to keep the
+ *     pink AFM event-signage banner legible (the honesty gate's own signage
+ *     exemption covers it, same as a SeriesFest backdrop would).
+ *   - business-of-show-business: "Catalina Film Festival.jfif" — a 3-panel
+ *     collage — LEFT PANEL ONLY (the suited attendee under the "Via Casino"
+ *     arch), cropped wholly inside that single panel; no seam or
+ *     neighbouring-panel sliver anywhere in the shipped crop.
+ *   - pa-workshop: "PA Workshop 2.jpg", a genuine PA Workshop session in
+ *     progress; cropped to exclude a laptop screen visible elsewhere in the
+ *     frame (its on-screen content is a blurred, illegible thumbnail, but
+ *     the crop sidesteps the question entirely).
+ *   - script-supervisor: "Script Supervisor Workshop.jfif" — Adam Smestad
+ *     pointing at a monitor titled "Continuity Overview – 180 Degree Rule"
+ *     (the honesty gate's own teaching-slide exemption: generic film-craft
+ *     curriculum, no private party named). Both Adam and the slide are kept
+ *     in frame; a portrait 0.8-aspect crop out of this landscape source
+ *     can't also fit the trailing "180 Degree Rule" half of the title
+ *     without losing Adam, so that tail is cropped off — "Continuity
+ *     Overview" plus the on-screen diagram remain, still generic curriculum,
+ *     not a truncation that changes what the exemption covers.
+ *   - carpenter: UNCHANGED — still the operator's own Carpenter-workshop
+ *     stills (E:\Makeshift\MEME\_CARPENTER-MINED\stills\), genuinely from
+ *     that workshop, per the standing scope rule already on this card.
+ *   - pitch-quorum, sound-workshop: UNCHANGED, still `photo: null`. No
+ *     genuine Pitch Quorum or Sound Workshop photography exists in the
+ *     archive — an honest miss beats a fake fit, the same rule already
+ *     applied to Sound Workshop before this pass.
+ * Every chosen frame was screened against the operator's own description
+ * (long dark hair, dark bandana/headscarf, goatee, waistcoat) — he does not
+ * appear in any of the eight archive photos, and none of the 4 newly chosen
+ * crops show him. No face is sliced by any crop — verified by direct crop
+ * preview before baking, same as the roster fixes in
  * scripts/fix-meme-roster-crops-2026-08-03.mjs.
+ *
+ * Three new plain-photo "MEME in the world" strip images (world-afm,
+ * world-catalina, world-retreat — see the STRIP_SHOTS section near the
+ * bottom of this file) were added the same pass: no duotone, no scrim, no
+ * motif, no on-image type — just a lightly graded, face-safe crop at
+ * 900/1600w, same AVIF+WebP pipeline as the cards. world-afm and
+ * world-catalina reuse two of the four archive sources above with
+ * DIFFERENT, wider/landscape crops than their cards (never the same crop
+ * twice); world-retreat uses a new source ("Writer's Retreat.jfif") no card
+ * touches — its crop was pulled in from a wider frame that included a
+ * bystander's legible "Carhartt" vest-patch logo, tightened until the patch
+ * falls outside the frame entirely while still keeping all three attendees'
+ * heads fully in shot.
+ *
+ * SUPERSEDED SOURCING NOTES (2026-08-03, photo-backed duotone rebuild) —
+ * kept for history only, no longer reflects the CARDS array below:
+ *   - On-Set Craft (pa-workshop, script-supervisor, carpenter) originally
+ *     all reused 3 different frames from the operator's own
+ *     Carpenter-workshop recording as a stylized texture; only `carpenter`
+ *     actually depicted its own program.
+ *   - Pitch & Market (pitch-quorum, market-fresh, business-of-show-business)
+ *     originally reused 3 different frames from the operator's own
+ *     PitchBoulder photography — a different program he films — for generic
+ *     "pitch-room energy" texture, later found to have consent problems
+ *     (legible third-party slide/deck/browser-tab content across most of
+ *     that pool) and replaced above.
+ *   - Sound: no genuine mic/recorder/mixing frame was ever found in the
+ *     operator's archives; unchanged then and now.
  *
  * DUOTONE MECHANICS: each source photo is cropped (face-safe, picked by eye)
  * to the card's 4:5 canvas, converted to greyscale, then every pixel is
@@ -324,48 +366,12 @@ function motifWaveform(color) {
 // the dated Zeffy/flyer copy, never "Makeshift Film Group" — forbidden term,
 // see audit-lib.mjs). The one-sentence descriptions live as real HTML text
 // in meme.astro's PROGRAMS array (below the card, not on it).
-const PITCHBOULDER_ROOT = String.raw`E:\Pitch Boulder\Top photos for web build\_TIER 1 - TOP (make stories)`;
 const CARPENTER_STILLS = String.raw`E:\Makeshift\MEME\_CARPENTER-MINED\stills`;
+// MEME-ARCHIVE-2026-08-03: MEME's own event archive — replaces
+// PITCHBOULDER_ROOT (removed; see the header note above for why). Every
+// photo-backed card except `carpenter` now sources from here.
+const MEME_ARCHIVE_ROOT = String.raw`E:\Makeshift\MEME\05 - Source Docs from MEME\Photos\Archive moments`;
 
-// MEME-STICKLER-2026-08-03 ROUND 2 (coordinator catch, retroactive rule —
-// no legible screen/slide/whiteboard/document content, no private company or
-// personal names, event/platform signage excepted): re-checked ALL SIX photo
-// cards at full card resolution, not just eyeballed. Two of the three
-// Pitch & Market picks failed outright, and the exhaustive re-check of the
-// pool surfaced a systemic problem that killed a third replacement too:
-//   - 20260506_091725 (old pitch-quorum): a slide reads "Leyden Space /
-//     PITCH BOULDER ALUMNI UPDATE / Founder: Ashle Jantzen" plus that deck's
-//     own "confidential and proprietary" notice. Failed outright.
-//   - 20260506_091643 (old market-fresh): the projected browser's own tab
-//     title reads "5.6 PEMPal.pptx" — a specific company/product name,
-//     legible even though it's a small UI element, not the slide's headline.
-//     Failed the same test.
-//   - 20260617_090711 (old business-of-show-business): the slide itself
-//     ("Follow Us!" + Meetup/LinkedIn/PitchBoulder/Reddit logos) is fine —
-//     event/platform signage, same exception as a SeriesFest backdrop — but
-//     the presenter's polo shirt carries a legible embroidered "JACK LINK'S"
-//     logo. Not a screen/slide/whiteboard/document (the rule's literal
-//     wording), but the identical consent problem, so treated the same way.
-// SYSTEMIC FINDING on the first replacement attempt: every OTHER "Reminders"/
-// "Follow Us"-style boilerplate frame in this pool is shot with the
-// presenter's own Google Slides browser tab visible along the top edge of
-// the screen, and that tab always shows THEIR deck's filename — legible,
-// and always a specific company name (checked and rejected: "4.29
-// Perlion.pptx", "5.6 PEMPal.pptx" again, "5.20 NoLimitRobotics.p...").
-// A slide's own body text can be generic housekeeping, but the browser tab
-// above it names their company regardless. Only the 2026-06-17 session's 3
-// photos are shot without that browser chrome visible at all — genuinely
-// clean. That pool is too small to supply 3 independent, non-near-duplicate
-// cards, so per the standing "an honest miss beats a fake fit" rule (already
-// applied to Sound Workshop), Pitch Quorum goes back to kit-geometric rather
-// than force a marginal pick. Market Fresh and Business of Show Business
-// both use 2026-06-17 frames — market-fresh gets 090642 as-is (clean);
-// business-of-show-business gets 090711 (the original pick) with a TIGHTER
-// crop that fully excludes the Jack Link's-branded presenter (verified at
-// full resolution — the first attempt at this recrop still left a sliver of
-// his shoulder/logo in frame; pushed further right until nothing of him
-// remains) rather than swapping frames again, since the slide/tab on that
-// photo was already clean — only the framing needed to change.
 const CARDS = [
   {
     slug: "pitch-quorum",
@@ -374,11 +380,9 @@ const CARDS = [
     titleSize: 122,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifSpotlightLedger(t.motif),
-    // NO photo — see the ROUND 2 header note: every remaining candidate in
-    // the pool that isn't from the clean 2026-06-17 session shows a private
-    // company name in its browser tab, and that session's 3 photos are
-    // already spoken for by the other two Pitch & Market cards. Honest miss,
-    // same treatment as Sound Workshop below.
+    // NO photo — see the MEME-ARCHIVE-2026-08-03 header note: no genuine
+    // Pitch Quorum photography exists in the archive. Honest miss, same
+    // treatment as Sound Workshop below.
     photo: null,
   },
   {
@@ -388,10 +392,12 @@ const CARDS = [
     titleSize: 122,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifPulseRings(t.motif),
-    // "Help us with attendance / SCAN ME!" + the PitchBoulder logo — an
-    // attendance-QR housekeeping slide, no private content, no browser tab
-    // visible at all in this frame (2026-06-17 session — verified clean).
-    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090642.jpg") },
+    // "American Film Market photo.jfif" (1080x1440 portrait, close to the
+    // card's own 4:5). Center-crop (45px off top and bottom) — keeps the
+    // pink "AFM / American Film Market" event-signage banner and the curved
+    // hotel/tower street scene fully in frame; the one person in the shot is
+    // walking away from camera, no face visible.
+    photo: { file: join(MEME_ARCHIVE_ROOT, "American Film Market photo.jfif"), box: [0, 45, 1080, 1350] },
   },
   {
     slug: "business-of-show-business",
@@ -400,12 +406,14 @@ const CARDS = [
     titleSize: 76,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifLedgerArc(t.text, t.motif),
-    // ROUND 2: same source photo as the original pick (its slide/tab was
-    // already clean — the same 2026-06-17 session as market-fresh, no
-    // browser chrome visible) but recropped tighter to fully exclude the
-    // Jack Link's-branded presenter who stood at the frame's left edge.
-    // Verified at full resolution: no shirt/logo fragment remains.
-    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090711.jpg"), box: [1405, 0, 1651, 2063] },
+    // "Catalina Film Festival.jfif" is a 3-panel collage (measured white
+    // gutters: panel border 0-20px, vertical gutter 710-729px, right column
+    // split 710-731px — verified by column/row brightness scan, not eyeballed).
+    // LEFT PANEL ONLY (x 21-709, y 21-1418): the suited attendee under the
+    // "Via Casino" arch. box stays fully inside that single panel — no
+    // gutter or right-column sliver anywhere near the crop edges (checked
+    // at full resolution). Face fully in frame, not sliced.
+    photo: { file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival.jfif"), box: [21, 121, 688, 860] },
   },
   {
     slug: "pa-workshop",
@@ -414,10 +422,12 @@ const CARDS = [
     titleSize: 126,
     instructor: "Adam Smestad",
     motif: (t) => motifChevrons(t.motif),
-    // face-safe manual crop (not center-crop): right two-thirds of the room,
-    // keeps the beanie'd attendee + the older instructor fully in frame,
-    // excludes the door/arm at the far right edge — see the header note.
-    photo: { file: join(CARPENTER_STILLS, "part2_00-07-30_attendee-engaged.jpg"), box: [486, 0, 864, 1080] },
+    // "PA Workshop 2.jpg" — a genuine PA Workshop session in progress.
+    // Face-safe manual crop centered on the instructor mid-explanation
+    // (coral shirt) with an engaged attendee alongside; deliberately stops
+    // short of a laptop visible further right in the source frame (its
+    // on-screen content isn't legible, but the crop avoids the question).
+    photo: { file: join(MEME_ARCHIVE_ROOT, "PA Workshop 2.jpg"), box: [620, 0, 496, 620] },
   },
   {
     slug: "script-supervisor",
@@ -426,10 +436,14 @@ const CARDS = [
     titleSize: 72,
     instructor: "Adam Smestad",
     motif: (t) => motifMarkedPage(t.text),
-    // face-safe manual crop: left-center portion (teal accent wall + two
-    // attendees), stops well short of the blue-shirted instructor at the
-    // table's far end so his face is never at risk of being sliced.
-    photo: { file: join(CARPENTER_STILLS, "part1_00-45-00_group-expanded.jpg"), box: [250, 0, 864, 1080] },
+    // "Script Supervisor Workshop.jfif" — Adam Smestad pointing at the
+    // "Continuity Overview – 180 Degree Rule" monitor (the honesty gate's
+    // teaching-slide exemption: generic film-craft curriculum, no private
+    // party named). Crop keeps Adam's full body + face and the slide's
+    // title/diagram in frame; the portrait 0.8-aspect width budget can't
+    // also reach the trailing "180 Degree Rule" half of the title without
+    // losing Adam, so that tail is cropped off (see header note).
+    photo: { file: join(MEME_ARCHIVE_ROOT, "Script Supervisor Workshop.jfif"), box: [30, 0, 805, 1006] },
   },
   {
     slug: "carpenter",
@@ -524,12 +538,28 @@ function buildCardSvg(card) {
   // lit whiteboard). Fixed by going darker overall AND non-linear — an early
   // step up (steep near the text zone's own edge) rather than a slow fade —
   // so the darkest values arrive before the text does instead of after it.
-  // Re-measured after this change: all 6 clear 4.5:1, most by a wide margin.
+  //
+  // MEME-ARCHIVE-2026-08-03: that earlier pass only checked the WHITE
+  // title/instructor text. Re-measuring every row per-pixel (rendering the
+  // duotone+scrim background with the text stripped out, then testing each
+  // track's actual kicker fill color against the brightest pixel in its
+  // row) turned up a real gap: the on-set track's SIGNAL_RED kicker label
+  // sits in the TOP scrim, and red text has much less luminance headroom
+  // than white — pa-workshop/script-supervisor/carpenter's kicker rows
+  // measured 2.51:1 / 3.38:1 / 3.38:1, all under the 4.5:1 floor, at the old
+  // top-scrim curve (0→0.86, 0.55→0.5, 1→0). Fixed by pushing the top
+  // scrim's high-opacity plateau further down and slightly darker (0→0.94,
+  // 0.45→0.9, 0.7→0.42, 1→0) so it still covers the kicker row for every
+  // track. Re-measured after the change (see the branch's PR/commit
+  // message for the full per-row numbers): every row on every photo-backed
+  // card — kicker, title, instructor — clears 4.5:1, on-set kickers now by
+  // 6.1-6.4:1.
   const scrims = hasPhoto
     ? `<defs>
         <linearGradient id="scrimTop" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#040912" stop-opacity="0.86"/>
-          <stop offset="0.55" stop-color="#040912" stop-opacity="0.5"/>
+          <stop offset="0" stop-color="#040912" stop-opacity="0.94"/>
+          <stop offset="0.45" stop-color="#040912" stop-opacity="0.9"/>
+          <stop offset="0.7" stop-color="#040912" stop-opacity="0.42"/>
           <stop offset="1" stop-color="#040912" stop-opacity="0"/>
         </linearGradient>
         <linearGradient id="scrimBottom" x1="0" y1="0" x2="0" y2="1">
@@ -593,6 +623,81 @@ for (const card of CARDS) {
 // her hair's crown; Eric's cut off his chin) and moved to
 // scripts/fix-meme-roster-crops-2026-08-03.mjs, which is now the source of
 // truth for both files — re-running this script no longer touches them.
+
+// ── 8. STRIP_SHOTS — MEME-ARCHIVE-2026-08-03: three new "MEME in the world"
+//    plain-photo strips (meme.astro's WORLD section, world-<slug>-<w>.{avif,
+//    webp}). Unlike the cards above, these carry NO duotone, NO scrim, NO
+//    motif, NO on-image type — just a face-safe crop with a gentle contrast/
+//    saturation lift (never posterized) at roughly 3:2, same width tiers and
+//    AVIF+WebP pipeline as the cards. Two reuse a card's source photo but
+//    with a different, wider/landscape crop (never the same crop shipped
+//    twice); world-retreat uses a source no card touches.
+const STRIP_SHOTS = [
+  {
+    slug: "world-afm",
+    // Same source as the market-fresh card, but a wider establishing crop
+    // (top of the frame, no person) — the curved hotel facade + glass tower
+    // + street, not the AFM banner close-up the card already uses.
+    file: join(MEME_ARCHIVE_ROOT, "American Film Market photo.jfif"),
+    box: [0, 60, 1080, 720],
+  },
+  {
+    slug: "world-catalina",
+    // "Catalina Film Festival 2.jfif" — a DIFFERENT 3-panel collage than the
+    // business-of-show-business card's source. Same gutter geometry (panel
+    // border 0-20/40px, vertical gutter 710-729px — verified by scan).
+    // LEFT PANEL ONLY (x 21-709, y 21-1418): the mermaid "Catalina Film
+    // Festival" banner. No people in this crop.
+    file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival 2.jfif"),
+    box: [21, 121, 688, 459],
+  },
+  {
+    slug: "world-retreat",
+    // "Writer's Retreat.jfif" — all three attendees, canopy, and pines.
+    // Tightened up from an initial wider crop that pulled in a bystander's
+    // legible "Carhartt" vest-patch logo (measured at full res: patch
+    // bbox ≈ x964-1021, y836-876); this box's bottom edge (817) sits above
+    // that, so the patch falls outside the frame while every head stays
+    // fully in shot.
+    file: join(MEME_ARCHIVE_ROOT, "Writer's Retreat.jfif"),
+    box: [172, 87, 1096, 731],
+  },
+];
+// Grade at the LARGEST output width (1600) so every WIDTHS tier is a
+// downscale, never an upscale — same reasoning as the cards' 2x SCALE render.
+const STRIP_W = 1600,
+  STRIP_H = 1067; // ~3:2, matches meme.astro's world-strip layout
+const STRIP_AVIF = { quality: 62, effort: 5 };
+const STRIP_WEBP = { quality: 82, effort: 5 };
+
+console.log(`▸ meme "in the world" strip photos → public/media/venture/meme/`);
+for (const shot of STRIP_SHOTS) {
+  let pipeline = sharp(shot.file).rotate();
+  if (shot.box) {
+    const [left, top, width, height] = shot.box;
+    pipeline = pipeline.extract({ left, top, width, height });
+  }
+  // gentle contrast/saturation lift only — plain photography, not a graded
+  // card background. linear() nudges contrast (a=1.06, b slightly negative
+  // to hold black point), modulate() lifts saturation a touch; nowhere near
+  // the posterize threshold the operator has flagged before at higher values.
+  const graded = await pipeline
+    .resize({ width: STRIP_W, height: STRIP_H, fit: "cover" })
+    .linear(1.06, -8)
+    .modulate({ saturation: 1.12 })
+    .toBuffer();
+  let bytes = 0;
+  for (const w of WIDTHS) {
+    const base = sharp(graded).resize({ width: w });
+    for (const [ext, opts] of [["avif", STRIP_AVIF], ["webp", STRIP_WEBP]]) {
+      const buf = await base.clone()[ext](opts).toBuffer();
+      const { writeFileSync } = await import("node:fs");
+      writeFileSync(join(OUT_DIR, `${shot.slug}-${w}.${ext}`), buf);
+      bytes += buf.length;
+    }
+  }
+  console.log(`  ✓ ${shot.slug.padEnd(30)} → ${(bytes / 1024).toFixed(0)}KB`);
+}
 
 rmSync(fontDir, { recursive: true, force: true });
 console.log("");
