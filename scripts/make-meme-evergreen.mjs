@@ -635,11 +635,22 @@ for (const card of CARDS) {
 const STRIP_SHOTS = [
   {
     slug: "world-afm",
-    // Same source as the market-fresh card, but a wider establishing crop
-    // (top of the frame, no person) — the curved hotel facade + glass tower
-    // + street, not the AFM banner close-up the card already uses.
+    // REVIEW FIX 2026-08-03 — was [0,60,1080,720], the TOP of the frame: a
+    // clean architectural crop of the hotel curve and glass towers, chosen to
+    // avoid repeating the market-fresh card's banner. Right instinct, wrong
+    // trade — it cropped out the only thing identifying the location, so the
+    // strip showed anonymous LA towers under a caption reading "The American
+    // Film Market." Not dishonest (it IS the AFM venue) but visually inert,
+    // and it duplicated the card's location while discarding its signage.
+    //
+    // Now the LOWER frame: the AFM stanchion at the hotel entrance, the AFM
+    // street banners beyond it, the arrival lane, and one attendee walking in
+    // — from behind, no face, unidentifiable, same as the card's figure.
+    // Overlapping the card's subject is deliberate; the two treatments read as
+    // separate moments rather than one repeat (the card is a tight portrait
+    // duotone carrying type, this is a plain full-colour landscape).
     file: join(MEME_ARCHIVE_ROOT, "American Film Market photo.jfif"),
-    box: [0, 60, 1080, 720],
+    box: [0, 620, 1080, 720],
   },
   {
     slug: "world-catalina",

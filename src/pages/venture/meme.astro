@@ -2,9 +2,15 @@
 /**
  * /venture/meme — P14b: the MEME story. Sibling to /venture/amazing-aerial
  * (same venture-article grammar: slate, italic title, LegendMark proof, short
- * paragraphs, external + back links). Typographic only — NO photos exist for
- * this relationship yet, so the page carries a ghost "M E M E" letter motif
- * (entertainment.astro's grammar) in place of a media collage.
+ * paragraphs, external + back links), over a ghost "M E M E" letter motif
+ * (entertainment.astro's grammar).
+ *
+ * PHOTOGRAPHY (2026-08-03): this page was typographic-only for most of its
+ * life because no MEME event photography existed on disk. That changed when
+ * the operator assembled and labelled MEME's own archive by event — see the
+ * WORLD const's header note. The page now carries real MEME photographs in
+ * the program cards and the "Beyond the classroom" strip. NOCOVA remains the
+ * one photo-less section (no cleared NOCOVA photo exists yet).
  *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — the ARTICLE prose below is new copy,
  * ADAPTED from the operator's own published bio at meme.ngo/meet-the-team
@@ -152,51 +158,58 @@ const PROGRAM_TRACKS = {
 // track), "b" = the dropped-baseline stagger partner, "plain"/"solo" = the
 // smaller companion or a lone track's single card. See `.meme-program-card--*`
 // in the stylesheet below.
-// MEME-STICKLER-2026-08-03: `alt` text below now also describes each card's
-// photo background — required by the honesty rule set alongside the
-// photo-backed duotone rebuild (scripts/make-meme-evergreen.mjs). Every card
-// but `carpenter` uses a stylized, heavily-duotoned photo that is NOT of the
-// named program's own session (Pitch & Market cards use the operator's
-// PitchBoulder photography; the other two On-Set Craft cards use different
-// frames from the same Carpenter-workshop recording as the carpenter card
-// itself) — so their alt text is explicit that the background is stylized/
-// abstract and does not depict that program. Only `carpenter`'s background
-// is honestly captioned as actually from that workshop. `sound-workshop`
-// carries no photo (see the script's header note) — its alt is unchanged.
+// MEME-ARCHIVE-2026-08-03 — the alt text below finally gets to be simple.
+//
+// The previous build had a problem it was honest about but couldn't fix: no
+// card except `carpenter` actually depicted its own program, so every alt
+// string had to carry a disclaimer ("not a photo of a Pitch Quorum session").
+// The Pitch & Market cards were borrowing the operator's PitchBoulder event
+// photography — a different organization entirely — and the two other On-Set
+// cards were reusing Carpenter-workshop frames.
+//
+// The operator then supplied MEME's real archive, labelled by event, which
+// removes the compromise: PA Workshop, Script Supervisor, and Carpenter now
+// show THEIR OWN sessions, so their alt text simply says so. Market Fresh and
+// Business of Show Business show a real film market and a real film festival —
+// not those programs' own classrooms, but the actual thing each program is
+// about, from MEME's own archive; their alt names what the photo is rather
+// than disclaiming what it isn't. `pitch-quorum` and `sound-workshop` carry no
+// photo at all (kit-geometric), and their alt now says THAT honestly — the
+// prior text wrongly described a "background photo" on cards that have none.
 const PROGRAMS = [
   {
     slug: "pitch-quorum",
     track: "pitch-market",
     rank: "lead",
-    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Pitch Quorum session).",
+    alt: "An evergreen MEME program card reading Pitch Quorum, Pitch & Market track, instructor credit to Nick C. Goins Jr., on a deep navy ground with a stage-spotlight motif.",
     desc: "An introduction to pitching a feature film to investors, plus deeper Beginner and Advanced sessions on querying and the documents behind a pitch — mostly remote, with an in-person practice session.",
   },
   {
     slug: "market-fresh",
     track: "pitch-market",
     rank: "b",
-    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Market Fresh session).",
+    alt: "An evergreen MEME program card reading Market Fresh, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a navy-duotone photo of the American Film Market in Los Angeles — the pink AFM banner at the venue entrance.",
     desc: "An introduction, then a multi-session remote program on preparing for a film market — what to expect, how to work it, and the follow-through after.",
   },
   {
     slug: "business-of-show-business",
     track: "pitch-market",
     rank: "plain",
-    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a stylized navy-duotone background photo (not a photo of a Business of Show Business session).",
+    alt: "An evergreen MEME program card reading The Business of Show Business, Pitch & Market track, instructor credit to Nick C. Goins Jr., over a navy-duotone photo from the Catalina Film Festival — a man in a suit walking under the Via Casino arch.",
     desc: "A workshop on the state of the film industry from a business perspective — the practical side of filmmaking that founders don't usually get taught anywhere.",
   },
   {
     slug: "pa-workshop",
     track: "on-set",
     rank: "lead",
-    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a stylized navy-duotone background photo (not a photo of a PA Workshop session).",
+    alt: "An evergreen MEME program card reading PA Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a navy-duotone photo from an actual PA Workshop — a room of attendees around tables, the instructor talking at the head of them.",
     desc: "An in-person workshop for new and experienced production assistants alike, covering the basics of the job and hard-won tips from time actually spent on set.",
   },
   {
     slug: "script-supervisor",
     track: "on-set",
     rank: "b",
-    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a stylized navy-duotone background photo (not a photo of a Script Supervisor Workshop session).",
+    alt: "An evergreen MEME program card reading Script Supervisor Workshop, On-Set Craft track, instructor credit to Adam Smestad, over a navy-duotone photo from an actual Script Supervisor Workshop — Adam pointing at a screen explaining the 180-degree rule.",
     desc: "An in-person workshop on the basics of script supervising — continuity, script-supervising notes, and how to build a career doing it.",
   },
   {
@@ -247,7 +260,10 @@ const PROGRAMS_INTRO = {
   heading: "The workshops, not the flyer.",
   body: "MEME runs the same handful of workshops most years — sometimes remote, sometimes at the Boulder library. What follows is the shape of the catalog rather than any single term's schedule: what each program actually covers, and who's usually teaching it.",
   footnote:
-    "Programs run on a rotating schedule. Current dates, cost, and registration live at meme.ngo — this page is the catalog, not the calendar.",
+    "Programs run on a rotating schedule, and they're priced to be affordable — MEME is a nonprofit, and the workshops are how it funds the next ones. This page is the catalog, not the calendar.",
+  // MEME-ARCHIVE-2026-08-03 — the catalog's own way out. Operator: "the whole
+  // point of these programs is to get you to go to the programs themselves."
+  cta: { label: "See what's running now at meme.ngo →", href: "https://www.meme.ngo/events" },
 };
 
 /**
@@ -259,12 +275,16 @@ const PROGRAMS_INTRO = {
  *     "a community-driven organization that operates as the social arm of
  *     MEME, providing a platform for professionals to network, collaborate,
  *     and share ideas."
- *   - FREE community-networking meetups for film/TV professionals. The
- *     operator's own correction: call it "community networking," not a
- *     workshop. This is the one deliberate exception to this round's
- *     free-language sweep (see the note above PROGRAMS_INTRO) — meme.ngo's
- *     own page states these meetups ARE free, so "free" is accurate HERE
- *     and only here.
+ *   - Community-networking meetups for film/TV professionals. The operator's
+ *     own correction, verbatim: "It is the free networking thing — or free,
+ *     poor word, let's call it community networking." MEME-ARCHIVE-2026-08-03
+ *     takes him at his word and drops "free" from this section too. An earlier
+ *     build kept it as a deliberate exception to the free-language sweep on
+ *     the grounds that meme.ngo's own page says the meetups are free — which
+ *     is true, but it was answering a factual question he hadn't asked. He
+ *     was making a POSITIONING call: "free" undersells the room and sets the
+ *     wrong expectation for an org whose other programs are paid. Cost is
+ *     meme.ngo's to state; this page describes what the thing IS.
  *   - Boulder venues incl. Rosetta Hall and the St. Julien Hotel lobby.
  *   - Mission wording (quoted verbatim below): fosters "creativity,
  *     knowledge-sharing, and expertise utilization in the Colorado Film and
@@ -299,10 +319,114 @@ const NOCOVA = {
   heading: "NOCOVA — the room outside the workshop.",
   paragraphs: [
     "Northern Colorado Visual Arts (NOCOVA) is a community-driven organization that operates as MEME's own social arm — a platform for film and TV professionals to network, collaborate, and share ideas, run as community networking rather than another workshop.",
-    `Meme.ngo describes NOCOVA's mission as fostering "creativity, knowledge-sharing, and expertise utilization in the Colorado Film and Television industry." In practice that means free, recurring meetups — usually a couple of times a month — at Boulder venues that have included Rosetta Hall and the St. Julien Hotel lobby.`,
+    `Meme.ngo describes NOCOVA's mission as fostering "creativity, knowledge-sharing, and expertise utilization in the Colorado Film and Television industry." In practice that means recurring meetups — usually a couple of times a month — at Boulder venues that have included Rosetta Hall and the St. Julien Hotel lobby.`,
   ],
   note: "Schedule and location for the next one are posted on the NOCOVA Facebook Group and Page.",
   cta: { label: "More at meme.ngo/nocova →", href: "https://www.meme.ngo/nocova" },
+};
+
+/**
+ * MEME-ARCHIVE-2026-08-03 — "MEME in the world" strip + the outbound link
+ * architecture, both operator-directed this round. Verbatim: "the whole point
+ * of these programs is to get you to go to the programs themselves and with
+ * enough buttons that ultimately direct people to meme's main website as well
+ * as their social media."
+ *
+ * So this page stops being a terminal read. Every section below now ends in a
+ * way OUT to meme.ngo, and the org's own accounts get a real block rather than
+ * a single trailing link. This page is a doorway; meme.ngo is the destination.
+ *
+ * SOURCE — all eight strip/card photographs come from the operator's own copy
+ * of MEME's archive: `E:\Makeshift\MEME\05 - Source Docs from MEME\Photos\
+ * Archive moments`, which HE assembled and labelled by event this session,
+ * exactly so this page could stop borrowing unrelated photography. (The
+ * previous build's Pitch & Market cards used his PitchBoulder event work —
+ * good photos, wrong organization. He flagged it: "the photos you integrated,
+ * a lot of them came from Pitch Boulder not MEME." They're gone.)
+ *
+ * DATING RULE still applies to the photos themselves: one frame in that folder
+ * is a whiteboard reading "WEDNESDAY, December 4th" — deliberately unused, for
+ * the same evergreen reason the flyers were retired.
+ *
+ * LINK FACTS verified against meme.ngo's own navigation and footer
+ * (fetched 2026-08-03): the org's full name is Makeshift Entertainment Media
+ * Education; its sections are about / meet-the-team / get-involved /
+ * sponsorship / partners-supporters / nocova / events / contact; its accounts
+ * are the five below. Note the Facebook handle is `MakeshiftENT` — that is
+ * MEME's real, current page, and it is NOT the forbidden build term (which is
+ * the exact phrase "makeshift film group"; see scripts/audit-lib.mjs).
+ *
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — every new sentence below is new copy.
+ */
+const worldShots = {
+  afm: bakedCard("world-afm"),
+  catalina: bakedCard("world-catalina"),
+  retreat: bakedCard("world-retreat"),
+};
+
+const WORLD = {
+  kicker: "Beyond the classroom",
+  heading: "The work doesn't stop at the workshop door.",
+  body:
+    "The reason to learn how a film market works is to go to one. These are from MEME's own archive — the markets, festivals, and retreats its people actually turn up to.",
+  shots: [
+    {
+      key: "afm",
+      caption: "The American Film Market, Los Angeles.",
+      sub: "The kind of market Market Fresh is built to prepare you for.",
+      alt: "A street outside the American Film Market in Los Angeles, a pink AFM banner at the hotel entrance, one person walking toward it away from camera.",
+    },
+    {
+      key: "catalina",
+      caption: "The Catalina Film Festival.",
+      sub: "Festivals are where the packaging work gets tested.",
+      alt: "A tall Catalina Film Festival banner with mermaid artwork, standing outside a clapboard building.",
+    },
+    {
+      key: "retreat",
+      caption: "A writers' retreat.",
+      sub: "Quieter rooms, same purpose — pages that go somewhere.",
+      alt: "Three people working on laptops at a picnic table under a white canopy, surrounded by pines.",
+    },
+  ],
+} as const;
+
+/**
+ * The outbound block. Grouped, because a wall of undifferentiated links reads
+ * as a footer and gets skipped — "go do the thing" is separated from "keep up
+ * with them," which is separated from "help them."
+ */
+const MEME_LINKS = {
+  kicker: "Go to the source",
+  heading: "MEME runs all of this. Go and find them.",
+  body:
+    "Everything above is my read on an organization I sit on the board of — not a substitute for it. The programs, the current schedule, and the people are all theirs.",
+  groups: [
+    {
+      label: "Start here",
+      links: [
+        { label: "What's running now", href: "https://www.meme.ngo/events", note: "The live calendar" },
+        { label: "meme.ngo", href: "https://www.meme.ngo", note: "The organization" },
+        { label: "NOCOVA meetups", href: "https://www.meme.ngo/nocova", note: "The social arm" },
+      ],
+    },
+    {
+      label: "Get involved",
+      links: [
+        { label: "Volunteer & membership", href: "https://www.meme.ngo/get-involved", note: null },
+        { label: "Sponsorship", href: "https://www.meme.ngo/sponsorship", note: null },
+        { label: "Partners & supporters", href: "https://www.meme.ngo/partners-supporters", note: null },
+        { label: "Contact MEME", href: "https://www.meme.ngo/contact", note: null },
+      ],
+    },
+  ],
+  socials: [
+    { label: "Instagram", href: "https://www.instagram.com/the_meme_ngo/", handle: "@the_meme_ngo" },
+    { label: "Facebook", href: "https://www.facebook.com/MakeshiftENT", handle: "MakeshiftENT" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/company/memengo/", handle: "memengo" },
+    { label: "TikTok", href: "https://www.tiktok.com/@meme_ngo", handle: "@meme_ngo" },
+    { label: "Threads", href: "https://www.threads.net/@the_meme_ngo", handle: "@the_meme_ngo" },
+  ],
 };
 
 /**
@@ -429,7 +553,7 @@ const ARTICLE = {
     "It runs on the same instinct as everything else this studio makes: a StorySmith's read on what an audience will feel, and a market strategist's read on who that audience actually is.",
   ],
   ctas: [
-    { label: "About the organization →", href: "https://www.meme.ngo", external: true },
+    { label: "Meet the full MEME team →", href: "https://www.meme.ngo/meet-the-team", external: true },
     { label: "See the venture lane →", href: `${base}/venture`, external: false },
   ],
 };
@@ -613,7 +737,43 @@ const ARTICLE = {
         </div>
 
         <p class="meme-footnote">{PROGRAMS_INTRO.footnote}</p>
+        <a href={PROGRAMS_INTRO.cta.href} class="meme-cta-strong" target="_blank" rel="noopener">
+          {PROGRAMS_INTRO.cta.label}
+        </a>
       </section>
+
+      {/* MEME-ARCHIVE-2026-08-03 — "MEME in the world." The first section on
+          this page built from MEME's OWN event archive rather than borrowed or
+          generated art (see the WORLD const's header note). Existence-gated:
+          if the three world-* renders aren't on disk the whole section simply
+          doesn't render, same pattern as the NOCOVA photo slot.
+          ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only. */}
+      {
+        Object.values(worldShots).some(Boolean) ? (
+          <section class="meme-world" aria-label="MEME beyond the workshops" data-reveal>
+            <p class="hud-label meme-kicker">{WORLD.kicker}</p>
+            <h2 class="meme-h2">{WORLD.heading}</h2>
+            <p class="meme-para meme-world-lede">{WORLD.body}</p>
+            <div class="meme-world-strip">
+              {WORLD.shots.map((s) => {
+                const shot = worldShots[s.key as keyof typeof worldShots];
+                return shot ? (
+                  <figure class="meme-world-shot">
+                    <picture>
+                      {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+                      <img src={shot.webp ?? shot.avif} alt={s.alt} loading="lazy" decoding="async" />
+                    </picture>
+                    <figcaption>
+                      <span class="meme-world-cap">{s.caption}</span>
+                      <span class="meme-world-sub">{s.sub}</span>
+                    </figcaption>
+                  </figure>
+                ) : null;
+              })}
+            </div>
+          </section>
+        ) : null
+      }
 
       {/* MEME-POLISH-2026-08-03 ROUND 3 — NOCOVA, MEME's social arm. Its own
           distinct, lighter moment (operator: "it can look/feel lighter than
@@ -728,6 +888,48 @@ const ARTICLE = {
         (including my own role) isn't repeated in this roster — see the article
         above.
       </p>
+      </section>
+
+      {/* MEME-ARCHIVE-2026-08-03 — the outbound block (operator: "enough
+          buttons that ultimately direct people to meme's main website as well
+          as their social media"). Grouped rather than listed flat, so "go do
+          the thing" doesn't get lost among "keep up with them." All hrefs
+          verified against meme.ngo's own nav/footer — see MEME_LINKS.
+          ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy, staging-only. */}
+      <section class="meme-out" aria-label="MEME's own website and accounts" data-reveal>
+        <p class="hud-label meme-kicker">{MEME_LINKS.kicker}</p>
+        <h2 class="meme-h2 meme-h2--bold">{MEME_LINKS.heading}</h2>
+        <p class="meme-para meme-out-lede">{MEME_LINKS.body}</p>
+
+        <div class="meme-out-groups">
+          {MEME_LINKS.groups.map((g) => (
+            <div class="meme-out-group">
+              <p class="hud-label meme-out-group-label">{g.label}</p>
+              <ul class="meme-out-list">
+                {g.links.map((l) => (
+                  <li>
+                    <a href={l.href} class="meme-out-link" target="_blank" rel="noopener">
+                      <span class="meme-out-link-label">{l.label}</span>
+                      {l.note && <span class="meme-out-link-note">{l.note}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <p class="hud-label meme-out-group-label meme-out-social-label">Follow MEME</p>
+        <ul class="meme-out-socials">
+          {MEME_LINKS.socials.map((s) => (
+            <li>
+              <a href={s.href} class="meme-out-social" target="_blank" rel="noopener">
+                <span class="meme-out-social-name">{s.label}</span>
+                <span class="meme-out-social-handle">{s.handle}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <nav class="meme-ctas" data-reveal>
@@ -1246,6 +1448,203 @@ const ARTICLE = {
   @media (max-width: 640px) {
     .meme-roster { grid-template-columns: 1fr 1fr; }
     .meme-roster--leads { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── MEME-ARCHIVE-2026-08-03 ─────────────────────────────────────────
+     The catalog's exit button. Deliberately the loudest single control on
+     the page (cyan fill, not the usual hairline .link) because it is the
+     one the operator actually wants pressed: "the whole point of these
+     programs is to get you to go to the programs themselves." Cyan on the
+     page's navy reads ~9:1, well clear of AA. */
+  .meme-cta-strong {
+    justify-self: start;
+    display: inline-block;
+    margin-top: 1.1rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    background: #38f8ec;
+    color: #04121f;
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+  .meme-cta-strong:hover,
+  .meme-cta-strong:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -10px color-mix(in srgb, #38f8ec 60%, transparent);
+  }
+
+  /* "Beyond the classroom" — MEME's own archive, shown as photography rather
+     than as card art. Ragged on purpose: the middle shot drops on a margin so
+     the row reads as a hand-laid strip, not a third rectangle grid (the
+     operator's standing note against "a lot of boxes"). */
+  .meme-world {
+    position: relative;
+    display: grid;
+    gap: 0.55rem;
+    margin: 1.4rem 0 0.6rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .meme-world::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    top: 0;
+    bottom: -1.4rem;
+    z-index: -1;
+    background: color-mix(in srgb, #0d2237 100%, transparent);
+  }
+  .meme-world-lede {
+    max-width: 46ch;
+  }
+  .meme-world-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
+    margin-top: 1.1rem;
+    align-items: start;
+  }
+  .meme-world-shot {
+    margin: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .meme-world-shot:nth-child(2) {
+    margin-top: 2.4rem;
+  }
+  .meme-world-shot:nth-child(3) {
+    margin-top: 1rem;
+  }
+  .meme-world-shot img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 18px 38px -14px rgba(0, 0, 0, 0.6);
+  }
+  .meme-world-shot figcaption {
+    display: grid;
+    gap: 0.15rem;
+  }
+  .meme-world-cap {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1rem;
+    color: #f2f4f8;
+  }
+  .meme-world-sub {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #eef2f5 58%, transparent);
+  }
+  @media (max-width: 760px) {
+    .meme-world-strip { grid-template-columns: 1fr; gap: 1.4rem; }
+    .meme-world-shot:nth-child(2),
+    .meme-world-shot:nth-child(3) { margin-top: 0; }
+  }
+
+  /* The outbound block — meme.ngo + the org's accounts. Two grouped columns
+     over a social row, so the "go do the thing" links don't get read as
+     footer furniture. */
+  .meme-out {
+    position: relative;
+    display: grid;
+    gap: 0.55rem;
+    margin: 1.4rem 0 0.4rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+  }
+  .meme-out-lede {
+    max-width: 52ch;
+  }
+  .meme-out-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem 2.2rem;
+    margin-top: 1.2rem;
+  }
+  .meme-out-group-label {
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, #38f8ec 82%, transparent);
+    margin-bottom: 0.6rem;
+  }
+  .meme-out-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .meme-out-link {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
+    border-radius: 8px;
+    text-decoration: none;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+  .meme-out-link:hover,
+  .meme-out-link:focus-visible {
+    border-color: color-mix(in srgb, #38f8ec 55%, transparent);
+    background: color-mix(in srgb, #38f8ec 8%, transparent);
+    transform: translateX(3px);
+  }
+  .meme-out-link-label {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #f2f4f8;
+  }
+  .meme-out-link-note {
+    font-size: 0.74rem;
+    color: color-mix(in srgb, #eef2f5 55%, transparent);
+  }
+  .meme-out-social-label {
+    margin-top: 1.6rem;
+  }
+  .meme-out-socials {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .meme-out-social {
+    display: grid;
+    gap: 0.05rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, #ffffff 18%, transparent);
+    text-decoration: none;
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .meme-out-social:hover,
+  .meme-out-social:focus-visible {
+    border-color: color-mix(in srgb, #38f8ec 60%, transparent);
+    background: color-mix(in srgb, #38f8ec 8%, transparent);
+  }
+  .meme-out-social-name {
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #f2f4f8;
+  }
+  .meme-out-social-handle {
+    font-size: 0.7rem;
+    color: color-mix(in srgb, #eef2f5 52%, transparent);
+  }
+  @media (max-width: 640px) {
+    .meme-out-groups { grid-template-columns: 1fr; }
   }
 
   .meme-ctas {
