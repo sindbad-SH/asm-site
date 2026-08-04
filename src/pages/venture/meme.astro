@@ -296,16 +296,21 @@ const PROGRAMS_INTRO = {
  * couple of times a month" and never paired with a specific date or venue —
  * same evergreen rule as the program catalog above.
  *
- * No NOCOVA photography exists anywhere: a parallel mining pass over MEME's
- * social accounts came back empty (their socials carry flyers only, no event
- * photography). So this section is built to stand ENTIRELY photo-less — a
- * venue/frequency card fills the visual slot instead — while still leaving
- * the door open for real photos with zero markup changes later: drop
- * `nocova-meetup-1` (and optionally `-2`) `-900`/`-1600` `.avif`/`.webp`
- * files into public/media/venture/meme/ and the photo slot activates itself
- * via the same existence-gated `pair()` helper the roster/program art
- * already uses. See the NOCOVA-PHOTOS integration comment in the markup
- * below.
+ * PHOTO — RESOLVED 2026-08-03. This section shipped photo-less on the stated
+ * finding that "no NOCOVA photography exists anywhere," after a mining pass
+ * over MEME's socials came back with flyers only. That finding was wrong, and
+ * usefully so: the operator had the photo the whole time, filed under
+ * `Photos\Archive moments` rather than anywhere the pass looked ("my bad,
+ * there was a photo for it, I just put it in the wrong folder"). A negative
+ * result from a search is evidence about the SEARCH, not proof of absence —
+ * worth remembering before another section gets built around a gap.
+ *
+ * It now carries `nocova-meetup-1` (scripts/make-meme-archive-adds.mjs): the
+ * group's own branded sign with members around it, which shows the community
+ * networking this copy describes far better than the venue card alone did.
+ * The card stays underneath it — it holds facts a photo can't. The operator
+ * appears in this frame and has explicitly cleared it; see that script's
+ * header for the (now narrowed) scope of the never-appears rule.
  *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every sentence in NOCOVA below is new
  * copy, staging-only until read.
@@ -511,7 +516,13 @@ const ROSTER_INSTRUCTORS = [
     key: "eric",
     name: "Eric Abramson",
     bio: "Teaches The Carpenter Not the Tools. A filmmaker and firefighter — documentary, music video, and live-event work aired on outlets including MTV, ESPN, and PBS, alongside years fighting wildland fires across the American West.",
-    alt: "Eric Abramson on a shoot, wearing a ballcap and headphones, camera and monitor visible beside him.",
+    // MEME-ARCHIVE-2026-08-03 — new source, and the crop finally stops
+    // fighting the photo. Every previous build cropped Eric tight to keep an
+    // interview subject out of frame; the operator's call is that this is the
+    // headshot Eric himself wants, used full frame. See
+    // scripts/make-meme-archive-adds.mjs for what the square trims (ceiling
+    // and lower torso only — the full width, and everyone in it, is kept).
+    alt: "Eric Abramson on a shoot — ballcap, glasses and headphones, a camera rig and two monitors beside him, and the interview subject lit and seated behind.",
   },
   {
     key: "adam",
@@ -793,35 +804,44 @@ const ARTICLE = {
             </a>
           </div>
 
-          {/* NOCOVA-PHOTOS: integration point — drop nocova-meetup-1 (and
-              optionally -2) -900/-1600 .avif/.webp files into
-              public/media/venture/meme/ to swap the venue card below for 1-2
-              real photos; no other code changes needed (existence-gated via
-              pair(), same helper the roster/program art already uses). */}
-          {
-            nocovaShots.length > 0 ? (
-              <div class="meme-nocova-photos">
-                {nocovaShots.map((shot) => (
-                  <figure class="meme-nocova-photo">
-                    <picture>
-                      {shot.avif && <source srcset={shot.avif} type="image/avif" />}
-                      <img src={shot.webp ?? shot.avif} alt="A NOCOVA community-networking meetup." loading="lazy" decoding="async" />
-                    </picture>
-                  </figure>
-                ))}
-              </div>
-            ) : (
-              <aside class="meme-nocova-card">
-                <p class="hud-label meme-nocova-card-kicker">Usually found at</p>
-                <ul class="meme-nocova-venues">
-                  <li>Rosetta Hall</li>
-                  <li>The St. Julien Hotel lobby</li>
-                </ul>
-                <p class="meme-nocova-freq">Recurring — usually a couple of times a month.</p>
-              </aside>
-            )
-          }
+          {/* MEME-ARCHIVE-2026-08-03 — the NOCOVA photo finally exists (see
+              scripts/make-meme-archive-adds.mjs). This slot used to be an
+              EITHER/OR: photos replaced the venue card entirely. Now it's
+              both, stacked — the card carries real information (which venues,
+              how often) that a photo can't, and dropping it to make room
+              would have been a straight loss. Still existence-gated, so the
+              section degrades to card-only if the render ever goes missing. */}
+          <aside class="meme-nocova-card">
+            <p class="hud-label meme-nocova-card-kicker">Usually found at</p>
+            <ul class="meme-nocova-venues">
+              <li>Rosetta Hall</li>
+              <li>The St. Julien Hotel lobby</li>
+            </ul>
+            <p class="meme-nocova-freq">Recurring — usually a couple of times a month.</p>
+          </aside>
         </div>
+
+        {/* The photo sits BELOW the copy/card grid, at full column width,
+            rather than inside the narrow right-hand column where it first
+            landed. At 34fr it rendered ~238px wide — five people around a
+            sign, none of them legible. A group shot needs the width or it
+            isn't worth showing. */}
+        {nocovaShots.map((shot) => (
+          <figure class="meme-nocova-photo">
+            <picture>
+              {shot.avif && <source srcset={shot.avif} type="image/avif" />}
+              <img
+                src={shot.webp ?? shot.avif}
+                alt="Five NOCOVA members gathered around the group's own branded sign — Northern Colorado Visual Arts — in a hotel lounge, mid-conversation."
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <figcaption class="meme-nocova-photo-cap">
+              A NOCOVA meetup — the sign, and the room it draws.
+            </figcaption>
+          </figure>
+        ))}
       </section>
 
       {/* MEME-POLISH-2026-08-03 REROSTER — the people, in two tiers: founders
@@ -1330,14 +1350,25 @@ const ARTICLE = {
     gap: 0.8rem;
     margin-top: 2.2rem;
   }
+  /* MEME-ARCHIVE-2026-08-03 — full column width, below the copy/card grid. */
   .meme-nocova-photo {
-    margin: 0;
+    margin: 1.4rem 0 0;
+    display: grid;
+    gap: 0.5rem;
   }
+  .meme-nocova-photo-cap {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, #eef2f5 58%, transparent);
+  }
+  /* 3/2, not the 4/5 this slot used to specify. The NOCOVA photo is a
+     LANDSCAPE group shot (1440x955); forcing it into a 4:5 portrait would
+     have cropped ~half its width and cut members out of their own photo. */
   .meme-nocova-photo img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     border-radius: 10px;
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
