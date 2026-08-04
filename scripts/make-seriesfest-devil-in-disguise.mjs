@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * make-seriesfest-devil-in-disguise.mjs — 2026-08-03.
+ * make-seriesfest-devil-in-disguise.mjs — 2026-08-03, revisited 2026-08-04.
  *
- * The one image for /venture/seriesfest-2025-devil-in-disguise.
+ * The images for /venture/seriesfest-2025-devil-in-disguise.
  *
  * ⚠ THIS IS THE ONE PLACE ON THE SITE THAT DOES NOT SOURCE FROM A FULL-RES
  * ORIGINAL. There is none: a full-drive search for any photo captured
@@ -11,49 +11,60 @@
  * Feb–May 2026. The only surviving frames of this screening are the three
  * LinkedIn-harvested display images in
  * E:\_LINKEDIN-ARCHIVE\seriesfest\2025-11-04-storytelling-documentary, all
- * 480px. OPERATOR DECISION 2026-08-03: build the chapter text-led and run ONE
- * soft photo rather than skip the visit or pad it.
+ * 480px.
  *
- * Of the three:
- *   img-01 ... the Peacock key art. EXCLUDED — third-party poster artwork, the
- *              same class of image the 2026-08-02 screening pass excluded.
- *   img-02 ... venue lobby with the event's own signage. NOT BAKED, held in
- *              reserve — one photo is the approved scope for this chapter.
- *   img-03 ... the post-screening conversation on stage. BAKED below.
+ * Of the three (the operator asked on 2026-08-04 to use more than one):
+ *   img-01 ... the Peacock key art, on its own. EXCLUDED, and it should stay
+ *              excluded. It is not his photograph — it is the distributor's
+ *              promotional artwork, and running it standalone publishes someone
+ *              else's copyrighted image as page content. He asked whether
+ *              "editing or processing it" would make it more his own; it would
+ *              not. A processed copy is a derivative work and the rights stay
+ *              with the holder. Nothing on the page needs it.
+ *   img-02 ... The Cable Center atrium ("CABLE HALL OF FAME") with SeriesFest's
+ *              own event signage tower. BAKED 2026-08-04. This one is HIS
+ *              photograph of a real room. The key art appears incidentally, in
+ *              situ, on the venue's own sign — the same thing as photographing
+ *              a cinema marquee, and ordinary editorial event coverage. It also
+ *              establishes the venue, which the page could not name before.
+ *   img-03 ... the post-screening conversation on stage. BAKED.
  *
- * NO UPSCALE: withoutEnlargement keeps the export at its native 480px, and the
- * page renders it at a deliberately small measure (max 26rem) so it is never
- * asked to hold a size it doesn't have.
+ * NO UPSCALE: withoutEnlargement keeps both exports at their native 480px, and
+ * the page sizes each beat close to native so neither is ever asked to hold a
+ * width it doesn't have.
  */
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const SRC = "E:/_LINKEDIN-ARCHIVE/seriesfest/2025-11-04-storytelling-documentary/img-03.jpg";
-const SLUG = "conversation-stage";
+const ARCHIVE = "E:/_LINKEDIN-ARCHIVE/seriesfest/2025-11-04-storytelling-documentary";
+const PICKS = [
+  { file: "img-02.jpg", slug: "venue-signage" },
+  { file: "img-03.jpg", slug: "conversation-stage" },
+];
 const AVIF = { quality: 50, effort: 5 };
 const WEBP = { quality: 72, effort: 5 };
 
 const outDir = join(process.cwd(), "public", "media", "venture", "seriesfest-2025-devil-in-disguise");
 await mkdir(outDir, { recursive: true });
 
-if (!existsSync(SRC)) {
-  console.error(`✖ missing source: ${SRC}`);
-  process.exit(1);
-}
-
-// ONE width only, unlike every other bake here. The source is 480px, so a
-// second 1600w export would be a byte-identical file advertised at a size it
-// does not have — a lie in the srcset. The page declares 900w only.
-const meta = await sharp(SRC).rotate().metadata();
-let bytes = 0;
-{
-  const base = sharp(SRC).rotate().resize({ width: 900, withoutEnlargement: true });
-  const avifOut = join(outDir, `${SLUG}-900.avif`);
-  const webpOut = join(outDir, `${SLUG}-900.webp`);
+// ONE width each, unlike every other bake in this repo. The sources are 480px,
+// so a second 1600w export would be a byte-identical file advertised at a size
+// it does not have — a lie in the srcset. The page declares 900w only.
+for (const { file, slug } of PICKS) {
+  const src = join(ARCHIVE, file);
+  if (!existsSync(src)) {
+    console.error(`✖ missing source: ${src}`);
+    process.exitCode = 1;
+    continue;
+  }
+  const meta = await sharp(src).rotate().metadata();
+  const base = sharp(src).rotate().resize({ width: 900, withoutEnlargement: true });
+  const avifOut = join(outDir, `${slug}-900.avif`);
+  const webpOut = join(outDir, `${slug}-900.webp`);
   await base.clone().avif(AVIF).toFile(avifOut);
   await base.clone().webp(WEBP).toFile(webpOut);
-  bytes += statSync(avifOut).size + statSync(webpOut).size;
+  const bytes = statSync(avifOut).size + statSync(webpOut).size;
+  console.log(`✓ ${slug.padEnd(20)} native ${meta.width}×${meta.height} (no upscale)  ${(bytes / 1024).toFixed(0)}KB`);
 }
-console.log(`✓ ${SLUG}  native ${meta.width}×${meta.height} (no upscale)  ${(bytes / 1024).toFixed(0)}KB`);

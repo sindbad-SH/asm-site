@@ -39,7 +39,10 @@ async function shot(slug: string, alt: string) {
   };
 }
 
-const hero = await shot("hero", "Two arrivals posed at the SeriesFest and Sie FilmCenter step-and-repeat, a boom mic and camera crew working the red carpet.");
+// OPERATOR PICK 2026-08-04 — his named frame for this story's hero; baked from
+// the 12240px original by scripts/make-seriesfest-operator-picks-2026-08-04.mjs.
+// The two-arrivals frame it replaced is still on disk as `hero` and unused.
+const hero = await shot("red-carpet-aba-lineup", "Six people lined up on the red carpet at the SeriesFest step-and-repeat outside the Sie FilmCenter, two of them holding red-white-and-blue ABA basketballs, a broadcast camera in the foreground.");
 const screening = await shot("screening", "The Soul Power: The Legend of the American Basketball Association titlecard, the Q&A panel seated below it.");
 const backdropArrivals = await shot("backdrop-arrivals", "An ABA-jerseyed guest being interviewed on the red carpet, the SeriesFest and Sie FilmCenter backdrop behind.");
 const backdropLobby = await shot("backdrop-lobby", "A press scrum working the step-and-repeat, cameras and boom mics raised.");
@@ -91,7 +94,7 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:38% 55%" loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 52%" loading="eager" decoding="async" />
         </picture>
       </figure>
     )}

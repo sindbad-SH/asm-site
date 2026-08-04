@@ -558,32 +558,48 @@ const GROUNDS = {
       </div>
     </section>
 
-    <!-- PUB-E (2026-07-27, Directive PUB-E) — CHAPTER 03 · MEME, the third
-         feature slot. Reuses meme.astro's own copy (heading + body + LOCKED
-         LegendMark proof), its ambient logo-loop asset, and — as of 2026-08-04
-         — the real MEME frames that page already publishes. No new claim about
-         MEME is made here.
+    <!-- CHAPTER 03 · MEME. Reuses meme.astro's own copy (heading + body +
+         LOCKED LegendMark proof), its ambient logo-loop asset, and the real
+         MEME frames that page already publishes. No new claim is made here.
 
-         2026-08-04 (operator: "section 03 of MEME looks pretty barren … put
-         some photos and segments around it so it's on par with the PitchBoulder
-         and Shelby segments above"): the chapter drops its solo treatment and
-         takes the same shape as 01 and 02 — a collage ringing the centred
-         title, with the animated MEME mark as the collage's anchor card (the
-         structural equivalent of their hover-video cards) and three real frames
-         around it. Its meta plate gains the programs strip, standing in for the
-         client testimonial 01/02 carry — MEME has no testimonial to quote, and
-         the evergreen program catalog is the honest substance in its place. -->
-    <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
+         2026-08-04, SECOND PASS. The first pass forced this chapter into the
+         absolute-positioned collage grammar chapters 01/02 use, and it broke:
+         "a lot of the photos got shrunk, our live video segment got shrunk and
+         stuck to the top left corner, there's text over a bunch of things."
+         All three are the same root cause. That grammar assumes a two-line
+         title and a SHORT meta plate; chapter 03 has a one-word title (so the
+         centre of the stage is occupied, not empty) and the tallest plate on
+         the page (it carries the programs strip). Cards got squeezed to the
+         corners to dodge the plate, the tag line landed on a photo, and the
+         mark had to shrink to clear it.
+
+         So chapter 03 gets its own layout instead of a broken copy of theirs:
+         a real MOSAIC — four generous cards in a two-column grid, staggered
+         vertically so it still reads as scattered rather than tabular, with
+         zero overlap by construction. The animated MEME mark leads the mosaic
+         at full column width. The tag line sits centred under the title on its
+         own, over nothing. The plate sits below the mosaic, over nothing. It
+         keeps the family's vocabulary — centred uppercase title, rounded
+         shadowed cards, the plate treatment — without inheriting a geometry
+         that doesn't fit its content. -->
+    <section class="im-sec im-chapter im-chapter--meme" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
       <span class="im-index im-turn" aria-hidden="true">03</span>
       <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
-      <div class="im-chapter-stage">
-        <div class="im-collage im-collage--meme" aria-hidden="true">
+      <div class="im-chapter-stage im-chapter-stage--meme">
+        <div class="im-chapter-type">
+          <h2 class="im-title" data-reveal>
+            <span class="im-line">MEME</span>
+          </h2>
+          <p class="im-turn im-tag im-tag--center" data-reveal>{memeData.body}</p>
+        </div>
+
+        <div class="im-meme-mosaic" data-reveal>
           {
             memeLoop && (
-              <a class="im-card im-meme-anchor im-card--link" href={`${base}/venture/meme`} data-meme-loop-wrap data-im-card data-depth="1.15" tabindex="-1">
+              <a class="im-card im-meme-anchor im-card--link" href={`${base}/venture/meme`} data-meme-loop-wrap aria-label="MEME — read the full story">
                 <picture>
                   <source type="image/avif" srcset={memeLoop.posterAvif} />
-                  <img src={memeLoop.posterWebp} alt="" loading="lazy" decoding="async" />
+                  <img src={memeLoop.posterWebp} alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground." loading="lazy" decoding="async" />
                 </picture>
                 <video class="im-meme-loop-vid" data-meme-loop muted loop playsinline preload="none" poster={memeLoop.posterWebp} aria-hidden="true">
                   <source src={memeLoop.mp4} type="video/mp4" />
@@ -593,42 +609,37 @@ const GROUNDS = {
           }
           {
             memeRoom && (
-              <figure class="im-card im-meme-room" data-im-card data-depth="0.65">
+              <figure class="im-card im-meme-room">
                 <picture>
                   {memeRoom.avif && <source srcset={memeRoom.avif} type="image/avif" />}
-                  <img src={memeRoom.webp ?? memeRoom.avif} alt="" loading="lazy" decoding="async" />
+                  <img src={memeRoom.webp ?? memeRoom.avif} alt="A MEME session in a soundproofed room, attendees seated around a table facing a presenter." loading="lazy" decoding="async" />
                 </picture>
               </figure>
             )
           }
           {
             memeMeetup && (
-              <figure class="im-card im-meme-meetup" data-im-card data-depth="1.7">
+              <figure class="im-card im-meme-meetup">
                 <picture>
                   {memeMeetup.avif && <source srcset={memeMeetup.avif} type="image/avif" />}
-                  <img src={memeMeetup.webp ?? memeMeetup.avif} alt="" loading="lazy" decoding="async" />
+                  <img src={memeMeetup.webp ?? memeMeetup.avif} alt="Members gathered around a table at a NOCOVA meetup." loading="lazy" decoding="async" />
                 </picture>
               </figure>
             )
           }
           {
             memeRetreat && (
-              <figure class="im-card im-meme-retreat" data-im-card data-depth="1.1">
+              <figure class="im-card im-meme-retreat">
                 <picture>
                   {memeRetreat.avif && <source srcset={memeRetreat.avif} type="image/avif" />}
-                  <img src={memeRetreat.webp ?? memeRetreat.avif} alt="" loading="lazy" decoding="async" />
+                  <img src={memeRetreat.webp ?? memeRetreat.avif} alt="Members outdoors under a canopy at a MEME retreat." loading="lazy" decoding="async" />
                 </picture>
               </figure>
             )
           }
         </div>
-        <div class="im-chapter-type">
-          <h2 class="im-title" data-reveal>
-            <span class="im-line">MEME</span>
-          </h2>
-          <p class="im-turn im-tag" data-reveal>{memeData.body}</p>
-        </div>
-        <div class="im-chapter-meta" data-reveal>
+
+        <div class="im-chapter-meta im-chapter-meta--meme" data-reveal>
           <LegendMark proof={memeData.proof} />
           {
             memePrograms.length > 0 && (
@@ -927,6 +938,16 @@ const GROUNDS = {
     align-content: center;
     gap: 0.4rem;
   }
+  /* chapter 03 is a mosaic, not a collage: it sizes to its own content instead
+     of being centred inside a viewport-height stage. */
+  .im-chapter-stage--meme {
+    min-height: 0;
+    align-content: start;
+  }
+  .im-chapter--meme {
+    min-height: 0;
+    padding-block: clamp(4rem, 9vw, 7rem);
+  }
   .im-collage {
     position: absolute;
     inset: 0;
@@ -986,22 +1007,48 @@ const GROUNDS = {
   .im-sh-lawn     { width: clamp(210px, 26vw, 400px); aspect-ratio: 16 / 10; left: 3%; bottom: 5%; }
   .im-sh-heritage { width: clamp(150px, 17vw, 260px); aspect-ratio: 4 / 3; right: 4%; bottom: 6%; }
   .im-sh-engine   { width: clamp(120px, 14vw, 210px); aspect-ratio: 4 / 3; left: 30%; top: 3%; }
-  /* ── 2026-08-04 · chapter-03 (MEME) collage geometry — the same ringing
-     grammar as 01/02, with the animated MEME mark as the anchor card. The mark
-     is a 1:1 asset, so it anchors at square (its own page shows it the same
-     way) and the four real frames ring it in mixed ratios. ── */
-  /* the anchor sits ABOVE the meta plate, not behind it: this chapter's plate
-     is taller than 01/02's (it carries the programs strip), and the MEME mark
-     getting clipped mid-wordmark reads as a bug rather than as layering. */
-  .im-meme-anchor   { width: clamp(130px, 16vw, 205px); aspect-ratio: 1 / 1; left: 1%; top: 1%; }
-  .im-meme-room     { width: clamp(210px, 27vw, 420px); aspect-ratio: 4 / 3; right: 1%; top: 4%; }
-  .im-meme-meetup   { width: clamp(150px, 18vw, 270px); aspect-ratio: 3 / 2; left: 5%; bottom: 4%; }
-  .im-meme-retreat  { width: clamp(190px, 24vw, 350px); aspect-ratio: 3 / 2; right: 3%; bottom: 5%; }
-  /* NOTE — a fifth frame (world-catalina) was tried at left:32%/top:2% and
-     landed straight on the centred "MEME" wordmark: unlike 01/02, this
-     chapter's title is a single short word, so the middle of the stage is
-     occupied, not empty. Four frames ring it exactly as chapter 01 does
-     (anchor TL, wide TR, small BL, medium BR) and the centre stays clear. */
+  /* ── 2026-08-04 (second pass) · chapter-03 (MEME) MOSAIC — see the markup
+     comment for why this chapter does not use the absolute collage geometry
+     that 01/02 use. Four generous cards, two columns, staggered vertically so
+     it reads as scattered rather than tabular, and non-overlapping by
+     construction: the grid owns the space, so nothing can land on the type. ── */
+  .im-meme-mosaic {
+    position: relative;
+    z-index: 2;
+    /* capped well inside the 78rem stage: at full stage width a 1:1 card is
+       ~600px tall and dwarfs the whole chapter. 5fr/7fr keeps the square mark
+       and the landscape frames close in height without either dominating. */
+    max-width: 60rem;
+    margin: clamp(1.6rem, 3vw, 2.6rem) auto 0;
+    display: grid;
+    /* the WIDE column leads: the MEME loop is a 16:9 asset (1280x720), so it
+       gets the 7fr track and its natural ratio. Squeezing it into a square card
+       cropped the "MAKESHIFT ENTERTAINMENT MEDIA EDUCATION" wordmark off both
+       edges — the mark is the whole point of the card. */
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(0.9rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+  .im-meme-mosaic .im-card {
+    /* RELATIVE, not static: the grid must place these (so not `absolute`), but
+       the anchor card contains an absolutely-positioned <video> overlay — with
+       `static` that video resolves against the chapter stage instead of its own
+       card and stretches across the whole section. */
+    position: relative;
+    width: 100%;
+  }
+  /* the stagger — the collage feel without the collisions */
+  .im-meme-mosaic .im-meme-room { transform: translateY(clamp(1rem, 3vw, 2.6rem)); }
+  .im-meme-mosaic .im-meme-retreat { transform: translateY(clamp(1rem, 3vw, 2.6rem)); }
+
+  .im-meme-anchor { aspect-ratio: 16 / 9; }
+  .im-meme-room { aspect-ratio: 4 / 3; }
+  .im-meme-meetup { aspect-ratio: 3 / 2; }
+  .im-meme-retreat { aspect-ratio: 3 / 2; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .im-meme-mosaic .im-card { transform: none; }
+  }
 
   .im-chapter-type {
     position: relative;
@@ -1035,6 +1082,18 @@ const GROUNDS = {
   }
   /* P23 — the proof line + testimonial + CTA also lifted onto a plate so none
      of the small type ever fights the collage underneath. */
+  /* chapter 03's tag sits centred under the title with nothing behind it, so
+     it needs no occluding plate — the plate treatment exists to stop small type
+     fighting a collage, and here there is no collage behind it. Declared AFTER
+     .im-tag so it wins at equal specificity. */
+  .im-tag.im-tag--center {
+    margin: 1.1rem auto 0;
+    text-align: center;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding-inline: 0;
+  }
   .im-chapter-meta {
     position: relative;
     z-index: 2;
@@ -1050,6 +1109,14 @@ const GROUNDS = {
   }
   .im-quote {
     font-style: italic;
+  }
+
+  /* chapter 03's plate sits BELOW the mosaic and over nothing, so it can be
+     wider and centred rather than a left-hugging occluder. */
+  .im-chapter-meta--meme {
+    max-width: 46rem;
+    margin-inline: auto;
+    margin-top: clamp(2.4rem, 5vw, 4rem);
   }
 
   /* ── 2026-08-04 · the MEME programs strip — chapter 03's parity beat for the
@@ -1489,6 +1556,13 @@ const GROUNDS = {
     .im-line--push { transform: none; }
     .im-intro-sub { justify-self: center; text-align: center; }
     .im-collage { position: relative; inset: auto; display: grid; gap: 0.7rem; grid-template-columns: 1fr 1fr; margin-bottom: 1.6rem; pointer-events: auto; }
+    /* chapter 03's mosaic goes single-column on phones: at 390px a two-column
+       7fr/5fr split leaves the narrow card ~135px, too small to read. */
+    .im-meme-mosaic { grid-template-columns: 1fr; max-width: none; }
+    .im-meme-mosaic .im-card { transform: none; }
+    /* keep the centred tag clear of the floating chapter index on the right */
+    .im-tag.im-tag--center { max-width: 88%; }
+    .im-meme-programs-row { gap: 0.45rem; }
     .im-card { position: relative; inset: auto; width: 100%; }
     /* P23 — mobile chapters were min-height:0 with a lone 6rem top pad but the
        10rem base bottom pad still applied; now the base is tighter and mobile

@@ -55,7 +55,11 @@ async function shot(slug: string, alt: string) {
   };
 }
 
-const hero = await shot("hero", "SeriesFest Soirée main stage — two lit screens carry the 2026 branding over the speakers.");
+// OPERATOR PICK 2026-08-04 — he named this frame for "the button and any other
+// hero moments"; baked from the 10032px original by
+// scripts/make-seriesfest-operator-picks-2026-08-04.mjs. The Soirée-stage frame
+// this replaced is still on disk as `hero` and unused.
+const hero = await shot("opening-night-red-carpet", "Six members of a cast and producing team lined up on the SeriesFest red carpet at Season 12's opening night, the SeriesFest step-and-repeat behind them.");
 const openingMingle = await shot("opening-night-mingle", "A small group talking in front of the SeriesFest 2026 sponsor wall on opening night.");
 const pressScrum = await shot("press-scrum", "Photographers and press gathered in front of the branded SeriesFest step-and-repeat.");
 const screeningGoldenGroves = await shot("screening-golden-groves", "An official-selection pilot on the big screen, a panel seated below for the post-screening Q&A.");
@@ -126,7 +130,7 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
           <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 55%" loading="eager" decoding="async" />
+          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 52%" loading="eager" decoding="async" />
         </picture>
       </figure>
     )}

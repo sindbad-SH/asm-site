@@ -12,10 +12,20 @@
  * scripts/make-seriesfest-devil-in-disguise.mjs for what was excluded and why).
  *
  * OPERATOR DECISION 2026-08-03, given that constraint: build the chapter
- * TEXT-LED and run ONE soft photo at a deliberately small measure, rather than
- * skip a real visit or pad it out with a third-party poster. The page is
- * therefore intentionally the shortest in the SeriesFest set — "small vessels
- * stay small", the same rule the hub page applies to itself.
+ * TEXT-LED and run soft photos at deliberately small measures, rather than skip
+ * a real visit or pad it out with a third-party poster. The page is therefore
+ * intentionally the shortest in the SeriesFest set — "small vessels stay
+ * small", the same rule the hub page applies to itself.
+ *
+ * 2026-08-04 — the operator asked to use more of the archive frames here, and
+ * whether the third could be processed into something "more original and my
+ * own". Answer, recorded so it isn't relitigated: the VENUE frame joins the
+ * page (his own photograph of The Cable Center atrium, SeriesFest's own event
+ * signage tower in it — ordinary editorial event coverage, and it finally lets
+ * the page name the venue). The Peacock key art does NOT, because it is the
+ * distributor's artwork rather than his photograph, and processing a copy of it
+ * would produce a derivative work, not an original — the rights would still sit
+ * with the holder. Nothing on this page needs it.
  *
  * DATE: the slate says "November 2025", not a day. His post is dated
  * 2025-11-04, and across this archive his posts run about a day behind the
@@ -40,16 +50,23 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const STORY = "seriesfest-2025-devil-in-disguise";
 const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
 
-// Single width by design — the source is 480px native (see the bake script).
-const SLUG = "conversation-stage";
-const hasShot = existsSync(join(mediaDir, `${SLUG}-900.webp`));
-const shot = hasShot
-  ? {
-      alt: "Two people seated in armchairs on a darkened stage, the screen behind them reading “Devil in Disguise: John Wayne Gacy — A Conversation with Creator and Showrunner,” with the UCP, Lifetime, Peacock and SeriesFest marks along the bottom.",
-      avif: `${base}/media/venture/${STORY}/${SLUG}-900.avif`,
-      webp: `${base}/media/venture/${STORY}/${SLUG}-900.webp`,
-    }
-  : undefined;
+// Single width by design — the sources are 480px native (see the bake script).
+function shot(slug: string, alt: string) {
+  if (!existsSync(join(mediaDir, `${slug}-900.webp`))) return undefined;
+  return {
+    alt,
+    avif: `${base}/media/venture/${STORY}/${slug}-900.avif`,
+    webp: `${base}/media/venture/${STORY}/${slug}-900.webp`,
+  };
+}
+const venue = shot(
+  "venue-signage",
+  "The Cable Center's atrium in Denver, a Cable Hall of Fame wall on the left and a tall lit SeriesFest signage tower on the right carrying the Devil in Disguise: John Wayne Gacy event card and its sponsor row.",
+);
+const conversation = shot(
+  "conversation-stage",
+  "Two people seated in armchairs on a darkened stage, the screen behind them reading “Devil in Disguise: John Wayne Gacy — A Conversation with Creator and Showrunner,” with the UCP, Lifetime, Peacock and SeriesFest marks along the bottom.",
+);
 
 const seriesRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "seriesfest",
@@ -60,7 +77,10 @@ const seriesRoom = PAGES.entertainment.rooms.items.find(
   line are new visible copy (staging-only until read). The two body paragraphs
   are his own published sentences, lightly condensed.
 */
-const CAPTION = "The conversation after the screening — creator and showrunner, on stage.";
+const CAPTIONS = {
+  venue: "The Cable Center, Denver — the evening's signage in the atrium.",
+  conversation: "The conversation after the screening — creator and showrunner, on stage.",
+};
 
 const meta = {
   title: "Devil in Disguise: John Wayne Gacy at SeriesFest — a venture story",
@@ -101,6 +121,22 @@ const meta = {
           exploration of how storytelling can confront darkness while revealing
           deeper truths about justice, psychology, and human nature.
         </p>
+      </div>
+    </section>
+
+    {venue && (
+      <figure class="vs-single vs-single--venue" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={venue.avif} />
+          <source type="image/webp" srcset={venue.webp} />
+          <img src={venue.webp} alt={venue.alt} width="480" height="480" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.venue}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
         <p>
           What the team offered afterwards was the craft underneath it — how
           structure, tone, and perspective shape what an audience understands. It's
@@ -111,14 +147,14 @@ const meta = {
       </div>
     </section>
 
-    {shot && (
+    {conversation && (
       <figure class="vs-single" data-reveal>
         <picture>
-          <source type="image/avif" srcset={shot.avif} />
-          <source type="image/webp" srcset={shot.webp} />
-          <img src={shot.webp} alt={shot.alt} width="480" height="480" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset={conversation.avif} />
+          <source type="image/webp" srcset={conversation.webp} />
+          <img src={conversation.webp} alt={conversation.alt} width="480" height="480" loading="lazy" decoding="async" />
         </picture>
-        <figcaption class="vs-cap">{CAPTION}</figcaption>
+        <figcaption class="vs-cap">{CAPTIONS.conversation}</figcaption>
       </figure>
     )}
 
@@ -225,8 +261,13 @@ const meta = {
     font-style: italic;
   }
 
-  /* deliberately small: the source is 480px native, so it is never asked to
-     hold a width it doesn't have (see the page header note) */
+  /* deliberately small: the sources are 480px native, so neither is ever asked
+     to hold a width it doesn't have (see the page header note). The venue frame
+     runs a touch wider — it is the establishing shot and its subject (the
+     signage tower) is large in frame — but still inside native. */
+  .vs-single--venue {
+    max-width: 30rem;
+  }
   .vs-single {
     margin: 0;
     max-width: 26rem;

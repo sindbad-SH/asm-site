@@ -967,11 +967,14 @@ export const VENTURE_STORY_RAIL: readonly VentureStoryCard[] = [
     title: "SeriesFest, in depth.",
     tag: "Film industry",
     mediaSlug: "seriesfest",
-    // Was seriesfest-2026/hero (Soirée screens under an exposed ceiling truss —
-    // unreadable at card size even after two object-position passes). The
-    // Fashion in Focus runway frame has one clear subject and a packed house.
-    imageSlug: "seriesfest/fashion-runway-crowd-900",
-    objectPosition: "50% 62%",
+    // OPERATOR PICK 2026-08-04 — he named this frame himself ("personally I
+    // think this is a better photo for both the button and any other hero
+    // moments"), pointing at its 800px LinkedIn copy; baked here from the
+    // 10032px original (scripts/make-seriesfest-operator-picks-2026-08-04.mjs).
+    // Supersedes the Fashion in Focus runway frame this card carried for a day,
+    // which in turn superseded the unreadable Soirée-ceiling hero.
+    imageSlug: "seriesfest/opening-night-red-carpet-900",
+    objectPosition: "50% 52%",
   },
   {
     href: "/venture/afm-2025",
@@ -2107,8 +2110,11 @@ export const PAGES = {
           date: "Feb 18, 2026",
           title: "Not a nostalgia trip.",
           body: "SeriesFest brought Soul Power: The Legend of the American Basketball Association to the Sie FilmCenter for a screening and Q&A. As moderator Vic Lombardi framed it: this is much deeper than that — it's real.",
-          imageSlug: "soulpower-red-carpet-press",
-          alt: "The SeriesFest step-and-repeat and red carpet outside the Sie FilmCenter, press photographers already in position ahead of the Soul Power screening.",
+          // OPERATOR PICK 2026-08-04 (see the note on the SeriesFest card in
+          // VENTURE_STORY_RAIL above) — replaces soulpower-red-carpet-press,
+          // which was a backs-of-camera-operators frame.
+          imageSlug: "soulpower-red-carpet-aba",
+          alt: "Six people lined up on the red carpet at the SeriesFest step-and-repeat outside the Sie FilmCenter, two of them holding red-white-and-blue ABA basketballs, a broadcast camera in the foreground.",
           href: "/venture/seriesfest-2026-soul-power",
           cta: "Soul Power premiere, in full",
         },
@@ -2129,8 +2135,9 @@ export const PAGES = {
           date: "May 6–10, 2026",
           title: "The room fills back up.",
           body: "The first-look screening of The Four Seasons Season 2, the NBC100 drama-writers panel, and the Soirée's inaugural Visionary Award, presented to John J. Sie.",
-          imageSlug: "s12-red-carpet-panel",
-          alt: "A cast and producing team pose on the SeriesFest red carpet, a branded screen behind them naming the production.",
+          // OPERATOR PICK 2026-08-04 (same note as above).
+          imageSlug: "opening-night-red-carpet",
+          alt: "Six members of a cast and producing team lined up on the SeriesFest red carpet at Season 12's opening night, the SeriesFest step-and-repeat behind them.",
           href: "/venture/seriesfest-2026",
           cta: "Season 12, in full",
         },
