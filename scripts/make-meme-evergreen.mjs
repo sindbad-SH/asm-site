@@ -327,6 +327,45 @@ function motifWaveform(color) {
 const PITCHBOULDER_ROOT = String.raw`E:\Pitch Boulder\Top photos for web build\_TIER 1 - TOP (make stories)`;
 const CARPENTER_STILLS = String.raw`E:\Makeshift\MEME\_CARPENTER-MINED\stills`;
 
+// MEME-STICKLER-2026-08-03 ROUND 2 (coordinator catch, retroactive rule —
+// no legible screen/slide/whiteboard/document content, no private company or
+// personal names, event/platform signage excepted): re-checked ALL SIX photo
+// cards at full card resolution, not just eyeballed. Two of the three
+// Pitch & Market picks failed outright, and the exhaustive re-check of the
+// pool surfaced a systemic problem that killed a third replacement too:
+//   - 20260506_091725 (old pitch-quorum): a slide reads "Leyden Space /
+//     PITCH BOULDER ALUMNI UPDATE / Founder: Ashle Jantzen" plus that deck's
+//     own "confidential and proprietary" notice. Failed outright.
+//   - 20260506_091643 (old market-fresh): the projected browser's own tab
+//     title reads "5.6 PEMPal.pptx" — a specific company/product name,
+//     legible even though it's a small UI element, not the slide's headline.
+//     Failed the same test.
+//   - 20260617_090711 (old business-of-show-business): the slide itself
+//     ("Follow Us!" + Meetup/LinkedIn/PitchBoulder/Reddit logos) is fine —
+//     event/platform signage, same exception as a SeriesFest backdrop — but
+//     the presenter's polo shirt carries a legible embroidered "JACK LINK'S"
+//     logo. Not a screen/slide/whiteboard/document (the rule's literal
+//     wording), but the identical consent problem, so treated the same way.
+// SYSTEMIC FINDING on the first replacement attempt: every OTHER "Reminders"/
+// "Follow Us"-style boilerplate frame in this pool is shot with the
+// presenter's own Google Slides browser tab visible along the top edge of
+// the screen, and that tab always shows THEIR deck's filename — legible,
+// and always a specific company name (checked and rejected: "4.29
+// Perlion.pptx", "5.6 PEMPal.pptx" again, "5.20 NoLimitRobotics.p...").
+// A slide's own body text can be generic housekeeping, but the browser tab
+// above it names their company regardless. Only the 2026-06-17 session's 3
+// photos are shot without that browser chrome visible at all — genuinely
+// clean. That pool is too small to supply 3 independent, non-near-duplicate
+// cards, so per the standing "an honest miss beats a fake fit" rule (already
+// applied to Sound Workshop), Pitch Quorum goes back to kit-geometric rather
+// than force a marginal pick. Market Fresh and Business of Show Business
+// both use 2026-06-17 frames — market-fresh gets 090642 as-is (clean);
+// business-of-show-business gets 090711 (the original pick) with a TIGHTER
+// crop that fully excludes the Jack Link's-branded presenter (verified at
+// full resolution — the first attempt at this recrop still left a sliver of
+// his shoulder/logo in frame; pushed further right until nothing of him
+// remains) rather than swapping frames again, since the slide/tab on that
+// photo was already clean — only the framing needed to change.
 const CARDS = [
   {
     slug: "pitch-quorum",
@@ -335,7 +374,12 @@ const CARDS = [
     titleSize: 122,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifSpotlightLedger(t.motif),
-    photo: { file: join(PITCHBOULDER_ROOT, "20260506_091725.jpg") }, // presenter + screen, center-crop to 4:5
+    // NO photo — see the ROUND 2 header note: every remaining candidate in
+    // the pool that isn't from the clean 2026-06-17 session shows a private
+    // company name in its browser tab, and that session's 3 photos are
+    // already spoken for by the other two Pitch & Market cards. Honest miss,
+    // same treatment as Sound Workshop below.
+    photo: null,
   },
   {
     slug: "market-fresh",
@@ -344,7 +388,10 @@ const CARDS = [
     titleSize: 122,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifPulseRings(t.motif),
-    photo: { file: join(PITCHBOULDER_ROOT, "20260506_091643.jpg") },
+    // "Help us with attendance / SCAN ME!" + the PitchBoulder logo — an
+    // attendance-QR housekeeping slide, no private content, no browser tab
+    // visible at all in this frame (2026-06-17 session — verified clean).
+    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090642.jpg") },
   },
   {
     slug: "business-of-show-business",
@@ -353,7 +400,12 @@ const CARDS = [
     titleSize: 76,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifLedgerArc(t.text, t.motif),
-    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090711.jpg") },
+    // ROUND 2: same source photo as the original pick (its slide/tab was
+    // already clean — the same 2026-06-17 session as market-fresh, no
+    // browser chrome visible) but recropped tighter to fully exclude the
+    // Jack Link's-branded presenter who stood at the frame's left edge.
+    // Verified at full resolution: no shirt/logo fragment remains.
+    photo: { file: join(PITCHBOULDER_ROOT, "20260617_090711.jpg"), box: [1405, 0, 1651, 2063] },
   },
   {
     slug: "pa-workshop",
