@@ -1,29 +1,34 @@
 ---
 /**
- * /venture/seriesfest — Build #2 of the 2026-08-01 archive-mining
- * integration round. A HUB page, not a second flagship: the four existing
- * chapter pages (seriesfest-2025, seriesfest-2026-soul-power,
- * seriesfest-2026-fashion-in-focus, seriesfest-2026) carry the real depth;
- * this page's value is the architecture — one cover-story frame that
- * finally gives those four orphan pages a parent, plus a condensed arc.
- * None of the four is replaced or retired.
+ * /venture/seriesfest — the SeriesFest hub. Not a second flagship: the
+ * chapter pages carry the real depth; this page's value is the architecture —
+ * one cover-story frame that gives them a parent, plus a condensed arc.
+ *
+ * ARCHIVE-REWORK 2026-08-03: a FIFTH row joins the contents column — the
+ * November 2025 "Devil in Disguise: John Wayne Gacy" screening, a real visit
+ * the arc previously jumped straight over (it sat between Season 11 and the
+ * Soul Power premiere). It is the one visit with NO photo pool, so it runs as
+ * a deliberately unillustrated row: an accent rule under the title stands in
+ * for the image, which is honest, where a 480px card beside four full-res ones
+ * would not be. See src/pages/venture/seriesfest-2025-devil-in-disguise.astro.
  *
  * LAYOUT-OVERHAUL P2 (2026-08-01, see LAYOUT-RESEQUENCE-PLAN.md): the
  * uniform 2×2 card grid (four identical 4:3 tiles — the audit's
  * "grid-as-body" fail, the operator's boxes complaint verbatim) becomes an
- * editorial CONTENTS-PAGE column: four chapter rows, each a different
- * layout, separated by hairlines instead of enclosed in bordered boxes.
+ * editorial CONTENTS-PAGE column: chapter rows, each a different layout,
+ * separated by hairlines instead of enclosed in bordered boxes.
  *   01 · 2025 festival — FEATURED row: 16:9 image at 58fr beside the text
  *        (the deepest visit reads biggest).
- *   02 · Soul Power — a contained 2:1 banner above its text (the
+ *   02 · Devil in Disguise — TEXT-ONLY, centered (no photo pool exists).
+ *   03 · Soul Power — a contained 2:1 banner above its text (the
  *        step-and-repeat + press pack composition is a natural wide band).
- *   03 · Fashion in Focus — a small ~200px square thumbnail beside text
+ *   04 · Fashion in Focus — a small ~200px square thumbnail beside text
  *        (the Magnum related-content device; deliberately the smallest).
- *   04 · Season 12 — mirrored row: portrait 4:5 image (the red-carpet
+ *   05 · Season 12 — mirrored row: portrait 4:5 image (the red-carpet
  *        lineup is a standing-figures vertical) with text to its right.
  * Crop note: the hub bakes are square/near-square (900×900, s12 900×996);
- * all four crops are CSS aspect-ratio + object-position tuned against a
- * contact sheet (eye-reviewed) — no new bakes, originals untouched.
+ * every crop is CSS aspect-ratio + object-position tuned against a contact
+ * sheet (eye-reviewed) — no new bakes, originals untouched.
  *
  * COLLISION-MAP GATE: only 5 of the miner's staged 10 images survive
  * perceptual dedup — see scripts/make-seriesfest-hub.mjs. That's a cover
@@ -59,13 +64,23 @@ function photo(slug: string) {
 const cover = photo(sf.coverImageSlug);
 const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
 
-// Per-row layout + crop assignment (index-aligned with sf.chapters 01–04;
+// Per-row layout + crop assignment (index-aligned with sf.chapters 01–05;
 // crops tuned against the eye-reviewed contact sheet — see header note).
+// Row 02 (Devil in Disguise) is deliberately imageless — see its consts entry.
+const ROW_LAYOUT = ["featured", "textonly", "banner", "thumb", "portrait"] as const;
 const ROW_STYLE = [
   "aspect-ratio:16/9;object-fit:cover;object-position:50% 42%", // 01 featured — keeps the Season 11 wordmark + moderator
-  "aspect-ratio:2/1;object-fit:cover;object-position:50% 45%",  // 02 banner — backdrop + press pack band
-  "aspect-ratio:1/1;object-fit:cover;object-position:55% 60%",  // 03 thumb — model + florals
-  "aspect-ratio:4/5;object-fit:cover;object-position:50% 45%",  // 04 portrait — the standing lineup
+  "",                                                            // 02 no image
+  "aspect-ratio:2/1;object-fit:cover;object-position:50% 45%",  // 03 banner — backdrop + press pack band
+  "aspect-ratio:1/1;object-fit:cover;object-position:55% 60%",  // 04 thumb — model + florals
+  "aspect-ratio:4/5;object-fit:cover;object-position:50% 45%",  // 05 portrait — the standing lineup
+] as const;
+const ROW_SIZES = [
+  "(max-width: 760px) 100vw, 38rem",
+  "",
+  "(max-width: 760px) 100vw, 30rem",
+  "200px",
+  "(max-width: 760px) 80vw, 20rem",
 ] as const;
 ---
 
@@ -117,22 +132,23 @@ const ROW_STYLE = [
         <p class="text-lg text-ink" data-reveal>{sf.intro}</p>
       </div>
 
-      <!-- THE CONTENTS COLUMN — four visits, four different row layouts
-           (featured / banner / thumbnail / portrait), hairline-separated.
-           The hub's value is architecture; the variety is the point. -->
-      <section class="sf-toc mx-auto px-8 pt-6" aria-label="The four visits">
+      <!-- THE CONTENTS COLUMN — five visits, five different row layouts
+           (featured / text-only / banner / thumbnail / portrait),
+           hairline-separated. The hub's value is architecture; the variety
+           is the point. -->
+      <section class="sf-toc mx-auto px-8 pt-6" aria-label="The five visits">
         {
           chapters.map((c, i) => (
             <a
               href={`${base}${c.href}`}
-              class={`sf-row sf-row--${i === 0 ? "featured" : i === 1 ? "banner" : i === 2 ? "thumb" : "portrait"}`}
+              class={`sf-row sf-row--${ROW_LAYOUT[i] ?? "featured"}`}
               data-reveal
             >
               {c.media && (
                 <div class="sf-row-media">
                   <picture>
-                    <source type="image/avif" srcset={c.media.avif} sizes={i === 0 ? "(max-width: 760px) 100vw, 38rem" : i === 1 ? "(max-width: 760px) 100vw, 30rem" : i === 2 ? "200px" : "(max-width: 760px) 80vw, 20rem"} />
-                    <source type="image/webp" srcset={c.media.webp} sizes={i === 0 ? "(max-width: 760px) 100vw, 38rem" : i === 1 ? "(max-width: 760px) 100vw, 30rem" : i === 2 ? "200px" : "(max-width: 760px) 80vw, 20rem"} />
+                    <source type="image/avif" srcset={c.media.avif} sizes={ROW_SIZES[i]} />
+                    <source type="image/webp" srcset={c.media.webp} sizes={ROW_SIZES[i]} />
                     <img src={c.media.src} alt={c.alt} style={ROW_STYLE[i]} loading="lazy" decoding="async" />
                   </picture>
                 </div>
@@ -299,7 +315,34 @@ const ROW_STYLE = [
   .sf-row--featured {
     grid-template-columns: 58fr 34fr;
   }
-  /* 02 — BANNER: contained 2:1 band stacked above centered text */
+  /* 02 — TEXT-ONLY: the one visit with no photo pool. Reads as a quieter
+     interstitial rather than a card with a hole where a photo should be —
+     an accent rule stands in for the image and holds the row's rhythm. */
+  .sf-row--textonly {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .sf-row--textonly .sf-row-body {
+    max-width: 42rem;
+    text-align: center;
+    justify-items: center;
+    padding-block: 0.6rem;
+    border-left: none;
+  }
+  .sf-row--textonly .sf-row-title::after {
+    content: "";
+    display: block;
+    width: 3rem;
+    height: 1px;
+    margin: 0.9rem auto 0;
+    background: var(--color-accent);
+    opacity: 0.7;
+  }
+  .sf-row--textonly .sf-row-copy {
+    margin-inline: auto;
+  }
+
+  /* 03 — BANNER: contained 2:1 band stacked above centered text */
   .sf-row--banner {
     grid-template-columns: 1fr;
     justify-items: center;
@@ -313,7 +356,7 @@ const ROW_STYLE = [
     text-align: center;
     justify-items: center;
   }
-  /* 03 — THUMB: text left, small square thumbnail right (~200px) */
+  /* 04 — THUMB: text left, small square thumbnail right (~200px) */
   .sf-row--thumb {
     grid-template-columns: 1fr 200px;
   }
@@ -324,7 +367,7 @@ const ROW_STYLE = [
   .sf-row--thumb .sf-row-body {
     order: 1;
   }
-  /* 04 — PORTRAIT: 4:5 image left at 20rem, text right */
+  /* 05 — PORTRAIT: 4:5 image left at 20rem, text right */
   .sf-row--portrait {
     grid-template-columns: 20rem 1fr;
   }

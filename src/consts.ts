@@ -2078,6 +2078,13 @@ export const PAGES = {
       },
     },
 
+    // ARCHIVE-REWORK 2026-08-03: a FIFTH chapter joins the arc — the
+    // November 2025 "Devil in Disguise: John Wayne Gacy" screening, which had
+    // no page and which this hub previously skipped straight over. It is the
+    // one visit with no photo pool (only 480px LinkedIn-harvest frames), so it
+    // runs as a deliberately unillustrated row here and a text-led chapter
+    // page; see src/pages/venture/seriesfest-2025-devil-in-disguise.astro.
+    //
     // Build #2 — SeriesFest hub. Source: _STORY-STAGING/seriesfest/STORY.md
     // ("The Same Air"), heavily condensed. COLLISION-MAP GATE (2026-08-01):
     // of the miner's 10 staged picks, 4 are pixel-identical to images already
@@ -2098,7 +2105,7 @@ export const PAGES = {
       meta: {
         title: "SeriesFest — the same air, 2025–2026",
         description:
-          "Four visits to SeriesFest across thirteen months — the 2025 festival, the Soul Power premiere, Fashion in Focus, and Season 12.",
+          "Five visits to SeriesFest across thirteen months — the 2025 festival, the Devil in Disguise screening, the Soul Power premiere, Fashion in Focus, and Season 12.",
       },
       cover: {
         masthead: "SeriesFest",
@@ -2109,16 +2116,16 @@ export const PAGES = {
         storyLabel: "The cover story",
         title: "The Same Air",
         deck: "Two years of showing up at SeriesFest — Denver's home for episodic storytelling — from a red carpet through a fashion runway to the Soirée stage twice over.",
-        teasers: ["2025 festival", "Soul Power premiere", "Fashion in Focus", "Season 12"],
+        teasers: ["2025 festival", "Devil in Disguise", "Soul Power premiere", "Fashion in Focus", "Season 12"],
         scrollCue: "Scroll for the story",
       },
       byline: "Words & photographs — Sindbad Horizon",
       slate: "SeriesFest · Denver, Colorado · 2025–2026",
       lede: "For a few days each spring, SeriesFest turns Denver into a room where creators, audiences, and industry actually share the same air.",
       intro:
-        "We've now sat in that room four times: the full 2025 festival, a February premiere, a March fashion panel, and back for the main event in May 2026. We just kept showing up.",
+        "We've now sat in that room five times: the full 2025 festival, a November screening between seasons, a February premiere, a March fashion panel, and back for the main event in May 2026. We just kept showing up.",
       close:
-        "A counter-thesis kept surfacing across all four visits: as the synthetic proliferates, the value of real human encounters only increases. Four rooms, thirteen months, one relationship that keeps carrying forward — and SeriesFest's programming runs year-round, all the way to Season 13. We'll be back.",
+        "A counter-thesis kept surfacing across all five visits: as the synthetic proliferates, the value of real human encounters only increases. Five rooms, thirteen months, one relationship that keeps carrying forward — and SeriesFest's programming runs year-round, all the way to Season 13. We'll be back.",
       chapters: [
         {
           no: "01",
@@ -2132,7 +2139,21 @@ export const PAGES = {
           cta: "SeriesFest 2025, in full",
         },
         {
+          // The one chapter with no image: no photo pool exists for this
+          // screening (see the bake script). An unillustrated row is honest;
+          // a 480px card next to four full-res ones would not be.
           no: "02",
+          slate: "Devil in Disguise · between seasons",
+          date: "November 2025",
+          title: "A screening, and the craft underneath it.",
+          body: "SeriesFest presented Devil in Disguise: John Wayne Gacy, then put the creator and showrunner on stage — how structure, tone and perspective shape what an audience understands.",
+          imageSlug: "",
+          alt: "",
+          href: "/venture/seriesfest-2025-devil-in-disguise",
+          cta: "The screening, in full",
+        },
+        {
+          no: "03",
           slate: "Soul Power · a premiere before the storm",
           date: "Feb 18, 2026",
           title: "Not a nostalgia trip.",
@@ -2143,7 +2164,7 @@ export const PAGES = {
           cta: "Soul Power premiere, in full",
         },
         {
-          no: "03",
+          no: "04",
           slate: "Fashion in Focus · costume as character",
           date: "Mar 7, 2026",
           title: "A nervous system, before dialogue.",
@@ -2154,7 +2175,7 @@ export const PAGES = {
           cta: "Fashion in Focus, in full",
         },
         {
-          no: "04",
+          no: "05",
           slate: "Season 12 · the main event",
           date: "May 6–10, 2026",
           title: "The room fills back up.",

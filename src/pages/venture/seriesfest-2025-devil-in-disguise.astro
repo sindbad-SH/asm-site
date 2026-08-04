@@ -1,0 +1,258 @@
+---
+/**
+ * Venture story · SeriesFest — "Devil in Disguise: John Wayne Gacy" screening
+ * and conversation, Denver, November 2025.
+ *
+ * NEW 2026-08-03. This visit sat between Season 11 (Apr–May 2025) and the Soul
+ * Power premiere (Feb 2026) and had no page at all — the SeriesFest hub's arc
+ * jumped straight over it. It's also the one SeriesFest visit with no photo
+ * pool: a full-drive search for anything captured 2025-11-03..05 or filed under
+ * "Gacy" / "Devil in Disguise" found nothing, so the only surviving frames are
+ * the three 480px LinkedIn-harvest images (see
+ * scripts/make-seriesfest-devil-in-disguise.mjs for what was excluded and why).
+ *
+ * OPERATOR DECISION 2026-08-03, given that constraint: build the chapter
+ * TEXT-LED and run ONE soft photo at a deliberately small measure, rather than
+ * skip a real visit or pad it out with a third-party poster. The page is
+ * therefore intentionally the shortest in the SeriesFest set — "small vessels
+ * stay small", the same rule the hub page applies to itself.
+ *
+ * DATE: the slate says "November 2025", not a day. His post is dated
+ * 2025-11-04, and across this archive his posts run about a day behind the
+ * event they cover, so the exact screening date isn't established. Every other
+ * SeriesFest chapter carries an exact date because its photo EXIF supplies one;
+ * this one has no EXIF to check, so it doesn't claim a day.
+ *
+ * HONESTY: the prose is condensed from his own post (E:\_LINKEDIN-ARCHIVE\
+ * seriesfest\2025-11-04-storytelling-documentary). The only status claim is the
+ * SeriesFest LegendMark (tier `attended`) — verbatim from consts, never
+ * upgraded. Attendance ≠ affiliation, and nothing here claims a relationship
+ * with the production, Peacock, UCP or Lifetime; they are named only as they
+ * appear on the screen in frame.
+ */
+import Base from "../../layouts/Base.astro";
+import LegendMark from "../../components/LegendMark.astro";
+import { PAGES } from "../../consts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const STORY = "seriesfest-2025-devil-in-disguise";
+const mediaDir = join(process.cwd(), "public", "media", "venture", STORY);
+
+// Single width by design — the source is 480px native (see the bake script).
+const SLUG = "conversation-stage";
+const hasShot = existsSync(join(mediaDir, `${SLUG}-900.webp`));
+const shot = hasShot
+  ? {
+      alt: "Two people seated in armchairs on a darkened stage, the screen behind them reading “Devil in Disguise: John Wayne Gacy — A Conversation with Creator and Showrunner,” with the UCP, Lifetime, Peacock and SeriesFest marks along the bottom.",
+      avif: `${base}/media/venture/${STORY}/${SLUG}-900.avif`,
+      webp: `${base}/media/venture/${STORY}/${SLUG}-900.webp`,
+    }
+  : undefined;
+
+const seriesRoom = PAGES.entertainment.rooms.items.find(
+  (r) => r.proof.relationshipId === "seriesfest",
+);
+
+/*
+  ⚠ OPERATOR READ-APPROVAL REQUIRED — the caption and the closing forward-link
+  line are new visible copy (staging-only until read). The two body paragraphs
+  are his own published sentences, lightly condensed.
+*/
+const CAPTION = "The conversation after the screening — creator and showrunner, on stage.";
+
+const meta = {
+  title: "Devil in Disguise: John Wayne Gacy at SeriesFest — a venture story",
+  description:
+    "A SeriesFest screening and post-screening conversation in Denver, November 2025 — Devil in Disguise: John Wayne Gacy, with the creator and showrunner on stage.",
+};
+---
+
+<Base title={meta.title} description={meta.description}>
+  <main class="vs" data-lane="venture" style="--ground:#10141f">
+    <section class="vs-head">
+      <a href={`${base}/venture/seriesfest`} class="link vs-back"><span class="arrow" aria-hidden="true">←</span> SeriesFest</a>
+
+      <p class="hud-label vs-slate" data-reveal>SeriesFest · November 2025 · Denver, CO</p>
+
+      <h1 class="vs-headline" data-reveal>
+        <span class="vs-line">DEVIL IN</span>
+        <span class="vs-line vs-line--push">DISGUISE</span>
+      </h1>
+
+      <p class="vs-standfirst" data-reveal>
+        A screening and conversation, between one festival and the next.
+      </p>
+
+      {seriesRoom && (
+        <div class="vs-proof" data-reveal>
+          <LegendMark proof={seriesRoom.proof} />
+        </div>
+      )}
+    </section>
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p>
+          Six months after Season 11 and six months before the next premiere, a
+          screening: <em>Devil in Disguise: John Wayne Gacy</em>, presented by
+          SeriesFest, followed by a conversation with the creative team. A powerful
+          exploration of how storytelling can confront darkness while revealing
+          deeper truths about justice, psychology, and human nature.
+        </p>
+        <p>
+          What the team offered afterwards was the craft underneath it — how
+          structure, tone, and perspective shape what an audience understands. It's
+          the reason we keep coming back to organizations like SeriesFest: they
+          elevate great storytellers, and they make space for the conversations that
+          matter.
+        </p>
+      </div>
+    </section>
+
+    {shot && (
+      <figure class="vs-single" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={shot.avif} />
+          <source type="image/webp" srcset={shot.webp} />
+          <img src={shot.webp} alt={shot.alt} width="480" height="480" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTION}</figcaption>
+      </figure>
+    )}
+
+    <section class="vs-movement" data-reveal>
+      <div class="vs-prose">
+        <p class="vs-close">
+          The festival's programming runs year-round, and the next stop was already
+          on the calendar that night: Season 12, the following May.
+        </p>
+      </div>
+    </section>
+
+    <section class="vs-foot">
+      <a href={`${base}/venture/seriesfest-2026`} class="link">Season 12, in full <span class="arrow" aria-hidden="true">→</span></a>
+      <a href={`${base}/venture/seriesfest`} class="link"><span class="arrow" aria-hidden="true">←</span> All SeriesFest visits</a>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .vs {
+    background: var(--ground);
+    min-height: 100svh;
+    padding: 6rem clamp(1.25rem, 5vw, 6rem) 5rem;
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.25rem);
+    max-width: 90rem;
+    margin-inline: auto;
+  }
+
+  .vs-head {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+  }
+  .vs-back {
+    margin-bottom: 0.4rem;
+  }
+  .vs-slate {
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--color-peak) 72%, transparent);
+  }
+
+  .vs-headline {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.94;
+    letter-spacing: 0.006em;
+    color: #f2f4f8;
+    font-size: clamp(2.6rem, 8vw, 7.4rem);
+    display: grid;
+    gap: 0.03em;
+  }
+  .vs-line {
+    display: block;
+  }
+  .vs-line--push {
+    transform: translateX(5vw);
+  }
+
+  /* the standfirst does the work a hero photo would do on the other chapters */
+  .vs-standfirst {
+    max-width: 34rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 460;
+    font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+    line-height: 1.4;
+    color: var(--color-peak);
+  }
+  .vs-proof {
+    margin-top: 0.4rem;
+    max-width: 42rem;
+  }
+
+  .vs-cap {
+    display: block;
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-muted);
+  }
+
+  .vs-movement {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: center;
+  }
+  .vs-prose {
+    max-width: 44rem;
+    display: grid;
+    gap: 1.1rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--color-ink) 92%, transparent);
+  }
+  .vs-prose em {
+    font-style: italic;
+    color: var(--color-peak);
+  }
+  .vs-close {
+    font-style: italic;
+  }
+
+  /* deliberately small: the source is 480px native, so it is never asked to
+     hold a width it doesn't have (see the page header note) */
+  .vs-single {
+    margin: 0;
+    max-width: 26rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-single img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-foot {
+    justify-self: start;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-hairline);
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 760px) {
+    .vs-line--push {
+      transform: none;
+    }
+  }
+</style>

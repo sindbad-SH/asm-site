@@ -98,7 +98,9 @@ const ARTICLE = {
 //     incorporation to liquidity; entity choice + vesting keeping a team aligned).
 //   · Formation: Building the Foundation — his "Building the Foundation" post
 //     (~May 2026: his own opening line, quoted as his words).
-//   · Building Your Team — NO post exists in the dossier, so no note (honest gap).
+//   · Building Your Team — his ASM-page post of 2026-07-13 (harvested into
+//     E:\_LINKEDIN-ARCHIVE\kolaw on 2026-08-02; the earlier build predates that
+//     harvest and left this row noteless, which is why the gap existed).
 const SESSIONS = [
   {
     date: "Jan 29, 2026",
@@ -115,8 +117,32 @@ const SESSIONS = [
     title: "Formation: Building the Foundation",
     note: "“You don't form a company. You answer questions, and what falls out of them is a company.”",
   },
-  { date: "Jun 25, 2026", title: "Building Your Team" },
+  {
+    date: "Jun 25, 2026",
+    title: "Building Your Team",
+    note: "Employee or contractor isn't the founder's call — classification follows control, and the label at the top of the agreement doesn't beat the facts.",
+  },
 ];
+
+// ── Build #6 (2026-08-03 archive rework) — "What the series teaches".
+// The page carried a session index with no substance behind it; every one of
+// these lessons is condensed from the operator's OWN recap posts of the four
+// sessions (E:\_LINKEDIN-ARCHIVE\kolaw). Deliberately FIRM-FIRST and
+// individual-free so it ships on a normal build, unlike the double-gated
+// teacher chapter below. The closing disclaimer is his own, carried verbatim
+// in spirit from the Jul 2026 post ("Educational only, not legal advice.").
+//
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible copy, staging-only until read.
+const LESSONS = {
+  kicker: "What the series teaches",
+  title: "Four sessions, one long argument.",
+  paragraphs: [
+    "The series opens where most founders hope to finish. Walking a standard M&A waterfall on a fifty-fifty cash-and-stock deal shows how fast a tax bill can drain the liquid cash out of an exit — a founder wealthy on paper and cash-poor on closing day. Working-capital adjustments are the quiet one: a large vendor invoice landing days before a deal closes is a dollar-for-dollar deduction from the purchase price. And on governance, the two-two-one board — two founder seats, two investor seats, one independent — keeps coming back as the steadiest way to stop short-term friction from derailing long-term focus.",
+    "From there the sessions work backwards, through the lifecycle of a company to the moment it's formed. That formation session is Socratic by design: not how to fill out the paperwork, but which questions to answer before the paperwork answers them for you. Skip the entity and you haven't avoided one — you've formed a general partnership, where every co-owner is liable for every other co-owner's mistakes. Hand a passive investor a “President” business card to make them feel important, and the next plaintiff's lawyer reads it as evidence of operational decision-making.",
+    "By the summer session the subject is the team, and the lesson is that you don't get to pick. You can put “independent contractor” at the top of an agreement, get both signatures, and the label can still be worthless: classification follows control — who sets the hours, the location, the standards, who can hire and fire. It sounds like HR housekeeping. It isn't. Misclassification compounds silently while a company is small, then surfaces when an investor opens the records, or when a buyer's accountants find the exposure sitting in the data room and carve it out of the price.",
+  ],
+  disclaimer: "Educational sessions — coverage, not legal advice.",
+};
 
 const CTAS = [
   { label: "See the venture lane", href: `${base}/venture`, external: false },
@@ -224,6 +250,13 @@ const IAN_CHAPTER = {
           ))
         }
       </ul>
+
+      <section class="ko-lessons" aria-label={LESSONS.kicker} data-reveal>
+        <p class="hud-label ko-lessons-kicker">{LESSONS.kicker}</p>
+        <h2 class="ko-lessons-title">{LESSONS.title}</h2>
+        {LESSONS.paragraphs.map((para) => <p class="ko-para">{para}</p>)}
+        <p class="hud-label ko-lessons-note">{LESSONS.disclaimer}</p>
+      </section>
 
       {
         collage.length > 0 && (
@@ -444,6 +477,34 @@ const IAN_CHAPTER = {
     font-size: 0.9rem;
     line-height: 1.5;
     color: color-mix(in srgb, #eef2f5 60%, transparent);
+  }
+
+  /* "What the series teaches" — the substance behind the session index.
+     Same reading measure and .ko-para voice as the intro; only the kicker,
+     the display heading and the closing disclaimer are new. */
+  .ko-lessons {
+    margin-top: 0.6rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    display: grid;
+    gap: 1.1rem;
+  }
+  .ko-lessons-kicker {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+  }
+  .ko-lessons-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-style: italic;
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    line-height: 1.15;
+    color: #f2f4f8;
+    margin: 0;
+  }
+  .ko-lessons-note {
+    letter-spacing: 0.16em;
+    color: color-mix(in srgb, #d9f2ec 52%, transparent);
   }
 
   /* photo collage — native 1:1 tiles (the frames are square as shot), a tidy

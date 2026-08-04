@@ -1,27 +1,51 @@
 ---
 /**
- * Venture story · SeriesFest 2025 — built on the P12.8 pilot pattern.
- * Same grammar as afm-2025.astro: operator's tiered photo library →
- * repeatable sharp export (scripts/make-venture-story.mjs) → this template.
+ * Venture story · SeriesFest 2025 (Season 11) — Denver, Apr 30 – May 4, 2025.
  *
- * HONESTY: the only status claim is the SeriesFest LegendMark (tier `attended`),
- * rendered near the top from consts — verbatim, never upgraded. The prose is the
- * operator's OWN words (see the read-approval block). Attendance ≠ affiliation.
+ * ARCHIVE-REWORK 2026-08-03. Two problems with the previous build, both fixed
+ * here:
  *
- * AUDIT-FIX (2026-08-03, design pass): rebuilt from the flat 6-col "editorial
- * wall" grid onto afm-2025.astro's Movement template — see seriesfest-2026.astro
- * for the fuller account of why (the operator's own consistency complaint).
- * Same rule applied here: every image now carries a caption, and near-duplicate
- * frames are collapsed to one. This folder's source set turned out to hold
- * THREE separate near-duplicate clusters of the same moment (hero/step-and-
- * repeat/podium-speaker all the same Soirée/Polis remarks; podium-lectern/
- * podium-address the same Awards Ceremony moment from two angles; panel-stage/
- * screening-title the same Season 11 wordmark backdrop) — the old grid ran
- * SIX of those as if they were six different beats. This pass keeps ONE frame
- * from the first cluster (hero), pairs the other two clusters as intentional
- * two-angle duos/diptychs (the same treatment afm-2025 uses for its own
- * two-angle panel pair), and leaves step-and-repeat + podium-speaker unused in
- * reserve (no-silent-caps rule).
+ * 1. NEAR-DUPLICATES. It ran ten Tier-1 frames that came from only three
+ *    moments. Its "Awards Ceremony, two angles" diptych was two frames of the
+ *    same titlecard from almost the same spot — they read as one photo printed
+ *    twice. Its two screening captions were also SWAPPED: `screening-card`
+ *    (20250430_201225) is the Season 11 wordmark, and `screening-title`
+ *    (20250430_172103) is the International Spotlight slate; the page labelled
+ *    them the other way round.
+ *
+ * 2. NO STORY. The operator never wrote a 2025 dispatch — his only published
+ *    2025-festival sentence is "I had a blast at the full festival last year"
+ *    (from his Feb 2026 Soul Power post), so the page could only say generic
+ *    things. OPERATOR DECISION 2026-08-03: rebuild it CAPTION-LED. The full
+ *    pool is 369 photos, and Tier 2 holds the actual programme — session after
+ *    session with its own title card projected behind the panel, legible in
+ *    frame. Those thirteen frames are baked by
+ *    scripts/make-seriesfest-2025-programme.mjs and carry the page now.
+ *
+ * HONESTY: every caption fact below is read off the screen in his own
+ * photograph — "AT LIBERTY hosted by W. Kamau Bell · ACLU", "PITCH-A-THON!"
+ * with its Canva / Working Artist Group / RBC sponsor lockup, "GIMME SHELTER
+ * (The Series) · Chantal Woodyard · Peter Trinh", "ZHIZHA created by Desdemona
+ * Chiang", "The Four Seasons · Netflix · Universal Studio Group", "MARCO
+ * CALVANI — Breakthrough Actor Award", "IMPACT IN TELEVISION WITH CARNIVAL
+ * FILMS", "HONORING RHEA SEEHORN with the Excellence in Acting Award",
+ * "LEADING THE NARRATIVE: INSIDE THE WORLD OF SHOWRUNNERS", "CLIPS AND
+ * CONVERSATION WITH ST. DENIS MEDICAL". Nothing is inferred; no session is
+ * described beyond its title and what is visible. The BODY COPY stays at its
+ * previous honest length (attendance + his own published cross-year SeriesFest
+ * voice) rather than inventing a 2025 recap he never wrote. The only status
+ * claim is the SeriesFest LegendMark (tier `attended`) — verbatim from consts,
+ * never upgraded. Attendance ≠ affiliation.
+ *
+ * CROSS-YEAR NOTE worth keeping: The Four Seasons panel and Marco Calvani's
+ * Breakthrough Actor Award are 2025 (Season 11). His own Season 12 opening-
+ * night post (May 2026) covers the show's Season 2 first-look with Calvani on
+ * the panel — "the show returns a year after Season 1 made its mark at
+ * SeriesFest." The two pages now actually connect.
+ *
+ * Bakes retired this pass (no-silent-caps rule): screening-card, panel-stage,
+ * panel-seated, podium-speaker, podium-lectern, step-and-repeat — all
+ * near-duplicates of a kept frame. Left on disk, simply not referenced.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
@@ -45,36 +69,72 @@ async function shot(slug: string, alt: string) {
   };
 }
 
-const hero = await shot("hero", "Governor Jared Polis addressing the room at the SeriesFest Soirée 2025, a ceramic peacock installation beside the stage.");
-const screeningCard = await shot("screening-card", "The International Spotlight screening slate projected on the big screen, two empty chairs staged for the post-screening Q&A.");
-const panelStage = await shot("panel-stage", "A five-person panel seated on stage before the SeriesFest Season 11 backdrop.");
-const screeningTitle = await shot("screening-title", "The SeriesFest Season 11 wordmark on the big screen, hosts introducing the room from the podium.");
-const podiumLectern = await shot("podium-lectern", "The Awards Ceremony titlecard lit up behind a five-person panel on stage.");
-const podiumAddress = await shot("podium-address", "The Awards Ceremony, from closer in — two hosts at the podium, trophies lined up on the table beside them.");
-const panelMics = await shot("panel-mics", "Four people on stage exchanging an award, the SeriesFest.com wordmark projected behind them.");
+// ── Opening day, Apr 30 ────────────────────────────────────────────────────
+const atLiberty = await shot("panel-at-liberty", "Four people seated on the SeriesFest stage below a pink screen reading “At Liberty, hosted by W. Kamau Bell, ACLU.”");
+const spotlightSlate = await shot("screening-title", "The International Spotlight slate on the big screen — a grid of six series stills — with two empty chairs staged for the post-screening conversation.");
+const sunnyNights = await shot("panel-sunny-nights", "Five panelists seated across the SeriesFest stage under a screen reading “Sunny Nights.”");
 
-// The SeriesFest proof line — imported from consts, rendered VERBATIM. This is
-// the only status claim on the page (tier `attended`), and it sits up top.
+// ── May 1 — the programme ──────────────────────────────────────────────────
+const pitchAThon = await shot("pitch-a-thon", "A host at the SeriesFest podium under a screen reading “Pitch-A-Thon!” with the Canva, Working Artist Group and RBC sponsor lockup.");
+const gimmeShelter = await shot("screening-gimme-shelter", "Two people at the podium beside a panel row, the screen behind them showing the Gimme Shelter (The Series) logo with the names Chantal Woodyard and Peter Trinh.");
+const zhizha = await shot("screening-zhizha", "A creator speaking from the stage in front of a still from Zhizha, the screen crediting Desdemona Chiang.");
+const fourSeasons = await shot("panel-four-seasons", "Three panelists seated on the SeriesFest stage under a screen reading “The Four Seasons,” with the Netflix and Universal Studio Group marks.");
+const calvaniCard = await shot("award-marco-calvani", "The SeriesFest screen reading “Marco Calvani — Breakthrough Actor Award,” a panel seated below it.");
+const calvaniHandoff = await shot("panel-mics", "Four people on stage handing over an award, the SeriesFest.com wordmark projected behind them.");
+
+// ── May 2 — panels and the Soirée ──────────────────────────────────────────
+const carnivalFilms = await shot("panel-carnival-films", "A row of panelists on stage beneath a screen reading “Impact in Television with Carnival Films,” with the Deadline and Universal Studio Group marks.");
+const soireeQuartet = await shot("soiree-quartet", "A string quartet in formal gowns performing on the Soirée stage, the sponsor wall projected behind them.");
+const soireeAddress = await shot("hero", "Governor Jared Polis addressing the room at the SeriesFest Soirée, a ceramic peacock installation beside the stage.");
+const seehornAward = await shot("award-rhea-seehorn", "Three people at the Soirée podium under a screen reading “Honoring Rhea Seehorn with the Excellence in Acting Award.”");
+
+// ── May 3–4 — the last days ────────────────────────────────────────────────
+const showrunners = await shot("panel-showrunners", "Six panelists seated on the SeriesFest stage beneath a screen reading “Leading the Narrative: Inside the World of Showrunners.”");
+const stDenis = await shot("panel-st-denis", "A panel on the SeriesFest stage under a screen reading “Clips and Conversation with St. Denis Medical.”");
+const awardsCeremony = await shot("podium-address", "A host at the podium during the Season 11 Awards Ceremony, the ceremony titlecard filling the screen behind the stage.");
+
+// The SeriesFest proof line — imported from consts, rendered VERBATIM.
 const seriesRoom = PAGES.entertainment.rooms.items.find(
   (r) => r.proof.relationshipId === "seriesfest",
 );
 
+/*
+  ⚠ OPERATOR READ-APPROVAL REQUIRED — the four movement kickers and every
+  caption below are new visible copy (staging-only until read). The body
+  paragraphs are UNCHANGED from the previous build (his own published
+  cross-year SeriesFest voice, plus the one supportable 2025 fact: he attended
+  the full festival). No 2025-specific session is described beyond its own
+  on-screen title.
+*/
 const KICKERS = {
-  m1: "Official selection",
-  m2: "The people behind it",
+  m1: "Apr 30 · Opening",
+  m2: "May 1 · The programme",
+  m3: "May 2 · Panels, then the Soirée",
+  m4: "May 3–4 · The last days",
 };
 const PULL = "You simply couldn't pull off this kind of intimate, high-access event in New York or LA.";
 const CAPTIONS = {
-  screeningCard: "The International Spotlight slate — six shows, six countries.",
-  panelStageDuo: "The room, twice over — the introduction, then the panel.",
-  awardsDiptych: "The Awards Ceremony, two angles — the titlecard, then the trophies.",
-  panelMics: "Handing off — the reason this festival still feels personal.",
+  hero: "Opening day, April 30 — At Liberty, hosted by W. Kamau Bell with the ACLU.",
+  spotlightSlate: "The International Spotlight slate — six series, one screening block.",
+  sunnyNights: "Sunny Nights, later the same evening.",
+  pitchAThon: "The Pitch-A-Thon, a year before we watched the Roadshow Showcase of the same programme.",
+  gimmeShelter: "Gimme Shelter (The Series) — Chantal Woodyard and Peter Trinh introduced from the podium.",
+  zhizha: "Zhizha, created by Desdemona Chiang.",
+  fourSeasons: "The Four Seasons — Netflix and Universal Studio Group — a year before its Season 2 first-look opened Season 12.",
+  calvaniDiptych: "The Breakthrough Actor Award to Marco Calvani: the titlecard, then the handoff.",
+  carnivalFilms: "Impact in Television with Carnival Films, presented with Deadline.",
+  soireeQuartet: "The Soirée opens with a string quartet, the sponsor wall behind them.",
+  soireeAddress: "Governor Jared Polis at the Soirée.",
+  seehornAward: "The Excellence in Acting Award to Rhea Seehorn.",
+  showrunners: "Leading the Narrative: Inside the World of Showrunners.",
+  stDenis: "Clips and Conversation with St. Denis Medical.",
+  awardsCeremony: "The Season 11 Awards Ceremony, the last night.",
 };
 
 const meta = {
   title: "SeriesFest 2025 — a venture story",
   description:
-    "SeriesFest 2025 in Denver, Colorado — official-selection screenings, on-stage Q&As and panels, and the Awards Ceremony, from a weekend of relationship-building attendance.",
+    "SeriesFest Season 11 in Denver, Colorado, April 30 – May 4, 2025 — official-selection screenings, the Pitch-A-Thon, panels from Carnival Films to the showrunners room, the Soirée and the Awards Ceremony, from a week of relationship-building attendance.",
 };
 ---
 
@@ -97,30 +157,18 @@ const meta = {
       )}
     </section>
 
-    {hero && (
+    {atLiberty && (
       <figure class="vs-hero" data-reveal>
         <picture>
-          <source type="image/avif" srcset={hero.avif} sizes="(max-width: 900px) 100vw, 78rem" />
-          <source type="image/webp" srcset={hero.webp} sizes="(max-width: 900px) 100vw, 78rem" />
-          <img src={hero.fallback} alt={hero.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 42%" loading="eager" decoding="async" />
+          <source type="image/avif" srcset={atLiberty.avif} sizes="(max-width: 900px) 100vw, 78rem" />
+          <source type="image/webp" srcset={atLiberty.webp} sizes="(max-width: 900px) 100vw, 78rem" />
+          <img src={atLiberty.fallback} alt={atLiberty.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 42%" loading="eager" decoding="async" />
         </picture>
+        <figcaption class="vs-cap">{CAPTIONS.hero}</figcaption>
       </figure>
     )}
 
-    <!--
-      ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (source: his LinkedIn posts —
-      the fact he attended the full 2025 festival is from his SeriesFest "Soul
-      Power" promo, Feb 2026, "I had a blast at the full festival last year"; the
-      cross-year SeriesFest voice is from his Opening Night post ["share the same
-      air"] and Soul Power recap ["couldn't pull this off in New York or LA … the
-      unique energy they bring to Denver is one-of-a-kind"]), staging-only until
-      read. HONESTY/FLAG: the dossier holds no detailed 2025-festival dispatch —
-      all his day-by-day posts are Season 12 (2026) — so this draws only on his
-      published cross-year SeriesFest voice + the single supportable 2025 fact
-      (he attended the full festival). No 2025-specific sessions are invented.
-      Named people are only those he publicly named/thanked.
-    -->
-    <!-- MOVEMENT 1 · OFFICIAL SELECTION -->
+    <!-- ══ APR 30 · OPENING ══════════════════════════════════════════════ -->
     <section class="vs-movement" data-reveal>
       <p class="hud-label vs-kicker">{KICKERS.m1}</p>
       <div class="vs-prose">
@@ -133,21 +181,18 @@ const meta = {
       </div>
     </section>
 
-    {screeningCard && (
-      <figure class="vs-fullbeat" data-reveal>
-        <picture>
-          <source type="image/avif" srcset={screeningCard.avif} sizes="(max-width: 900px) 100vw, 60rem" />
-          <source type="image/webp" srcset={screeningCard.webp} sizes="(max-width: 900px) 100vw, 60rem" />
-          <img src={screeningCard.fallback} alt={screeningCard.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 45%" loading="lazy" decoding="async" />
-        </picture>
-        <figcaption class="vs-cap">{CAPTIONS.screeningCard}</figcaption>
-      </figure>
-    )}
-
-    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
-
-    <section class="vs-movement" data-reveal>
-      <div class="vs-prose">
+    <div class="vs-duo" data-reveal>
+      {spotlightSlate && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={spotlightSlate.avif} sizes="(max-width: 760px) 100vw, 30rem" />
+            <source type="image/webp" srcset={spotlightSlate.webp} sizes="(max-width: 760px) 100vw, 30rem" />
+            <img src={spotlightSlate.fallback} alt={spotlightSlate.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 45%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.spotlightSlate}</figcaption>
+        </figure>
+      )}
+      <div class="vs-prose vs-prose--inrow">
         <p>
           There's a saying about SeriesFest: you simply couldn't pull off this kind
           of intimate, high-access event in New York or LA. The energy the team
@@ -155,88 +200,220 @@ const meta = {
           coming back.
         </p>
       </div>
+    </div>
+
+    {sunnyNights && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={sunnyNights.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={sunnyNights.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={sunnyNights.fallback} alt={sunnyNights.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.sunnyNights}</figcaption>
+      </figure>
+    )}
+
+    <blockquote class="vs-pull" data-reveal>{PULL}</blockquote>
+
+    <!-- ══ MAY 1 · THE PROGRAMME ═════════════════════════════════════════ -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m2}</p>
+      <div class="vs-prose">
+        <p>
+          A full festival day here is a title card, a panel, and a room that turns
+          over and does it again — pitches in the morning, official selections
+          through the afternoon, an award before the evening block.
+        </p>
+      </div>
     </section>
 
-    {(screeningTitle || panelStage) && (
-      <div class="vs-duo" data-reveal>
-        {screeningTitle && (
-          <figure class="vs-duo-fig vs-duo-fig--small">
+    {(pitchAThon || gimmeShelter) && (
+      <div class="vs-pair" data-reveal>
+        {gimmeShelter && (
+          <figure class="vs-pair-a">
             <picture>
-              <source type="image/avif" srcset={screeningTitle.avif} sizes="(max-width: 760px) 100vw, 26rem" />
-              <source type="image/webp" srcset={screeningTitle.webp} sizes="(max-width: 760px) 100vw, 26rem" />
-              <img src={screeningTitle.fallback} alt={screeningTitle.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
+              <source type="image/avif" srcset={gimmeShelter.avif} sizes="(max-width: 760px) 100vw, 44rem" />
+              <source type="image/webp" srcset={gimmeShelter.webp} sizes="(max-width: 760px) 100vw, 44rem" />
+              <img src={gimmeShelter.fallback} alt={gimmeShelter.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 48%" loading="lazy" decoding="async" />
             </picture>
+            <figcaption class="vs-cap">{CAPTIONS.gimmeShelter}</figcaption>
           </figure>
         )}
-        {panelStage && (
-          <figure class="vs-duo-fig">
+        {pitchAThon && (
+          <figure class="vs-pair-b">
             <picture>
-              <source type="image/avif" srcset={panelStage.avif} sizes="(max-width: 760px) 100vw, 34rem" />
-              <source type="image/webp" srcset={panelStage.webp} sizes="(max-width: 760px) 100vw, 34rem" />
-              <img src={panelStage.fallback} alt={panelStage.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 68%" loading="lazy" decoding="async" />
+              <source type="image/avif" srcset={pitchAThon.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={pitchAThon.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={pitchAThon.fallback} alt={pitchAThon.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:50% 55%" loading="lazy" decoding="async" />
             </picture>
+            <figcaption class="vs-cap">{CAPTIONS.pitchAThon}</figcaption>
           </figure>
         )}
-        <figcaption class="vs-cap vs-duo-cap">{CAPTIONS.panelStageDuo}</figcaption>
       </div>
     )}
 
-    <!-- MOVEMENT 2 · THE PEOPLE BEHIND IT -->
+    {zhizha && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={zhizha.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={zhizha.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={zhizha.fallback} alt={zhizha.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 52%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.zhizha}</figcaption>
+      </figure>
+    )}
+
+    {fourSeasons && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={fourSeasons.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={fourSeasons.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={fourSeasons.fallback} alt={fourSeasons.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.fourSeasons}</figcaption>
+      </figure>
+    )}
+
+    {(calvaniCard || calvaniHandoff) && (
+      <figure class="vs-diptych vs-diptych--wide" data-reveal>
+        <div class="vs-diptych-row">
+          {calvaniCard && (
+            <picture>
+              <source type="image/avif" srcset={calvaniCard.avif} sizes="(max-width: 760px) 50vw, 30rem" />
+              <source type="image/webp" srcset={calvaniCard.webp} sizes="(max-width: 760px) 50vw, 30rem" />
+              <img src={calvaniCard.fallback} alt={calvaniCard.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 62%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+          {calvaniHandoff && (
+            <picture>
+              <source type="image/avif" srcset={calvaniHandoff.avif} sizes="(max-width: 760px) 50vw, 30rem" />
+              <source type="image/webp" srcset={calvaniHandoff.webp} sizes="(max-width: 760px) 50vw, 30rem" />
+              <img src={calvaniHandoff.fallback} alt={calvaniHandoff.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 58%" loading="lazy" decoding="async" />
+            </picture>
+          )}
+        </div>
+        <figcaption class="vs-cap">{CAPTIONS.calvaniDiptych}</figcaption>
+      </figure>
+    )}
+
+    <!-- ══ MAY 2 · PANELS, THEN THE SOIRÉE ═══════════════════════════════ -->
     <section class="vs-movement" data-reveal>
-      <p class="hud-label vs-kicker">{KICKERS.m2}</p>
+      <p class="hud-label vs-kicker">{KICKERS.m3}</p>
       <div class="vs-prose">
         <p>
           Co-founders Randi Kleiner and Kaily Smith, with Claire Taylor Smith and
           Patrick O'Brien, keep championing the independent creative community here
           — the reason a festival of this caliber still manages to feel this
-          personal.
+          personal. Nowhere more than at the Soirée, the festival's signature
+          evening.
         </p>
       </div>
     </section>
 
-    {(podiumLectern || podiumAddress) && (
-      <figure class="vs-diptych" data-reveal>
-        <div class="vs-diptych-row">
-          {podiumLectern && (
-            <picture>
-              <source type="image/avif" srcset={podiumLectern.avif} sizes="(max-width: 760px) 100vw, 26rem" />
-              <source type="image/webp" srcset={podiumLectern.webp} sizes="(max-width: 760px) 100vw, 26rem" />
-              <img src={podiumLectern.fallback} alt={podiumLectern.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 78%" loading="lazy" decoding="async" />
-            </picture>
-          )}
-          {podiumAddress && (
-            <picture>
-              <source type="image/avif" srcset={podiumAddress.avif} sizes="(max-width: 760px) 100vw, 26rem" />
-              <source type="image/webp" srcset={podiumAddress.webp} sizes="(max-width: 760px) 100vw, 26rem" />
-              <img src={podiumAddress.fallback} alt={podiumAddress.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 82%" loading="lazy" decoding="async" />
-            </picture>
-          )}
-        </div>
-        <figcaption class="vs-cap">{CAPTIONS.awardsDiptych}</figcaption>
+    {carnivalFilms && (
+      <figure class="vs-fullbeat" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={carnivalFilms.avif} sizes="(max-width: 900px) 100vw, 60rem" />
+          <source type="image/webp" srcset={carnivalFilms.webp} sizes="(max-width: 900px) 100vw, 60rem" />
+          <img src={carnivalFilms.fallback} alt={carnivalFilms.alt} style="aspect-ratio:3/2;object-fit:cover;object-position:50% 50%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.carnivalFilms}</figcaption>
       </figure>
+    )}
+
+    <div class="vs-duo vs-duo--flip" data-reveal>
+      {soireeQuartet && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={soireeQuartet.avif} sizes="(max-width: 760px) 100vw, 34rem" />
+            <source type="image/webp" srcset={soireeQuartet.webp} sizes="(max-width: 760px) 100vw, 34rem" />
+            <img src={soireeQuartet.fallback} alt={soireeQuartet.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 50%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.soireeQuartet}</figcaption>
+        </figure>
+      )}
+      {soireeAddress && (
+        <figure class="vs-duo-fig">
+          <picture>
+            <source type="image/avif" srcset={soireeAddress.avif} sizes="(max-width: 760px) 100vw, 34rem" />
+            <source type="image/webp" srcset={soireeAddress.webp} sizes="(max-width: 760px) 100vw, 34rem" />
+            <img src={soireeAddress.fallback} alt={soireeAddress.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 45%" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="vs-cap">{CAPTIONS.soireeAddress}</figcaption>
+        </figure>
+      )}
+    </div>
+
+    {seehornAward && (
+      <figure class="vs-closer" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={seehornAward.avif} sizes="(max-width: 760px) 100vw, 40rem" />
+          <source type="image/webp" srcset={seehornAward.webp} sizes="(max-width: 760px) 100vw, 40rem" />
+          <img src={seehornAward.fallback} alt={seehornAward.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:50% 48%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.seehornAward}</figcaption>
+      </figure>
+    )}
+
+    <!-- ══ MAY 3–4 · THE LAST DAYS ═══════════════════════════════════════ -->
+    <section class="vs-movement" data-reveal>
+      <p class="hud-label vs-kicker">{KICKERS.m4}</p>
+      <div class="vs-prose">
+        <p>
+          The last two days ran the same way to the end — a showrunners room, a
+          clips-and-conversation block, and then the Season 11 Awards Ceremony to
+          close it out.
+        </p>
+      </div>
+    </section>
+
+    {showrunners && (
+      <figure class="vs-widest" data-reveal>
+        <picture>
+          <source type="image/avif" srcset={showrunners.avif} sizes="(max-width: 900px) 100vw, 86rem" />
+          <source type="image/webp" srcset={showrunners.webp} sizes="(max-width: 900px) 100vw, 86rem" />
+          <img src={showrunners.fallback} alt={showrunners.alt} style="aspect-ratio:2/1;object-fit:cover;object-position:50% 58%" loading="lazy" decoding="async" />
+        </picture>
+        <figcaption class="vs-cap">{CAPTIONS.showrunners}</figcaption>
+      </figure>
+    )}
+
+    {(stDenis || awardsCeremony) && (
+      <div class="vs-pair vs-pair--flip" data-reveal>
+        {stDenis && (
+          <figure class="vs-pair-b">
+            <picture>
+              <source type="image/avif" srcset={stDenis.avif} sizes="(max-width: 760px) 100vw, 26rem" />
+              <source type="image/webp" srcset={stDenis.webp} sizes="(max-width: 760px) 100vw, 26rem" />
+              <img src={stDenis.fallback} alt={stDenis.alt} style="aspect-ratio:4/5;object-fit:cover;object-position:50% 50%" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.stDenis}</figcaption>
+          </figure>
+        )}
+        {awardsCeremony && (
+          <figure class="vs-pair-a">
+            <picture>
+              <source type="image/avif" srcset={awardsCeremony.avif} sizes="(max-width: 760px) 100vw, 44rem" />
+              <source type="image/webp" srcset={awardsCeremony.webp} sizes="(max-width: 760px) 100vw, 44rem" />
+              <img src={awardsCeremony.fallback} alt={awardsCeremony.alt} style="aspect-ratio:4/3;object-fit:cover;object-position:35% 58%" loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="vs-cap">{CAPTIONS.awardsCeremony}</figcaption>
+          </figure>
+        )}
+      </div>
     )}
 
     <section class="vs-movement" data-reveal>
       <div class="vs-prose">
         <p class="vs-close">
           Official-selection screenings and creator Q&amp;As and panels. SeriesFest,
-          Denver, Colorado, late April – early May 2025.
+          Denver, Colorado, April 30 – May 4, 2025.
         </p>
       </div>
     </section>
 
-    {panelMics && (
-      <figure class="vs-closer" data-reveal>
-        <picture>
-          <source type="image/avif" srcset={panelMics.avif} sizes="(max-width: 760px) 100vw, 40rem" />
-          <source type="image/webp" srcset={panelMics.webp} sizes="(max-width: 760px) 100vw, 40rem" />
-          <img src={panelMics.fallback} alt={panelMics.alt} style="aspect-ratio:1/1;object-fit:cover;object-position:50% 40%" loading="lazy" decoding="async" />
-        </picture>
-        <figcaption class="vs-cap">{CAPTIONS.panelMics}</figcaption>
-      </figure>
-    )}
-
     <section class="vs-foot">
+      <a href={`${base}/venture/seriesfest`} class="link">All five SeriesFest visits <span class="arrow" aria-hidden="true">→</span></a>
       <a href={`${base}/venture`} class="link"><span class="arrow" aria-hidden="true">←</span> Venture</a>
     </section>
   </main>
@@ -273,7 +450,7 @@ const meta = {
     line-height: 0.94;
     letter-spacing: 0.006em;
     color: #f2f4f8;
-    font-size: clamp(2.8rem, 9vw, 8.5rem);
+    font-size: clamp(2.4rem, 7.6vw, 7.4rem);
     display: grid;
     gap: 0.03em;
   }
@@ -313,6 +490,9 @@ const meta = {
     width: 100%;
     height: auto;
   }
+  .vs-hero .vs-cap {
+    padding: 0.55rem 0.35rem 0.15rem;
+  }
 
   .vs-cap {
     display: block;
@@ -341,6 +521,9 @@ const meta = {
     line-height: 1.6;
     color: color-mix(in srgb, var(--color-ink) 92%, transparent);
   }
+  .vs-prose--inrow {
+    max-width: none;
+  }
   .vs-close {
     font-style: italic;
   }
@@ -352,6 +535,39 @@ const meta = {
     justify-self: center;
   }
   .vs-fullbeat img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-widest {
+    margin: 0;
+    width: 100%;
+  }
+  .vs-widest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-pair {
+    display: grid;
+    grid-template-columns: 58fr 34fr;
+    gap: clamp(0.9rem, 2vw, 1.6rem);
+    align-items: start;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-pair--flip {
+    grid-template-columns: 34fr 58fr;
+  }
+  .vs-pair figure {
+    margin: 0;
+  }
+  .vs-pair img {
     display: block;
     width: 100%;
     height: auto;
@@ -371,41 +587,14 @@ const meta = {
     color: var(--color-peak);
   }
 
-  /* two-angle duo of the SAME moment — equal columns, ONE shared caption
-     spanning both (unlike the site's usual duo, which pairs image + prose) */
-  .vs-duo {
-    display: grid;
-    grid-template-columns: 34fr 58fr;
-    grid-template-areas: "small big" "cap cap";
-    gap: clamp(0.9rem, 2vw, 1.6rem) clamp(0.9rem, 2vw, 1.6rem);
-    align-items: start;
-    max-width: 74rem;
-    width: 100%;
-    justify-self: center;
-  }
-  .vs-duo-fig {
-    margin: 0;
-    grid-area: big;
-  }
-  .vs-duo-fig--small {
-    grid-area: small;
-  }
-  .vs-duo-fig img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 6px;
-  }
-  .vs-duo-cap {
-    grid-area: cap;
-    margin-top: 0;
-  }
-
-  /* two-angle diptych of the SAME moment — equal columns, shared caption */
   .vs-diptych {
     margin: 0;
     max-width: 54rem;
     width: 100%;
+    justify-self: center;
+  }
+  .vs-diptych--wide {
+    max-width: 66rem;
   }
   .vs-diptych-row {
     display: grid;
@@ -413,6 +602,29 @@ const meta = {
     gap: 0.8rem;
   }
   .vs-diptych img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .vs-duo {
+    display: grid;
+    grid-template-columns: 30rem 1fr;
+    gap: clamp(1.2rem, 3vw, 2.6rem);
+    align-items: center;
+    max-width: 74rem;
+    width: 100%;
+    justify-self: center;
+  }
+  .vs-duo--flip {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .vs-duo-fig {
+    margin: 0;
+  }
+  .vs-duo-fig img {
     display: block;
     width: 100%;
     height: auto;
@@ -437,15 +649,26 @@ const meta = {
     padding-top: 1rem;
     border-top: 1px solid var(--color-hairline);
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
   }
 
   @media (max-width: 760px) {
     .vs-line--push {
       transform: none;
     }
-    .vs-duo {
+    .vs-pair,
+    .vs-pair--flip,
+    .vs-duo,
+    .vs-duo--flip {
       grid-template-columns: 1fr;
-      grid-template-areas: "small" "big" "cap";
+    }
+    .vs-diptych-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .vs-pair--flip .vs-pair-b {
+      order: 2;
     }
   }
 </style>
