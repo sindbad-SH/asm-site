@@ -912,150 +912,99 @@ export const WORK_ARCHIVE: readonly ArchiveItem[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// VENTURE_COLLECTIONS — RESTRUCTURED 2026-08-03 (operator decisions, /venture
-// lower-section restructure). PUB-E (2026-07-27) originally shipped TWO named
-// collections below /venture's three features (Pebble Beach / PitchBoulder /
-// MEME), deliberately allowing a collection to also carry a story that's
-// featured elsewhere on the page (PitchBoulder led Collection A even though
-// it was also a feature chapter).
+// VENTURE_STORY_RAIL — FLATTENED 2026-08-04 (operator decision).
 //
-// The operator reversed that allowance this pass: a feature must not repeat
-// in the collections below it. Removing PitchBoulder from "Founders & Pitch
-// Rooms" and MEME from "The Film Industry" left the former with ONE story
-// (KO Law) — below the operator's own rule that a named collection needs
-// >= 2 stories (see the `stories` field comment on VentureCollection below),
-// so that collection is DISSOLVED rather than shipped as a one-story
-// "collection." "The Film Industry" keeps its 2 remaining stories (SeriesFest
-// + AFM) and is the only named collection this pass.
+// This used to be TWO exports driving TWO full-height sections on /venture: a
+// named collection ("The Film Industry": SeriesFest + AFM) and an ungrouped
+// standalone rail (KO Law + the Pebble Beach Concours piece). With only four
+// stories total, that split shipped two half-empty rails — two cards each in a
+// rail sized for four — separated by a screen of dead space, which is exactly
+// what the operator flagged: "I've only got 4 of those stories, I don't know if
+// it makes sense to overly separate them … maybe there's some better way to
+// have that differentiator there."
 //
-// KO Law is not padded into a fake collection, and no feature was
-// reintroduced to fill the empty slot — both explicitly ruled out. It renders
-// instead as a STANDALONE story card (VENTURE_STANDALONE_STORIES below),
-// alongside the reframed Pebble Beach Concours piece (formerly the narrower
-// "Dawn Patrol" — see the REFRAME note on PAGES.ventureStories.dawnPatrol).
-// Both ride venture.astro's ungrouped rail: same card grammar as a collection
-// below, just without the "Collection · NAME" kicker — that absence is the
-// visual tell that a story is standalone rather than grouped.
+// The differentiator survives at a much lower cost: one rail, four cards, each
+// carrying a small category CHIP. A chip is a one-line tell instead of a
+// section header, an intro sentence and 100svh of scroll — and it scales
+// (a fifth story just joins the rail with its own chip; no collection has to be
+// invented, dissolved or padded to hold it). The operator's old ">= 2 stories
+// or it isn't a collection" rule is therefore moot here — nothing is named a
+// collection any more.
 //
-// `slate` + `title` strings below are copied VERBATIM from each story's own
-// destination page (already flagged there — reuse adds no new copy); only
-// the collection `name` and `intro` are new sentences on this page.
+// `slate` + `title` are still copied VERBATIM from each story's own destination
+// page (reuse adds no new copy). The `tag` strings are the only new words.
+// ⚠ OPERATOR READ-APPROVAL REQUIRED — the four `tag` chips, staging-only until
+// read, logged in SITE-COPY-DECK-publication-v1.md.
 //
-// NAME IS A PLACEHOLDER — operator to confirm or rename: "The Film Industry"
-// is the operator's own working name from the original directive; he offered
-// "The Screen Trade" as an alternate to consider.
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — the collection's intro line was edited
-// this pass (see below); staging-only until read, logged in
-// SITE-COPY-DECK-publication-v1.md.
-//
-// Amazing Aerial and the Makeshift Film Group slot are GONE from /venture
-// entirely this pass (operator decisions) — see the comments above
-// venture.astro's standalone-stories rail for the full account. Neither ever
-// had a VENTURE_COLLECTIONS entry, so nothing here changes for them beyond
-// this note.
+// CARD FACES: each card now names its own `imageSlug` rather than defaulting to
+// the story page's `hero-900`. The heroes are wide venue frames chosen to hold
+// a 78rem page hero — at a 336px card they read as ceiling trusses and
+// chandeliers, which is the second half of the operator's note ("better, more
+// focused and centred photos"). Each face below is picked to survive the small
+// box: one clear subject, legible branding, no back-of-heads foreground.
 // ---------------------------------------------------------------------------
 
-export type CollectionStory = {
+export type VentureStoryCard = {
   href: string;
   slate: string;
   title: string;
+  /** Small category chip — the low-cost replacement for collection sections. */
+  tag: string;
+  /** Overrides the /venture/<slug> derivation for the card's media directory. */
   mediaSlug?: string;
-  /** CSS object-position for the rail card's hero-900 face, to keep the real
-   *  subject in the crop (the card box is 16:10) — same convention as
-   *  WorkItem.objectPosition above. */
+  /** Explicit card face, relative to public/media/venture/ and without the
+   *  extension (e.g. "afm-2025/panel-finance-packaging-900"). Defaults to
+   *  "<slug>/hero-900" when omitted. */
+  imageSlug?: string;
+  /** CSS object-position for the card face — the card box is 16:10. */
   objectPosition?: string;
 };
 
-export type VentureCollection = {
-  id: string;
-  /** ⚠ Placeholder — operator to confirm or rename. */
-  name: string;
-  /** ⚠ New sentence — operator read-approval required. */
-  intro: string;
-  /** The operator's own rule: a named collection needs >= 2 stories, or it
-   *  isn't a "collection" — never pad it with a filler story, and never
-   *  reintroduce a feature that's already promoted elsewhere on the page to
-   *  fill a slot. A story with no second story to pair with belongs in
-   *  VENTURE_STANDALONE_STORIES instead. */
-  stories: readonly CollectionStory[];
-};
-
-export const VENTURE_COLLECTIONS: readonly VentureCollection[] = [
+export const VENTURE_STORY_RAIL: readonly VentureStoryCard[] = [
   {
-    id: "film-industry",
-    name: "The Film Industry",
-    // EDITED 2026-08-03 — MEME left this collection (it already leads the
-    // page as a feature chapter), so "the organization" no longer belongs in
-    // this list of what the collection covers.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — edited sentence, staging-only.
-    intro:
-      "The industry side of the venture lane — the festival and the market we keep a pulse on.",
-    stories: [
-      {
-        // Build #2 (2026-08-01 archive-mining integration) — repointed from
-        // /work/seriesfest to the new hub page per _INTEGRATION-PLAN.md §1.2
-        // "Links in". AUDIT-FIX (2026-08-02): /work/seriesfest is now
-        // formally retired (redirects to /venture/seriesfest — see
-        // astro.config.mjs); this card already pointed at the right place.
-        href: "/venture/seriesfest",
-        slate: "SeriesFest · Denver, Colorado",
-        title: "SeriesFest, in depth.",
-        mediaSlug: "seriesfest-2026",
-        // AUDIT-FIX (2026-08-03): default center-crop of the native-square
-        // hero showed mostly exposed ceiling truss above the branded SOIRÉE
-        // screens (operator: "the images there are not good and centered").
-        // Pushed down to frame both screens + the speaker instead.
-        objectPosition: "50% 68%",
-      },
-      {
-        href: "/venture/afm-2025",
-        slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
-        title: "American Film Market 2025 — a venture story",
-        // AUDIT-FIX (2026-08-03): same operator complaint as SeriesFest above.
-        // Direction matches the object-position already tuned for this exact
-        // photo on its own page (venture/afm-2025.astro's hero — see that
-        // file's CROP NOTE: "subjects in the lower band, ~55-68% down"); this
-        // card's box is a different ratio (16:10 vs that page's 16:9) so it
-        // gets its own tuned value.
-        objectPosition: "50% 60%",
-      },
-    ],
+    href: "/venture/seriesfest",
+    slate: "SeriesFest · Denver, Colorado",
+    title: "SeriesFest, in depth.",
+    tag: "Film industry",
+    mediaSlug: "seriesfest",
+    // Was seriesfest-2026/hero (Soirée screens under an exposed ceiling truss —
+    // unreadable at card size even after two object-position passes). The
+    // Fashion in Focus runway frame has one clear subject and a packed house.
+    imageSlug: "seriesfest/fashion-runway-crowd-900",
+    objectPosition: "50% 62%",
   },
-] as const;
-
-// ---------------------------------------------------------------------------
-// VENTURE_STANDALONE_STORIES — 2026-08-03 (operator decisions). Real venture
-// stories that don't currently have a second story to be named a
-// "collection" with (the operator's own >= 2-per-collection rule — see the
-// VentureCollection.stories comment above). Same CollectionStory shape and
-// the same "slate + title copied VERBATIM from the story's own page"
-// convention as VENTURE_COLLECTIONS; rendered on venture.astro's ungrouped
-// standalone-stories rail (no "Collection · NAME" kicker).
-//
-//  • KO Law — relocated from the now-dissolved "Founders & Pitch Rooms"
-//    collection (PitchBoulder's departure left it with only KO Law). Copy
-//    unchanged from that entry.
-//  • The Pebble Beach Concours piece — the reframed /venture/dawn-patrol (see
-//    the REFRAME note on PAGES.ventureStories.dawnPatrol below). It doesn't
-//    get a "High Craft / Luxury Events"-style collection of its own either,
-//    for the identical one-story reason.
-// ---------------------------------------------------------------------------
-export const VENTURE_STANDALONE_STORIES: readonly CollectionStory[] = [
+  {
+    href: "/venture/afm-2025",
+    slate: "American Film Market · Nov 8–15, 2025 · Los Angeles, CA",
+    title: "American Film Market 2025 — a venture story",
+    tag: "Film industry",
+    // Was afm-2025/hero, whose top band is marquee chandeliers. This is the
+    // frame that now opens the AFM page itself: five panelists and the red AFM
+    // Sessions mark, both legible small.
+    imageSlug: "afm-2025/panel-finance-packaging-900",
+    objectPosition: "50% 62%",
+  },
   {
     href: "/venture/ko-law-workshops",
     slate: "KO LAW · STARTUP WORKSHOP SERIES · 2026",
     title: "A startup workshop series, on camera.",
-    // AUDIT-FIX (2026-08-03): default center-crop of the native-square
-    // hero left too much exposed ceiling/lighting truss above the
-    // branded screen (operator: "needs to be recentered ... too much
-    // ceiling"). Pushed down to frame the screen + presenters + crowd.
-    objectPosition: "50% 60%",
+    tag: "Founders & law",
+    // Was ko-law-workshops/hero, an audience-from-behind frame. stage-team puts
+    // the two presenters and the KO LAW mark front and centre.
+    imageSlug: "ko-law-workshops/stage-team-900",
+    objectPosition: "50% 45%",
   },
   {
     href: "/venture/dawn-patrol",
     // Copied VERBATIM from PAGES.ventureStories.dawnPatrol.slate / .cover.title.
     slate: "Pebble Beach Concours d'Elegance · August 2025",
     title: "Pebble Beach Concours d'Elegance",
+    tag: "Motoring & craft",
+    // Was dawn-patrol/hero, a wide crowd where no single car reads. The No. 8
+    // Ferrari 250 LM is one unmistakable subject — and deliberately NOT the
+    // Shelby, which already carries chapter 01 above.
+    imageSlug: "dawn-patrol/ferrari-250-lm-no8-three-quarter-900",
+    objectPosition: "50% 50%",
   },
 ] as const;
 

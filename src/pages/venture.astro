@@ -42,7 +42,7 @@ import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
 import YouTubeEmbed from "../components/YouTubeEmbed.astro";
-import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_COLLECTIONS, VENTURE_STANDALONE_STORIES } from "../consts";
+import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_STORY_RAIL } from "../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -90,12 +90,12 @@ const pbEmbedPoster = pair("work/pitchboulder/wednesday-room/room-about-1600");
 // as it was: this top-of-page chapter is still the SPECIFIC Shelby Cobra /
 // Jack Bell story, untouched by the 2026-08-03 restructure below. Per the
 // operator's own rule, a named collection needs at least two stories, so
-// this feature still does NOT get a VENTURE_COLLECTIONS entry of its own —
+// this feature still does NOT get a VENTURE_STORY_RAIL entry of its own —
 // no "High Craft / Luxury Events" collection exists (still just one story in
 // that space). What DID change 2026-08-03: the OVERALL Concours d'Elegance
 // story (the reframed /venture/dawn-patrol — Dawn Patrol is now one movement
 // inside it, not the page's own title) rides the standalone-stories rail
-// further down this page (see VENTURE_STANDALONE_STORIES in consts.ts) —
+// further down this page (see VENTURE_STORY_RAIL in consts.ts) —
 // same one-story reason, just resolved as a standalone card instead.
 const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 const shHref = shelby?.href ?? "/work/shelby-pebble-beach";
@@ -144,10 +144,21 @@ const pbTalk = bust("work/pitchboulder/coworking-presenter-1600", pair("work/pit
 // FEATURE (chapter 03), reusing meme.astro's already-verified copy/quotes
 // (PAGES.entertainment.meme.body, the LOCKED "meme" LegendMark proof, and
 // the SAME operator-produced logo-loop asset that page plays) — no new claim
-// about MEME is made here; this is a structural placement only. There is no
-// event photography for MEME yet, so unlike the collage chapters this one
-// centers its own animated mark instead of a photo collage — the same
-// treatment /venture/meme itself uses (see that file's `.meme-loop-wrap`).
+// about MEME is made here; this is a structural placement only.
+//
+// 2026-08-04 — the note that used to sit here ("there is no event photography
+// for MEME yet") is now OUT OF DATE, and it was the reason this chapter shipped
+// as a lone centred logo beside two fully-collaged chapters — the operator's
+// "section 03 looks pretty barren" note. Real MEME frames landed in the
+// 2026-08-03 archive pass (scripts/make-carpenter-room.mjs,
+// make-meme-archive-adds.mjs, make-meme-evergreen.mjs), so chapter 03 now rings
+// its animated mark the same way 01 and 02 ring theirs. Every frame below is
+// already published on /venture/meme itself — same assets, same verified
+// context, no new claim:
+//   carpenter-room ... Eric Abramson's "The Carpenter, Not the Tools" session
+//   nocova-meetup .... a NOCOVA meetup, MEME's social arm
+//   world-retreat .... members at a MEME retreat
+// (world-catalina was considered and cut — see the collage geometry note.)
 const memeLoopDir = join(process.cwd(), "public", "media", "venture", "meme");
 const memeLv = (file: string) => {
   try {
@@ -164,6 +175,26 @@ const memeLoop = existsSync(join(memeLoopDir, "meme-loop.mp4"))
     }
   : undefined;
 const memeData = PAGES.entertainment.meme; // heading "MEME" + body, both already-approved copy — reused verbatim
+
+// chapter-03 collage frames (same bust()/pair() contract as chapters 01-02).
+const memeRoom = bust("venture/meme/carpenter-room-1440", pair("venture/meme/carpenter-room-1440"));
+const memeMeetup = bust("venture/meme/nocova-meetup-1", pair("venture/meme/nocova-meetup-1"));
+const memeRetreat = bust("venture/meme/world-retreat-1600", pair("venture/meme/world-retreat-1600"));
+
+// The programs strip — the chapter's answer to what chapters 01/02 carry in
+// their meta plate (a client testimonial). MEME has no testimonial to quote, so
+// the parity beat is its actual substance: the evergreen program catalog, three
+// covers deep, linking into the full catalog on /venture/meme. Titles are
+// rendered from the ALT text of the already-published program cards on that
+// page — no new claim, and per the MEME site rule these are evergreen programs,
+// never dated marketing.
+const memePrograms = [
+  { slug: "program-carpenter", label: "The Carpenter, Not the Tools" },
+  { slug: "program-pitch-quorum", label: "Pitch Quorum" },
+  { slug: "program-market-fresh", label: "Market Fresh" },
+]
+  .map((pr) => ({ ...pr, img: bust(`venture/meme/${pr.slug}-900`, pair(`venture/meme/${pr.slug}-900`)) }))
+  .filter((pr) => !!pr.img);
 
 // P29 (unchanged) — the PitchBoulder commercial's video id, the SAME embed the
 // case page carries (work/pitchboulder.astro; his live site's published id).
@@ -219,14 +250,14 @@ const heroGhost = ["S", "T", "O", "R", "Y"]; // P12.3 — from "business stories
 //     /venture/amazing-aerial, stays live and reachable — just unlinked from
 //     this page). No replacement card takes its place.
 //  3 & 4. PitchBoulder and MEME no longer repeat in the collections below —
-//     both already lead the page as feature chapters (see VENTURE_COLLECTIONS
+//     both already lead the page as feature chapters (see VENTURE_STORY_RAIL
 //     in consts.ts for the full account, including how the resulting
 //     one-story "Founders & Pitch Rooms" collection was dissolved rather than
 //     padded or backfilled with a feature).
 //
 // What's left below the (now single) collection is genuinely two ungrouped
 // STANDALONE stories — KO Law and the reframed Pebble Beach Concours piece
-// (consts.ts VENTURE_STANDALONE_STORIES) — riding the same rail grammar the
+// (consts.ts VENTURE_STORY_RAIL) — riding the same rail grammar the
 // old partner rail used, minus the "Collection ·" kicker treatment: real
 // stories, just not collection-grouped. slate + title are copied VERBATIM
 // from each story's own destination page, same convention as the collections
@@ -239,13 +270,18 @@ const railGhosts: Record<string, string> = {
   // its photography does (hardening added in commit df48f42; see that
   // function's own comment below).
 };
-function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?: string; objectPosition?: string }) {
+function toRailCard(c: { href: string; slate: string; title: string; tag?: string; mediaSlug?: string; imageSlug?: string; objectPosition?: string }) {
   // PUB-A — a card's media slug is `mediaSlug` when set (a /work/* href, or
   // any href that shouldn't drive its own media path), else derived from a
   // /venture/<slug> href exactly as before.
   const slug = c.mediaSlug ? c.mediaSlug : c.href.replace(/^\/venture\//, "");
   const ghostKey = c.href.replace(/^\/(venture|work)\//, "");
-  const img = bust(`venture/${slug}/hero-900`, pair(`venture/${slug}/hero-900`));
+  // 2026-08-04 — a card may now name its OWN face (`imageSlug`) instead of
+  // defaulting to the story page's hero. The heroes are composed for a 78rem
+  // page-width beat; at a 336px card the same frame reads as ceiling. See the
+  // CARD FACES note on VENTURE_STORY_RAIL in consts.ts.
+  const facePath = c.imageSlug ? `venture/${c.imageSlug}` : `venture/${slug}/hero-900`;
+  const img = bust(facePath, pair(facePath));
   const ghost = railGhosts[ghostKey];
   // AUDIT-FIX (2026-08-03) — hardening: the PitchBoulder card used to render
   // a ghost mark instead of its (real, existing) photo because its /work/*
@@ -256,18 +292,14 @@ function toRailCard(c: { href: string; slate: string; title: string; mediaSlug?:
   // instead of shipping that silently.
   if (!img && !ghost) {
     throw new Error(
-      `venture.astro toRailCard: "${c.href}" has no media at public/media/venture/${slug}/hero-900.{avif,webp} ` +
+      `venture.astro toRailCard: "${c.href}" has no media at public/media/${facePath}.{avif,webp} ` +
         `and no railGhosts["${ghostKey}"] fallback — it would silently render as a blank rail card. ` +
         `Fix by adding a correct mediaSlug, baking the missing hero-900 pair, or adding a railGhosts entry.`,
     );
   }
   return { ...c, slug, img, ghost };
 }
-const collectionCards = VENTURE_COLLECTIONS.map((coll) => ({
-  ...coll,
-  cards: coll.stories.map(toRailCard),
-}));
-const standaloneCards = VENTURE_STANDALONE_STORIES.map(toRailCard);
+const storyCards = VENTURE_STORY_RAIL.map(toRailCard);
 
 // chapter ground colors — the reference's jewel-tone ride, our dark family.
 // PUB-A — `hire` retired with the E1b services chapter; `archive` stays for
@@ -527,15 +559,69 @@ const GROUNDS = {
     </section>
 
     <!-- PUB-E (2026-07-27, Directive PUB-E) — CHAPTER 03 · MEME, the third
-         feature slot. Structure only: reuses meme.astro's own copy (heading +
-         body + LOCKED LegendMark proof) and its ambient logo-loop asset — no
-         new claim about MEME. No collage (no event photography exists yet for
-         this relationship), so the chapter centers the animated mark instead,
-         the same treatment the standalone article uses. -->
-    <section class="im-sec im-chapter im-chapter--solo" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
+         feature slot. Reuses meme.astro's own copy (heading + body + LOCKED
+         LegendMark proof), its ambient logo-loop asset, and — as of 2026-08-04
+         — the real MEME frames that page already publishes. No new claim about
+         MEME is made here.
+
+         2026-08-04 (operator: "section 03 of MEME looks pretty barren … put
+         some photos and segments around it so it's on par with the PitchBoulder
+         and Shelby segments above"): the chapter drops its solo treatment and
+         takes the same shape as 01 and 02 — a collage ringing the centred
+         title, with the animated MEME mark as the collage's anchor card (the
+         structural equivalent of their hover-video cards) and three real frames
+         around it. Its meta plate gains the programs strip, standing in for the
+         client testimonial 01/02 carry — MEME has no testimonial to quote, and
+         the evergreen program catalog is the honest substance in its place. -->
+    <section class="im-sec im-chapter" data-im-section data-ground={GROUNDS.ch03} style={`--sec-ground:${GROUNDS.ch03}`}>
       <span class="im-index im-turn" aria-hidden="true">03</span>
       <span class="im-index im-index--of im-turn" aria-hidden="true">/03</span>
-      <div class="im-chapter-stage im-chapter-stage--solo">
+      <div class="im-chapter-stage">
+        <div class="im-collage im-collage--meme" aria-hidden="true">
+          {
+            memeLoop && (
+              <a class="im-card im-meme-anchor im-card--link" href={`${base}/venture/meme`} data-meme-loop-wrap data-im-card data-depth="1.15" tabindex="-1">
+                <picture>
+                  <source type="image/avif" srcset={memeLoop.posterAvif} />
+                  <img src={memeLoop.posterWebp} alt="" loading="lazy" decoding="async" />
+                </picture>
+                <video class="im-meme-loop-vid" data-meme-loop muted loop playsinline preload="none" poster={memeLoop.posterWebp} aria-hidden="true">
+                  <source src={memeLoop.mp4} type="video/mp4" />
+                </video>
+              </a>
+            )
+          }
+          {
+            memeRoom && (
+              <figure class="im-card im-meme-room" data-im-card data-depth="0.65">
+                <picture>
+                  {memeRoom.avif && <source srcset={memeRoom.avif} type="image/avif" />}
+                  <img src={memeRoom.webp ?? memeRoom.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            memeMeetup && (
+              <figure class="im-card im-meme-meetup" data-im-card data-depth="1.7">
+                <picture>
+                  {memeMeetup.avif && <source srcset={memeMeetup.avif} type="image/avif" />}
+                  <img src={memeMeetup.webp ?? memeMeetup.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+          {
+            memeRetreat && (
+              <figure class="im-card im-meme-retreat" data-im-card data-depth="1.1">
+                <picture>
+                  {memeRetreat.avif && <source srcset={memeRetreat.avif} type="image/avif" />}
+                  <img src={memeRetreat.webp ?? memeRetreat.avif} alt="" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            )
+          }
+        </div>
         <div class="im-chapter-type">
           <h2 class="im-title" data-reveal>
             <span class="im-line">MEME</span>
@@ -545,25 +631,28 @@ const GROUNDS = {
         <div class="im-chapter-meta" data-reveal>
           <LegendMark proof={memeData.proof} />
           {
-            memeLoop && (
-              <figure class="im-meme-loop" data-meme-loop-wrap>
-                <picture>
-                  <source type="image/avif" srcset={memeLoop.posterAvif} />
-                  <img src={memeLoop.posterWebp} alt="The MEME logo — a filmstrip-lettered M, on a deep blue textured ground." loading="lazy" decoding="async" />
-                </picture>
-                <video
-                  class="im-meme-loop-vid"
-                  data-meme-loop
-                  muted
-                  loop
-                  playsinline
-                  preload="none"
-                  poster={memeLoop.posterWebp}
-                  aria-hidden="true"
-                >
-                  <source src={memeLoop.mp4} type="video/mp4" />
-                </video>
-              </figure>
+            memePrograms.length > 0 && (
+              <div class="im-meme-programs">
+                {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — the strip's label is new
+                    copy (staging-only). The three program titles are already
+                    published on /venture/meme; nothing new is claimed here. */}
+                <p class="hud-label im-meme-programs-label">From the program catalog</p>
+                <ul class="im-meme-programs-row">
+                  {memePrograms.map((pr) => (
+                    <li>
+                      <a href={`${base}/venture/meme`} class="im-meme-program">
+                        <span class="im-meme-program-media">
+                          <picture>
+                            {pr.img?.avif && <source srcset={pr.img.avif} type="image/avif" />}
+                            <img src={pr.img?.webp ?? pr.img?.avif} alt="" loading="lazy" decoding="async" />
+                          </picture>
+                        </span>
+                        <span class="im-meme-program-label">{pr.label}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )
           }
           <a href={`${base}/venture/meme`} class="im-cta">
@@ -574,91 +663,41 @@ const GROUNDS = {
       </div>
     </section>
 
-    <!-- ═══ S4 · THE COLLECTIONS — PUB-E (2026-07-27) originally shipped TWO
-         NAMED, operator-directed collections here, each a grouped story
-         section, deliberately allowing a collection to carry a story that's
-         ALSO a feature above. RESTRUCTURED 2026-08-03 (operator decisions): a
-         feature must NOT repeat in the collections below it now — see
-         VENTURE_COLLECTIONS in consts.ts for the full account. Only ONE
-         collection survives this pass ("The Film Industry"); the dissolved
-         collection's leftover story (KO Law) and the reframed Pebble Beach
-         Concours piece render as STANDALONE cards in S4c below instead. Same
-         user-driven carousel grammar either way — native overflow-x +
+    <!-- ═══ S4 · THE STORY RAIL — FLATTENED 2026-08-04 (operator decision).
+         This was TWO full-height sections: a named collection ("The Film
+         Industry": SeriesFest + AFM) and an ungrouped standalone rail (KO Law +
+         Pebble Beach). With four stories total that shipped two half-empty
+         rails separated by a screen of dead space — the operator's note
+         verbatim: "I've only got 4 of those stories, I don't know if it makes
+         sense to overly separate them … maybe there's some better way to have
+         that differentiator there."
+
+         One rail now, four cards, each carrying a small category CHIP. The chip
+         is the differentiator at a fraction of the cost of a section header +
+         intro + 100svh of scroll, and it scales — a fifth story joins the rail
+         with its own chip instead of forcing a collection to be invented or
+         dissolved around it. See VENTURE_STORY_RAIL in consts.ts. Same
+         user-driven carousel grammar as before: native overflow-x +
          scroll-snap, zero-JS baseline, pointer-drag enhancement. ═══ -->
-    {
-      collectionCards.map((coll, ci) => (
-        <section class="im-sec im-rail-sec" data-im-section data-ground={ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB} style={`--sec-ground:${ci === 0 ? GROUNDS.collectionA : GROUNDS.collectionB}`}>
-          {ci === 0 && (
-            <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
-              <span class="im-confetti" data-im-confetti style="--ci:0"></span>
-              <span class="im-confetti" data-im-confetti style="--ci:1"></span>
-              <span class="im-confetti" data-im-confetti style="--ci:2"></span>
-              <span class="im-confetti" data-im-confetti style="--ci:3"></span>
-            </div>
-          )}
-          {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — collection name is a
-              PLACEHOLDER (operator to confirm/rename) and the intro is new
-              copy; both come from VENTURE_COLLECTIONS in consts.ts, staging-
-              only until read. */}
-          <p class="hud-label im-kicker" data-reveal>Collection · {coll.name}</p>
-          <p class="im-turn im-rail-intro" data-reveal>{coll.intro}</p>
-
-          <div class="im-rail-wrap">
-            <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
-            <ul class="im-rail" data-im-rail>
-              {
-                coll.cards.map((c) => (
-                  <li class="im-rail-card">
-                    <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
-                      <span class="im-rail-media">
-                        {c.img ? (
-                          <picture>
-                            {c.img.avif && <source srcset={c.img.avif} type="image/avif" />}
-                            <img src={c.img.webp ?? c.img.avif} alt="" loading="lazy" decoding="async" style={c.objectPosition ? `object-position:${c.objectPosition}` : undefined} />
-                          </picture>
-                        ) : (
-                          <span class="im-rail-ghost">{c.ghost ?? ""}</span>
-                        )}
-                      </span>
-                      <span class="im-rail-slate hud-label">{c.slate}</span>
-                      <span class="im-rail-title im-turn">{c.title}</span>
-                      <span class="im-cta im-cta--sm im-rail-cta">
-                        <span class="im-cta-label">Read the story</span>
-                        <span class="im-cta-arrow" aria-hidden="true">→</span>
-                      </span>
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </section>
-      ))
-    }
-
-    <!-- ═══ S4c · STANDALONE STORIES — 2026-08-03 restructure: this section
-         used to be the ungrouped partner rail (Amazing Aerial + the held-
-         from-publish film-venture card); both are gone now (see the comments
-         above `railGhosts`). Repurposed for KO Law + the reframed Pebble
-         Beach Concours piece — two real stories that don't have a second
-         story to be named a "collection" with (the operator's own >= 2 rule;
-         see VENTURE_STANDALONE_STORIES in consts.ts). Same rail grammar as a
-         collection above, minus the "Collection ·" kicker — that absence is
-         the visual tell that these are standalone. ═══ -->
-    <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.rooms} style={`--sec-ground:${GROUNDS.rooms}`}>
-      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker carried over unchanged
-          from the prior rail copy (staging-only until read); intro EDITED
-          2026-08-03 to describe standalone stories instead of partner orgs. */}
+    <section class="im-sec im-rail-sec" data-im-section data-ground={GROUNDS.collectionA} style={`--sec-ground:${GROUNDS.collectionA}`}>
+      <div class="im-ghosts im-ghosts--rooms" aria-hidden="true">
+        <span class="im-confetti" data-im-confetti style="--ci:0"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:1"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:2"></span>
+        <span class="im-confetti" data-im-confetti style="--ci:3"></span>
+      </div>
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker + intro rewritten
+          2026-08-04 for the flattened rail; staging-only until read. */}
       <p class="hud-label im-kicker" data-reveal>More venture stories</p>
       <p class="im-turn im-rail-intro" data-reveal>
-        More venture stories that stand on their own, outside any collection — each one marked at exactly what it is.
+        The rest of the venture lane — the festival and the market we keep a pulse on, the founders' room, and the lawn at Pebble Beach.
       </p>
 
       <div class="im-rail-wrap">
         <p class="im-rail-hint hud-label" aria-hidden="true">drag →</p>
         <ul class="im-rail" data-im-rail>
           {
-            standaloneCards.map((c) => (
+            storyCards.map((c) => (
               <li class="im-rail-card">
                 <a class="im-rail-link" href={`${base}${c.href}`} data-reveal data-reveal-stagger="55">
                   <span class="im-rail-media">
@@ -670,6 +709,7 @@ const GROUNDS = {
                     ) : (
                       <span class="im-rail-ghost">{c.ghost ?? ""}</span>
                     )}
+                    {c.tag && <span class="im-rail-tag hud-label">{c.tag}</span>}
                   </span>
                   <span class="im-rail-slate hud-label">{c.slate}</span>
                   <span class="im-rail-title im-turn">{c.title}</span>
@@ -946,6 +986,23 @@ const GROUNDS = {
   .im-sh-lawn     { width: clamp(210px, 26vw, 400px); aspect-ratio: 16 / 10; left: 3%; bottom: 5%; }
   .im-sh-heritage { width: clamp(150px, 17vw, 260px); aspect-ratio: 4 / 3; right: 4%; bottom: 6%; }
   .im-sh-engine   { width: clamp(120px, 14vw, 210px); aspect-ratio: 4 / 3; left: 30%; top: 3%; }
+  /* ── 2026-08-04 · chapter-03 (MEME) collage geometry — the same ringing
+     grammar as 01/02, with the animated MEME mark as the anchor card. The mark
+     is a 1:1 asset, so it anchors at square (its own page shows it the same
+     way) and the four real frames ring it in mixed ratios. ── */
+  /* the anchor sits ABOVE the meta plate, not behind it: this chapter's plate
+     is taller than 01/02's (it carries the programs strip), and the MEME mark
+     getting clipped mid-wordmark reads as a bug rather than as layering. */
+  .im-meme-anchor   { width: clamp(130px, 16vw, 205px); aspect-ratio: 1 / 1; left: 1%; top: 1%; }
+  .im-meme-room     { width: clamp(210px, 27vw, 420px); aspect-ratio: 4 / 3; right: 1%; top: 4%; }
+  .im-meme-meetup   { width: clamp(150px, 18vw, 270px); aspect-ratio: 3 / 2; left: 5%; bottom: 4%; }
+  .im-meme-retreat  { width: clamp(190px, 24vw, 350px); aspect-ratio: 3 / 2; right: 3%; bottom: 5%; }
+  /* NOTE — a fifth frame (world-catalina) was tried at left:32%/top:2% and
+     landed straight on the centred "MEME" wordmark: unlike 01/02, this
+     chapter's title is a single short word, so the middle of the stage is
+     occupied, not empty. Four frames ring it exactly as chapter 01 does
+     (anchor TL, wide TR, small BL, medium BR) and the centre stays clear. */
+
   .im-chapter-type {
     position: relative;
     z-index: 2;
@@ -995,6 +1052,60 @@ const GROUNDS = {
     font-style: italic;
   }
 
+  /* ── 2026-08-04 · the MEME programs strip — chapter 03's parity beat for the
+     client testimonial chapters 01/02 carry. Three evergreen program covers,
+     small, all linking into the full catalog on /venture/meme. ── */
+  .im-meme-programs {
+    display: grid;
+    gap: 0.55rem;
+  }
+  .im-meme-programs-label {
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, #e8f6f3 62%, transparent);
+  }
+  .im-meme-programs-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .im-meme-program {
+    display: grid;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .im-meme-program-media {
+    display: block;
+    aspect-ratio: 4 / 5;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    transition: transform 320ms var(--ease-survey, ease), border-color 320ms ease;
+  }
+  .im-meme-program-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .im-meme-program:hover .im-meme-program-media,
+  .im-meme-program:focus-visible .im-meme-program-media {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+  }
+  .im-meme-program-label {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    color: color-mix(in srgb, #eef1f6 74%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .im-meme-program:hover .im-meme-program-media,
+    .im-meme-program:focus-visible .im-meme-program-media { transform: none; }
+  }
+
   /* Round 3 — the chapter-03 (MEME) ambient-loop styles left with the chapter
      (that treatment now lives on /work's MEME anchor panel). */
 
@@ -1004,28 +1115,20 @@ const GROUNDS = {
     width: 100%;
   }
 
-  /* ── PUB-E · chapter 03 (MEME) — no collage, so the stage just centers its
-     type + meta column (same grid as every other chapter, minus the absolute
-     collage layer). The ambient logo loop mirrors meme.astro's own
-     .meme-loop-wrap: poster-first, video fades in once JS confirms motion +
-     on-screen. ── */
-  .im-chapter-stage--solo {
-    max-width: 46rem;
-  }
-  .im-meme-loop {
-    position: relative;
-    margin: 0;
+  /* ── chapter 03 (MEME) — the ambient logo loop. 2026-08-04: it moved OUT of
+     the meta plate and INTO the collage as the anchor card (see
+     .im-meme-anchor above), so these styles now scope to that card. The
+     `is-playing` class is still toggled by the same script at the bottom of
+     this file, on whatever carries [data-meme-loop-wrap]. Poster-first: the
+     video only fades in once JS confirms motion is allowed and it's on screen.
+     The stage no longer needs the --solo width cap — chapter 03 uses the same
+     full stage as 01 and 02 now. ── */
+  .im-meme-anchor {
     border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-    border-radius: 8px;
-    overflow: hidden;
     background: color-mix(in srgb, #ffffff 4%, transparent);
-    box-shadow: 0 0 32px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent);
-  }
-  .im-meme-loop img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
+    box-shadow:
+      0 24px 80px -24px rgba(0, 0, 0, 0.55),
+      0 0 32px -12px color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent);
   }
   .im-meme-loop-vid {
     position: absolute;
@@ -1035,8 +1138,9 @@ const GROUNDS = {
     object-fit: cover;
     opacity: 0;
     transition: opacity 600ms var(--ease-survey, ease);
+    pointer-events: none;
   }
-  .im-meme-loop.is-playing .im-meme-loop-vid {
+  .im-meme-anchor.is-playing .im-meme-loop-vid {
     opacity: 1;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1107,9 +1211,12 @@ const GROUNDS = {
   /* ── P12.6b · S4 THE STORY RAIL — the coverage stories as a user-driven
      horizontal carousel. Native overflow-x + scroll-snap (no-JS baseline);
      pointer-drag + "drag →" hint enhance on top. ── */
+  /* 2026-08-04 — was min-height:100svh + 9rem padding, sized for TWO rails of
+     two cards each. One rail of four fills its own width now, so the section is
+     sized to its content instead of to the viewport; that removes the screen of
+     dead space the operator flagged above and below it. */
   .im-rail-sec {
-    min-height: 100svh;
-    padding: 9rem clamp(1.5rem, 6vw, 8rem);
+    padding: 5.5rem clamp(1.5rem, 6vw, 8rem);
     display: grid;
     /* minmax(0, 1fr) is load-bearing: without the 0 min-track, the flex rail's
        content width (all cards) would blow the column — and the page — wide.
@@ -1202,6 +1309,22 @@ const GROUNDS = {
     letter-spacing: 0.04em;
     line-height: 1;
     color: color-mix(in srgb, #ffffff 16%, transparent);
+  }
+  /* 2026-08-04 — the category chip that replaced the collection sections.
+     Sits on the card face so it reads before the slate line does. */
+  .im-rail-tag {
+    position: absolute;
+    left: 0.55rem;
+    top: 0.55rem;
+    z-index: 1;
+    padding: 0.28rem 0.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    border-radius: 999px;
+    color: #eaf7f5;
+    background: color-mix(in srgb, #0b0f16 78%, transparent);
+    border: 1px solid color-mix(in srgb, #ffffff 20%, transparent);
+    backdrop-filter: blur(6px);
   }
   .im-rail-slate {
     font-size: 0.6rem;
