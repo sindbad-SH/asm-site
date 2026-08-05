@@ -649,8 +649,18 @@ const STRIP_SHOTS = [
     // Overlapping the card's subject is deliberate; the two treatments read as
     // separate moments rather than one repeat (the card is a tight portrait
     // duotone carrying type, this is a plain full-colour landscape).
+    // OPERATOR FIX 2026-08-04 — the [0,620,1080,720] box above was still a
+    // 3:2 slice of the BOTTOM half of a 1080×1440 PORTRAIT frame, chosen only
+    // because the strip layout demanded 3:2. It threw away the whole reason
+    // the photograph works: the curved hotel facade sweeping down into the
+    // arrival lane, the glass towers, the sky. Operator, verbatim: "they kind
+    // of cut off a lot of stuff and I'd rather they be optimized where pretty
+    // much the full photos are shown in relativity to the copy."
+    // Now essentially the FULL frame (94%) — only the bottom 90px of dark car
+    // hood is trimmed. Shape is 4:5 portrait; the strip no longer forces 3:2.
+    // Still no identifiable face: the one figure is walking away from camera.
     file: join(MEME_ARCHIVE_ROOT, "American Film Market photo.jfif"),
-    box: [0, 620, 1080, 720],
+    box: [0, 0, 1080, 1350],
   },
   {
     slug: "world-catalina",
@@ -659,8 +669,16 @@ const STRIP_SHOTS = [
     // border 0-20/40px, vertical gutter 710-729px — verified by scan).
     // LEFT PANEL ONLY (x 21-709, y 21-1418): the mermaid "Catalina Film
     // Festival" banner. No people in this crop.
+    // OPERATOR FIX 2026-08-04 — [21,121,688,459] took a 3:2 horizontal SLICE
+    // out of a banner that is, in the source, a tall roll-up: the title
+    // lettering, the mermaid artwork and the festival logo/URL at its foot all
+    // fell outside that slice. The full LEFT PANEL is 688×1397 (AR 0.49).
+    // Now the whole banner, edge to edge: title, artwork, 35th-year logo,
+    // CatalinaFilm.org — the part that actually identifies the festival. The
+    // collage's other two panels (harbour view; a two-person selfie) stay out
+    // of frame, so no identifiable faces enter the site.
     file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival 2.jfif"),
-    box: [21, 121, 688, 459],
+    box: [45, 120, 640, 1270],
   },
   {
     slug: "world-retreat",
@@ -670,14 +688,27 @@ const STRIP_SHOTS = [
     // bbox ≈ x964-1021, y836-876); this box's bottom edge (817) sits above
     // that, so the patch falls outside the frame while every head stays
     // fully in shot.
+    // OPERATOR FIX 2026-08-04 — the [172,87,1096,731] box cropped to 3:2 for
+    // the strip and cut all three people off at chest height. Now the FULL
+    // frame (1440×1134, AR 1.27): the whole canopy, the pines and lawn behind
+    // it, the table. More environment is the point — it reads as a retreat
+    // rather than a face close-up.
+    // NOTE the earlier box also existed to keep a bystander's legible
+    // "Carhartt" vest patch (≈x964-1021, y836-876) out of frame; the full
+    // frame includes it again. A brand mark incidentally visible in a
+    // documentary photograph is normal editorial use — but it is a deliberate
+    // reversal of a prior decision, so it is called out in the review doc.
     file: join(MEME_ARCHIVE_ROOT, "Writer's Retreat.jfif"),
-    box: [172, 87, 1096, 731],
+    box: [0, 0, 1440, 1134],
   },
 ];
 // Grade at the LARGEST output width (1600) so every WIDTHS tier is a
 // downscale, never an upscale — same reasoning as the cards' 2x SCALE render.
-const STRIP_W = 1600,
-  STRIP_H = 1067; // ~3:2, matches meme.astro's world-strip layout
+// OPERATOR FIX 2026-08-04 — was STRIP_W/STRIP_H = 1600×1067, a hard 3:2 that
+// every extract box above had been reverse-engineered to satisfy. The layout
+// was dictating the crop. Now it is a WIDTH CAP only: each shot keeps its own
+// native aspect ratio and meme.astro's strip accepts whatever shape arrives.
+const STRIP_MAXW = 1600;
 const STRIP_AVIF = { quality: 62, effort: 5 };
 const STRIP_WEBP = { quality: 82, effort: 5 };
 
@@ -693,13 +724,13 @@ for (const shot of STRIP_SHOTS) {
   // to hold black point), modulate() lifts saturation a touch; nowhere near
   // the posterize threshold the operator has flagged before at higher values.
   const graded = await pipeline
-    .resize({ width: STRIP_W, height: STRIP_H, fit: "cover" })
+    .resize({ width: STRIP_MAXW, withoutEnlargement: true })
     .linear(1.06, -8)
     .modulate({ saturation: 1.12 })
     .toBuffer();
   let bytes = 0;
   for (const w of WIDTHS) {
-    const base = sharp(graded).resize({ width: w });
+    const base = sharp(graded).resize({ width: w, withoutEnlargement: true });
     for (const [ext, opts] of [["avif", STRIP_AVIF], ["webp", STRIP_WEBP]]) {
       const buf = await base.clone()[ext](opts).toBuffer();
       const { writeFileSync } = await import("node:fs");

@@ -344,7 +344,12 @@ const meta = {
         <picture>
           <source type="image/avif" srcset={awardsCeremonyGroup.avif} sizes="(max-width: 900px) 100vw, 86rem" />
           <source type="image/webp" srcset={awardsCeremonyGroup.webp} sizes="(max-width: 900px) 100vw, 86rem" />
-          <img src={awardsCeremonyGroup.fallback} alt={awardsCeremonyGroup.alt} style="aspect-ratio:12/5;object-fit:cover;object-position:50% 84%" loading="lazy" decoding="async" />
+          {/* OPERATOR FIX 2026-08-05 — source is SQUARE (this event set was
+              shot 1:1). 12/5 kept only 42% of the frame and cut the honorees
+              off at the shins while clipping the laurel above them. 16/9
+              anchored low keeps the whole SeriesFest Season 12 title card AND
+              the complete line of people, feet included. */}
+          <img src={awardsCeremonyGroup.fallback} alt={awardsCeremonyGroup.alt} style="aspect-ratio:16/9;object-fit:cover;object-position:50% 95%" loading="lazy" decoding="async" />
         </picture>
         <figcaption class="vs-cap">{CAPTIONS.awardsCeremonyGroup}</figcaption>
       </figure>

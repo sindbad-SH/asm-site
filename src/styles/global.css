@@ -2280,9 +2280,40 @@
       column-count: 2;
     }
   }
+  /* OPERATOR FIX 2026-08-04 — this used to be `column-count: 3`, which makes
+     every painting exactly one column wide. Measured on /adventure/field:
+     11 paintings, ONE distinct display width, 10 same-width adjacencies —
+     the most uniform block on the site, and the operator's "a lot of
+     rectangle photos" complaint in its purest form. The vertical nudges below
+     were doing all the work of pretending otherwise.
+     Now a real salon hang: a 6-column grid where width varies by BOTH the
+     photograph's orientation (verticals run narrow) and its place in the run,
+     so the wall has three distinct scales instead of one. `dense` packing
+     keeps the rows tight as the operator adds field notes. */
   @media (min-width: 960px) {
     .painting-wall {
-      column-count: 3;
+      column-count: initial;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-flow: row dense;
+      gap: clamp(1.2rem, 2.6vw, 2.2rem);
+      align-items: start;
+    }
+    .painting {
+      margin: 0;
+      grid-column: span 3;
+    }
+    .painting--tall {
+      grid-column: span 2;
+    }
+    .painting:nth-child(6n + 3) {
+      grid-column: span 2;
+    }
+    .painting:nth-child(6n + 4) {
+      grid-column: span 4;
+    }
+    .painting--tall:nth-child(6n + 4) {
+      grid-column: span 2;
     }
   }
 
@@ -2299,15 +2330,18 @@
     color: inherit;
     outline: none;
   }
-  /* Salon asymmetry — nudge alternating paintings so the hang reads hand-placed,
-     not gridded. Only in the 3-column hang (≥960px); the stacked/2-col layouts
-     need no vertical offset. */
+  /* Salon asymmetry — nudge paintings off the row baseline so the hang reads
+     hand-placed rather than gridded. The widths now vary too (see the grid
+     above), so these offsets are seasoning, not the whole disguise. */
   @media (min-width: 960px) {
-    .painting:nth-child(3n + 2) {
-      margin-top: clamp(0.8rem, 2.6vw, 2rem);
+    .painting:nth-child(4n + 2) {
+      margin-top: clamp(0.9rem, 2.6vw, 2.1rem);
     }
-    .painting:nth-child(3n + 3) {
+    .painting:nth-child(4n + 3) {
       margin-top: clamp(0.3rem, 1.4vw, 1.1rem);
+    }
+    .painting:nth-child(6n + 5) {
+      margin-top: clamp(1.1rem, 3vw, 2.4rem);
     }
   }
 

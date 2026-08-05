@@ -379,19 +379,19 @@ const WORLD = {
       key: "afm",
       caption: "The American Film Market, Los Angeles.",
       sub: "The kind of market Market Fresh is built to prepare you for.",
-      alt: "A street outside the American Film Market in Los Angeles, a pink AFM banner at the hotel entrance, one person walking toward it away from camera.",
+      alt: "The approach to the American Film Market in Los Angeles: a curved hotel facade sweeping down to its entrance, glass towers and cloud behind it, pink AFM banners along the arrival lane, one attendee walking in away from camera.",
     },
     {
       key: "catalina",
       caption: "The Catalina Film Festival.",
       sub: "Festivals are where the packaging work gets tested.",
-      alt: "A tall Catalina Film Festival banner with mermaid artwork, standing outside a clapboard building.",
+      alt: "A full-height Catalina Film Festival roll-up banner on a brick porch: mermaid artwork in a kelp forest under the festival's title, the thirty-fifth-year mark and CatalinaFilm.org at its foot.",
     },
     {
       key: "retreat",
       caption: "A writers' retreat.",
-      sub: "Quieter rooms, same purpose — pages that go somewhere.",
-      alt: "Three people working on laptops at a picnic table under a white canopy, surrounded by pines.",
+      sub: "No room at all, and the same purpose — pages that go somewhere.",
+      alt: "Three people at a table under a white pop-up canopy at a writers' retreat, a laptop and drinks in front of them, pines and open lawn behind.",
     },
   ],
 } as const;
@@ -1534,28 +1534,57 @@ const ARTICLE = {
   .meme-world-lede {
     max-width: 46ch;
   }
+  /* OPERATOR FIX 2026-08-04 — this row used to be `repeat(3, 1fr)` with every
+     photo forced to `aspect-ratio: 3/2; object-fit: cover`. Three identical
+     rectangles, and the crop was being dictated by the layout: the AFM frame
+     is natively PORTRAIT and lost half its height, the Catalina banner is a
+     tall roll-up and was reduced to a horizontal slice. Operator: "they kind
+     of cut off a lot of stuff and I'd rather... pretty much the full photos
+     are shown in relativity to the copy."
+     Now the photographs keep their own shapes (4:5 portrait / 1:2 banner /
+     5:4 landscape, re-baked in make-meme-evergreen.mjs section 8) and the row
+     is laid out around them: unequal columns, staggered baselines, a degree
+     of tilt — prints set down on a desk, not a third box grid. */
   .meme-world-strip {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.1rem;
-    margin-top: 1.1rem;
+    grid-template-columns: 34fr 24fr 30fr;
+    gap: clamp(1rem, 2.6vw, 2.2rem);
+    margin-top: 1.5rem;
     align-items: start;
+    /* The section already runs a full-bleed navy band behind itself
+       (.meme-world::before). Inside the 46rem reading column the three prints
+       came out 167-236px wide — postage stamps. The photographs are the point
+       of this beat, so the row breaks out of the column and uses the band it
+       already owns. Text stays at reading width; only the prints go wide.
+       Centred on the BAND, not on the reading column (the column is offset to
+       make room for the ghost "M E M E" letterforms, so centring on it threw
+       the row right). Same 100vw breakout the band itself uses, with padding
+       doing the centring — so the prints stay centred at any width. */
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    padding-inline: max(1.5rem, calc((100vw - 74rem) / 2));
+    box-sizing: border-box;
   }
   .meme-world-shot {
     margin: 0;
     display: grid;
-    gap: 0.55rem;
+    gap: 0.6rem;
+  }
+  .meme-world-shot:nth-child(1) {
+    transform: rotate(-0.7deg);
   }
   .meme-world-shot:nth-child(2) {
-    margin-top: 2.4rem;
+    margin-top: 2.6rem;
+    transform: rotate(0.5deg);
   }
   .meme-world-shot:nth-child(3) {
-    margin-top: 1rem;
+    margin-top: 1.1rem;
+    transform: rotate(-0.4deg);
   }
   .meme-world-shot img {
     width: 100%;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
+    height: auto;
     border-radius: 8px;
     display: block;
     box-shadow: 0 18px 38px -14px rgba(0, 0, 0, 0.6);
@@ -1576,9 +1605,18 @@ const ARTICLE = {
     color: color-mix(in srgb, #eef2f5 58%, transparent);
   }
   @media (max-width: 760px) {
-    .meme-world-strip { grid-template-columns: 1fr; gap: 1.4rem; }
+    .meme-world-strip { grid-template-columns: 1fr; gap: 1.7rem; }
+    .meme-world-shot:nth-child(1),
     .meme-world-shot:nth-child(2),
-    .meme-world-shot:nth-child(3) { margin-top: 0; }
+    .meme-world-shot:nth-child(3) { margin-top: 0; transform: none; }
+    /* Stacked, the 1:2 banner would run two screens tall — cap by height and
+       let width follow, so each print sits centred at a readable size. */
+    .meme-world-shot img {
+      width: auto;
+      max-width: 100%;
+      max-height: 68svh;
+      margin-inline: auto;
+    }
   }
 
   /* The outbound block — meme.ngo + the org's accounts. Two grouped columns
