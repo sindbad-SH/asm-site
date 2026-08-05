@@ -2118,8 +2118,14 @@ export const PAGES = {
           date: "November 2025",
           title: "A screening, and the craft underneath it.",
           body: "SeriesFest presented Devil in Disguise: John Wayne Gacy, then put the creator and showrunner on stage — how structure, tone and perspective shape what an audience understands.",
-          imageSlug: "",
-          alt: "",
+          // OPERATOR REWORK 2026-08-05 — this row used to be deliberately
+          // imageless, which made it read as a dead entry beside four
+          // photographed ones. Two frames DO exist (480x480 each, the largest
+          // anywhere — there is no bigger original). It now takes the smallest
+          // treatment on the page using the frame that names the screening.
+          // Small is honest here; absent was not.
+          imageSlug: "devil-venue-signage",
+          alt: "Venue signage for the SeriesFest screening of Devil in Disguise: John Wayne Gacy.",
           href: "/venture/seriesfest-2025-devil-in-disguise",
           cta: "The screening, in full",
         },
@@ -2161,8 +2167,19 @@ export const PAGES = {
           cta: "Season 12, in full",
         },
       ],
-      coverImageSlug: "fashion-runway-crowd",
-      coverAlt: "A model walks the runway at SeriesFest's Fashion in Focus, a full seated audience watching from both sides under the SeriesFest-branded wall.",
+      // OPERATOR REWORK 2026-08-05 — was "fashion-runway-crowd", a Fashion in
+      // Focus frame standing in as the hero for the whole 2025-2026 SeriesFest
+      // relationship. Two problems, both his: wrong event for a hub, and the
+      // 1:1 source was stretched into a landscape band showing ~44% of it.
+      // Now a Season 12 frame at its native square (see .sf-stage). Chosen
+      // over the other Season 12 candidates because it is the only strong one
+      // that appears NOWHERE else on the site — soiree-mic and press-scrum are
+      // near-duplicate moments of frames already shipping on
+      // /venture/seriesfest-2026 (that page's own header comment records
+      // soiree-mic as a deliberate hold-out for exactly that reason), and
+      // awards-ceremony-group is that page's closing image.
+      coverImageSlug: "s12-podium-duo",
+      coverAlt: "Two presenters at a SeriesFest-branded lectern on the Season 12 stage — one speaking into a handheld microphone, the other standing beside him in a red suit — in front of a step-and-repeat wall of repeated SeriesFest marks, a lit projection screen filling the wall behind them.",
       links: {
         // AUDIT-FIX (2026-08-02): /work/seriesfest is retired (redirects to
         // this very hub — see astro.config.mjs), so "More about SeriesFest"

@@ -55,9 +55,13 @@ const WIDTHS = [900, 1600] as const;
 function photo(slug: string) {
   if (!existsSync(join(mediaDir, `${slug}-900.avif`))) return undefined;
   const url = (w: number, ext: string) => `${base}/media/venture/seriesfest/${slug}-${w}.${ext}`;
+  // Existence-gate each width. Not every frame has a 1600 tier — the Devil in
+  // Disguise signage tops out at 480px native, so emitting a -1600 candidate
+  // for it would put a URL that 404s into the srcset.
+  const widths = WIDTHS.filter((w) => existsSync(join(mediaDir, `${slug}-${w}.avif`)));
   return {
-    avif: WIDTHS.map((w) => `${url(w, "avif")} ${w}w`).join(", "),
-    webp: WIDTHS.map((w) => `${url(w, "webp")} ${w}w`).join(", "),
+    avif: widths.map((w) => `${url(w, "avif")} ${w}w`).join(", "),
+    webp: widths.map((w) => `${url(w, "webp")} ${w}w`).join(", "),
     src: url(900, "webp"),
   };
 }
@@ -67,52 +71,82 @@ const chapters = sf.chapters.map((c) => ({ ...c, media: photo(c.imageSlug) }));
 // Per-row layout + crop assignment (index-aligned with sf.chapters 01–05;
 // crops tuned against the eye-reviewed contact sheet — see header note).
 // Row 02 (Devil in Disguise) is deliberately imageless — see its consts entry.
-const ROW_LAYOUT = ["featured", "textonly", "banner", "thumb", "portrait"] as const;
+// OPERATOR REWORK 2026-08-05. Two changes to the sequence:
+//  (a) It used to END SMALL — row 04 was a 200px thumb and row 05 a 20rem
+//      portrait, the two smallest treatments back to back at the close, so the
+//      page faded out on its own main event. The two full festivals are now
+//      the BOOKENDS (01 and 05, mirrored), and the page ends large.
+//  (b) Row 02 was `textonly` — a deliberately imageless row, which read as a
+//      dead entry beside four photographed ones. Devil in Disguise does have
+//      photography: two 480x480 frames, all that exists (no larger original
+//      anywhere). It now runs at the smallest treatment on the page, using the
+//      venue sign that names the screening. Small is the honest answer here —
+//      operator: "I only really had like two photos, it was a pretty small
+//      event" — but small and present beats absent.
+// Aspect ratios are also relaxed: every source here is 1:1, so the old 16/9
+// featured crop threw away 44% of the frame. 4/3 keeps 75%.
+const ROW_LAYOUT = ["featured", "thumb", "banner", "portrait", "featured-flip"] as const;
 const ROW_STYLE = [
-  "aspect-ratio:16/9;object-fit:cover;object-position:50% 42%", // 01 featured — keeps the Season 11 wordmark + moderator
-  "",                                                            // 02 no image
+  "aspect-ratio:4/3;object-fit:cover;object-position:50% 42%",  // 01 featured — Season 11 wordmark + moderator
+  "aspect-ratio:1/1;object-fit:cover;object-position:50% 50%",  // 02 thumb — the venue sign, uncropped (square in square)
   "aspect-ratio:2/1;object-fit:cover;object-position:50% 58%",  // 03 banner — the ABA lineup, tuned to keep full bodies in the band
-  "aspect-ratio:1/1;object-fit:cover;object-position:55% 60%",  // 04 thumb — model + florals
-  "aspect-ratio:4/5;object-fit:cover;object-position:50% 45%",  // 05 portrait — the standing lineup
+  "aspect-ratio:4/5;object-fit:cover;object-position:55% 55%",  // 04 portrait — model + florals
+  "aspect-ratio:4/3;object-fit:cover;object-position:50% 45%",  // 05 featured-flip — the standing lineup
 ] as const;
 const ROW_SIZES = [
   "(max-width: 760px) 100vw, 38rem",
-  "",
-  "(max-width: 760px) 100vw, 30rem",
   "200px",
+  "(max-width: 760px) 100vw, 30rem",
   "(max-width: 760px) 80vw, 20rem",
+  "(max-width: 760px) 100vw, 38rem",
 ] as const;
 ---
 
 <Base title={sf.meta.title} description={sf.meta.description}>
   <div data-lane="venture">
-    <!-- ── COVER · six typographic ranks, landscape full-bleed (source
-         material is 1:1 square; CSS aspect-ratio crops it to a wide frame) -->
+    {/* ── COVER · OPERATOR REWORK 2026-08-05 ────────────────────────────
+         Was: a full-bleed landscape band with the type laid over it. The
+         source is 1:1 (every SeriesFest frame is — 96 of 98 across the sets),
+         so `object-fit: cover` in a 70svh band showed ~44% of the picture and
+         cut the subject. Operator: "it uses a photo from the Fashion in Focus
+         event that's really stretched out, which doesn't really work super
+         well as the main SeriesFest hero photo."
+         Note the old `aspect-ratio: 16/9` on .sf-cover-img was INERT — with
+         `inset: 0` plus width/height 100% both axes were already definite, so
+         the band's height came from .sf-stage's min-height alone. Editing the
+         ratio would have changed nothing; the band itself had to go.
+         Now: the photograph runs at its NATIVE SQUARE beside the type instead
+         of underneath it. Nothing is cropped, and because the type no longer
+         sits on the picture, the picture no longer has to be a letterbox. */}
     <section class="sf-stage" aria-label={`${sf.cover.masthead} — ${sf.meta.title}`}>
-      {
-        cover && (
-          <picture>
-            <source type="image/avif" srcset={cover.avif} sizes="100vw" />
-            <source type="image/webp" srcset={cover.webp} sizes="100vw" />
-            <img src={cover.src} alt={sf.coverAlt} class="sf-cover-img" fetchpriority="high" decoding="async" />
-          </picture>
-        )
-      }
-      <div class="sf-scrim" aria-hidden="true"></div>
-      <p class="sf-corner sf-corner--tl hud-label">{sf.cover.issue}</p>
-      <p class="sf-corner sf-corner--tr hud-label sf-accent">{sf.cover.location}</p>
-      <p class="sf-coords hud-label" aria-hidden="true">{sf.cover.coords}</p>
-      <header class="sf-masthead">
-        <p class="sf-masthead-word">{sf.cover.masthead}</p>
-        <p class="sf-masthead-credit hud-label">{sf.cover.credit}</p>
-      </header>
-      <div class="sf-titleblock">
-        <p class="hud-label sf-accent">{sf.cover.storyLabel}</p>
-        <h1 class="sf-title">{sf.cover.title}</h1>
-        <p class="sf-deck">{sf.cover.deck}</p>
-        <ul class="sf-teasers" role="list">
-          {sf.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
-        </ul>
+      <div class="sf-stage-inner">
+        <div class="sf-cover-frame">
+          {
+            cover && (
+              <picture>
+                <source type="image/avif" srcset={cover.avif} sizes="(max-width: 900px) 92vw, 40rem" />
+                <source type="image/webp" srcset={cover.webp} sizes="(max-width: 900px) 92vw, 40rem" />
+                <img src={cover.src} alt={sf.coverAlt} class="sf-cover-img" fetchpriority="high" decoding="async" />
+              </picture>
+            )
+          }
+          <p class="sf-corner sf-corner--tl hud-label">{sf.cover.issue}</p>
+          <p class="sf-corner sf-corner--tr hud-label sf-accent">{sf.cover.location}</p>
+        </div>
+
+        <div class="sf-titleblock">
+          <header class="sf-masthead">
+            <p class="sf-masthead-word">{sf.cover.masthead}</p>
+            <p class="sf-masthead-credit hud-label">{sf.cover.credit}</p>
+          </header>
+          <p class="hud-label sf-accent">{sf.cover.storyLabel}</p>
+          <h1 class="sf-title">{sf.cover.title}</h1>
+          <p class="sf-deck">{sf.cover.deck}</p>
+          <ul class="sf-teasers" role="list">
+            {sf.cover.teasers.map((t) => <li class="hud-label">{t}</li>)}
+          </ul>
+          <p class="sf-coords hud-label" aria-hidden="true">{sf.cover.coords}</p>
+        </div>
       </div>
       <p class="sf-cue hud-label" aria-hidden="true">{sf.cover.scrollCue} ↓</p>
     </section>
@@ -153,9 +187,20 @@ const ROW_SIZES = [
                   </picture>
                 </div>
               )}
+              {/* OPERATOR REWORK 2026-08-05 — the five visits did not read as
+                  five separate events: the date was an 0.68rem mono line
+                  typographically identical to the slate directly above it, so
+                  the two blurred into one grey run. The dateline is now its
+                  own plate — big numeral, event name at display scale, date
+                  spelled out — and it is the FIRST thing in each row. */}
               <div class="sf-row-body">
-                <p class="hud-label sf-accent">{c.no} · {c.slate}</p>
-                <p class="hud-label sf-row-date">{c.date}</p>
+                <div class="sf-dateline">
+                  <span class="sf-dateline-no">{c.no}</span>
+                  <span class="sf-dateline-stack">
+                    <span class="sf-dateline-event">{c.slate}</span>
+                    <span class="sf-dateline-date">{c.date}</span>
+                  </span>
+                </div>
                 <h2 class="sf-row-title">{c.title}</h2>
                 <p class="sf-row-copy">{c.body}</p>
                 <span class="sf-row-cta">{c.cta} <span class="arrow" aria-hidden="true">→</span></span>
@@ -180,38 +225,53 @@ const ROW_SIZES = [
 </Base>
 
 <style>
+  /* OPERATOR REWORK 2026-08-05 — the stage is no longer a full-bleed band
+     with type over the picture. It is a two-column composition: the square
+     photograph at NATIVE ratio on the left, the masthead and title stack on
+     the right. Nothing is cropped and nothing is stretched. */
   .sf-stage {
     position: relative;
-    min-height: 70svh;
+    padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3rem) 0;
     display: grid;
-    align-content: end;
+    gap: 1rem;
+  }
+  .sf-stage-inner {
+    width: min(100%, 78rem);
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 40rem) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  .sf-cover-frame {
+    position: relative;
+    border-radius: 8px;
     overflow: clip;
+    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.75);
   }
-  .sf-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16/9; }
-  .sf-scrim {
+  /* height:auto + no object-fit = the 1:1 source renders as 1:1. */
+  .sf-cover-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .sf-corner {
     position: absolute;
-    inset: 0;
-    z-index: 1;
-    background:
-      linear-gradient(to bottom, rgba(10, 13, 18, 0.6) 0%, rgba(10, 13, 18, 0.12) 26%, transparent 42%),
-      linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.4) 30%, transparent 58%);
+    top: 0.9rem;
+    z-index: 2;
+    font-size: 0.6rem;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
   }
-  .sf-corner { position: absolute; top: 5.5rem; z-index: 2; font-size: 0.6rem; }
-  .sf-corner--tl { left: 1.25rem; }
-  .sf-corner--tr { right: 1.25rem; }
+  .sf-corner--tl { left: 1rem; }
+  .sf-corner--tr { right: 1rem; }
   .sf-accent { color: var(--color-accent); }
   .sf-coords {
-    position: absolute;
-    right: 1.1rem;
-    top: 45%;
-    z-index: 2;
-    transform: translateY(-50%);
-    writing-mode: vertical-rl;
     font-size: 0.55rem;
     letter-spacing: 0.3em;
     color: var(--color-accent-deep);
+    margin-top: 0.4rem;
   }
-  .sf-masthead { position: absolute; top: 10%; left: 0; right: 0; z-index: 2; text-align: center; }
+  .sf-masthead { margin-bottom: 0.2rem; }
   .sf-masthead-word {
     font-family: var(--font-display-condensed);
     font-size: clamp(2.2rem, 8vw, 4rem);
@@ -222,7 +282,8 @@ const ROW_SIZES = [
     text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
   }
   .sf-masthead-credit { margin-top: 0.5rem; font-size: 0.58rem; letter-spacing: 0.32em; color: color-mix(in srgb, #fff 72%, transparent); }
-  .sf-titleblock { position: relative; z-index: 2; max-width: 42rem; margin: 0 auto; padding: 0 1.5rem 2.5rem; display: grid; gap: 0.6rem; text-align: center; }
+  /* Left-aligned now that it sits beside the picture rather than over it. */
+  .sf-titleblock { display: grid; gap: 0.55rem; justify-items: start; text-align: left; }
   .sf-title {
     font-family: var(--font-display);
     font-optical-sizing: auto;
@@ -233,11 +294,16 @@ const ROW_SIZES = [
     letter-spacing: -0.01em;
     font-style: italic;
   }
-  .sf-deck { max-width: 38ch; margin-inline: auto; font-family: var(--font-display); font-style: italic; font-size: 0.98rem; line-height: 1.5; color: color-mix(in srgb, #fff 92%, transparent); }
-  .sf-teasers { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1.2rem; margin-top: 0.2rem; padding: 0; list-style: none; }
+  .sf-deck { max-width: 38ch; font-family: var(--font-display); font-style: italic; font-size: 0.98rem; line-height: 1.5; color: color-mix(in srgb, #fff 92%, transparent); }
+  .sf-teasers { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-top: 0.2rem; padding: 0; list-style: none; }
   .sf-teasers li { font-size: 0.56rem; color: color-mix(in srgb, #fff 68%, transparent); }
   .sf-teasers li::before { content: "◆ "; color: var(--color-accent); font-size: 0.5em; vertical-align: 20%; }
-  .sf-cue { position: relative; z-index: 2; text-align: center; padding-bottom: 0.8rem; font-size: 0.58rem; color: color-mix(in srgb, #fff 55%, transparent); }
+  .sf-cue { position: relative; z-index: 2; text-align: center; padding-block: 1.6rem 0.8rem; font-size: 0.58rem; color: color-mix(in srgb, #fff 55%, transparent); }
+
+  @media (max-width: 900px) {
+    .sf-stage-inner { grid-template-columns: 1fr; gap: 1.4rem; }
+    .sf-cover-frame { max-width: 34rem; margin-inline: auto; }
+  }
 
   .sf-report { overflow-x: clip; }
   .sf-col { margin-inline: auto; max-width: 48rem; padding-inline: 2rem; }
@@ -288,7 +354,46 @@ const ROW_SIZES = [
     gap: 0.4rem;
     align-content: center;
   }
-  .sf-row-date { color: var(--color-ink-muted); letter-spacing: 0.14em; }
+  /* ── THE DATELINE PLATE (2026-08-05) ────────────────────────────────────
+     Constant across all five rows — a repeating masthead is what makes them
+     read as one series. The event NAME carries the display scale rather than
+     the year, because four of the five years would read 2025/2026/2026/2026
+     and defeat the purpose. */
+  .sf-dateline {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    margin-bottom: 0.55rem;
+  }
+  .sf-dateline-no {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 0.85;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+  .sf-dateline-stack { display: grid; gap: 0.12rem; }
+  .sf-dateline-event {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(1rem, 1.9vw, 1.25rem);
+    line-height: 1.15;
+    color: var(--color-peak);
+  }
+  /* The actual fix he asked for: the date was 0.68rem muted mono. Now larger,
+     brighter, letterspaced, and no longer a typographic clone of the line
+     above it. */
+  .sf-dateline-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
   .sf-row-title {
     font-family: var(--font-display);
     font-style: italic;
@@ -311,36 +416,20 @@ const ROW_SIZES = [
   .sf-row:focus-visible .sf-row-cta .arrow { transform: translateX(4px); }
   .sf-row-cta .arrow { display: inline-block; transition: transform var(--dur-hover, 160ms) var(--ease-swift); }
 
-  /* 01 — FEATURED: big 16:9 image left (58fr), text right */
+  /* 01 — FEATURED: big image left, text right. The 2025 festival. */
   .sf-row--featured {
     grid-template-columns: 58fr 34fr;
   }
-  /* 02 — TEXT-ONLY: the one visit with no photo pool. Reads as a quieter
-     interstitial rather than a card with a hole where a photo should be —
-     an accent rule stands in for the image and holds the row's rhythm. */
-  .sf-row--textonly {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  /* 05 — FEATURED-FLIP: the mirror of 01. Same weight, opposite hand, so the
+     two full festivals bookend the page and the sequence ends large instead
+     of trailing off on the two smallest rows. */
+  .sf-row--featured-flip {
+    grid-template-columns: 34fr 58fr;
   }
-  .sf-row--textonly .sf-row-body {
-    max-width: 42rem;
-    text-align: center;
-    justify-items: center;
-    padding-block: 0.6rem;
-    border-left: none;
-  }
-  .sf-row--textonly .sf-row-title::after {
-    content: "";
-    display: block;
-    width: 3rem;
-    height: 1px;
-    margin: 0.9rem auto 0;
-    background: var(--color-accent);
-    opacity: 0.7;
-  }
-  .sf-row--textonly .sf-row-copy {
-    margin-inline: auto;
-  }
+  .sf-row--featured-flip .sf-row-media { order: 2; }
+  .sf-row--featured-flip .sf-row-body { order: 1; }
+  /* (The old `textonly` variant is gone — row 02 now carries the Devil in
+     Disguise venue sign at thumb scale instead of standing in with a rule.) */
 
   /* 03 — BANNER: contained 2:1 band stacked above centered text */
   .sf-row--banner {
