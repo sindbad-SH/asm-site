@@ -380,10 +380,18 @@ const CARDS = [
     titleSize: 122,
     instructor: "Nick C. Goins Jr.",
     motif: (t) => motifSpotlightLedger(t.motif),
-    // NO photo — see the MEME-ARCHIVE-2026-08-03 header note: no genuine
-    // Pitch Quorum photography exists in the archive. Honest miss, same
-    // treatment as Sound Workshop below.
-    photo: null,
+    // OPERATOR SWAP 2026-08-05 (made by hand in Claude Design, ported here).
+    // This card used to run photo-less — "no genuine Pitch Quorum photography
+    // exists in the archive," an honest miss. The operator filled it by moving
+    // the Catalina "Via Casino" frame across from business-of-show-business,
+    // which in turn took the AFM speaker graphic below. Same left-panel crop
+    // that card used, unchanged: the suited attendee under the arch, face
+    // fully in frame, no gutter or neighbouring-panel sliver.
+    // HONESTY NOTE: this is a Catalina Film Festival frame standing in on a
+    // Pitch Quorum card — MEME's own archive, so it clears the standing rule
+    // that barred PitchBoulder photography from this page, but it is not
+    // photography OF this program. The card claims nothing about the image.
+    photo: { file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival.jfif"), box: [21, 121, 688, 860] },
   },
   {
     slug: "market-fresh",
@@ -405,15 +413,32 @@ const CARDS = [
     title: ["The Business Of", "Show Business"],
     titleSize: 76,
     instructor: "Nick C. Goins Jr.",
-    motif: (t) => motifLedgerArc(t.text, t.motif),
-    // "Catalina Film Festival.jfif" is a 3-panel collage (measured white
-    // gutters: panel border 0-20px, vertical gutter 710-729px, right column
-    // split 710-731px — verified by column/row brightness scan, not eyeballed).
-    // LEFT PANEL ONLY (x 21-709, y 21-1418): the suited attendee under the
-    // "Via Casino" arch. box stays fully inside that single panel — no
-    // gutter or right-column sliver anywhere near the crop edges (checked
-    // at full resolution). Face fully in frame, not sliced.
-    photo: { file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival.jfif"), box: [21, 121, 688, 860] },
+    // OPERATOR SWAP 2026-08-05 (made by hand in Claude Design, ported here).
+    // The Catalina "Via Casino" frame moved to pitch-quorum; this card takes
+    // MEME's own AFM speaker graphic, whose baked-in headline — "WHERE THE
+    // BUSINESS OF SHOW-BUSINESS IS DONE" — is literally this program's name.
+    //
+    // Rendered INSET, not as a duotone background: it is a finished piece of
+    // design (Nick C. Goins' headshot, the pull-quote, the AFM lockup, its own
+    // navy//teal palette), so cover-cropping and duotoning it would destroy
+    // both its type and its composition. `fit: "inset"` contains it whole on
+    // the card's navy, with the kicker/title/instructor stack below it. Motif
+    // dropped for the same reason the PA Workshop chevrons went — the graphic
+    // is busy enough without a second decorative layer over it.
+    //
+    // ⚠ DATING RULE — the source graphic's bottom line reads "NOVEMBER 11-16 |
+    // LOS ANGELES", i.e. one specific AFM edition. This page is an EVERGREEN
+    // program catalog, and that rule is why the dated flyers were retired and
+    // why the "WEDNESDAY, December 4th" whiteboard frame is deliberately
+    // unused. The box below therefore stops at y=968, which keeps the
+    // "American Film Market®" wordmark and drops the dated line beneath it.
+    // To ship the graphic whole instead, change height 968 → 1070.
+    motif: null,
+    photo: {
+      file: join(MEME_ARCHIVE_ROOT, "554851070_1097517292578585_3332508522834382840_n.jpg"),
+      box: [0, 0, 1070, 968],
+      fit: "inset",
+    },
   },
   {
     slug: "pa-workshop",
@@ -490,7 +515,43 @@ const W = 1080,
 const DUOTONE_SHADOW = { r: 1, g: 29, b: 76 }; // #011D4C — the kit navy
 const DUOTONE_HIGHLIGHT = { r: 185, g: 196, b: 214 }; // #B9C4D6 — desaturated light slate
 
+// INSET MODE (2026-08-05) — for a card whose "photo" is a finished graphic
+// rather than a photograph. Instead of cover-cropping and duotoning it into a
+// background, the artwork is contained WHOLE on the card's navy, sitting in
+// the space above the title block. Downstream is unchanged: this still returns
+// a full-size card background, so `hasPhoto` stays true and the scrim/type
+// layer composites over it exactly as it does for a duotone card.
+const INSET_TOP = 150; // clears the kicker row (y≈112)
+const INSET_BOTTOM = 1000; // clears the accent rule above the title block
+async function buildInsetPhoto(photo) {
+  let pipeline = sharp(photo.file).rotate();
+  if (photo.box) {
+    const [left, top, width, height] = photo.box;
+    pipeline = pipeline.extract({ left, top, width, height });
+  }
+  const boxW = (W - MARGIN * 2) * SCALE;
+  const boxH = (INSET_BOTTOM - INSET_TOP) * SCALE;
+  const art = await pipeline
+    .resize({ width: boxW, height: boxH, fit: "inside", withoutEnlargement: false })
+    .png()
+    .toBuffer();
+  const meta = await sharp(art).metadata();
+  return sharp({
+    create: { width: W * SCALE, height: H * SCALE, channels: 3, background: NAVY },
+  })
+    .composite([
+      {
+        input: art,
+        left: Math.round((W * SCALE - meta.width) / 2),
+        top: Math.round(INSET_TOP * SCALE + (boxH - meta.height) / 2),
+      },
+    ])
+    .png()
+    .toBuffer();
+}
+
 async function buildDuotonePhoto(photo) {
+  if (photo.fit === "inset") return buildInsetPhoto(photo);
   let pipeline = sharp(photo.file).rotate();
   if (photo.box) {
     const [left, top, width, height] = photo.box;
@@ -659,7 +720,7 @@ const STRIP_SHOTS = [
     // separate moments rather than one repeat (the card is a tight portrait
     // duotone carrying type, this is a plain full-colour landscape).
     file: join(MEME_ARCHIVE_ROOT, "American Film Market photo.jfif"),
-    box: [0, 620, 1080, 720],
+    box: [0, 0, 1080, 1350], // OPERATOR 2026-08-05: was the bottom half only (50% of a portrait frame); now near-full 4:5
   },
   {
     slug: "world-catalina",
@@ -669,7 +730,7 @@ const STRIP_SHOTS = [
     // LEFT PANEL ONLY (x 21-709, y 21-1418): the mermaid "Catalina Film
     // Festival" banner. No people in this crop.
     file: join(MEME_ARCHIVE_ROOT, "Catalina Film Festival 2.jfif"),
-    box: [21, 121, 688, 459],
+    box: [45, 120, 640, 1270], // OPERATOR 2026-08-05: was a 3:2 slice through the banner; now the whole roll-up
   },
   {
     slug: "world-retreat",
@@ -680,13 +741,16 @@ const STRIP_SHOTS = [
     // that, so the patch falls outside the frame while every head stays
     // fully in shot.
     file: join(MEME_ARCHIVE_ROOT, "Writer's Retreat.jfif"),
-    box: [172, 87, 1096, 731],
+    box: [0, 0, 1440, 1134], // OPERATOR 2026-08-05: was 3:2 and cut everyone off at chest height; now the full frame
   },
 ];
 // Grade at the LARGEST output width (1600) so every WIDTHS tier is a
 // downscale, never an upscale — same reasoning as the cards' 2x SCALE render.
-const STRIP_W = 1600,
-  STRIP_H = 1067; // ~3:2, matches meme.astro's world-strip layout
+// OPERATOR 2026-08-05 — was a forced 1600x1067 (3:2) cover resize, which meant
+// every extract box above had to be reverse-engineered to land on 3:2 and the
+// LAYOUT was dictating the crop. Now a width cap only: each photo keeps its own
+// shape, and meme.astro's strip is a justified row that adapts to them.
+const STRIP_MAXW = 1600;
 const STRIP_AVIF = { quality: 62, effort: 5 };
 const STRIP_WEBP = { quality: 82, effort: 5 };
 
@@ -702,13 +766,13 @@ for (const shot of STRIP_SHOTS) {
   // to hold black point), modulate() lifts saturation a touch; nowhere near
   // the posterize threshold the operator has flagged before at higher values.
   const graded = await pipeline
-    .resize({ width: STRIP_W, height: STRIP_H, fit: "cover" })
+    .resize({ width: STRIP_MAXW, withoutEnlargement: true })
     .linear(1.06, -8)
     .modulate({ saturation: 1.12 })
     .toBuffer();
   let bytes = 0;
   for (const w of WIDTHS) {
-    const base = sharp(graded).resize({ width: w });
+    const base = sharp(graded).resize({ width: w, withoutEnlargement: true });
     for (const [ext, opts] of [["avif", STRIP_AVIF], ["webp", STRIP_WEBP]]) {
       const buf = await base.clone()[ext](opts).toBuffer();
       const { writeFileSync } = await import("node:fs");
