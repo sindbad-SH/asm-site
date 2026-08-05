@@ -421,7 +421,16 @@ const CARDS = [
     title: ["PA Workshop"],
     titleSize: 126,
     instructor: "Adam Smestad",
-    motif: (t) => motifChevrons(t.motif),
+    // OPERATOR FIX 2026-08-05 — was motifChevrons(t.motif). On every other
+    // photo-backed card the deep-crimson motif disappears into a dark region
+    // of the duotone; on this one it lands squarely on the bright window wall
+    // in the middle of the frame and reads as a red scrawl over the room —
+    // operator: "get rid of the red X that's in the center of this image."
+    // Dropped rather than repositioned: the motif is a texture accent, and
+    // this photograph has no dark quarter to hide it in. The kicker, accent
+    // bar and title still carry the On-Set Craft signal-red, so the card
+    // keeps its track identity.
+    motif: null,
     // "PA Workshop 2.jpg" — a genuine PA Workshop session in progress.
     // Face-safe manual crop centered on the instructor mid-explanation
     // (coral shirt) with an engaged attendee alongside; deliberately stops
@@ -577,7 +586,7 @@ function buildCardSvg(card) {
   ${background}
   <g clip-path="url(#cardClip)">
     <defs><clipPath id="cardClip"><rect width="${W}" height="${H}" rx="12"/></clipPath></defs>
-    <g opacity="${motifOpacity}">${card.motif(track)}</g>
+    ${card.motif ? `<g opacity="${motifOpacity}">${card.motif(track)}</g>` : ""}
     ${scrims}
     <rect x="${MARGIN}" y="${MARGIN}" width="64" height="6" rx="3" fill="${track.text}"/>
     <text x="${MARGIN}" y="${kickerY}" font-family="Montserrat" font-weight="700" font-size="26" letter-spacing="2.5" fill="${track.text}">${esc(track.label)}</text>
