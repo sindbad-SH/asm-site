@@ -1534,53 +1534,40 @@ const ARTICLE = {
   .meme-world-lede {
     max-width: 46ch;
   }
-  /* OPERATOR FIX 2026-08-04 — this row used to be `repeat(3, 1fr)` with every
-     photo forced to `aspect-ratio: 3/2; object-fit: cover`. Three identical
-     rectangles, and the crop was being dictated by the layout: the AFM frame
-     is natively PORTRAIT and lost half its height, the Catalina banner is a
-     tall roll-up and was reduced to a horizontal slice. Operator: "they kind
-     of cut off a lot of stuff and I'd rather... pretty much the full photos
-     are shown in relativity to the copy."
-     Now the photographs keep their own shapes (4:5 portrait / 1:2 banner /
-     5:4 landscape, re-baked in make-meme-evergreen.mjs section 8) and the row
-     is laid out around them: unequal columns, staggered baselines, a degree
-     of tilt — prints set down on a desk, not a third box grid. */
+  /* OPERATOR RESIZE 2026-08-05 — ported from his own Claude Design edit. This
+     was `repeat(3, 1fr)` with every photo forced to `aspect-ratio: 3/2` +
+     `object-fit: cover` — three identical rectangles. Worse, because the
+     layout demanded 3:2, the BAKE was cropped to 3:2 to match: the AFM frame
+     is natively portrait and lost half its height, and the Catalina roll-up
+     was reduced to a horizontal slice through its middle.
+     Now a justified row (the contact-sheet device): each photo runs to a
+     common height and its width follows its own aspect ratio via flex-grow,
+     so nothing is cropped and no two widths match. Photos re-baked at native
+     shape in make-meme-evergreen.mjs §8. */
   .meme-world-strip {
-    display: grid;
-    grid-template-columns: 34fr 24fr 30fr;
-    gap: clamp(1rem, 2.6vw, 2.2rem);
-    margin-top: 1.5rem;
-    align-items: start;
-    /* The section already runs a full-bleed navy band behind itself
-       (.meme-world::before). Inside the 46rem reading column the three prints
-       came out 167-236px wide — postage stamps. The photographs are the point
-       of this beat, so the row breaks out of the column and uses the band it
-       already owns. Text stays at reading width; only the prints go wide.
-       Centred on the BAND, not on the reading column (the column is offset to
-       make room for the ghost "M E M E" letterforms, so centring on it threw
-       the row right). Same 100vw breakout the band itself uses, with padding
-       doing the centring — so the prints stay centred at any width. */
-    width: 100vw;
-    max-width: none;
-    margin-left: calc(50% - 50vw);
-    padding-inline: max(1.5rem, calc((100vw - 74rem) / 2));
-    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: clamp(0.9rem, 2.2vw, 1.6rem);
+    margin-top: 1.3rem;
   }
   .meme-world-shot {
     margin: 0;
     display: grid;
-    gap: 0.6rem;
+    gap: 0.55rem;
+    flex-basis: 0;
+    min-width: 0;
   }
+  /* flex-grow = the photograph's own aspect ratio, so the equal heights fall
+     out of the ratios instead of being imposed on them. */
   .meme-world-shot:nth-child(1) {
-    transform: rotate(-0.7deg);
+    flex-grow: 0.8;
   }
   .meme-world-shot:nth-child(2) {
-    margin-top: 2.6rem;
-    transform: rotate(0.5deg);
+    flex-grow: 0.5;
   }
   .meme-world-shot:nth-child(3) {
-    margin-top: 1.1rem;
-    transform: rotate(-0.4deg);
+    flex-grow: 1.27;
   }
   .meme-world-shot img {
     width: 100%;
@@ -1605,12 +1592,11 @@ const ARTICLE = {
     color: color-mix(in srgb, #eef2f5 58%, transparent);
   }
   @media (max-width: 760px) {
-    .meme-world-strip { grid-template-columns: 1fr; gap: 1.7rem; }
-    .meme-world-shot:nth-child(1),
-    .meme-world-shot:nth-child(2),
-    .meme-world-shot:nth-child(3) { margin-top: 0; transform: none; }
-    /* Stacked, the 1:2 banner would run two screens tall — cap by height and
-       let width follow, so each print sits centred at a readable size. */
+    /* Stacked: the justified row would leave the 1:2 banner a sliver, so each
+       print centres at its own shape, capped by height so the tall one can't
+       run two screens deep. */
+    .meme-world-strip { flex-direction: column; gap: 1.6rem; }
+    .meme-world-shot { flex-grow: 0; flex-basis: auto; }
     .meme-world-shot img {
       width: auto;
       max-width: 100%;
