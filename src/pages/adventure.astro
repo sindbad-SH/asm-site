@@ -9,10 +9,22 @@
  * wrapped in its own <section> so the globe's scroll-handoff retargets to
  * THIS section automatically (GlobeHero.astro targets `root.closest("section")`).
  *
- * ROUND 5 (2026-07-21, operator consolidation): final order is
- * hero/sales → THE TERRITORY (count-free, coverage places added) → THE FIELD
- * teaser (the gallery wall moved to /adventure/field) → the Medieval Festival
- * spread → VYBE → Postcards from the Road → close.
+ * 2026-08-06 (operator direct review): "THE TERRITORY" constellation is
+ * RETIRED. His words — "I'm reconsidering if we need both the territory and
+ * the globe effect... in a sense we've almost got like the stuff appearing
+ * twice." He is right: a 3D globe at the top and a location map two sections
+ * below both answered "where has he been". The map was also the page's worst
+ * honesty defect — its country dots were true, but 57 of its 62 location dots
+ * were drawn 1,500-4,710 km from the real place (a golden-angle spray added to
+ * stop Zermatt/Crans-Montana/Ayent, ~30 km apart, from collapsing into one
+ * point) in identical styling on an accurate coastline, with nothing in the UI
+ * to tell a reader which were real. That is not tunable — the spray existed
+ * precisely to hide the collapse — so the component is deleted rather than
+ * corrected. src/data/territory.ts STAYS: it is the typed provenance inventory
+ * and the source of truth for the archive. It simply has no renderer now.
+ *
+ * Order is now: hero/globe → THE FIELD (travel stories index + board) → the
+ * Medieval Festival spread → VYBE → Postcards from the Road → close.
  *
  * 2026-07-31 (operator direct review): "FROM THE ARCHIVE" is RETIRED — it
  * duplicated the Postcards section below it (Nordic Daughter / Something for
@@ -25,9 +37,7 @@ import DistortionLayer from "../components/DistortionLayer.astro";
 import GlobeHero from "../components/GlobeHero.astro";
 import LegendMark from "../components/LegendMark.astro";
 import PostcardCover from "../components/PostcardCover.astro";
-import WorldMapBackdrop from "../components/WorldMapBackdrop.astro";
 import { PAGES, WORK } from "../consts";
-import { TERRITORY } from "../data/territory";
 import { POSTCARDS } from "../data/postcards";
 import { getCollection } from "astro:content";
 
@@ -81,138 +91,6 @@ const dispatchStream = (await getCollection("fieldNotes", ({ data }) => !data.dr
     };
   });
 const dispatchDateFmt = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
-
-/* ─────────────────────────────────────────────────────────────────────────
- * "THE TERRITORY" constellation geometry — now SEATED ON THE WORLD MAP.
- *
- * The constellation shares ONE coordinate frame with WorldMapBackdrop: a 2:1
- * wrapper (.terr-frame) that reproduces the map SVG's `meet` letterbox exactly
- * (aspect-ratio:2/1, max 100%, centered in the 16:9 field). Because that frame
- * IS the rendered map rectangle, a node's position is pure projection math
- * against the equirectangular world (viewBox 0 0 360 180):
- *     left% = (lon + 180) / 360 * 100      top% = (90 − lat) / 180 * 100
- * No JS measurement, no hand-tuned percentages — lon/lat are the source of
- * truth and cx/cy are derived, so the dots land on their true coastline.
- *
- * The label-collision problem (Switzerland↔Italy are ~0.5% apart at world zoom,
- * Colorado↔New Mexico ~3%): each cluster keeps its DOT at the true point, and
- * its LABEL + expanded location list are offset away on a hairline leader —
- * classic cartographic labeling. The per-cluster `labelDir` fans the callouts
- * apart so they never overlap. The location dots are a decorative legend cloud
- * that sprays around that offset callout (NOT geographic pins — we have no
- * per-place lat/lon), so a dense country reads as "many shoots here" without
- * implying wrong coordinates.
- * ───────────────────────────────────────────────────────────────────────── */
-type LabelDir = "up-left" | "up-right" | "down-left" | "down-right";
-const TERRITORY_CLUSTERS: Record<
-  string,
-  { lat: number; lon: number; labelDir: LabelDir; sprayR: number }
-> = {
-  // lat/lon are the ONLY hand values now; cx/cy derive from them below.
-  // labelDir: both edge-pairs open INWARD (rightward) so no callout runs off the
-  // panel — within each pair the northern dot's label goes up, the southern down,
-  // so the two coincident clusters stack cleanly instead of colliding.
-  Colorado: { lat: 40.0, lon: -105.3, labelDir: "up-right", sprayR: 6 }, // Boulder (N of NM → up)
-  "New Mexico": { lat: 34.5, lon: -106.1, labelDir: "down-right", sprayR: 2 }, // Taos (S → down)
-  // Round 5 — California joins as a coverage territory (⚠ OPERATOR-CONFIRM,
-  // see territory.ts): LA sits well west of the CO/NM pair, so its callout
-  // opens down-LEFT — away from New Mexico's down-right label — and still
-  // lands ~10% inside the frame edge.
-  California: { lat: 34.05, lon: -118.24, labelDir: "down-left", sprayR: 2 }, // Los Angeles
-  // The Alp pair coincides at world zoom, so their up/down callouts share an x —
-  // a tighter spray keeps the two clouds from merging (they separate vertically)
-  // and keeps Switzerland's dense 24-dot cloud inside the frame.
-  Switzerland: { lat: 46.1, lon: 7.9, labelDir: "up-right", sprayR: 4 }, // Valais (N of IT → up)
-  Italy: { lat: 45.9, lon: 9.8, labelDir: "down-right", sprayR: 4 }, // Como / Trentino (S → down)
-};
-
-// Equirectangular projection into the shared 2:1 frame (percent of frame box).
-const lon2x = (lon: number) => ((lon + 180) / 360) * 100;
-const lat2y = (lat: number) => ((90 - lat) / 180) * 100;
-
-// Callout bias: the decorative location cloud sprays around a point pushed off
-// the dot toward the label side, so the two near-coincident Alp clusters throw
-// their clouds apart. dx in x-%, dy in y-% (the frame is 2:1, so a y-% is half
-// the pixels of an x-% — see TERRITORY_YSCALE).
-const LABEL_BIAS: Record<LabelDir, { dx: number; dy: number }> = {
-  "up-left": { dx: -7, dy: -11 },
-  "up-right": { dx: 7, dy: -11 },
-  "down-left": { dx: -7, dy: 11 },
-  "down-right": { dx: 7, dy: 11 },
-};
-
-const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ≈137.5°, the sunflower angle
-// The frame is twice as wide as tall, so 1 y-% is half the pixels of 1 x-%.
-// Doubling the spiral's y component keeps the decorative cloud round on screen.
-const TERRITORY_YSCALE = 2;
-
-function terrSlug(s: string) {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-const territory = TERRITORY.map((c) => {
-  const cfg = TERRITORY_CLUSTERS[c.country];
-  const cx = lon2x(cfg.lon);
-  const cy = lat2y(cfg.lat);
-  const bias = LABEL_BIAS[cfg.labelDir];
-  const sx = cx + bias.dx; // spray center — pushed toward the callout
-  const sy = cy + bias.dy;
-  const n = c.locations.length;
-  const locations = c.locations.map((loc, i) => {
-    const frac = (i + 0.5) / n;
-    const rad = cfg.sprayR * Math.sqrt(frac);
-    const theta = i * GOLDEN_ANGLE;
-    const x = sx + rad * Math.cos(theta);
-    const y = sy + rad * Math.sin(theta) * TERRITORY_YSCALE;
-    // Info chip opens toward the frame interior so it never runs off an edge.
-    const side = x > 58 ? "left" : x < 42 ? "right" : "down";
-    return {
-      ...loc,
-      slug: terrSlug(`${c.country}-${loc.name}`),
-      x: Math.round(x * 100) / 100,
-      y: Math.round(y * 100) / 100,
-      side,
-    };
-  });
-  return {
-    ...c,
-    slug: terrSlug(c.country),
-    cx: Math.round(cx * 100) / 100,
-    cy: Math.round(cy * 100) / 100,
-    labelDir: cfg.labelDir,
-    locations,
-  };
-});
-
-// Decorative hairline arcs, REGENERATED from the true positions in the SAME 2:1
-// frame. The arcs SVG uses viewBox "0 0 100 100" + preserveAspectRatio="none",
-// so x→width and y→height exactly as the CSS percentages do — an (cx,cy)
-// endpoint lands precisely on that cluster's dot. Only the small bow constants
-// are authored; the endpoints are derived, never hand-placed.
-const posOf = (country: string) => {
-  const t = territory.find((c) => c.country === country)!;
-  return { x: t.cx, y: t.cy };
-};
-const terrArc = (a: string, b: string, bowX: number, bowY: number) => {
-  const p = posOf(a);
-  const q = posOf(b);
-  const mx = Math.round(((p.x + q.x) / 2 + bowX) * 100) / 100;
-  const my = Math.round(((p.y + q.y) / 2 + bowY) * 100) / 100;
-  return `M${p.x},${p.y} Q${mx},${my} ${q.x},${q.y}`;
-};
-const TERRITORY_ARCS = [
-  terrArc("Colorado", "Switzerland", 0, -13), // transatlantic bridge (bows north)
-  terrArc("Switzerland", "Italy", 3.5, 7), // the short Alps hop (near-coincident pair)
-  terrArc("Colorado", "New Mexico", -3, 0), // the home column (bows west)
-  terrArc("Colorado", "California", 0, -5), // the coast hop (Round 5 — bows north)
-];
-const AA_HREF = p.aaFunnel.cta.href; // same operator portfolio URL as the gallery (P12.4b)
-// Round 5 NO-COUNT rework: the kicker lists the territory NAMES (self-growing,
-// never a number) instead of the retired outings/territories counts.
-const TERRITORY_KICKER = territory.map((c) => c.label).join(" · ");
 
 // Ambient reel + the floating gallery wall: MOVED to /adventure/field
 // (Round 5 block→subpage pattern). This page keeps a teaser only.
@@ -442,137 +320,6 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
         </section>
       )
     }
-
-    <!-- A2 — the territory -->
-    <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-      <hr class="flight-line mb-6" aria-hidden="true" />
-      <h2 class="text-2xl font-bold" data-reveal>{p.territory.heading}</h2>
-      <p class="text-ink" data-reveal>{p.territory.body}</p>
-
-      {/* ── P12.4c — THE TERRITORY constellation ──────────────────────────────
-          A clickable location-dots map that ILLUSTRATES the copy above: where
-          the operator has actually shot, in outings. No new claim sentences —
-          every string here is functional data/labels (country + location names,
-          outing counts, "License this work →").
-
-          Progressive enhancement model:
-            • Base (no-JS / reduced motion): every location is rendered and
-              visible — the constellation reads as a static star map, nothing
-              needs a click to be seen. Chips (with the license link) reveal on
-              hover / focus so keyboard + no-JS users can still reach the link.
-            • Enhanced (html.js, motion allowed): the interaction script adds
-              `.terr--live`, which collapses each country's locations. Clicking a
-              country node sprays its dots out (staggered); clicking another
-              country collapses the previous. Clicking a location dot opens its
-              info chip. All controls are real <button>s with aria-expanded.
-
-          The <ul> structure IS the plain accessible list the spec asks for:
-          country → its locations, each a labelled control with a real license
-          link. Under no-JS it renders fully expanded, so it doubles as the
-          screen-reader / no-JS fallback list. The decorative SVG arcs are
-          aria-hidden. */}
-      <figure class="terr" data-reveal aria-labelledby="terr-kicker">
-        <figcaption id="terr-kicker" class="terr-kicker hud-label">
-          {/* Round 5 NO-COUNT rework — the kicker names the territories
-              (derived from the data, self-growing) instead of the retired
-              outings/territories counts: a growing body of work is never
-              numerized. */}
-          {TERRITORY_KICKER}
-        </figcaption>
-        <p class="sr-only">
-          Where this work has been shot. Expand a territory to list its
-          locations; aerial-archive locations link out to the licensing
-          portfolio, coverage locations link to their story.
-        </p>
-        <div class="terr-field">
-          {/* The shared coordinate frame: a 2:1 wrapper that reproduces the map
-              SVG's `meet` letterbox exactly, so the constellation and the world
-              behind it live in ONE frame — dots seat on their true coastline by
-              pure projection math (see the geometry block above). The parallax
-              drift now rides this frame, so map + nodes move locked together. */}
-          <div class="terr-frame">
-            {/* Faint world-outline backdrop (atmosphere). Fills the frame; the
-                interactive country dots now carry the "you-are-here" markers
-                (the old in-SVG pings were removed as duplicates). */}
-            <WorldMapBackdrop />
-            <svg
-              class="terr-arcs"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              {TERRITORY_ARCS.map((d) => <path class="terr-arc" d={d} />)}
-            </svg>
-            <ul class="terr-clusters">
-              {
-                territory.map((c) => (
-                  <li
-                    class="terr-cluster"
-                    style={`--cx:${c.cx};--cy:${c.cy}`}
-                    data-country={c.country}
-                    data-label-dir={c.labelDir}
-                  >
-                    <button
-                      type="button"
-                      class="terr-country"
-                      aria-expanded="true"
-                      aria-controls={`terr-locs-${c.slug}`}
-                      aria-label={`${c.country} — expand to list its locations`}
-                    >
-                      <span class="terr-dot" aria-hidden="true" />
-                      <span class="terr-leader" aria-hidden="true" />
-                      <span class="terr-country-label">{c.label}</span>
-                    </button>
-                  <ul class="terr-locations" id={`terr-locs-${c.slug}`}>
-                    {c.locations.map((loc, i) => (
-                      <li
-                        class="terr-loc"
-                        style={`--lx:${loc.x};--ly:${loc.y};--i:${i}`}
-                        data-side={loc.side}
-                      >
-                        <button
-                          type="button"
-                          class="terr-loc-node"
-                          aria-expanded="false"
-                          aria-controls={`terr-chip-${loc.slug}`}
-                          aria-label={loc.name}
-                        >
-                          <span class="terr-loc-dot" aria-hidden="true" />
-                          <span class="terr-loc-label" aria-hidden="true">{loc.name}</span>
-                        </button>
-                        {/* Round 5 — count-free chip: name + the link that
-                            proves the place. Aerial-archive dots keep the
-                            licensing pointer; coverage dots link to their
-                            story page (see territory.ts, ⚠-flagged). */}
-                        <span class="terr-chip" id={`terr-chip-${loc.slug}`} role="group">
-                          <span class="terr-chip-name">{loc.name}</span>
-                          {loc.kind === "coverage" && loc.href ? (
-                            <a class="terr-chip-link link" href={`${base}${loc.href}`}>
-                              {loc.linkLabel ?? "See the story"} <span class="arrow" aria-hidden="true">→</span>
-                            </a>
-                          ) : (
-                            <a
-                              class="terr-chip-link link"
-                              href={AA_HREF}
-                              target="_blank"
-                              rel="noopener"
-                            >
-                              License this work <span class="arrow" aria-hidden="true">→</span>
-                            </a>
-                          )}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))
-            }
-            </ul>
-          </div>
-        </div>
-      </figure>
-    </section>
 
     <!-- A3b — THE FIELD teaser (Round 5): the floating-portraits gallery
          moved to /adventure/field (with the licensed/personal nesting and the
@@ -1562,97 +1309,4 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 
   // ── P19 — the "jump into the painting" click transition moved to
   // /adventure/field with the gallery wall (Round 5).
-
-  // ── P12.4c — THE TERRITORY constellation interaction ─────────────────────
-  // Pure progressive enhancement over the static (all-expanded) base. Under
-  // reduced motion we do NOTHING: every location stays rendered so nothing
-  // needs a click to be seen (the country nodes keep aria-expanded="true" from
-  // the markup, matching the visible state). With motion allowed we add
-  // `.terr--live`, which lets the CSS collapse each country's locations; the
-  // handlers below spray one country's dots at a time and toggle info chips.
-  (() => {
-    const terr = document.querySelector<HTMLElement>(".terr");
-    if (!terr) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const clusters = Array.from(terr.querySelectorAll<HTMLElement>(".terr-cluster"));
-
-    // Enter the live (collapsible) mode and start every country collapsed.
-    terr.classList.add("terr--live");
-    clusters.forEach((cl) => {
-      cl.classList.remove("is-open");
-      cl.querySelector<HTMLElement>(".terr-country")?.setAttribute("aria-expanded", "false");
-    });
-
-    const closeChips = (keep?: Element | null) =>
-      terr.querySelectorAll<HTMLElement>('.terr-loc-node[aria-expanded="true"]').forEach((n) => {
-        if (n !== keep) n.setAttribute("aria-expanded", "false");
-      });
-
-    terr.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-
-      // Country node → expand its locations, collapse every other country.
-      const country = target.closest<HTMLElement>(".terr-country");
-      if (country) {
-        const cluster = country.closest<HTMLElement>(".terr-cluster");
-        const willOpen = country.getAttribute("aria-expanded") !== "true";
-        clusters.forEach((cl) => {
-          const open = cl === cluster && willOpen;
-          cl.classList.toggle("is-open", open);
-          cl.querySelector<HTMLElement>(".terr-country")?.setAttribute(
-            "aria-expanded",
-            String(open),
-          );
-        });
-        closeChips(); // any open chip belonged to a country we may have just collapsed
-        return;
-      }
-
-      // Location dot → toggle its info chip (only one chip open at a time).
-      const loc = target.closest<HTMLElement>(".terr-loc-node");
-      if (loc) {
-        const open = loc.getAttribute("aria-expanded") !== "true";
-        closeChips(open ? loc : null);
-        loc.setAttribute("aria-expanded", String(open));
-      }
-    });
-  })();
-
-  // ── THE TERRITORY — world-frame parallax ─────────────────────────────────
-  // Subtle vertical drift of the WHOLE frame (world map + constellation move
-  // LOCKED together, so a dot never separates from its coastline). Ownership
-  // moved here from WorldMapBackdrop: the map now fills a 2:1 frame with no
-  // internal letterbox to absorb, so the frame is the thing that drifts.
-  // rAF-throttled; bails entirely under reduced motion (var default 0px →
-  // static). No-JS never runs it. On mobile the frame is static and the map is
-  // hidden, so the CSS `transform:none` there makes any --wm-shift a no-op.
-  (() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const frames = Array.from(document.querySelectorAll<HTMLElement>(".terr-frame"));
-    if (!frames.length) return;
-    const AMP = 10; // px — at/under the site's other drift amplitudes
-    let ticking = false;
-
-    const update = () => {
-      ticking = false;
-      const vh = window.innerHeight || 1;
-      for (const frame of frames) {
-        const r = frame.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) continue; // offscreen — skip
-        const progress = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
-        frame.style.setProperty("--wm-shift", `${(-progress * AMP).toFixed(1)}px`);
-      }
-    };
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
-  })();
 </script>
