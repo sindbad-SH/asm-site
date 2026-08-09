@@ -50,9 +50,15 @@ const AVIF = { quality: 50, effort: 5 };
 const WEBP = { quality: 72, effort: 5 };
 
 // Orientation → cover aspect (w/h) + the export widths the pages expect.
+// `reel` (2026-08-06) — a native 9:16 bucket. Its ABSENCE is why four gallery
+// files (madonna-di-campiglio-01/02/03, matterhorn-zermatt-01) shipped with no
+// watermark: there was no in-pipeline way to emit that shape, so they were
+// baked off-pipeline on 2026-07-22 by a script that was never committed and had
+// no watermark step. See scripts/fix-gallery-watermarks-2026-08-06.mjs.
 const ORIENT = {
   landscape: { aspect: 3 / 2, widths: [800, 1400, 2200] },
   vertical: { aspect: 4 / 5, widths: [800, 1120, 1600] },
+  reel: { aspect: 9 / 16, widths: [800, 1120, 1600] },
 };
 
 // Watermark geometry, as fractions of the final canvas (measured off the

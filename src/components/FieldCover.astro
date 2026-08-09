@@ -1,22 +1,25 @@
 ---
 /**
- * FieldCover.astro — the location magazine cover (M4, 2026-07-22).
+ * FieldCover.astro — the location magazine cover (M4 2026-07-22, M5 2026-08-06).
  *
  * Generalizes the Steel & Dust cover treatment into a reusable, self-contained
- * cover for every /field-notes location. Four VARIANTS give the set variety
- * while a single FIELD NOTES masthead keeps it one cohesive series:
+ * cover for every /field-notes location. ONE treatment, so the set reads as one
+ * magazine (M5 — the five slug-hashed variants are retired; two of them,
+ * `band` and `stamp`, rendered on zero pages. See the note in [slug].astro).
  *
- *   sky   — masthead in the top sky band, title set into the lower third
- *           (the Steel & Dust grammar).
- *   spine — masthead rotated up the left spine, an oversized title bleeding
- *           off the bottom edge (film one-sheet).
- *   band  — a solid ink band across the foot carries title + deck; masthead
- *           small, top-left (editorial cover).
- *   stamp — a circular FIELD NOTES seal + title top-left, survey marks (dossier).
+ * THE FRAME IS THE PHOTOGRAPH. `aspect` carries the lead's true W/H, measured
+ * at build time by the caller, so the cover is 3:2, 4:5 or 9:16 as shot — never
+ * a crop. The shape bucket below sets only how WIDE to draw it.
  *
- * The lead photo fills the frame (4:5 for vertical leads, 3:2 for landscape).
- * The Amazing Aerial licensing stitch (logo + "commercial & editorial
- * licensing" → the operator's collection) rides the cover when licensed.
+ * WATERMARK CONTRACT — the gallery exports carry a burned-in AMAZING AERIAL
+ * wordmark CENTRED at 0.47·W and an ASM monogram bottom-right at 0.073·W / 3%
+ * inset (scripts/make-adventure-frame.mjs:59-66, 300-314). Two placements are
+ * therefore load-bearing and must not be moved back:
+ *   · small type never sits mid-frame — the slate rides the FOOT rail (scrim
+ *     ~0.79) instead of above the headline (scrim 0.04-0.20, on the wordmark).
+ *   · the AA licensing stitch sits TOP-right — bottom-right lands on the
+ *     monogram.
+ * The big serif headline may cross the wordmark; it is heavy enough to read.
  *
  * HONESTY: every string is passed in from the note's own data (title, deck,
  * location, territory, date). No coordinates are invented — the survey texture
@@ -38,7 +41,8 @@ interface Props {
   location?: string;
   territory?: string;
   dateSlate?: string;
-  variant?: "sky" | "spine" | "band" | "stamp" | "editorial";
+  /** The lead photo's true `W / H`, measured at build time. Drives the frame. */
+  aspect?: string;
   licensed?: boolean;
   aaLogo?: string;
   aaHref?: string;
@@ -55,7 +59,7 @@ const {
   location,
   territory,
   dateSlate,
-  variant = "sky",
+  aspect,
   licensed = false,
   aaLogo,
   aaHref,
@@ -64,10 +68,24 @@ const {
 
 // The big line: an editorial headline when supplied, else the factual title.
 const bigLine = headline ?? title;
-const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(min-width: 1100px) 1000px, 94vw";
+
+// The shape bucket decides only how WIDE the frame is drawn (and the `sizes`
+// hint) — never a crop. Falls back to the declared orientation if the export
+// could not be measured.
+const ratio = (() => {
+  const [w, h] = (aspect ?? "").split("/").map((n) => parseFloat(n));
+  return w && h ? w / h : orientation === "vertical" ? 0.8 : 1.5;
+})();
+const shape = ratio >= 1.2 ? "wide" : ratio >= 0.7 ? "portrait" : "tall";
+const sizes =
+  shape === "wide"
+    ? "(min-width: 1100px) 1000px, 94vw"
+    : shape === "portrait"
+      ? "(min-width: 760px) 620px, 92vw"
+      : "(min-width: 620px) 480px, 92vw";
 ---
 
-<figure class={`fcover fcover--${variant} fcover--${orientation} ${klass}`} data-reveal>
+<figure class={`fcover fcover--${shape} ${klass}`} style={`--fcover-r: ${ratio.toFixed(4)}`} data-reveal>
   {
     media ? (
       <picture>
@@ -85,49 +103,48 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
   <span class="fcover-mark fcover-mark--tl" aria-hidden="true"></span>
   <span class="fcover-mark fcover-mark--br" aria-hidden="true"></span>
 
-  {/* masthead — placement varies by variant via CSS */}
   <p class="fcover-masthead">
     <span class="fcover-mast-word">Field Notes</span>
     <span class="fcover-mast-credit hud-label">Adventure Storytelling Media</span>
   </p>
 
-  {/* dossier seal (stamp variant only; hidden otherwise) */}
-  <span class="fcover-seal" aria-hidden="true">
-    <span class="fcover-seal-top">Field Notes</span>
-    <span class="fcover-seal-mid">{territory ?? "Field"}</span>
-    <span class="fcover-seal-bot">Adventure Storytelling</span>
-  </span>
-
-  {/* the title block */}
-  <div class="fcover-block">
-    <p class="fcover-kicker hud-label">
-      {/* the editorial variant leads the kicker with a dash rule (the flagship
-          grammar). Location already carries the country, so no redundant
-          territory repeat. */}
-      {variant === "editorial" && <span class="fcover-rule" aria-hidden="true"></span>}
-      <span class="fcover-terr">{location ?? territory}</span>
-      {dateSlate && <span class="fcover-date"> · {dateSlate}</span>}
+  {/* THE FOOT — headline, deck and the factual slate as ONE bottom-anchored
+      stack, so nothing is positioned by a guessed clearance. The slate carries
+      place and date on the rail (see the watermark contract above); the old
+      "Field Notes · <territory>" folio is gone — it duplicated the masthead
+      while the real slate was stranded mid-frame on the wordmark. */}
+  <div class="fcover-foot">
+    <div class="fcover-block">
+      <h1 class="fcover-title">{bigLine}</h1>
+      {deck && <p class="fcover-deck">{deck}</p>}
+    </div>
+    <p class="fcover-rail">
+      <span class="fcover-slate hud-label">
+        <span class="fcover-rule" aria-hidden="true"></span>
+        <span class="fcover-place">{location ?? territory}</span>
+        {dateSlate && <span class="fcover-date"> · {dateSlate}</span>}
+      </span>
+      <span class="fcover-cue hud-label" aria-hidden="true">Read the dispatch ↓</span>
     </p>
-    <h1 class="fcover-title">{bigLine}</h1>
-    {deck && <p class="fcover-deck">{deck}</p>}
   </div>
 
-  {/* editorial variant — folio + scroll cue at the foot (flagship grammar) */}
-  {
-    variant === "editorial" && (
-      <>
-        <p class="fcover-folio hud-label" aria-hidden="true">Field Notes{territory ? ` · ${territory}` : ""}</p>
-        <p class="fcover-cue hud-label" aria-hidden="true">Read the dispatch ↓</p>
-      </>
-    )
-  }
-
-  {/* Amazing Aerial licensing stitch */}
+  {/* Amazing Aerial licensing stitch — TOP-right, clearing the burned-in
+      monogram bottom-right. The line is the Honesty Ledger's permittedPhrasing
+      verbatim (consts.ts amazing-aerial) per the PARTNER-LOGO RULE, which
+      requires the logo to sit adjacent to that exact wording. It stays visually
+      SUBORDINATE to the FIELD NOTES masthead — this is a licensing credit, not
+      co-branding. */}
   {
     licensed && aaLogo && aaHref && (
-      <a class="fcover-aa" href={aaHref} target="_blank" rel="noopener" aria-label="Licensing through Amazing Aerial Agency">
+      <a
+        class="fcover-aa"
+        href={aaHref}
+        target="_blank"
+        rel="noopener"
+        aria-label="Aerial work licensed through Amazing Aerial Agency"
+      >
         <img src={aaLogo} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
-        <span class="fcover-aa-line hud-label">Commercial &amp; editorial licensing</span>
+        <span class="fcover-aa-line hud-label">Aerial work licensed through Amazing Aerial Agency</span>
       </a>
     )
   }
@@ -136,20 +153,44 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
 <style>
   .fcover {
     position: relative;
-    margin: 0 auto;
+    /* Type scales to the FRAME, not the viewport. The old vw clamps gave a
+       620px vertical the same 83px headline as a 1000px landscape —
+       proportionally 61% larger — which is why the vertical covers ran 45-47%
+       type block and overflowed the frame on a phone. One set of rules now
+       serves all three silhouettes and mobile, with no per-shape overrides. */
+    container-type: inline-size;
+    /* The frame IS the photograph's ratio — a plain NUMBER (W÷H) measured at
+       build, not a `W / H` pair, so the same custom property also works inside
+       the calc() that drives the phone extension band below. The fallback only
+       fires if the export could not be read. */
+    aspect-ratio: var(--fcover-r, 1.5);
+    /* The wide frame is deliberately wider than the .spotlight column, so it
+       must be CENTRED on it. `margin: 0 auto` CANNOT centre an over-wide child
+       — the auto margins collapse and it bleeds right only, causing horizontal
+       page scroll at ~1100px. Use `transform`, NOT `translate`: global.css
+       sets `html.js [data-reveal] { translate: 0 28px }` UNLAYERED at (0,2,1),
+       which beats any Astro-scoped rule and would clobber it on reveal — the
+       same trap documented in global.css for the authored tilts. */
+    left: 50%;
+    transform: translateX(-50%);
+    /* no margin here — .spotlight-cover supplies the 2.75rem below the cover,
+       which the old `margin: 0 auto` was silently overriding. */
     overflow: hidden;
     border-radius: 10px;
     background: var(--color-elevated);
     box-shadow: 0 34px 90px -30px rgba(0, 0, 0, 0.7);
   }
-  .fcover--vertical {
-    width: min(92vw, 620px);
-    aspect-ratio: 4 / 5;
-  }
-  .fcover--landscape {
+  /* Shape buckets set only how WIDE the frame is drawn — never a crop. */
+  .fcover--wide {
     width: min(94vw, 1000px);
-    aspect-ratio: 3 / 2;
   }
+  .fcover--portrait {
+    width: min(92vw, 620px);
+  }
+  .fcover--tall {
+    width: min(92vw, 480px);
+  }
+
   /* the <picture> wrapper must fill the cover so the absolute img has a box */
   .fcover > picture {
     position: absolute;
@@ -162,6 +203,8 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
     inset: 0;
     width: 100%;
     height: 100%;
+    /* a no-op now that the box matches the frame; kept as the safety net for
+       the fallback-ratio case */
     object-fit: cover;
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -210,75 +253,160 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
     border-right: 1px solid var(--color-accent-deep);
   }
 
-  /* masthead */
+  /* masthead — top-left, paired with the AA stitch top-right */
   .fcover-masthead {
-    top: 7%;
-    left: 0;
-    right: 0;
-    text-align: center;
+    top: clamp(14px, 3cqi, 22px);
+    left: clamp(14px, 3cqi, 22px);
+    margin: 0;
   }
   .fcover-mast-word {
     display: block;
     font-family: var(--font-display-condensed);
-    font-size: clamp(1.7rem, 6vw, 3rem);
+    font-size: clamp(0.95rem, 3.4cqi, 1.5rem);
     line-height: 1;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #fff;
     text-shadow: 0 2px 22px rgba(0, 0, 0, 0.5);
   }
   .fcover-mast-credit {
     display: block;
-    margin-top: 0.4rem;
-    font-size: 0.52rem;
-    letter-spacing: 0.32em;
+    margin-top: 0.35rem;
+    font-size: clamp(0.42rem, 1.15cqi, 0.52rem);
+    letter-spacing: 0.24em;
     color: color-mix(in srgb, #fff 70%, transparent);
   }
 
-  /* title block (default: lower-left) */
-  .fcover-block {
-    left: 20px;
-    right: 20px;
-    bottom: 18px;
+  /* ── THE FOOT ────────────────────────────────────────────────────────────
+     One bottom-anchored stack: the type block, then the rail beneath it. The
+     old build lifted the block to `bottom: clamp(52px,9vw,82px)` to clear a
+     separately-positioned folio, which put its kicker at ~48% frame height —
+     directly on the centred AMAZING AERIAL wordmark, at scrim alpha 0.09-0.11.
+     There is no `bottom` value that fixes that: to clear the wordmark on a 3:2
+     frame the kicker top must exceed y=411, the block is 258px tall, and
+     667 − 411 − 258 = −2.3px. So the kicker LEAVES the block and becomes the
+     rail, which sits at the foot where the scrim is ~0.79. */
+  .fcover-foot {
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: grid;
-    gap: 0.5rem;
+    gap: clamp(0.7rem, 2cqi, 1.1rem);
+    padding: 0 clamp(16px, 4.6cqi, 56px) clamp(14px, 2.6cqi, 22px);
   }
-  .fcover-kicker {
-    font-size: 0.6rem;
-    color: color-mix(in srgb, #fff 78%, transparent);
-  }
-  .fcover-terr {
-    color: var(--color-accent);
-  }
-  .fcover-date {
-    color: color-mix(in srgb, #fff 55%, transparent);
+  .fcover-block {
+    display: grid;
+    gap: clamp(0.5rem, 1.6cqi, 0.9rem);
   }
   .fcover-title {
+    max-width: 16ch;
+    margin: 0;
     font-family: var(--font-display);
     font-optical-sizing: auto;
-    font-weight: 640;
-    font-size: clamp(2.1rem, 7vw, 3.6rem);
+    font-weight: 600;
+    /* cqi = 1% of the container's inline size, so the headline is the same
+       PROPORTION of every frame regardless of which silhouette it lands in */
+    font-size: clamp(1.6rem, 8.3cqi, 5.2rem);
     line-height: 0.98;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
     color: #fff;
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
   }
   .fcover-deck {
-    max-width: 34ch;
+    max-width: 40ch;
+    margin: 0;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+    font-size: clamp(0.82rem, 2cqi, 1.25rem);
     line-height: 1.45;
-    color: color-mix(in srgb, var(--color-ink) 90%, transparent);
+    color: color-mix(in srgb, #fff 90%, transparent);
   }
 
-  /* AA stitch (default: bottom-right) */
+  /* the rail: the factual slate left, the scroll cue right */
+  .fcover-rail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    padding-top: clamp(0.5rem, 1.4cqi, 0.8rem);
+    border-top: 1px solid color-mix(in srgb, #fff 16%, transparent);
+  }
+  .fcover-slate {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    font-size: clamp(0.52rem, 1.32cqi, 0.68rem);
+    letter-spacing: 0.24em;
+    color: var(--color-accent);
+  }
+  .fcover-rule {
+    display: inline-block;
+    flex: none;
+    width: clamp(18px, 4cqi, 44px);
+    height: 1px;
+    background: var(--color-accent);
+  }
+  .fcover-place {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fcover-date {
+    flex: none;
+    color: color-mix(in srgb, var(--color-accent) 62%, transparent);
+  }
+  .fcover-cue {
+    flex: none;
+    font-size: clamp(0.46rem, 1.1cqi, 0.56rem);
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
+  }
+  /* When the rail runs out of room the CUE goes first (it is decorative and
+     aria-hidden), and the slate is allowed to wrap rather than truncate — a
+     clipped place name is a fact half-told, which the ellipsis was doing to
+     "Crans-Montana, Valais, Switzerl…" at 375px. */
+  @container (max-width: 420px) {
+    .fcover-cue {
+      display: none;
+    }
+    .fcover-slate {
+      flex-wrap: wrap;
+      row-gap: 0.2rem;
+    }
+    .fcover-place {
+      overflow: visible;
+      white-space: normal;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .fcover-cue {
+      animation: fcover-cue 2.4s ease-in-out infinite;
+    }
+    @keyframes fcover-cue {
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.85;
+      }
+      50% {
+        transform: translateY(3px);
+        opacity: 1;
+      }
+    }
+  }
+
+  /* AA licensing stitch — TOP-right (bottom-right is the burned-in monogram's
+     seat). Capped so it reads as a credit line, never as co-branding beside
+     the masthead. */
   .fcover-aa {
-    right: 16px;
-    bottom: 14px;
+    top: clamp(14px, 3cqi, 20px);
+    right: clamp(14px, 3cqi, 20px);
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    max-width: 34%;
     padding: 0.3rem 0.5rem;
     border-radius: 5px;
     background: color-mix(in srgb, var(--color-base) 58%, transparent);
@@ -286,204 +414,71 @@ const sizes = orientation === "vertical" ? "(min-width: 900px) 620px, 92vw" : "(
     text-decoration: none;
   }
   .fcover-aa img {
+    flex: none;
     width: auto;
-    height: 20px;
+    height: 18px;
   }
   .fcover-aa-line {
-    font-size: 0.46rem;
-    letter-spacing: 0.16em;
+    font-size: clamp(0.4rem, 1cqi, 0.46rem);
+    line-height: 1.3;
+    letter-spacing: 0.12em;
     color: color-mix(in srgb, #fff 78%, transparent);
-    max-width: 11ch;
   }
-
-  /* seal (hidden unless stamp variant) */
-  .fcover-seal {
-    display: none;
-  }
-
-  /* ─────────────── VARIANT: spine ─────────────── */
-  .fcover--spine .fcover-masthead {
-    top: auto;
-    left: 14px;
-    right: auto;
-    bottom: 20px;
-    text-align: left;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
-  .fcover--spine .fcover-mast-word {
-    font-size: clamp(1.1rem, 3.4vw, 1.7rem);
-    letter-spacing: 0.3em;
-  }
-  .fcover--spine .fcover-mast-credit {
-    margin: 0.4rem 0 0;
-    letter-spacing: 0.28em;
-  }
-  .fcover--spine .fcover-block {
-    left: 58px;
-    right: 12px;
-  }
-  .fcover--spine .fcover-title {
-    font-size: clamp(2.6rem, 11vw, 5rem);
-    letter-spacing: -0.02em;
-    margin-left: -0.04em;
-  }
-
-  /* ─────────────── VARIANT: band ─────────────── */
-  .fcover--band .fcover-masthead {
-    top: 16px;
-    left: 18px;
-    right: auto;
-    text-align: left;
-  }
-  .fcover--band .fcover-mast-word {
-    font-size: clamp(1.1rem, 3.2vw, 1.5rem);
-    letter-spacing: 0.2em;
-  }
-  .fcover--band .fcover-mast-credit {
-    letter-spacing: 0.22em;
-  }
-  .fcover--band .fcover-block {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 1.1rem 1.25rem 1.15rem;
-    background: linear-gradient(to top, rgba(10, 13, 18, 0.94), rgba(10, 13, 18, 0.72));
-    border-top: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
-  }
-  .fcover--band .fcover-title {
-    text-shadow: none;
-  }
-
-  /* ─────────────── VARIANT: stamp ─────────────── */
-  .fcover--stamp .fcover-masthead {
-    display: none;
-  }
-  .fcover--stamp .fcover-block {
-    top: 18px;
-    left: 20px;
-    right: 20px;
-    bottom: auto;
-  }
-  .fcover--stamp .fcover-title {
-    font-size: clamp(1.9rem, 6vw, 3rem);
-  }
-  .fcover--stamp .fcover-deck {
-    color: color-mix(in srgb, #fff 84%, transparent);
-  }
-  .fcover--stamp .fcover-seal {
-    display: grid;
-    place-items: center;
-    gap: 0.05rem;
-    right: 18px;
-    bottom: 18px;
-    width: clamp(74px, 15vw, 104px);
-    height: clamp(74px, 15vw, 104px);
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-    background: color-mix(in srgb, var(--color-base) 40%, transparent);
-    backdrop-filter: blur(3px);
-    text-align: center;
-    text-transform: uppercase;
-  }
-  .fcover-seal-top,
-  .fcover-seal-bot {
-    font-family: var(--font-mono);
-    font-size: 0.4rem;
-    letter-spacing: 0.18em;
-    color: color-mix(in srgb, #fff 72%, transparent);
-  }
-  .fcover-seal-mid {
-    font-family: var(--font-display-condensed);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: var(--color-accent);
-  }
-  /* stamp puts AA bottom-left so it never collides with the seal */
-  .fcover--stamp .fcover-aa {
-    right: auto;
-    left: 16px;
-  }
-
-  /* ─────────────── VARIANT: editorial (the flagship cinematic hero) ───────────────
-     Big Fraunces headline lower-left, a turquoise coordinate kicker led by a
-     dash rule, an italic deck, a folio + scroll cue at the foot. Derived from
-     the operator-reviewed Claude Design "Matterhorn hero" flagship. */
-  .fcover--editorial .fcover-masthead {
-    top: 22px;
-    left: 22px;
-    right: auto;
-    text-align: left;
-  }
-  .fcover--editorial .fcover-mast-word {
-    font-size: clamp(1.1rem, 2.8vw, 1.5rem);
-    letter-spacing: 0.14em;
-  }
-  .fcover--editorial .fcover-mast-credit {
-    letter-spacing: 0.24em;
-  }
-  .fcover--editorial .fcover-block {
-    left: clamp(22px, 5vw, 56px);
-    right: clamp(22px, 5vw, 56px);
-    bottom: clamp(52px, 9vw, 82px);
-    gap: 0.9rem;
-  }
-  .fcover--editorial .fcover-kicker {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.28em;
-    color: var(--color-accent);
-  }
-  .fcover-rule {
-    display: inline-block;
-    width: clamp(24px, 4vw, 44px);
-    height: 1px;
-    background: var(--color-accent);
-  }
-  .fcover--editorial .fcover-date {
-    color: color-mix(in srgb, var(--color-accent) 62%, transparent);
-  }
-  .fcover--editorial .fcover-title {
-    max-width: 16ch;
-    font-weight: 600;
-    font-size: clamp(2.4rem, 8vw, 5.2rem);
-    line-height: 0.98;
-    letter-spacing: -0.015em;
-  }
-  .fcover--editorial .fcover-deck {
-    max-width: 40ch;
-    font-size: clamp(1rem, 1.9vw, 1.25rem);
-    color: color-mix(in srgb, #fff 90%, transparent);
-  }
-  .fcover-folio {
-    left: clamp(22px, 5vw, 56px);
-    bottom: 20px;
-    font-size: 0.56rem;
-    letter-spacing: 0.24em;
-    color: color-mix(in srgb, #fff 60%, transparent);
-  }
-  .fcover-cue {
-    right: clamp(22px, 5vw, 56px);
-    bottom: 20px;
-    font-size: 0.56rem;
-    letter-spacing: 0.2em;
-    color: var(--color-accent);
-  }
-  /* editorial keeps the AA stitch top-right so it clears the headline/folio */
-  .fcover--editorial .fcover-aa {
-    right: 20px;
-    bottom: auto;
-    top: 20px;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    :global(html.js) .fcover--editorial .fcover-cue {
-      animation: fcover-cue 2.4s ease-in-out infinite;
+  /* The line may NEVER be hidden. The PARTNER-LOGO RULE (consts.ts) allows the
+     real AA logo here only "always adjacent to the Ledger phrasing", so a
+     logo-only chip is a compliance break, not a responsive nicety. On a narrow
+     frame (the 480px tall silhouette, and every phone) the chip stacks instead:
+     logo over line, line wrapping to two or three short rows. */
+  @container (max-width: 560px) {
+    .fcover-aa {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      max-width: 40%;
     }
-    @keyframes fcover-cue {
-      0%, 100% { transform: translateY(0); opacity: 0.85; }
-      50% { transform: translateY(3px); opacity: 1; }
+    .fcover-aa img {
+      height: 15px;
+    }
+    .fcover-aa-line {
+      font-size: 0.4rem;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  /* ── THE PHONE EXTENSION BAND ────────────────────────────────────────────
+     On a 375px phone a WIDE frame is 353x234, and after masthead + AA chip +
+     a two-line headline + a three-line deck the type block does not fit — it
+     was overflowing the TOP of the frame and being clipped by
+     `overflow:hidden` on crans-montana, flatirons-chautauqua and
+     varenna-lake-como. The alternative fix is an art-directed 1:1 crop, which
+     discards 33% of the width — MORE than the 29.7% crop this whole change
+     removes, and against his no-crop rule. So instead the frame stops being
+     ratio-locked: the photo holds its true shape at the top and the cover's
+     own dark ground continues below it. The bottom scrim already fades to
+     0.85 black, so the photo's lower edge and the ground meet with no seam.
+
+     WIDE ONLY. A portrait frame at 375px is 345x431 and a tall one 345x613 —
+     both have room, and extending them would only add dead ground.
+
+     This is a MEDIA query, not a container query: `.fcover` is itself the
+     container, and a container can never match its own @container rule. Its
+     descendants can, which is why the type scaling above works — and why the
+     photo's height here can still be expressed in cqi. `.fcover`'s own
+     min-height has to restate the 94vw from the width rule. */
+  @media (max-width: 600px) {
+    .fcover--wide {
+      aspect-ratio: auto;
+      min-height: calc(94vw / var(--fcover-r, 1.5) + 8.5rem);
+    }
+    .fcover--wide > picture,
+    .fcover--wide .fcover-img {
+      bottom: auto;
+      height: calc(100cqi / var(--fcover-r, 1.5));
+    }
+    .fcover--wide .fcover-scrim {
+      background:
+        linear-gradient(to bottom, rgba(10, 13, 18, 0.6) 0%, rgba(10, 13, 18, 0.12) 18%, transparent 34%),
+        linear-gradient(to top, rgba(10, 13, 18, 0.94) 0%, rgba(10, 13, 18, 0.88) 26%, transparent 64%);
     }
   }
 </style>
