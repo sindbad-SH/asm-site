@@ -43,15 +43,18 @@ import { getCollection } from "astro:content";
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-// Slug → gallery media map (moved up from the field-teaser section below,
-// 2026-08-03 — the dispatch-stream thumbnails added that same pass need it
-// earlier in the file; see the note left in the field-teaser section).
+// Slug → gallery media map. Lives up here, ahead of its first caller, because
+// `const TEASER_WIDTHS` does not hoist the way a `function` declaration does —
+// declaring it down in the field-teaser block threw "Cannot access
+// 'TEASER_WIDTHS' before initialization" at request time. Now used by both the
+// travel-stories index below and the teaser itself.
 const TEASER_WIDTHS = {
   landscape: [800, 1400, 2200],
   vertical: [800, 1120, 1600],
@@ -67,30 +70,110 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
   };
 }
 
-// PUB-A (2026-07-27) — the field-notes DISPATCH STREAM: every published note,
-// newest first, surfaced directly on this index page (per ACTION-PLAN.md —
-// "story index framing, not services"). Same source + filter as Nav.astro's
-// dropdown (non-draft notes that carry photos), so the two can never drift.
-//
-// DESIGN AUDIT (2026-08-03) — this was a bare 11-row text list (index + title
-// + date, no imagery) sandwiched between the GlobeHero above and the heavily
-// art-directed Territory map below — the exact "dead trough" pattern flagged
-// site-wide. Fix: each row now carries a lead thumbnail, reusing the SAME
-// gallery export every field note already has (galleryMedia() above). No new
-// media, no new page.
-const dispatchStream = (await getCollection("fieldNotes", ({ data }) => !data.draft))
-  .filter((n) => n.data.photos && n.data.photos.length > 0)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .map((n) => {
-    const lead = n.data.photos![0]!;
-    return {
-      id: n.id,
-      title: n.data.title,
-      date: n.data.date,
-      media: galleryMedia(lead.slug, lead.orientation),
-    };
-  });
-const dispatchDateFmt = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
+/* ── THE TRAVEL-STORIES INDEX (2026-08-06) ─────────────────────────────────
+   Replaces the PUB-A dispatch stream — eleven rows, ALL 704x76px, each a 56px
+   thumbnail + a sort-position numeral + the factual `title`. Operator,
+   2026-08-05: "that straight-down layout, I don't know if I'm a big fan of...
+   it's a big long list and I don't know if people will go down through it
+   all. Or if we should have that list there at all — and if not, just sort of
+   incorporate it a little bit better into the travel stories section."
+
+   The uniformity was the complaint, not the length: one row width and one row
+   height, eleven times. So the list is not deleted — it is this page's ONLY
+   route to any individual story (the field board below is a single <a> around
+   the whole collage, 1 link and 1 tab stop) — it MERGES INTO the travel-
+   stories section, his own second option. One section, not two; one fewer
+   border-t and flight-line seam.
+
+   THREE REGISTERS, one rule: WIDTH COMES FROM SHAPE.
+     · the lead      — the featured note, plate width set by its own aspect
+     · the shoulder  — the next two, unequal widths, staggered
+     · the folio     — the rest as a text index grouped by territory, no images
+
+   The lead and shoulder finally render `headline` and `deck`, which the note
+   schema has carried since M5 and the old list threw away: it printed "Above
+   Crans-Montana" where "The shelf that holds the light" already existed,
+   approved, in the markdown.
+
+   Also retired: 626 KB of thumbnail waste. The old rows shipped `sizes="56px"`
+   against a srcset whose smallest candidate is 800w, so every visitor
+   downloaded eleven 800-wide AVIFs to fill 3,136px² boxes.
+
+   NO NUMBERS. The 01-11 were sort positions that renumbered whenever a
+   markdown file landed; per-territory counts are barred outright by the
+   operator-directed NO-COUNT rule (src/data/territory.ts).                  */
+
+// Native aspect of a lead frame, read at BUILD time from the already-baked
+// 800-wide export (the P12.6 `aspectOf` idiom from Tableaux.astro). A note
+// baked at any shape lays out correctly with nothing to keep in sync by hand —
+// the drift that left matterhorn-zermatt-01 a 9:16 file in a 4:5 box.
+const AR = new Map<string, number>();
+async function leadAspect(slug: string) {
+  if (AR.has(slug)) return AR.get(slug)!;
+  const f = join(process.cwd(), "public", "media", "adventure", "gallery", `${slug}-800.webp`);
+  let ar = 1.5;
+  if (existsSync(f)) {
+    const m = await sharp(f).metadata();
+    if (m.width && m.height) ar = m.width / m.height;
+  }
+  AR.set(slug, ar);
+  return ar;
+}
+
+// YYYY.MM.DD — the site's survey slate, matching /adventure/field and
+// /field-notes. Replaces the old Intl month/year formatter.
+const fmtSlate = (d: Date) =>
+  `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")}`;
+
+// Same collection + same filter as Nav.astro's dropdown, so the index and the
+// nav can never drift — the contract the retired dispatch stream held.
+const notes = await Promise.all(
+  (await getCollection("fieldNotes", ({ data }) => !data.draft))
+    .filter((n) => n.data.photos && n.data.photos.length > 0)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+    .map(async (n) => {
+      const p0 = n.data.photos![0]!;
+      return {
+        id: n.id,
+        head: n.data.headline ?? n.data.title,
+        deck: n.data.deck,
+        place: n.data.location ?? n.data.territory ?? "",
+        territory: n.data.territory ?? "Elsewhere",
+        slate: fmtSlate(n.data.date),
+        alt: p0.alt,
+        featured: n.data.featured === true,
+        ar: await leadAspect(p0.slug),
+        media: galleryMedia(p0.slug, p0.orientation)!,
+      };
+    }),
+);
+
+// Cover story: the newest note flagged `featured: true`, else simply the
+// newest. One boolean he types in the markdown he is already editing — not a
+// hash, which is how the cover variants used to pick and why renaming a file
+// silently changed a page's design.
+const li = Math.max(0, notes.findIndex((n) => n.featured));
+const lead = notes[li];
+const shoulder = notes.filter((_, i) => i !== li).slice(0, 2);
+const rest = notes.filter((n) => n !== lead && !shoulder.includes(n));
+
+// The folio: grouped by territory, groups ordered by their newest note. NO
+// COUNTS — the group head is the territory name and a rule, nothing more.
+const folio: { name: string; rows: typeof rest }[] = [];
+for (const n of rest) {
+  let g = folio.find((f) => f.name === n.territory);
+  if (!g) folio.push((g = { name: n.territory, rows: [] }));
+  g.rows.push(n);
+}
+
+// Plate width by shape (percent of the column) and its exact `sizes`. The
+// column is max-w-5xl (64rem) minus p-8, so 960px once the viewport passes
+// 1024. The `sizes` ladder is LOAD-BEARING: a bare `66vw` makes the browser
+// fetch the 2200w file for a 634px plate.
+const plateW = (ar: number) => (ar >= 1.2 ? 66 : ar >= 0.7 ? 46 : 36);
+const plateSizes = (pct: number) =>
+  `(min-width:1024px) ${Math.round(9.6 * pct)}px, (min-width:900px) calc(${pct}vw - ${Math.round(0.64 * pct)}px), calc(92vw - 42px)`;
+const LW = plateW(lead.ar);
 
 // Ambient reel + the floating gallery wall: MOVED to /adventure/field
 // (Round 5 block→subpage pattern). This page keeps a teaser only.
@@ -236,12 +319,13 @@ const postcards = POSTCARDS.map((pc) => ({
  * source (the fieldNotes collection), so the teaser can never drift from the
  * wall it points at.
  *
- * TEASER_WIDTHS + galleryMedia() moved up to right after the `href` helper
- * near the top of this file (2026-08-03) — the dispatch-stream thumbnails
- * added that same pass call galleryMedia() too, and call it earlier in the
- * file than this comment; `const TEASER_WIDTHS` doesn't hoist the way a
- * `function` declaration does, so leaving it here threw "Cannot access
- * 'TEASER_WIDTHS' before initialization" at request time. See it there now.
+ * TEASER_WIDTHS + galleryMedia() live up near the `href` helper at the top of
+ * this file, not here — see the hoisting note there.
+ *
+ * 2026-08-06: the travel-stories index (the merged dispatch stream) now opens
+ * this same section, so the board is its tail rather than a section of its
+ * own. `teaserStories` survives only as the empty-state guard on the plain-CTA
+ * fallback below; the board itself is hand-composed from the fieldboard bake.
  * ───────────────────────────────────────────────────────────────────────── */
 const TEASER_ORDER = ["matterhorn-zermatt", "bellagio", "flatirons-chautauqua"];
 const teaserStories = (await getCollection("fieldNotes", ({ data }) => !data.draft))
@@ -283,54 +367,107 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       <GlobeHero />
     </section>
 
-    <!-- PUB-A (2026-07-27) — A1b "Hire the operator" (day rate, compliance
-         line, direct booking CTA) REMOVED: this is now a story index, not a
-         services pillar (no service offerings on this site, per
-         ACTION-PLAN.md). Replaced with THE DISPATCH STREAM — every published
-         Field Notes entry, newest first, so the index itself is a feed of
-         real stories rather than a rate card.
-         ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new
-         copy (staging-only until read; see COPY-DECK-A.md). -->
-    {
-      dispatchStream.length > 0 && (
-        <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8">
-          <hr class="flight-line mb-6" aria-hidden="true" />
-          <p class="hud-label" data-reveal>Field Notes · dispatch stream</p>
-          <h2 class="text-2xl font-bold" data-reveal>Every dispatch from the field.</h2>
-          <ol class="dispatch-list">
-            {dispatchStream.map((d, i) => (
-              <li class="dispatch-row" data-reveal data-reveal-stagger="40">
-                <a href={`${base}/field-notes/${d.id}`} class="dispatch-link">
-                  <span class="dispatch-no hud-label" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-                  {d.media && (
-                    <span class="dispatch-thumb">
-                      <picture>
-                        <source type="image/avif" srcset={d.media.avif} sizes="56px" />
-                        <source type="image/webp" srcset={d.media.webp} sizes="56px" />
-                        <img src={d.media.src} alt="" loading="lazy" decoding="async" />
-                      </picture>
-                    </span>
-                  )}
-                  <span class="dispatch-title">{d.title}</span>
-                  <span class="dispatch-date hud-label">{dispatchDateFmt.format(d.date)}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )
-    }
+    <!-- A3b — THE FIELD (Round 5; the dispatch stream merged in 2026-08-06).
+         The floating-portraits gallery lives at /adventure/field; this page
+         keeps ONE block — the travel stories themselves, then the field board
+         as the invitation to the rest.
 
-    <!-- A3b — THE FIELD teaser (Round 5): the floating-portraits gallery
-         moved to /adventure/field (with the licensed/personal nesting and the
-         AA licensing weave); this page keeps ONE inviting block — travel
-         stories from the field, with the wall's three lead frames as the
-         invitation. Copy from consts (⚠ flagged, staging-only until read). -->
+         The retired PUB-A dispatch section that used to sit above this one
+         also retires two ⚠-flagged strings that were never read-approved:
+         "Field Notes · dispatch stream" and "Every dispatch from the field."
+         The second was also a claim the folio could eventually falsify, so
+         retiring it is a correctness fix — do not reinstate it. This section's
+         own copy is p.fieldTeaser, unchanged. -->
     <section class="mx-auto max-w-5xl space-y-4 border-t border-hairline p-8">
       <hr class="flight-line mb-6" aria-hidden="true" />
       <p class="hud-label" data-reveal>{p.fieldTeaser.kicker}</p>
       <h2 class="text-2xl font-bold" data-reveal>{p.fieldTeaser.heading}</h2>
       <p class="max-w-3xl text-ink" data-reveal>{p.fieldTeaser.body}</p>
+
+      {/* ① THE LEAD — plate width comes from the frame's own shape, so a 9:16
+          lead is not a skyscraper and nothing is cropped. */}
+      <a class="df-lead" href={`${base}/field-notes/${lead.id}`} style={`--plate-w:${LW}%`} data-reveal>
+        <div class="df-plate" style={`--ar:${lead.ar.toFixed(4)}`}>
+          <picture>
+            <source type="image/avif" srcset={lead.media.avif} sizes={plateSizes(LW)} />
+            <source type="image/webp" srcset={lead.media.webp} sizes={plateSizes(LW)} />
+            <img
+              src={lead.media.src}
+              alt={lead.alt}
+              width={Math.round(1000 * lead.ar)}
+              height="1000"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+        </div>
+        <div class="df-say">
+          <span class="df-where hud-label">
+            {lead.place} · {lead.slate}
+          </span>
+          <h3 class="df-head">{lead.head}</h3>
+          {lead.deck && <span class="df-deck">{lead.deck}</span>}
+          <span class="df-cue hud-label">
+            Read the dispatch <span class="arrow" aria-hidden="true">→</span>
+          </span>
+        </div>
+      </a>
+
+      {/* ② THE SHOULDER — an asymmetric pair. Unequal columns plus a vertical
+          stagger, so it is never symmetric whatever shapes land here. */}
+      <div class="df-shoulder">
+        {shoulder.map((n) => (
+          <a class="df-two" href={`${base}/field-notes/${n.id}`} data-reveal data-reveal-stagger="90">
+            <div class="df-plate" style={`--ar:${n.ar.toFixed(4)}`}>
+              <picture>
+                <source type="image/avif" srcset={n.media.avif} sizes="(min-width:900px) 42vw, 88vw" />
+                <source type="image/webp" srcset={n.media.webp} sizes="(min-width:900px) 42vw, 88vw" />
+                <img
+                  src={n.media.src}
+                  alt={n.alt}
+                  width={Math.round(1000 * n.ar)}
+                  height="1000"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+            </div>
+            <div class="df-two-say">
+              <h3 class="df-head df-head--sm">{n.head}</h3>
+              <span class="df-where hud-label">
+                {n.place} · {n.slate}
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* ③ THE FOLIO — the rest as a territory index. NO numerals: sort
+          positions renumber on every new file, and per-territory counts are
+          barred by the NO-COUNT rule (src/data/territory.ts). */}
+      <div class="df-folio" data-reveal>
+        {folio.map((g) => (
+          <section class="df-terr">
+            <h3 class="df-terr-head">
+              <span class="df-terr-name">{g.name}</span>
+              <span class="df-terr-rule" aria-hidden="true" />
+            </h3>
+            <ul class="df-terr-list">
+              {g.rows.map((n) => (
+                <li>
+                  <a href={`${base}/field-notes/${n.id}`}>
+                    <span class="df-fh">{n.head}</span>
+                    <span class="df-fp hud-label">
+                      {n.place} · {n.slate}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
       {/* M3 — THE FIELD BOARD (2026-07-22, operator: this section is the
           advertisement space for ALL the locales — it should out-premium the
           festival teaser). A dense expedition collage: seven frames from seven
@@ -660,72 +797,277 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 </Base>
 
 <style>
-  /* ── PUB-A · the dispatch stream — a numbered list of every Field Notes
-     entry, replacing the retired hire-the-operator panel. Space Mono index
-     + date, serif title, hairline row dividers; the whole row is the link
-     (matches the site's .signpost-link affordance on home).
-     2026-08-03 design audit — this was a bare text list (no imagery) right
-     between the hero and the art-directed Territory map, the site's own
-     named "dead trough" pattern. Each row now carries a lead thumbnail
-     (dispatch-thumb) pulled from the same gallery bake every field note
-     already has — align-items moves from baseline to center to seat it. ── */
-  .dispatch-list {
-    list-style: none;
-    margin: 0.5rem 0 0;
-    padding: 0;
-    display: grid;
-  }
-  .dispatch-row {
-    border-top: 1px solid var(--color-hairline);
-  }
-  .dispatch-row:last-child {
-    border-bottom: 1px solid var(--color-hairline);
-  }
-  .dispatch-link {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.6rem 0.1rem;
+  /* ── THE TRAVEL-STORIES INDEX (2026-08-06) — replaces the .dispatch-* list.
+     One rule carries all three registers: WIDTH COMES FROM SHAPE.
+
+     These live in the PAGE-SCOPED style block, not global.css, and must stay
+     here: Astro emits page styles UNLAYERED while global.css sits inside a
+     @layer, and unlayered beats layered regardless of specificity — a
+     primitive added there would be inert against these rules. ── */
+
+  /* ① THE LEAD */
+  .df-lead {
+    display: block;
+    margin-top: clamp(1.2rem, 3vw, 1.9rem);
     text-decoration: none;
     color: inherit;
-    transition: color var(--dur-hover, 160ms) var(--ease-swift);
   }
-  .dispatch-link:hover,
-  .dispatch-link:focus-visible {
-    color: var(--color-accent, #38f8ec);
-  }
-  .dispatch-no {
-    flex: none;
-    color: var(--color-ink-muted, #8a9a96);
-  }
-  .dispatch-thumb {
-    flex: none;
+  .df-plate {
     display: block;
-    width: 3.5rem;
-    height: 3.5rem;
     overflow: hidden;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--color-surface, #171b22) 70%, transparent);
+    border-radius: 10px;
+    aspect-ratio: var(--ar); /* measured from the file itself at build */
+    background: color-mix(in srgb, var(--color-elevated) 70%, transparent);
   }
-  .dispatch-thumb img {
+  .df-plate img {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(0.92) brightness(0.94);
-    transition: filter var(--dur-hover, 180ms) var(--ease-swift, ease);
+    height: auto; /* native aspect — never object-fit, never cropped */
+    filter: saturate(0.94) brightness(0.96);
+    transition: filter var(--dur-hover, 220ms) var(--ease-swift);
   }
-  .dispatch-link:hover .dispatch-thumb img,
-  .dispatch-link:focus-visible .dispatch-thumb img {
-    filter: saturate(1) brightness(1);
+  .df-lead:hover .df-plate img,
+  .df-lead:focus-visible .df-plate img,
+  .df-two:hover .df-plate img,
+  .df-two:focus-visible .df-plate img {
+    filter: none;
   }
-  .dispatch-title {
-    flex: 1 1 auto;
-    font-size: 1.02rem;
+  .df-say {
+    display: grid;
+    gap: 0.5rem;
   }
-  .dispatch-date {
-    flex: none;
-    color: var(--color-ink-muted, #8a9a96);
+  .df-where {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+  }
+  .df-head {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3.4vw, 2.35rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--color-peak);
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .df-head--sm {
+    font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+    line-height: 1.2;
+  }
+  .df-deck {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    max-width: 38ch;
+    color: var(--color-ink);
+  }
+
+  /* Measured while building this: --color-accent-deep on --color-elevated is
+     3.99:1, BELOW WCAG AA. It only clears 4.5:1 on --color-base (4.54:1),
+     which is what the 2026-08-02 audit-fix tuned it for. This cue sits ON the
+     elevated slab, so it rests in ink-muted (5.27:1) and fires accent only on
+     hover. The token itself wants a separate sweep. */
+  .df-cue {
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .df-cue .arrow {
+    display: inline-block;
+    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .df-lead:hover .df-cue,
+  .df-lead:focus-visible .df-cue {
+    color: var(--color-accent);
+  }
+  .df-lead:hover .df-cue .arrow,
+  .df-lead:focus-visible .df-cue .arrow {
+    transform: translateX(5px);
+  }
+
+  /* ② THE SHOULDER — a plain asymmetric pair. */
+  .df-shoulder {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(1rem, 2.4vw, 1.9rem);
+    align-items: start;
+    margin-top: clamp(2.4rem, 5vw, 3.6rem);
+  }
+  .df-two {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .df-two:nth-child(2) {
+    margin-top: clamp(1.1rem, 3.2vw, 2.8rem); /* the hand-hung drop */
+  }
+  .df-two-say {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .df-two:hover .df-head,
+  .df-two:focus-visible .df-head {
+    color: var(--color-accent);
+  }
+
+  /* ③ THE FOLIO — `columns: 3 17rem` picks its own column count (3/2/1) with
+     no breakpoints; `break-inside: avoid` keeps each territory whole so groups
+     PACK rather than forming a grid. Column depth varies with how many
+     dispatches a territory holds — real data, not decoration. */
+  .df-folio {
+    margin-top: clamp(2.4rem, 5vw, 3.4rem);
+    /* the deepest column's last row otherwise lands 16px off the field board —
+       the group margin-bottom is contained by the multicol box, so the gap to
+       the board has to be declared here */
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--color-hairline);
+    columns: 3 17rem;
+    column-gap: clamp(1.6rem, 4vw, 3rem);
+  }
+  .df-terr {
+    break-inside: avoid;
+    margin: 0 0 1.8rem;
+  }
+  .df-terr-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+  }
+  .df-terr-name {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-ink-muted);
+  }
+  .df-terr-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-accent) 45%, transparent),
+      color-mix(in srgb, var(--color-accent) 8%, transparent)
+    );
+  }
+  .df-terr-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .df-terr-list li + li {
+    border-top: 1px solid var(--color-hairline);
+  }
+  .df-terr-list a {
+    position: relative;
+    display: grid;
+    gap: 0.12rem;
+    padding: 0.6rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .df-fh {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    line-height: 1.28;
+    color: var(--color-peak);
+    transition: color var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .df-fp {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted);
+  }
+  .df-terr-list a:hover .df-fh,
+  .df-terr-list a:focus-visible .df-fh {
+    color: var(--color-accent);
+  }
+  /* the you-are-here contour draws out of the gutter — the accent-discipline
+     doc's own sanctioned use of cyan, at row scale */
+  .df-terr-list a::before {
+    content: "";
+    position: absolute;
+    left: -0.85rem;
+    top: 1.02rem;
+    width: 0;
+    height: 1px;
+    background: var(--color-accent);
+    transition: width var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .df-terr-list a:hover::before,
+  .df-terr-list a:focus-visible::before {
+    width: 0.55rem;
+  }
+
+  /* the lead's caption slab only overlaps where there is room for it */
+  @media (min-width: 900px) {
+    .df-lead {
+      display: grid;
+      grid-template-columns: var(--plate-w) minmax(0, 1fr);
+      align-items: end;
+    }
+    .df-lead .df-plate {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .df-say {
+      grid-column: 2;
+      grid-row: 1;
+      position: relative;
+      z-index: 2;
+      align-self: end;
+      width: min(25rem, 100%);
+      margin-left: -3.5rem; /* bites into the plate */
+      margin-bottom: clamp(-2.6rem, -3vw, -1.4rem); /* hangs below it */
+      padding: 1.15rem 1.3rem 1.25rem;
+      background: var(--color-elevated); /* opaque — no text on photo */
+      border: 1px solid var(--color-hairline);
+      border-radius: 10px;
+      box-shadow: 0 26px 56px -22px rgba(0, 0, 0, 0.72);
+    }
+  }
+  /* tablet: the plate goes full width, the caption keeps a left indent so the
+     block still reads hand-placed rather than stacked */
+  @media (min-width: 720px) and (max-width: 899px) {
+    .df-say {
+      margin-top: 1.1rem;
+      margin-left: clamp(2rem, 8vw, 5rem);
+      max-width: 34rem;
+    }
+  }
+  /* phone: a side-by-side pair renders at ~120px and ~175px — thumbnails
+     again, the exact failure being fixed. Stack, and keep the stagger as an
+     indent. */
+  @media (max-width: 719px) {
+    .df-shoulder {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(1.6rem, 6vw, 2.4rem);
+      margin-top: 2.2rem;
+    }
+    .df-two:nth-child(2) {
+      margin-top: 0;
+      margin-left: clamp(1.5rem, 9vw, 3.5rem);
+    }
+    .df-folio {
+      columns: 1;
+    }
+    .df-say {
+      margin-top: 1rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .df-plate img,
+    .df-cue,
+    .df-cue .arrow,
+    .df-fh,
+    .df-head,
+    .df-terr-list a::before {
+      transition: none;
+    }
   }
 
   /* ── A4b · the festival TEASER (M1 v3): a mini magazine cover beside the
