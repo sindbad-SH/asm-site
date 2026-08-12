@@ -353,13 +353,7 @@ const meta = {
                         <picture>
                           <source type="image/avif" srcset={m.avif} sizes="140px" />
                           <source type="image/webp" srcset={m.webp} sizes="140px" />
-                          <img
-                            src={m.src}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            style={`aspect-ratio:${ph.orientation === "vertical" ? "4/5" : "3/2"};object-fit:cover`}
-                          />
+                          <img src={m.src} alt="" loading="lazy" decoding="async" />
                         </picture>
                       </span>
                     ))}
@@ -941,16 +935,29 @@ const meta = {
     background: color-mix(in srgb, var(--color-base) 45%, transparent);
     border: 1px solid color-mix(in srgb, var(--color-peak) 10%, transparent);
   }
+  /* Uniform 4:5 frames. The cell owns the box and the photo fills it; a
+     landscape frame used to keep its own 3:2 ratio inside a cell stretched to
+     the tallest sibling, leaving ~44px of empty box under it (measured at
+     75x94: the image drew 74x49). A filmstrip reads as a strip only when the
+     frames match — and unlike the cover, these are 75px decorative cues, so
+     the box leads and the photo fits it. */
   .spotlight-filmstrip-cell {
     display: block;
     width: clamp(3.4rem, 9vw, 4.7rem);
+    aspect-ratio: 4 / 5;
     border-radius: 2px;
     overflow: clip;
     border: 1px solid color-mix(in srgb, var(--color-peak) 16%, transparent);
   }
+  .spotlight-filmstrip-cell picture {
+    display: block;
+    height: 100%;
+  }
   .spotlight-filmstrip-cell img {
     display: block;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .spotlight-funnel-cta {
     display: inline-flex;
