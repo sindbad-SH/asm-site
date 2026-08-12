@@ -1418,11 +1418,16 @@ export const PAGES = {
     // PUB-A (2026-07-27) — A1b "Hire the operator" (services + day rate +
     // booking CTA) REMOVED here: adventure.astro is a story index now, not a
     // services pillar. Field removed rather than left orphaned.
-    // 2026-08-06 — `territory.heading` / `territory.body` REMOVED with the
-    // constellation they described (see adventure.astro's header note). Both
-    // were ⚠-flagged, never read-approved, and the body closed on "The map
-    // grows as the work does" — a sentence about an object that no longer
-    // exists. Field removed rather than left orphaned, same as A1b above.
+    territory: {
+      heading: "The territory",
+      // Authored positioning (COPY.md §5.1), grounded in the stories the site
+      // itself publishes: Alps (Italy + Switzerland), Colorado's Front Range,
+      // and the coverage rooms (Denver, Los Angeles). ROUND 5 (2026-07-21):
+      // rewritten TIMELESS ("so far" dropped) and count-free — the territory
+      // grows without the copy aging. ⚠ OPERATOR READ-APPROVAL REQUIRED — new
+      // sentence (staging-only until read).
+      body: "The work runs deepest through the Alps — Italy and Switzerland — and across Colorado's Front Range at home, shooting on the ground and from the air. Coverage reaches wherever the story is: festival rooms in Denver, market floors in Los Angeles. The map grows as the work does.",
+    },
     // A3 — Licensed vs Personal nesting (Mark Clennon model).
     licensed: {
       heading: "Licensed",

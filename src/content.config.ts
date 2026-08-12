@@ -50,12 +50,6 @@ const fieldNotes = defineCollection({
     // deck — optional one-line standfirst under the headline (magazine grammar,
     // M2 2026-07-22). Renders as the article deck; absent on plainer notes.
     deck: z.string().optional(),
-    // featured — optional (2026-08-06). Marks this note as the /adventure cover
-    // story: it takes the large lead plate in the travel-stories index. A HAND
-    // PIN, deliberately — the cover variants this work replaces were selected
-    // by a character-sum hash of the slug, so renaming a file silently changed
-    // the design. Absent on every note = the newest note leads.
-    featured: z.boolean().optional(),
     // `coerce` lets the operator write a bare `YYYY-MM-DD` string and still get
     // a real Date for sorting/formatting — no quotes-vs-no-quotes footguns.
     date: z.coerce.date(),
