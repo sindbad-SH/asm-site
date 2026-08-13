@@ -53,6 +53,7 @@ const WM = {
 
 const TWIN = `${U}/2026-08-08/_SHOOT/_Upload/02 - Twin Lakes/photos/best`;
 const CLEAR = `${U}/2026-08-08/_SHOOT/_Upload/01 - Clear Creek Reservoir/photos/best`;
+const CLINTON = `${U}/2026-08-06/_SHOOT/_Upload/03 - Clinton Gulch and Climax Tailings/photos/best`;
 
 // slug → source. `position` only matters where the source is not already 3:2.
 const PICKS = {
@@ -72,6 +73,32 @@ const PICKS = {
   },
   "twin-lakes-04": {
     src: `${CLEAR}/01_-_Clear_Creek_Reservoir_03.jpg`, // native 3:2
+    orientation: "landscape",
+  },
+
+  // ── Clinton Gulch + the Climax tailings (Fremont Pass, Summit/Lake County)
+  // Operator pointed at the turquoise water as the thing he wants shown. It is
+  // NOT a natural lake: those are the Climax mine's tailings impoundments, one
+  // of which is named Mayflower — almost certainly where "Mayflower Gulch" came
+  // from. Mayflower Gulch proper is a separate basin ~6 miles north on CO-91
+  // and is not in this shoot. So the colour ships, captioned for what it is.
+  // Two alpine frames lead, two colour frames follow.
+  "clinton-gulch-01": {
+    src: `${CLINTON}/03_-_Clinton_Gulch_and_Climax_Tailings_05.jpg`, // the reservoir — lead
+    orientation: "landscape",
+  },
+  "clinton-gulch-02": {
+    // _39 was tried first and rejected: it reads as haul roads and benches, not
+    // as the reservoir. _13 is the same water with the Tenmile crest behind it.
+    src: `${CLINTON}/03_-_Clinton_Gulch_and_Climax_Tailings_13.jpg`,
+    orientation: "landscape",
+  },
+  "clinton-gulch-03": {
+    src: `${CLINTON}/03_-_Clinton_Gulch_and_Climax_Tailings_43.jpg`, // impoundment against the shore
+    orientation: "landscape",
+  },
+  "clinton-gulch-04": {
+    src: `${CLINTON}/03_-_Clinton_Gulch_and_Climax_Tailings_27.jpg`, // turquoise/ochre edge
     orientation: "landscape",
   },
 };
