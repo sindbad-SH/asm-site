@@ -657,7 +657,9 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
 
           <div class="fb-cell fb-cell--aa panel">
             <img src={`${base}/media/adventure/aa-logo.png`} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
-            <p class="hud-label">Full collection · editorial licensing</p>
+            {/* Portfolio-level, never per-frame — see the note in
+                field-notes/[slug].astro (operator rule 2026-08-13). */}
+            <p class="hud-label">Full collection · commercial &amp; editorial licensing</p>
           </div>
         </div>
         <span class="fb-cta btn" aria-hidden="true">

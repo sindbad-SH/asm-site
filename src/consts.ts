@@ -1582,11 +1582,20 @@ export const PAGES = {
       },
       // The bottom sign-off band (operator rule 2026-07-22): wherever this
       // coverage's licensing is referenced, use the Amazing Aerial logo + a
-      // link to his contributor page. This footage is registered EDITORIAL on
-      // AA — verbal consent to film/fly, no signed commercial release — so it
-      // is licensable for editorial use only. Copy states exactly that.
+      // link to his contributor page.
+      //
+      // 2026-08-13 — this line no longer states a licence class. Operator rule:
+      // the site points at the PORTFOLIO and never rules a given frame in or
+      // out, because nobody licenses from here — Amazing Aerial holds the
+      // releases and sets the class per asset.
+      //
+      // It deliberately does NOT take the "commercial & editorial" wording used
+      // on the aerial surfaces. This footage is registered EDITORIAL on AA
+      // (verbal consent to film and fly, no signed commercial release), so
+      // naming commercial here would overclaim in the opposite direction.
+      // Fully neutral wording is the honest form for this one.
       editorial: {
-        note: "Shot for editorial use. This coverage lives in the Adventure Storytelling Media portfolio on Amazing Aerial Agency, where it can be licensed for editorial stories.",
+        note: "This coverage lives in the Adventure Storytelling Media portfolio on Amazing Aerial Agency, where the work is available to license.",
         cta: {
           label: "See more of this work at Amazing Aerial",
           href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
