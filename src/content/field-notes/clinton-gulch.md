@@ -10,6 +10,25 @@
 #   about six miles north on CO-91 (the Boston Mine cabins) and is NOT in this
 #   shoot. So the colour ships, because it is spectacular and it is his, but it
 #   is captioned for what it is. Nothing here calls an impoundment a lake.
+#
+# ⚠ PUBLISHING / LICENSING — checked 2026-08-13 at the operator's request ("I
+#   know it's kind of on the line to share photos of industrial stuff... that's
+#   a relatively public space, most people can get photos of everything there
+#   from the bridge nearby, so drone or not I'm assuming I'm all OK").
+#   Publishing these is fine. The FAA holds exclusive sovereignty over navigable
+#   airspace (49 U.S.C. 40103); a landowner controls only the "immediate
+#   reaches" above their ground, mines are not on the FAA's national-security
+#   restricted list, and Colorado's drone privacy statute protects PEOPLE in
+#   private places — not an open industrial site already visible from CO-91.
+#   THE REAL CONSTRAINT IS THE LICENCE CLASS, NOT THE PHOTOGRAPHY. Frames that
+#   prominently feature identifiable private property need a property release
+#   for COMMERCIAL stock licensing; without one they are EDITORIAL-ONLY. Climax
+#   is Freeport-McMoRan property and no release exists, so 03 and 04 are
+#   editorial-class. That is already what this page claims: the AA funnel prints
+#   "Available for editorial licensing" for every licensed note, so license:true
+#   is correct here and needs no exception. Flag 03/04 as editorial in the AA
+#   upload tagging too. Separately, Part 107 applies to the flight itself and
+#   take-off/landing must not have been on mine property — operator's call.
 title: Clinton Gulch
 headline: Blue water, green water
 deck: An alpine reservoir and the mine ponds above it, on the same afternoon.
