@@ -53,6 +53,8 @@ const WM = {
 
 const TWIN = `${U}/2026-08-08/_SHOOT/_Upload/02 - Twin Lakes/photos/best`;
 const CLEAR = `${U}/2026-08-08/_SHOOT/_Upload/01 - Clear Creek Reservoir/photos/best`;
+const CLEAR_ALTS = `${U}/2026-08-08/_SHOOT/_Upload/01 - Clear Creek Reservoir/photos/alts`;
+const CLEAR_PANO = `${U}/2026-08-08/_SHOOT/_Upload/01 - Clear Creek Reservoir/panos_stock`;
 const CLINTON = `${U}/2026-08-06/_SHOOT/_Upload/03 - Clinton Gulch and Climax Tailings/photos/best`;
 
 // slug → source. `position` only matters where the source is not already 3:2.
@@ -71,9 +73,30 @@ const PICKS = {
     orientation: "landscape",
     position: "centre",
   },
-  "twin-lakes-04": {
-    src: `${CLEAR}/01_-_Clear_Creek_Reservoir_03.jpg`, // native 3:2
+  // ── Clear Creek Reservoir (Chaffee County) — ITS OWN NOTE as of 2026-08-13.
+  // It first shipped as twin-lakes-04, a single supporting frame on the Twin
+  // Lakes page. Operator: "I did want two separate pages... I know Clear Creek
+  // is arguably still considered Twin Lakes but I think there's significant
+  // enough to do their own separate coverage." So the frame moved here and grew
+  // a set. The story is the 2026 drawdown, so the selection shows the basin,
+  // not just the water: what is left, how far it dropped, and the braid of
+  // channels the retreat exposed.
+  "clear-creek-01": {
+    src: `${CLEAR}/01_-_Clear_Creek_Reservoir_03.jpg`, // the water that is left
     orientation: "landscape",
+  },
+  "clear-creek-02": {
+    src: `${CLEAR_ALTS}/01_-_Clear_Creek_Reservoir_alt_10.jpg`, // the drawn-down basin, peaks behind
+    orientation: "landscape",
+  },
+  "clear-creek-03": {
+    src: `${CLEAR_ALTS}/01_-_Clear_Creek_Reservoir_alt_12.jpg`, // braided channels on the exposed bed
+    orientation: "landscape",
+  },
+  "clear-creek-04": {
+    src: `${CLEAR_PANO}/DJI_20260808124040_0082_D.jpg`, // shallows + delta; 1.389 source, minimal crop
+    orientation: "landscape",
+    position: "centre",
   },
 
   // ── Clinton Gulch + the Climax tailings (Fremont Pass, Summit/Lake County)

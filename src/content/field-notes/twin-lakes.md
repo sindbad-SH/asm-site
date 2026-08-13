@@ -13,17 +13,20 @@
 #       Lakes Tunnel to the Front Range; fills on snowmelt, draws down through
 #       summer. 91,829 acre-ft on 2026-08-12 = 91% of normal for the date.
 #       Slightly dry, not notable. The first draft implied more than that.
-#     · Clear Creek — a DELIBERATE drawdown. Pueblo Water (owner; CPW leases the
-#       recreation) lowered it in 2026 for dam work and to extend the boat ramp
-#       for low-water access. Campground closed 2026-04-06; ramp expected back
-#       for the full 2027 season. Poor snowpack / limited runoff in the upper
-#       Arkansas ACCELERATED the work into 2026 rather than causing the low
-#       water. Sources: Ark Valley Voice / Chaffee County Times, snoflo, USBR.
-#   Nothing here attributes either level to climate change; the fire-suppression
+#   Nothing here attributes the level to climate change; the fire-suppression
 #   theory turned up no supporting source and is not claimed.
-title: Twin Lakes and Clear Creek
-headline: Two lakes, drawn down
-deck: Late summer on the upper Arkansas, where the shoreline moves every year.
+#   Sources: snoflo, USBR.
+#
+# ⚠ SPLIT 2026-08-13 — Clear Creek Reservoir moved to its own note
+#   (clear-creek-reservoir.md) on operator instruction: "I did want two separate
+#   pages... I think there's significant enough to do their own separate
+#   coverage." Its frame (twin-lakes-04) went with it as clear-creek-01, and the
+#   Clear Creek paragraph — a DELIBERATE Pueblo Water drawdown for dam work, not
+#   drought — now lives there in full. This page is Twin Lakes only. Operator
+#   flagged a possible future note for the town and the mountains above it.
+title: Twin Lakes
+headline: The shoreline moves every year
+deck: Late summer under Independence Pass, where the sandbars are the reservoir working.
 date: 2026-08-08
 location: Lake County, Colorado
 territory: Colorado
@@ -42,9 +45,6 @@ photos:
   - slug: twin-lakes-03
     orientation: landscape
     alt: Shallow turquoise water over a rippled sand shelf at the edge of Twin Lakes
-  - slug: twin-lakes-04
-    orientation: landscape
-    alt: Clear Creek Reservoir at low water, the shoreline pulled back to bare flats ringed by dry hills
 license: true
 ---
 
@@ -52,6 +52,6 @@ Twin Lakes sits at about 9,200 feet in Lake County, at the eastern foot of Indep
 
 So the pale flats in these frames are the reservoir doing its job, not a lake disappearing. Storage fills on snowmelt and draws down through the summer as water goes downstream. In mid-August 2026 Twin Lakes held about 92,000 acre-feet — roughly 91% of normal for the date. A little dry. Not a story.
 
-Clear Creek Reservoir, ten miles south near Granite, is the different one. Pueblo Water lowered it deliberately in 2026 to work on the dam and extend the boat ramp for low-water access, and a thin snowpack in the upper Arkansas basin is what moved that work forward instead of delaying it. The campground closed in April; the ramp is expected back for the 2027 season. That is the last frame here — a reservoir held down on purpose.
+What the low water leaves behind is the reason to fly it: a sandbar splitting two arms of the lake, a channel running turquoise between them, and a shelf of rippled sand you only see from above.
 
 Every frame on this page was flown and shot by Adventure Storytelling Media. The full collection is licensed through Amazing Aerial, where the rest of the Colorado high country archive lives.
