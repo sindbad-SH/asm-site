@@ -246,11 +246,20 @@ const p = PAGES.contact;
 
   @media (max-width: 860px) {
     .ct-split {
-      grid-template-columns: 1fr;
+      /* minmax(0,1fr), not 1fr — a bare 1fr track has min-width:auto, so the
+         unbreakable email pill set the column's min-content width (~557px)
+         and the whole page scrolled sideways on phones. Measured at 375px:
+         182px of horizontal overflow. (2026-08-13 mobile audit) */
+      grid-template-columns: minmax(0, 1fr);
     }
     .ct-canvas {
       min-height: 40svh;
     }
+  }
+  /* the email address is one unbreakable token — allow it to wrap inside its
+     pill instead of defining the pill's minimum width (2026-08-13). */
+  .ct-pill--mail {
+    overflow-wrap: anywhere;
   }
 </style>
 

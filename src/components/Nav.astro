@@ -7,25 +7,46 @@
  * (the "you-are-here" signal). Forge the Saga owns the single CTA button.
  */
 import { NAV, SITE, PRIMARY_CTA } from "../consts";
-import { getCollection } from "astro:content";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// M2 (2026-07-22) — the Adventure Stories item gains a dropdown of the field
-// locations (each a Field Notes article). Built from the collection so it stays
-// in sync as the operator drops in new notes: non-draft notes that carry photos
-// (the located stories), newest-first, plus the field index at the top. The menu
-// is absolutely positioned (see styles) so it never widens the capped nav row.
-const fieldLocations = (await getCollection("fieldNotes", ({ data }) => !data.draft))
-  .filter((n) => n.data.photos && n.data.photos.length > 0)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .map((n) => ({ label: n.data.title, href: `/field-notes/${n.id}` }));
-// The dropdown attaches to whichever nav item points at /adventure.
-const adventureSub = [
-  { label: "The Field — all locations", href: "/adventure/field" },
+// NAV-SLIM (2026-08-13, operator-directed): the Adventure dropdown no longer
+// lists every field location — with 14 notes it had outgrown a menu. It is now
+// The Field (the all-locations index) + the three main covered stories; the
+// location dispatches are reached from /adventure itself, which presents them
+// properly. The getCollection() feed is retired with it — the menu is a HAND
+// LIST now, deliberately: adding a note no longer changes the nav.
+// ⚠ OPERATOR: the three stories are one-line swaps. Steel & Dust and VYBE are
+// the lane's two dedicated story pages; the third slot (Matterhorn) is my
+// pick of marquee dispatch — change it freely.
+type SubItem = { label: string; href: string; divider?: boolean };
+const adventureSub: SubItem[] = [
+  { label: "The Field — all locations", href: "/adventure/field", divider: true },
   { label: "Steel & Dust — Field Notes No. 01", href: "/adventure/steel-and-dust" },
-  ...fieldLocations,
+  { label: "In the Room with Vybe", href: "/adventure/vybe" },
+  { label: "Matterhorn, Zermatt", href: "/field-notes/matterhorn-zermatt" },
 ];
+// NAV-SLIM (2026-08-13, operator-directed): Venture Stories gets the same
+// dropdown treatment — the lane's stories, hub-level only (the SeriesFest
+// chapters live under their hub, not here).
+const ventureSub: SubItem[] = [
+  { label: "SeriesFest — the festival", href: "/venture/seriesfest" },
+  { label: "PitchBoulder — the founders' room", href: "/work/pitchboulder" },
+  { label: "MEME — the film board", href: "/venture/meme" },
+  { label: "Amazing Aerial — the agency", href: "/venture/amazing-aerial" },
+  { label: "Dawn Patrol — the Concours day", href: "/venture/dawn-patrol" },
+  { label: "A restored Shelby — the commission", href: "/work/shelby-pebble-beach" },
+  { label: "KO Law — the workshops", href: "/venture/ko-law-workshops" },
+  { label: "American Film Market 2025", href: "/venture/afm-2025" },
+  // NOT LISTED: Makeshift Film Group — §4 POSSIBLE FUTURE on the honesty
+  // ledger; the phrase is a hard exclusion in scripts/audit-lib.mjs and the
+  // build fails if it ships. The page exists unlinked until the operator
+  // lifts the exclusion.
+];
+const SUBMENUS: Record<string, { items: SubItem[]; aria: string }> = {
+  "/adventure": { items: adventureSub, aria: "Adventure stories" },
+  "/venture": { items: ventureSub, aria: "Venture stories" },
+};
 // The you-are-here marker compares this page's route against each NAV href.
 // Two prior-latent bugs fixed here: (1) use Astro.url (Astro.request.url is a
 // constant placeholder in a static build, so it never carried the page path);
@@ -59,9 +80,9 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
       {
         NAV.map((item) => {
           const isCurrent = path === item.href || path.startsWith(`${item.href}/`);
-          const sub = item.href === "/adventure" ? adventureSub : null;
+          const submenu = SUBMENUS[item.href] ?? null;
           return (
-            <li class={`nav-item ${sub ? "nav-item--has-sub" : ""}`}>
+            <li class={`nav-item ${submenu ? "nav-item--has-sub" : ""}`}>
               <a
                 href={`${base}${item.href}`}
                 aria-current={isCurrent ? "page" : undefined}
@@ -72,15 +93,16 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
                     world name so the nav decodes in seconds (NAV.buyer). */}
                 {item.buyer && <span class="nav-buyer">{item.buyer}</span>}
               </a>
-              {/* M2 — field-locations dropdown (absolutely positioned; reveals on
-                  hover / focus-within, so it never widens the capped nav row).
-                  Progressive enhancement over the plain link above. */}
-              {sub && (
-                <ul class="nav-sub" aria-label="Field locations">
-                  {sub.map((s) => {
+              {/* NAV-SLIM (2026-08-13) — story dropdown (absolutely positioned;
+                  reveals on hover / focus-within, so it never widens the capped
+                  nav row). Progressive enhancement over the plain link above;
+                  the divider is per-item data now, not an nth-child guess. */}
+              {submenu && (
+                <ul class="nav-sub" aria-label={submenu.aria}>
+                  {submenu.items.map((s) => {
                     const here = path === s.href;
                     return (
-                      <li>
+                      <li class={s.divider ? "nav-sub-divider" : undefined}>
                         <a
                           href={`${base}${s.href}`}
                           aria-current={here ? "page" : undefined}
@@ -192,9 +214,10 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
   .nav-sub-link.is-here {
     color: var(--color-accent);
   }
-  /* first two entries (the index + the flagship story) get a hairline divider
-     from the location list below them */
-  .nav-sub > li:nth-child(2) {
+  /* NAV-SLIM (2026-08-13) — the divider is declared per-item (`divider: true`
+     on the entry ABOVE the rule) instead of the old nth-child(2) guess, which
+     would have drawn a divider mid-list in the venture menu. */
+  .nav-sub > li.nav-sub-divider {
     border-bottom: 1px solid var(--color-hairline);
     padding-bottom: 0.15rem;
     margin-bottom: 0.15rem;
