@@ -51,6 +51,19 @@ function galleryMedia(slug: string, orientation: "landscape" | "vertical") {
     src: `${base}/media/adventure/gallery/${slug}-800.webp`,
   };
 }
+/** The same ladder, unmarked, for the hero only. Undefined when that lead's
+    clean master has not been recovered — the caller then falls back to the
+    watermarked gallery file, so this is safe to ship partially populated. */
+function coverMedia(slug: string, orientation: "landscape" | "vertical") {
+  const c = join(process.cwd(), "public", "media", "adventure", "covers");
+  if (!existsSync(join(c, `${slug}-800.avif`))) return undefined;
+  const widths = GALLERY_WIDTHS[orientation];
+  return {
+    avif: widths.map((w) => `${base}/media/adventure/covers/${slug}-${w}.avif ${w}w`).join(", "),
+    webp: widths.map((w) => `${base}/media/adventure/covers/${slug}-${w}.webp ${w}w`).join(", "),
+    src: `${base}/media/adventure/covers/${slug}-800.webp`,
+  };
+}
 
 export async function getStaticPaths() {
   // Newest-first — the same order as the /field-notes log, so prev/next read
@@ -85,7 +98,15 @@ const fmtDate = (d: Date) =>
 
 const photos = note.data.photos ?? [];
 const lead = photos[0];
-const leadMedia = lead ? galleryMedia(lead.slug, lead.orientation) : undefined;
+// The HERO reads the UNMARKED ladder when one exists; everything else on the
+// page — the floating supporting frames, the licensing filmstrip, and the
+// dispatch squares on /adventure — keeps the watermarked gallery files.
+// Operator, 2026-08-12: "the hero photo... saying amazing aerial in the center
+// is irrelevant... it's also fine for the smaller windowed photos to have it."
+// Existence-gated per slug (coverMedia falls back), so a lead whose clean
+// master has not been recovered yet simply keeps today's marked cover rather
+// than 404-ing. See scripts/make-clean-covers-2026-08-13.mjs.
+const leadMedia = lead ? (coverMedia(lead.slug, lead.orientation) ?? galleryMedia(lead.slug, lead.orientation)) : undefined;
 
 // M2b (2026-07-22) — the location REEL: a clean vertical drone loop for this
 // place, if one has been baked to public/media/field-notes/<slug>/. Existence-
@@ -123,16 +144,23 @@ const seed = [...note.id].reduce((a, c) => a + c.charCodeAt(0), 0);
 // re-shapes its cover on the next build. That drift is exactly how
 // matterhorn-zermatt-01 came to be a 9:16 file rendering in a hardcoded 4:5
 // box, losing 29.7% of the frame. A read failure falls back to `orientation`.
-async function leadAspect(slug: string): Promise<string | undefined> {
+// Measured off the file the cover ACTUALLY renders — the unmarked copy when one
+// exists, else the gallery file. A recovered master is not always the shipped
+// shape (eldorado-springs-01's clean master is 4:3 where the marked export is
+// 3:2), and reading the wrong file would hand the frame an aspect its own image
+// does not have.
+async function leadAspect(slug: string, fromCovers: boolean): Promise<string | undefined> {
   try {
-    const file = join(process.cwd(), "public", "media", "adventure", "gallery", `${slug}-800.webp`);
+    const dir = fromCovers ? "covers" : "gallery";
+    const file = join(process.cwd(), "public", "media", "adventure", dir, `${slug}-800.webp`);
     const { width, height } = await sharp(file).metadata();
     return width && height ? `${width} / ${height}` : undefined;
   } catch {
     return undefined;
   }
 }
-const coverAspect = lead ? await leadAspect(lead.slug) : undefined;
+const usingCleanCover = !!(lead && coverMedia(lead.slug, lead.orientation));
+const coverAspect = lead ? await leadAspect(lead.slug, usingCleanCover) : undefined;
 const aaLogo = `${base}/media/adventure/aa-logo.png`;
 const aaHref = PAGES.adventure.aaFunnel.cta.href;
 
