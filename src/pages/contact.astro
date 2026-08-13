@@ -66,6 +66,11 @@ const p = PAGES.contact;
         <div class="ct-action" data-reveal>
           <a href={`mailto:${p.email}`} class="ct-pill ct-pill--mail">{p.email}</a>
           <ul class="ct-trust">
+            <!-- COHESION PASS (2026-08-13): SITE.trust.drone ("FAA Part 107
+                 licensed drone operations") was approved copy the page never
+                 rendered — the one line that quietly states the adventure
+                 specialty right where a hire-us enquiry lands. -->
+            <li>{SITE.trust.drone}</li>
             <li>{SITE.trust.response}</li>
             <li>{SITE.trust.base}</li>
             <li>{SITE.trust.travel}</li>

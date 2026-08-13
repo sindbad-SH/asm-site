@@ -54,4 +54,3 @@ So the pale flats in these frames are the reservoir doing its job, not a lake di
 
 What the low water leaves behind is the reason to fly it: a sandbar splitting two arms of the lake, a channel running turquoise between them, and a shelf of rippled sand you only see from above.
 
-Every frame on this page was flown and shot by Adventure Storytelling Media. The full collection is licensed through Amazing Aerial, where the rest of the Colorado high country archive lives.

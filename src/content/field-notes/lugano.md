@@ -24,7 +24,7 @@ photos:
 license: true
 ---
 
-From the air the bay reads as a crescent, closed off by a mountain at each end. On the south side Monte San Salvatore rises as a near-perfect pyramid, 912 metres; Monte Brè answers it across the water at 925. Between them the lakefront gardens curve along the shore, and at dusk the flowerbeds hold the last light while the peaks go dark first. This is Lugano — the largest city in Ticino and the largest Italian-speaking city outside Italy.
+The bay is a crescent, closed off by a mountain at each end. On the south side Monte San Salvatore rises as a near-perfect pyramid, 912 metres; Monte Brè answers it across the water at 925. Between them the lakefront gardens curve along the shore, and at dusk the flowerbeds hold the last light while the peaks go dark first. This is Lugano — the largest city in Ticino and the largest Italian-speaking city outside Italy.
 
 The water is Lake Lugano, marked Ceresio on the old maps, from the Latin Ceresius. It sits at 271 metres and drops to 288 at its deepest, and it is not Switzerland's alone: 63 percent lies in Ticino, the other 37 across the border in Italy. A stone causeway thrown across the lake in the 1840s near Melide pinches it into two basins. That causeway still carries the A2 motorway and the Gotthard railway — the only land route linking the far south of Ticino to the rest of the country.
 

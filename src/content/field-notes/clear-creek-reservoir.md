@@ -48,4 +48,3 @@ It is low here because someone decided it should be. Pueblo Water is working on 
 
 The drawdown is what makes it worth flying. Pulled back this far, the old bed returns as a braid of channels running through pale sediment, and what's left of the water sits in the deepest ground.
 
-Every frame here was flown and shot by Adventure Storytelling Media. The full collection is licensed through Amazing Aerial, where the rest of the Colorado high country archive lives.

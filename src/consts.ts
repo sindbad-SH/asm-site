@@ -229,32 +229,47 @@ export const COPY = {
     // drone work, founder/industry storytelling, Boulder, worldwide) but as
     // what the publication covers, not what's for sale. ⚠ OPERATOR
     // READ-APPROVAL REQUIRED — revised sentence (staging-only until read).
+    // COHESION PASS (2026-08-13, operator-directed): the site is a publication
+    // of adventure stories and venture stories; the two specialties — DRONE
+    // WORK (adventure) and MARKET RESEARCH (venture) — are named or implied,
+    // never sold. This line is the one plain decode of the whole site and
+    // previously named only the adventure specialty. ⚠ OPERATOR READ-APPROVAL
+    // REQUIRED — revised sentence (staging-only until read).
     buyerLine:
-      "Drone and expedition photography, founder and industry storytelling — Boulder, Colorado, working worldwide",
+      "Drone and expedition photography, founder stories and market research — Boulder, Colorado, working worldwide",
     globeCaption: "Where the stories are told", // LOCKED — see GLOBE below
   },
   anchors: {
-    belief: "Your product works. Your story isn't landing.",
+    // COHESION PASS (2026-08-13): `belief` renders as the home chapter-002
+    // headline (its only render site). The old line diagnosed the READER's
+    // problem in second person — agency-pitch voice on a publication home.
+    // `testing` renders as the home forge-teaser anchor and had the same
+    // problem ("before you spend real money"). ⚠ read-approval, both.
+    belief: "Every venture runs on a story.",
     beliefIsntData: "belief isn't data",
     noPressure: "No pitch, no pressure.",
     homeBase: "Boulder is home base. The world is the territory.",
-    testing: "find out what works before you spend real money finding out what doesn't.",
+    testing: "every story is tested on a small audience before it goes wide.",
   },
   // P29 — signpost paths reordered money-first and PAIRED with buyer terms
   // (the world names stay; the plain term leads so it decodes instantly).
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible labels (staging-only).
+  // COHESION PASS (2026-08-13): the signpost labels dropped their service-
+  // category pairings ("production", "corporate storytelling", "consulting")
+  // — PUB-A already removed exactly these from the nav as "a publication, not
+  // a services menu", and the signposts disagreed with their own chrome. Each
+  // label now pairs the lane name with what the lane PUBLISHES; "market
+  // research" stays because it is the venture specialty, correctly named.
+  // ⚠ OPERATOR READ-APPROVAL REQUIRED — new visible labels (staging-only).
   paths: [
-    { label: "Drone & aerial production — Adventure Stories", href: "/adventure" },
+    { label: "Drone stories from the wild — Adventure Stories", href: "/adventure" },
     // PUB-A (2026-07-27) — href repointed from the retired /entertainment
-    // route to /venture (the new venture-stories index); label unchanged.
-    { label: "Corporate storytelling & market research — Venture Stories", href: "/venture" },
-    // AUDIT-FIX (2026-08-02): "Both, end to end — Forge the Saga" named an
-    // internal product with no meaning to a first-time visitor. Relabeled to
-    // say what it IS, matching the "[what it is] — [destination]" pattern of
-    // the two items above (Forge the Saga is the site's one consulting
-    // engagement — research/strategy + production together; see
-    // FORGE_SERVICES[0] and PILLARS.consulting). href unchanged.
-    { label: "Strategy & production consulting — Forge the Saga", href: "/forge-the-saga" },
+    // route to /venture (the new venture-stories index).
+    { label: "Founder stories & market research — Venture Stories", href: "/venture" },
+    // Forge the Saga is presented as the METHOD page (PUB-B rebuilt it to
+    // "no longer sell anything"), so the signpost says what it is, not what
+    // was once for sale there.
+    { label: "How the stories get made — Forge the Saga", href: "/forge-the-saga" },
     // HOME-REFRESH (2026-08-04): the flat archive (/work — every Adventure +
     // Venture story incl. both flagship case studies) was reachable from the
     // footer only; the home BODY never linked it. Fourth signpost closes that
@@ -1214,22 +1229,29 @@ export const PAGES = {
         link: { label: "See the adventure work", href: "/adventure" },
       },
       {
+        // COHESION PASS (2026-08-13): chapter 002 was a consulting pitch ("we
+        // turn a founder's real advantage…", "before you spend") sitting in
+        // the natural home of the VENTURE specialty. It now presents the
+        // market research as how the stories get made. `terrain` is an
+        // internal media key — never rename. ⚠ read-approval, headline+body.
         terrain: "The market",
-        headline: COPY.anchors.belief, // "Your product works. Your story isn't landing."
-        body: "Under Forge the Saga, we turn a founder's real advantage into a narrative the market actually feels — and pressure-test it before you spend to find out.",
+        headline: COPY.anchors.belief, // "Every venture runs on a story."
+        body: "Venture stories start with the market research — who the audience really is, what they already believe, what everyone else missed — before anything is filmed.",
         proof: { relationshipId: "pitchboulder" },
-        link: { label: "Forge your saga", href: "/forge-the-saga" },
+        link: { label: "How the stories get made", href: "/forge-the-saga" },
       },
       {
+        // COHESION PASS (2026-08-13): "your story" flipped mid-page into
+        // second-person sales register; "The network" was a third public name
+        // for the /venture lane on one page (nav + footer + hero all say
+        // "Venture Stories"). ⚠ read-approval, headline+link.
         terrain: "The industry",
-        headline: "We keep a pulse on the rooms your story has to survive.",
+        headline: "We keep a pulse on the rooms the industry moves in.",
         body: "We stay close to how the industry moves — the board work, the coverage, the festivals and markets — and we are honest about exactly how close each relationship is.",
         proof: { relationshipId: "meme" },
         // PUB-A (2026-07-27) — Industry Stories is retired; MEME + festival/
         // market coverage now live on /venture (the venture-stories index).
-        // href repointed only — terrain/headline/body/proof untouched (media-
-        // layer keys + hero copy are out of this restructure's scope).
-        link: { label: "The network", href: "/venture" },
+        link: { label: "Read the venture stories", href: "/venture" },
       },
     ] as readonly TableauChapter[],
     // H4 — proof band. P29 INVERSION (operator-directed): lead with the
@@ -1257,11 +1279,18 @@ export const PAGES = {
       ] as readonly string[],
     },
     // H5 — Forge the Saga teaser. Stage names come from SAGA_STAGES.
+    // COHESION PASS (2026-08-13): the body framed the method as a client
+    // service ("a founder's story") while the method page frames it as the
+    // publication's own editorial method — converged on the latter, keeping
+    // "raw market intelligence" (the venture specialty, correctly implied).
+    // The cta was PRIMARY_CTA ("Follow the Stories" → newsletter): a second
+    // copy of the hero button, under a teaser that described the method but
+    // never linked it. ⚠ read-approval, body+cta.
     forgeTeaser: {
       heading: "Forge the Saga",
-      body: "A five-stage method that takes a founder's story from raw market intelligence to a tested, ready-to-run narrative.",
-      anchor: COPY.anchors.testing, // "find out what works before you spend real money..."
-      cta: PRIMARY_CTA,
+      body: "The five stages behind every story published here — research first, from raw market intelligence to a tested, ready-to-run narrative.",
+      anchor: COPY.anchors.testing, // "every story is tested on a small audience before it goes wide."
+      cta: { label: "Read the method", href: "/forge-the-saga" },
     },
     // H6 — About teaser.
     aboutTeaser: {
@@ -1270,10 +1299,17 @@ export const PAGES = {
       link: { label: "How it all fits", href: "/about" },
     },
     // H7 — contact CTA band.
+    // COHESION PASS (2026-08-13): the close was a consulting-qualification
+    // pitch ("Tell us what you're building… we'll tell you how"). It is now
+    // the home page's ONE quiet hire-us pointer — the operator's framing,
+    // near-verbatim: "we mostly do this to go capture all these stories, but
+    // if you have a story you want to hire us to capture — adventure or
+    // venture — here's what we do: mainly the drone work and the market
+    // research." ⚠ read-approval, body+cta label.
     contactBand: {
       headline: COPY.anchors.noPressure, // "No pitch, no pressure."
-      body: "Tell us what you're building. If we can help you make it land, we'll tell you how. If we can't, we'll tell you that too.",
-      cta: { label: "Book a call", href: "/contact" },
+      body: "Mostly, we make these stories for their own sake. If you have one you want captured — an adventure or a venture — get in touch. The specialties: drone work and market research.",
+      cta: { label: "Get in touch", href: "/contact" },
     },
   },
 
@@ -1361,7 +1397,9 @@ export const PAGES = {
     // F6 — close. No CTA button, no trustline — one quiet line to the founder.
     close: {
       headline: "The same method, off the page.",
-      body: "This same method is available to clients — the research, the production, the testing — through the founder, Sindbad Horizon.",
+      // COHESION PASS (2026-08-13): third hire-us surface, aligned to the
+      // same two specialties as contact + about. ⚠ read-approval.
+      body: "This same method is available to clients — mainly the drone work and the market research — through the founder, Sindbad Horizon.",
       links: [
         { label: "About the founder", href: "/about" },
         { label: "Get in touch", href: "/contact" },
@@ -1410,10 +1448,16 @@ export const PAGES = {
         "Expedition and adventure coverage — photo and film — from the Alps, Colorado's Front Range, and wherever the story leads. Field notes, postcards, and aerial work licensed through Amazing Aerial Agency.",
     },
     hero: {
-      eyebrow: "Adventure Stories — Drone & Aerial Production",
+      // COHESION PASS (2026-08-13): the eyebrow led the lane with a service
+      // category ("Production") and broke parallel with /venture's plain
+      // "Venture Stories" eyebrow. The drone specialty moves INTO the subline
+      // ("shot from the air") so dropping the eyebrow's service tag does not
+      // silently delete the specialty from its own lane hero.
+      // ⚠ read-approval, eyebrow+subline. Meta title untouched (SEO surface).
+      eyebrow: "Adventure Stories",
       headline: "The wild doesn't do second takes.",
       subline:
-        "Expedition and adventure coverage — photo and film — from the places that are hardest to reach.",
+        "Expedition and adventure stories — most of them shot from the air — from the places that are hardest to reach.",
     },
     // PUB-A (2026-07-27) — A1b "Hire the operator" (services + day rate +
     // booking CTA) REMOVED here: adventure.astro is a story index now, not a
@@ -1634,18 +1678,24 @@ export const PAGES = {
     // homepage. Copy invites licensing THROUGH Amazing Aerial.
     aaFunnel: {
       heading: "License the full collection",
-      body: "The aerial work is represented by Amazing Aerial Agency. The watermarked frames here are previews — see the full, licensable collection on the Amazing Aerial portfolio.",
+      // COHESION PASS (2026-08-13): "the watermarked frames here are
+      // previews" became factually false once the field-note heroes went
+      // unmarked (covers/, 2026-08-13) — the sentence now claims nothing
+      // about which frames carry marks. ⚠ read-approval.
+      body: "The aerial work is represented by Amazing Aerial Agency — the full, licensable collection lives on the Amazing Aerial portfolio.",
       cta: {
         label: "See the full collection at Amazing Aerial",
         href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
       },
     },
-    // A5 — P29: the close now points at PRODUCTION (this lane's own buyer),
-    // not at consulting — adventure buyers aren't founders. Calendly direct.
+    // COHESION PASS (2026-08-13): "Need this eye on your production?" talked
+    // AT a buyer — the reframe keeps the same door open in the publication's
+    // voice, and the CTA routes through /contact (the site's one deliberate
+    // hire-us surface) instead of a second direct booking link.
     // ⚠ OPERATOR READ-APPROVAL REQUIRED — new closing line (staging-only).
     handoff: {
-      body: "Need this eye on your production? Tell us where and when.",
-      cta: { label: "Book a call", href: SITE.bookACall },
+      body: "We mostly shoot these stories for their own sake. If you have one you want captured, tell us where and when.",
+      cta: { label: "Get in touch", href: "/contact" },
     },
   },
 
@@ -1667,8 +1717,13 @@ export const PAGES = {
   entertainment: {
     meta: {
       title: "Venture Stories — Adventure Storytelling Media",
+      // COHESION PASS (2026-08-13): the description was the retired services
+      // pitch — a capability list ending in "Floors and direct booking", a
+      // surface that no longer exists. Now describes what the lane PUBLISHES,
+      // keeping the research spine (the venture specialty).
+      // ⚠ read-approval.
       description:
-        "Corporate storytelling with a research spine: event & conference coverage, brand-story films, and market research that tells you what your audience actually hears. Floors and direct booking.",
+        "Stories of ventures — founders, festivals, and the rooms where business gets done. Coverage with a market-research spine, every relationship stated at exactly what it is.",
     },
     // E1 — the pun IS the headline; the subline makes it land honestly.
     hero: {
@@ -1681,8 +1736,12 @@ export const PAGES = {
       // /work under the final lane definitions, so this lane's promise is now
       // purely the business-storytelling one. ⚠ OPERATOR READ-APPROVAL
       // REQUIRED — new sentence (staging-only until read).
+      // COHESION PASS (2026-08-13): "Real client work" was agency framing,
+      // and market research — the venture specialty — was implied nowhere on
+      // the rendered page. "Researched first, told second" states it in the
+      // publication's voice. ⚠ read-approval.
       subline:
-        "We tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Real client work, real coverage — each stated at exactly what it is.",
+        "We tell stories from the wild — and stories of the modern expedition: founders, markets, and the rooms where business gets done. Researched first, told second — every relationship stated at exactly what it is.",
     },
     // E2 — MEME (the most formal role).
     meme: {
@@ -1780,7 +1839,7 @@ export const PAGES = {
           body: "The commercial now runs as PitchBoulder's primary website asset — commissioned directly by Peter, produced end to end. The event coverage and recaps continue week to week.",
         },
         testimonialId: "pitchboulder",
-        cta: { label: "Forge your saga", href: "/forge-the-saga" },
+        cta: { label: "How the stories get made", href: "/forge-the-saga" },
       },
       // ---- Shelby / Pebble Beach case study (NEW — COPY.md §4). ------------
       // Honesty rails: relationship tier = `attended`; the proof line carries
@@ -1813,7 +1872,7 @@ export const PAGES = {
         },
         // P29 — Jack Bell testimonial ACTIVATED (operator direction, 2026-07-20).
         testimonialId: "pebble-beach-owner",
-        cta: { label: "Forge your saga", href: "/forge-the-saga" },
+        cta: { label: "How the stories get made", href: "/forge-the-saga" },
       },
     },
   },
@@ -1880,7 +1939,11 @@ export const PAGES = {
     // site (ACTION-PLAN.md addendum). No prices, no packages, no service list.
     services: {
       heading: "Working together",
-      body: "I also work directly with founders and organizations on positioning and brand films. If that's you, enquiries go through the contact page.",
+      // COHESION PASS (2026-08-13): aligned to the contact page's hire-us
+      // framing, first person for About's voice — the same two specialties,
+      // the same order, so the three quiet surfaces read as one.
+      // ⚠ read-approval.
+      body: "Mostly I do this to go capture the stories. But if you have one you want captured — an adventure or a venture — that's work I take on. The specialties are the drone work and the market research. Enquiries go through the contact page.",
       link: { label: "Get in touch", href: "/contact" },
     },
   },
@@ -1899,7 +1962,9 @@ export const PAGES = {
         "Story tips, licensing enquiries, or work with the founder directly — one email, one line to book a call.",
     },
     headline: "Have an adventure or venture worth telling?",
-    body: "Reach out for story tips, licensing enquiries, or to talk with the founder about brand and positioning work. One inbox, real replies.",
+    // COHESION PASS (2026-08-13): "brand and positioning work" was a third
+    // name for the offer; aligned to the two specialties. ⚠ read-approval.
+    body: "Reach out for story tips, licensing enquiries, or to talk with the founder about capturing a story of your own. One inbox, real replies.",
     categories: [
       {
         label: "Story tips",
@@ -1910,8 +1975,13 @@ export const PAGES = {
         body: "Interested in licensing footage or photography from the archive? Say what you need.",
       },
       {
+        // COHESION PASS (2026-08-13): THE designated quiet hire-us surface.
+        // Operator, near-verbatim: "we mostly do this to go capture all these
+        // stories, but if you have a story that you want to hire us to
+        // capture — adventure or venture — here's what we do: mainly the
+        // drone work and the market research." ⚠ read-approval.
         label: "Work with the founder",
-        body: "Sindbad also works directly with founders and organizations on positioning and brand films.",
+        body: "Mostly we do this to go capture the stories ourselves. But if you have one you want captured — an adventure or a venture — that's work we take on. The specialties: the drone work and the market research.",
       },
     ] as readonly { label: string; body: string }[],
     email: SITE.email,

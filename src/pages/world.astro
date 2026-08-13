@@ -345,17 +345,14 @@ const asset = (p: string) => `${base}${p}`;
             eyebrow: "FORGE THE SAGA",
             title: "One craft holds it all together.",
             body: "Raw experience in, stories out — narrative strategy, forged for founders.",
-            // Finale: the forge take pushes in to a CLOSER angle mid-clip
-            // (~50% progress) — the visitor lands eye-to-eye with the StorySmith,
-            // so the direct ask POPS DEAD-CENTER right there (engine centerCta).
-            // If they flew the whole world, they're sold — make the ask easy.
-            // Calendly URL = consts.ts SITE.bookACall.
-            centerCta: {
-              label: "Schedule a talk with the StorySmith",
-              href: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting",
-              at: 0.5,
-            },
-            cta: { primary: { label: "Forge your saga", href: base + "/forge-the-saga" } },
+            // COHESION PASS (2026-08-13): the centerCta — a Calendly booking
+            // ask popping dead-center mid-scene ("if they flew the whole
+            // world, they're sold — make the ask easy") — was the most
+            // in-your-face services surface on the site, and the finale CTA
+            // beneath it was a second sales imperative. The finale now hands
+            // off to the method page in the publication's voice; the ONE
+            // deliberate hire-us surface is /contact. ⚠ read-approval.
+            cta: { primary: { label: "How the stories get made", href: base + "/forge-the-saga" } },
           },
         ],
         // Transit clips slot here when the operator generates them (Plan B, or

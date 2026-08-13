@@ -63,14 +63,19 @@ const personalSocialEntries = [
 // chrome anywhere on the site. This is that link, without adding a 5th item
 // to the capped 4-item NAV in consts.ts.
 type FooterNavItem = { label: string; href: string; buyer?: string };
+// COHESION PASS (2026-08-13): the buyer sub-labels dropped their service
+// categories ("production", "corporate storytelling", "consulting", "Book a
+// call") and now mirror the home signposts — the lane name paired with what
+// the lane PUBLISHES. "Commercial & editorial licensing" is locked and stays.
+// ⚠ read-approval, four buyer strings.
 const FOOTER_NAV: readonly FooterNavItem[] = [
-  { label: "Adventure Stories", buyer: "Drone & aerial production", href: "/adventure" },
-  { label: "Venture Stories", buyer: "Corporate storytelling & research", href: "/venture" },
+  { label: "Adventure Stories", buyer: "Drone stories from the wild", href: "/adventure" },
+  { label: "Venture Stories", buyer: "Founder stories & market research", href: "/venture" },
   { label: "All Stories", href: "/work" },
   { label: "About", href: "/about" },
-  { label: "Contact", buyer: "Book a call", href: "/contact" },
+  { label: "Contact", buyer: "Story tips & enquiries", href: "/contact" },
   { label: "Licensing", buyer: "Commercial & editorial licensing", href: "/licensing" },
-  { label: "Forge the Saga", buyer: "Consulting — research + production", href: "/forge-the-saga" },
+  { label: "Forge the Saga", buyer: "How the stories get made", href: "/forge-the-saga" },
 ] as const;
 ---
 

@@ -24,10 +24,10 @@
 #   prominently feature identifiable private property need a property release
 #   for COMMERCIAL stock licensing; without one they are EDITORIAL-ONLY. Climax
 #   is Freeport-McMoRan property and no release exists, so 03 and 04 are
-#   editorial-class. That is already what this page claims: the AA funnel prints
-#   "Available for editorial licensing" for every licensed note, so license:true
-#   is correct here and needs no exception. Flag 03/04 as editorial in the AA
-#   upload tagging too. Separately, Part 107 applies to the flight itself and
+#   editorial-class. The page claims nothing narrower: the AA funnel prints the
+#   collection-level "Commercial & editorial licensing" line (locked
+#   2026-08-13), so license:true is correct here and needs no exception. Flag
+#   03/04 as editorial in the AA upload tagging. Separately, Part 107 applies to the flight itself and
 #   take-off/landing must not have been on mine property — operator's call.
 # ⚠ HEADLINE CHANGED 2026-08-13 — operator: "the copy should be changed, at
 #   least the beginning of 'blue water green water', because the hero shot only
@@ -67,4 +67,3 @@ A short distance up the pass the water changes colour completely. These are the 
 
 Both are worth flying. The blue is the picture people expect from the Colorado high country; the green is the one they don't.
 
-Every frame here was flown and shot by Adventure Storytelling Media. The full collection is licensed through Amazing Aerial, where the rest of the Colorado high country archive lives.
