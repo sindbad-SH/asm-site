@@ -861,9 +861,11 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
          pass, so this section is currently a no-op (see that file's header for
          the expected filers: VYBE/Boogie Lights, Nordic Daughter, Something
          Tomorrow, others TBD from archive mining). -->
+    <!-- id="postcards" (2026-08-13) — nav dropdown anchor, matching the
+         #festival / #vybe pattern on this page. -->
     {
       postcards.length > 0 && (
-        <section class="border-t border-hairline p-8">
+        <section id="postcards" class="border-t border-hairline p-8">
           <div class="mx-auto max-w-5xl space-y-3">
             <hr class="flight-line mb-6" aria-hidden="true" />
             <p class="hud-label" data-reveal>{p.postcards.kicker}</p>

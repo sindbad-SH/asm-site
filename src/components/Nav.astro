@@ -16,15 +16,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // location dispatches are reached from /adventure itself, which presents them
 // properly. The getCollection() feed is retired with it — the menu is a HAND
 // LIST now, deliberately: adding a note no longer changes the nav.
-// ⚠ OPERATOR: the three stories are one-line swaps. Steel & Dust and VYBE are
-// the lane's two dedicated story pages; the third slot (Matterhorn) is my
-// pick of marquee dispatch — change it freely.
+// The three stories are one-line swaps. Steel & Dust and VYBE are the lane's
+// two dedicated story pages; the third slot is the Postcards collection
+// (operator direction 2026-08-13, replacing my interim Matterhorn pick).
+// Postcards have no index page, so the item anchors to the postcards section
+// on /adventure (id added there, matching #festival / #vybe).
 type SubItem = { label: string; href: string; divider?: boolean };
 const adventureSub: SubItem[] = [
   { label: "The Field — all locations", href: "/adventure/field", divider: true },
   { label: "Steel & Dust — Field Notes No. 01", href: "/adventure/steel-and-dust" },
   { label: "In the Room with Vybe", href: "/adventure/vybe" },
-  { label: "Matterhorn, Zermatt", href: "/field-notes/matterhorn-zermatt" },
+  { label: "Postcards from the road", href: "/adventure#postcards" },
 ];
 // NAV-SLIM (2026-08-13, operator-directed): Venture Stories gets the same
 // dropdown treatment — the lane's stories, hub-level only (the SeriesFest
