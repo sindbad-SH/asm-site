@@ -29,9 +29,14 @@
 #   is correct here and needs no exception. Flag 03/04 as editorial in the AA
 #   upload tagging too. Separately, Part 107 applies to the flight itself and
 #   take-off/landing must not have been on mine property — operator's call.
+# ⚠ HEADLINE CHANGED 2026-08-13 — operator: "the copy should be changed, at
+#   least the beginning of 'blue water green water', because the hero shot only
+#   shows the blue water... I don't think I have a shot good enough to show
+#   both." The cover now claims only what its photograph shows; the blue→green
+#   turn still happens in the body, where frames 03/04 carry it.
 title: Clinton Gulch
-headline: Blue water, green water
-deck: An alpine reservoir and the mine ponds above it, on the same afternoon.
+headline: Blue at eleven thousand feet
+deck: An alpine reservoir on Fremont Pass — and stranger water a little farther up the road.
 date: 2026-08-06
 location: Fremont Pass, Colorado
 territory: Colorado
