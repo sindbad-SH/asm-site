@@ -20,7 +20,7 @@ photos:
     alt: The village of Varenna stepping down its promontory to Lake Como, boats moored below and the far shore beyond
   - slug: varenna-lake-como-02
     orientation: landscape
-    alt: Lake Como framed by cypresses from the eastern shore near Varenna, a village on the far promontory
+    alt: Varenna seen from the water, the village stacked along the shore beneath a steep wooded mountain, a ferry at the quay
   - slug: varenna-lake-como-03
     orientation: landscape
     alt: The open water of Lake Como from the shore near Varenna, a wooded promontory and mountains beyond

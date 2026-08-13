@@ -1,5 +1,13 @@
 ---
 # ⚠ OPERATOR READ-APPROVAL REQUIRED — research-expanded copy (M2, 2026-07-22; sources logged in session). Staging-only until read.
+# ⚠ Supporting frames 02–03 replaced 2026-08-13 — operator: "they're pretty much
+#   all samey and nothing's really distinct." Both now come from the ADJACENT
+#   Icogne outing of the SAME DAY (2023-08-11); Icogne merged into the commune
+#   of Crans-Montana in 2017, so it is the same municipality and the same shelf.
+#   Same pattern as varenna-lake-como, whose 02–04 come from Perledo. The Lens
+#   folder itself could not fix this: after the road sign, bus interior, hotel
+#   plaque, sponsor board and circus tent are dropped it holds ~8 frames of one
+#   view, and the outing has no drone material at all.
 title: Above Crans-Montana
 headline: The shelf that holds the light
 deck: A sun-struck shelf at roughly 1,500 metres, the Weisshorn holding the far side of the valley.
@@ -17,10 +25,10 @@ photos:
     alt: Forested slopes rising to a bare rock summit above Crans-Montana, a pine in the foreground
   - slug: crans-montana-02
     orientation: landscape
-    alt: The Rhône valley falling away below the Crans-Montana shelf, forested slopes and distant Alps
+    alt: A suspension footbridge running out across a wooded gorge above the Rhône valley, cables rising to the far side
   - slug: crans-montana-03
     orientation: landscape
-    alt: Forested slopes descending from Crans-Montana to the valley, peaks ranged along the horizon
+    alt: Evening light over the Rhône valley from the Crans-Montana shelf, cloud banks lit along the ridgelines
 license: true
 ---
 
