@@ -1,27 +1,39 @@
 ---
 /**
- * /venture/amazing-aerial — P13g → company-page treatment. UNLIKE the coverage
- * articles (whose prose is assembled from the operator's _ABOUT.md files), this
- * one was WRITTEN BY THE ORCHESTRATOR in the operator's voice at his explicit
- * direction ("feel free to just kind of use my voice… and just go ahead").
+ * /venture/amazing-aerial — REDESIGN (2026-08-13, operator-directed: "the
+ * layout is pretty formulaic… utilize a lot more of the recent photos… a lot
+ * of call to action buttons that are attractive and interesting that get
+ * people to go to specifically my page on Amazing Aerial").
  *
- * ⚠ OPERATOR READ-APPROVAL REQUIRED — the three ARTICLE paragraphs below are new
- * copy (staging-only until read). They are KEPT VERBATIM from the P13g approval
- * queue — the company-page expansion does NOT rewrite them. Fact base he
- * supplied (2026-07-08): first conversation with founder Paul came through
- * LinkedIn in June 2024; about a month of talking; an official agent by mid-2024
- * ("they're my agency"). Everything else stays inside the LOCKED permitted
- * phrasing: contributor / licensed-through / "an official agent with the
- * collection" — never "represented exclusively", never ownership.
+ * Direction chosen by the operator from three staged options: THE LIVING
+ * COLLECTION.
  *
- * P-company additions (also read-approval-gated, but labels/facts ONLY — no new
- * sentences): a logo lockup (the real AA mark, nominative editorial use the
- * operator authorized), a facts row whose chips are each a fact already present
- * verbatim in the article/slate, and a fuller photo COLLAGE. The photos reuse
- * the EXISTING licensed adventure-gallery exports (dual-brand AA+ASM watermarked
- * teasers) — the watermarks aren't a compromise, they ARE the story: this is
- * what agency licensing looks like. The band caption is the LOCKED permitted
- * phrasing from consts, verbatim.
+ * THESIS: the collection is alive and growing — the page proves it with the
+ * newest work first. Refuses the article-with-a-collage default it replaces.
+ * OWN-WORLD: the site's survey grammar — near-black ground, cyan accent,
+ * Fraunces display, mono slates — carried photo-first: full-bleed frames,
+ * location-stamped, watermarked previews standing as what licensing looks like.
+ * STORY: a visitor sees fresh aerials, learns the agent arrangement in the
+ * operator's own approved words, and leaves for his Amazing Aerial portfolio.
+ * FIRST VIEWPORT: an edge-to-edge Twin Lakes aerial; AA lockup and slate top,
+ * headline and the primary "License the collection" action lower-left.
+ * FORM: user-pinned (beats the roll per new-work §3); no seed run.
+ *
+ * ── HONESTY RAILS (unchanged from the P13g build) ─────────────────────────
+ * The four ARTICLE paragraphs are KEPT VERBATIM from the approval queue.
+ * Locked phrasing only: contributor / licensed-through / "official agent
+ * arrangement with the collection" — never "represented exclusively", never
+ * ownership. The AA mark is nominative editorial use, operator-authorized.
+ * "Thousands of aerial photographs" is the operator-approved collection-scale
+ * phrasing (2026-08-13; counts never numerized).
+ * ⚠ OPERATOR READ-APPROVAL REQUIRED — new non-verbatim strings are the section
+ * headings, the strip intro line, the ribbon, and the CTA labels (staging-only
+ * until read). Photo slates carry only place + month, from the notes' own
+ * frontmatter dates.
+ *
+ * Watermark discipline (matches the field notes): the HERO is the unmarked
+ * covers/ export; every collection preview below is the marked gallery/ export
+ * — the watermarks aren't a compromise, they ARE the story.
  */
 import Base from "../../layouts/Base.astro";
 import LegendMark from "../../components/LegendMark.astro";
@@ -33,295 +45,610 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const aa = PAGES.adventure.licensed; // the locked licensed-relationship block
 const AA_PORTFOLIO = PAGES.adventure.aaFunnel.cta.href;
 
-// the real AA mark (nominative editorial use, operator-authorized). Existence-
-// gated so a missing asset just drops the lockup rather than 404-ing.
 const logoAbs = join(process.cwd(), "public", "media", "adventure", "aa-logo.png");
 const hasLogo = existsSync(logoAbs);
 const LOGO = `${base}/media/adventure/aa-logo.png`;
 
-// A fuller COLLAGE from the existing gallery exports — every frame + width
-// existence-gated at build so nothing can 404. avif+webp, responsive, lazy.
-const g = join(process.cwd(), "public", "media", "adventure", "gallery");
-const GALLERY_WIDTHS = [800, 1120, 1400, 1600, 2200];
-function frame(slug: string) {
-  if (!existsSync(join(g, `${slug}-800.avif`))) return undefined;
-  const widths = GALLERY_WIDTHS.filter((w) => existsSync(join(g, `${slug}-${w}.avif`)));
+// Existence-gated frame lookup over BOTH ladders (landscape 800/1400/2200,
+// vertical 800/1120/1600), from either the marked gallery or the clean covers.
+const MEDIA = join(process.cwd(), "public", "media", "adventure");
+const ALL_WIDTHS = [800, 1120, 1400, 1600, 2200];
+function frame(dir: "gallery" | "covers", slug: string) {
+  const root = join(MEDIA, dir);
+  if (!existsSync(join(root, `${slug}-800.avif`))) return undefined;
+  const widths = ALL_WIDTHS.filter((w) => existsSync(join(root, `${slug}-${w}.avif`)));
   const set = (ext: string) =>
-    widths.map((w) => `${base}/media/adventure/gallery/${slug}-${w}.${ext} ${w}w`).join(", ");
-  return { avif: set("avif"), webp: set("webp"), src: `${base}/media/adventure/gallery/${slug}-800.webp` };
+    widths.map((w) => `${base}/media/adventure/${dir}/${slug}-${w}.${ext} ${w}w`).join(", ");
+  return { avif: set("avif"), webp: set("webp"), src: `${base}/media/adventure/${dir}/${slug}-800.webp` };
 }
-const shots = [
-  "matterhorn-zermatt-01",
-  "flatirons-chautauqua-03",
-  "lac-de-tseuzier-01",
-  "castel-toblino-01",
-  "eldorado-springs-01",
-  "gornergrat-glacier-01",
-  "varenna-lake-como-01",
-]
-  .map((slug) => frame(slug))
-  .filter((f): f is NonNullable<typeof f> => !!f);
 
-// ── THE ARTICLE (all new sentences — see the approval note above) ──
+// HERO — the newest marquee frame, clean (the covers export the operator
+// approved as the twin-lakes field-note lead).
+const hero = frame("covers", "twin-lakes-01");
+
+// FRESH FROM THE FIELD — the August 2026 Colorado flights, marked previews.
+// Slates carry place + month only (dates from the notes' own frontmatter).
+const FRESH = [
+  { slug: "twin-lakes-02", place: "Twin Lakes, Colorado", date: "Aug 2026" },
+  { slug: "clinton-gulch-01", place: "Clinton Gulch, Colorado", date: "Aug 2026" },
+  { slug: "clear-creek-02", place: "Clear Creek Reservoir, Colorado", date: "Aug 2026" },
+  { slug: "twin-lakes-03", place: "Twin Lakes, Colorado", date: "Aug 2026" },
+  { slug: "clinton-gulch-03", place: "Climax tailings, Colorado", date: "Aug 2026" },
+  { slug: "clear-creek-03", place: "Clear Creek Reservoir, Colorado", date: "Aug 2026" },
+  { slug: "clinton-gulch-04", place: "Climax tailings, Colorado", date: "Aug 2026" },
+  { slug: "clear-creek-04", place: "Clear Creek Reservoir, Colorado", date: "Aug 2026" },
+  { slug: "clinton-gulch-02", place: "Clinton Gulch, Colorado", date: "Aug 2026" },
+].map((f) => ({ ...f, media: frame("gallery", f.slug) })).filter((f) => f.media);
+
+// THE COLLECTION — the rest of the represented leads, marked. (The old page
+// silently dropped one slug here: lac-de-tseuzier-01 never existed — the lead
+// is -02. Fixed in passing.)
+const WALL = [
+  { slug: "matterhorn-zermatt-01", place: "Zermatt, Switzerland" },
+  { slug: "bellagio-01", place: "Bellagio, Lake Como" },
+  { slug: "eldorado-springs-01", place: "Eldorado Springs, Colorado" },
+  { slug: "castel-toblino-01", place: "Castel Toblino, Trentino" },
+  { slug: "lac-de-tseuzier-02", place: "Lac de Tseuzier, Valais" },
+  { slug: "varenna-lake-como-01", place: "Varenna, Lake Como" },
+  { slug: "gornergrat-glacier-01", place: "Gornergrat, Switzerland" },
+  { slug: "flatirons-chautauqua-03", place: "The Flatirons, Colorado" },
+  { slug: "lugano-01", place: "Lugano, Ticino" },
+  { slug: "madonna-di-campiglio-01", place: "Madonna di Campiglio, Dolomites" },
+].map((f) => ({ ...f, media: frame("gallery", f.slug) })).filter((f) => f.media);
+
+// The story — VERBATIM from the P13g approval queue. Do not edit here.
 const ARTICLE = {
-  slate: "AMAZING AERIAL AGENCY · SINCE MID-2024",
+  slate: "AMAZING AERIAL AGENCY · OFFICIAL AGENT · SINCE MID-2024",
   title: "The agency that takes our aerials to market.",
-  // Facts row — labels ONLY, each already present verbatim in the copy below /
-  // the slate above. ⚠ OPERATOR READ-APPROVAL REQUIRED (new visible labels).
   facts: ["SINCE MID-2024", "OFFICIAL AGENT", "FRONT RANGE · THE ALPS"],
   paragraphs: [
     "In June 2024, a LinkedIn conversation with Amazing Aerial's founder, Paul, turned into a month of talking — and by mid-2024 it was an official agent arrangement with the collection.",
     "The arrangement is simple and honest: we chase the frames, from the Front Range to the Alps, and Amazing Aerial licenses them to the people who need them. The aerial work you see across our adventure pages lives with them.",
     "It's the quiet engine behind the adventure stories — every expedition feeds the collection, and the collection funds the next one.",
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (source: his LinkedIn post
-    // "Adventure Storytelling Media — real drone/travel footage", ~Sept 2025:
-    // "None of this was generated. Every frame you see was captured on location
-    // — shot, flown, and edited … From the peaks of Zermatt to rooftops in
-    // Colorado … not stock filler, not AI renderings … audiences can tell what's
-    // real, and that's what earns belief"). ADDED, not a rewrite — the three
-    // paragraphs above stay verbatim from the P13g queue. Staging-only until read.
     "And it matters that every frame is real. None of it is generated — from the peaks of Zermatt to rooftops in Colorado, the work is shot, flown, and edited on location, never stock filler and never an AI rendering. Audiences can tell what's real, and that's what earns belief.",
   ],
-  ctas: [
-    { label: "License the work", href: AA_PORTFOLIO, external: true, primary: true },
-    { label: "About the agency", href: "https://www.amazingaerial.com/", external: true },
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new CTA label (staging-only). Cross-link
-    // to the work-side highlights reel (/work/amazing-aerial) — the two AA pages
-    // point at each other: this is the agency STORY, that is the REEL.
-    { label: "The highlights reel", href: `${base}/work/amazing-aerial`, external: false },
-    { label: "More adventure stories", href: `${base}/adventure`, external: false },
-  ],
 };
+
+// The ribbon line, repeated for the marquee. Composed ONLY of the approved
+// collection-scale phrasing + the locked permitted phrasing.
+const RIBBON = "Thousands of aerial photographs · One collection · Licensed through Amazing Aerial Agency";
 ---
 
-<Base title="Amazing Aerial — the agency story" description="How our aerial work reaches the market: an official agent with Amazing Aerial Agency since mid-2024.">
-  <main class="aa-story">
-    <article class="aa-inner">
-      <a href={`${base}/venture`} class="link aa-back">← Venture</a>
+<Base
+  title="Amazing Aerial — the agency story"
+  description="How our aerial work reaches the market: an official agent with Amazing Aerial Agency since mid-2024. The collection is live and growing."
+>
+  <main class="aax">
+    <!-- ═ 1 · HERO — the newest marquee frame, edge to edge ═══════════════ -->
+    <section class="aax-hero">
+      {hero && (
+        <picture class="aax-hero-media">
+          <source type="image/avif" srcset={hero.avif} sizes="100vw" />
+          <source type="image/webp" srcset={hero.webp} sizes="100vw" />
+          <img
+            src={hero.src}
+            alt="Twin Lakes, Colorado from the air — a turquoise channel between sandbars, the Sawatch Range behind"
+            loading="eager"
+            decoding="async"
+          />
+        </picture>
+      )}
+      <div class="aax-hero-scrim" aria-hidden="true"></div>
 
-      <div class="aa-lockup" data-reveal>
+      <a href={`${base}/venture`} class="aax-back hud-label">← Venture</a>
+
+      <div class="aax-hero-top" data-reveal>
         {hasLogo && (
-          <img class="aa-logo" src={LOGO} alt="Amazing Aerial Agency" width="480" height="158" loading="eager" decoding="async" />
+          <img class="aax-logo" src={LOGO} alt="Amazing Aerial Agency" width="480" height="158" loading="eager" decoding="async" />
         )}
-        <p class="hud-label aa-slate">
-          <span data-decode>{ARTICLE.slate}</span>
+        <p class="hud-label aax-slate"><span data-decode>{ARTICLE.slate}</span></p>
+      </div>
+
+      <div class="aax-hero-foot">
+        <h1 class="aax-title" data-reveal>{ARTICLE.title}</h1>
+        <div class="aax-hero-ctas" data-reveal>
+          <a href={AA_PORTFOLIO} class="aax-btn aax-btn--primary" rel="noopener" target="_blank">
+            <span>License the collection</span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://www.amazingaerial.com/" class="aax-btn aax-btn--ghost" rel="noopener" target="_blank">
+            <span>About the agency</span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <p class="hud-label aax-hero-stamp">Twin Lakes, Colorado · Aug 2026 · shot, flown &amp; edited on location</p>
+      </div>
+    </section>
+
+    <!-- ═ 2 · THE RIBBON — a moving line that is itself the door ══════════ -->
+    <a href={AA_PORTFOLIO} class="aax-ribbon" rel="noopener" target="_blank" aria-label="Thousands of aerial photographs, one collection — licensed through Amazing Aerial Agency. Visit the portfolio.">
+      <div class="aax-ribbon-track" aria-hidden="true">
+        {[0, 1].map(() => (
+          <span class="aax-ribbon-run">
+            {[0, 1, 2].map(() => (
+              <span class="aax-ribbon-line">{RIBBON} <span class="aax-ribbon-arrow">→</span> </span>
+            ))}
+          </span>
+        ))}
+      </div>
+    </a>
+
+    <!-- ═ 3 · FRESH FROM THE FIELD — the strip that proves it's alive ═════ -->
+    <section class="aax-fresh" aria-labelledby="aax-fresh-h">
+      <div class="aax-band-head">
+        <h2 id="aax-fresh-h" class="aax-h2" data-reveal>Fresh from the field</h2>
+        <p class="aax-lede" data-reveal>
+          The three newest flights, straight into the collection — Colorado's high country, August 2026.
         </p>
       </div>
-
-      <h1 class="aa-title" data-reveal>{ARTICLE.title}</h1>
-      <div class="aa-proof" data-reveal>
-        <LegendMark proof={aa.proof} />
-      </div>
-
-      <ul class="aa-facts" data-reveal aria-label="At a glance">
-        {ARTICLE.facts.map((f) => <li class="aa-chip">{f}</li>)}
-      </ul>
-
-      {ARTICLE.paragraphs.map((para) => <p class="aa-para" data-reveal>{para}</p>)}
-
-      {
-        shots.length > 0 && (
-          <figure class="aa-collage-wrap" data-reveal>
-            <div class="aa-collage">
-              {shots.map((s) => (
-                <div class="aa-shot">
-                  <picture>
-                    <source
-                      type="image/avif"
-                      srcset={s.avif}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <source
-                      type="image/webp"
-                      srcset={s.webp}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <img src={s.src} alt="" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-              ))}
-            </div>
-            <figcaption class="hud-label aa-collage-cap">Aerial work licensed through Amazing Aerial Agency</figcaption>
+      <div class="aax-strip" tabindex="0" role="group" aria-label="Newest frames, scroll sideways">
+        {FRESH.map((f) => (
+          <figure class="aax-cell">
+            <picture>
+              <source type="image/avif" srcset={f.media!.avif} sizes="(max-width: 640px) 78vw, 30rem" />
+              <source type="image/webp" srcset={f.media!.webp} sizes="(max-width: 640px) 78vw, 30rem" />
+              <img src={f.media!.src} alt={`Aerial frame — ${f.place}`} loading="lazy" decoding="async" />
+            </picture>
+            <figcaption class="hud-label aax-cell-slate">{f.place} · {f.date}</figcaption>
           </figure>
-        )
-      }
+        ))}
+        <a href={AA_PORTFOLIO} class="aax-cell aax-cell--cta" rel="noopener" target="_blank">
+          <span class="aax-cell-cta-kicker hud-label">The strip keeps going</span>
+          <span class="aax-cell-cta-line">See what's new on Amazing Aerial</span>
+          <span class="aax-btn aax-btn--primary aax-cell-cta-btn" aria-hidden="true">
+            <span>Open the portfolio</span>
+            <span class="arrow">↗</span>
+          </span>
+        </a>
+      </div>
+    </section>
 
-      <nav class="aa-ctas" data-reveal>
-        {
-          ARTICLE.ctas.map((c) => (
-            <a
-              href={c.href}
-              class={`aa-cta${c.primary ? " aa-cta--primary" : ""}`}
-              rel={c.external ? "noopener" : undefined}
-              target={c.external ? "_blank" : undefined}
-            >
-              <span>{c.label}</span>
-              <span class="arrow" aria-hidden="true">→</span>
-            </a>
-          ))
-        }
-      </nav>
-      <a href={`${base}/venture`} class="link aa-back">← Venture</a>
-    </article>
+    <!-- ═ 4 · THE STORY — the approved prose, beside a tall frame ═════════ -->
+    <section class="aax-story" aria-labelledby="aax-story-h">
+      <div class="aax-story-text">
+        <h2 id="aax-story-h" class="aax-h2" data-reveal>How the arrangement works</h2>
+        <div class="aax-proof" data-reveal><LegendMark proof={aa.proof} /></div>
+        {ARTICLE.paragraphs.map((para) => <p class="aax-para" data-reveal>{para}</p>)}
+        <ul class="aax-facts" aria-label="At a glance">
+          {ARTICLE.facts.map((f) => <li class="aax-chip hud-label">{f}</li>)}
+        </ul>
+      </div>
+      {WALL[9]?.media && (
+        <figure class="aax-story-figure" data-reveal>
+          <picture>
+            <source type="image/avif" srcset={WALL[9].media.avif} sizes="(max-width: 900px) 92vw, 24rem" />
+            <source type="image/webp" srcset={WALL[9].media.webp} sizes="(max-width: 900px) 92vw, 24rem" />
+            <img src={WALL[9].media.src} alt={`Aerial frame — ${WALL[9].place}`} loading="lazy" decoding="async" />
+          </picture>
+          <figcaption class="hud-label aax-cell-slate">{WALL[9].place}</figcaption>
+        </figure>
+      )}
+    </section>
+
+    <!-- ═ 5 · THE COLLECTION WALL — the mosaic is the door ════════════════ -->
+    <section class="aax-wall-wrap" aria-labelledby="aax-wall-h">
+      <div class="aax-band-head">
+        <h2 id="aax-wall-h" class="aax-h2" data-reveal>The represented collection</h2>
+        <p class="aax-lede" data-reveal>Front Range to the Alps — every frame below is licensable through the agency.</p>
+      </div>
+      <div class="aax-wall">
+        {WALL.slice(0, 9).map((f) => (
+          <a class="aax-tile" href={AA_PORTFOLIO} rel="noopener" target="_blank" aria-label={`${f.place} — view the collection on Amazing Aerial`}>
+            <picture>
+              <source type="image/avif" srcset={f.media!.avif} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw" />
+              <source type="image/webp" srcset={f.media!.webp} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw" />
+              <img src={f.media!.src} alt={`Aerial frame — ${f.place}`} loading="lazy" decoding="async" />
+            </picture>
+            <span class="aax-tile-veil" aria-hidden="true">
+              <span class="hud-label aax-tile-place">{f.place}</span>
+              <span class="aax-tile-go">View in the collection <span class="arrow">↗</span></span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="hud-label aax-wall-cap">Aerial work licensed through Amazing Aerial Agency</p>
+    </section>
+
+    <!-- ═ 6 · THE CLOSE — the funnel panel ════════════════════════════════ -->
+    <section class="aax-close" aria-labelledby="aax-close-h">
+      <div class="aax-close-panel">
+        <span class="aax-close-grid" aria-hidden="true"></span>
+        <span class="aax-close-shimmer" aria-hidden="true"></span>
+        <div class="aax-close-inner">
+          {hasLogo && (
+            <img class="aax-logo aax-close-logo" src={LOGO} alt="Amazing Aerial Agency" width="480" height="158" loading="lazy" decoding="async" />
+          )}
+          <h2 id="aax-close-h" class="aax-close-h">{PAGES.adventure.aaFunnel.heading}</h2>
+          <p class="aax-close-body">{PAGES.adventure.aaFunnel.body}</p>
+          <a href={AA_PORTFOLIO} class="aax-btn aax-btn--primary aax-close-cta" rel="noopener" target="_blank">
+            <span>{PAGES.adventure.aaFunnel.cta.label}</span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <nav class="aax-close-links" aria-label="Related">
+            <a href={`${base}/work/amazing-aerial`} class="link">The highlights reel <span class="arrow" aria-hidden="true">→</span></a>
+            <a href={`${base}/adventure`} class="link">More adventure stories <span class="arrow" aria-hidden="true">→</span></a>
+            <a href={`${base}/venture`} class="link">← Venture</a>
+          </nav>
+        </div>
+      </div>
+    </section>
   </main>
 </Base>
 
 <style>
-  .aa-story {
-    background: #10141f; /* the venture rooms ground — this is a rooms story */
+  .aax {
+    background: #10141f; /* the venture rooms ground */
     min-height: 100svh;
   }
-  .aa-inner {
-    max-width: 52rem;
-    margin-inline: auto;
-    padding: 7rem 2rem 6rem;
-    display: grid;
-    gap: 1.5rem;
+
+  /* ── shared type + buttons ─────────────────────────────────────────── */
+  .aax-h2 {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    color: #f2f4f8;
+    text-wrap: balance;
   }
-  .aa-back {
-    justify-self: start;
+  .aax-lede {
+    color: color-mix(in srgb, #eef2f5 78%, transparent);
+    max-width: 52ch;
+  }
+  .aax-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 46px;
+    padding: 0.75rem 1.3rem;
+    border-radius: 2px;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
+    transition:
+      border-color var(--dur-hover, 160ms) var(--ease-swift),
+      background-color var(--dur-hover, 160ms) var(--ease-swift),
+      color var(--dur-hover, 160ms) var(--ease-swift),
+      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  }
+  .aax-btn .arrow { display: inline-block; transition: transform var(--dur-hover, 160ms) var(--ease-swift); }
+  .aax-btn:hover .arrow, .aax-btn:focus-visible .arrow { transform: translate(3px, -3px); }
+  .aax-btn--primary {
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 14%, #0c1018);
+    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
+    color: var(--color-accent, #38f8ec);
+  }
+  .aax-btn--primary:hover, .aax-btn--primary:focus-visible {
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 24%, #0c1018);
+    box-shadow: 0 6px 32px -8px color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
+  }
+  .aax-btn--ghost {
+    border: 1px solid color-mix(in srgb, #ffffff 26%, transparent);
+    color: color-mix(in srgb, #eef2f5 90%, transparent);
+    background: color-mix(in srgb, #0c1018 55%, transparent);
+  }
+  .aax-btn--ghost:hover, .aax-btn--ghost:focus-visible {
+    border-color: var(--color-accent, #38f8ec);
+    color: var(--color-accent, #38f8ec);
   }
 
-  /* logo lockup — the real AA mark above the slate */
-  .aa-lockup {
+  /* ── 1 · hero ──────────────────────────────────────────────────────── */
+  .aax-hero {
+    position: relative;
+    min-height: 86svh;
+    display: grid;
+    align-content: end;
+    overflow: hidden;
+  }
+  .aax-hero-media, .aax-hero-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .aax-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(8, 11, 18, 0.72) 0%, rgba(8, 11, 18, 0.05) 34%, rgba(8, 11, 18, 0.08) 55%, rgba(8, 11, 18, 0.88) 100%);
+  }
+  .aax-back {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.4rem;
+    z-index: 3;
+    letter-spacing: 0.16em;
+    color: color-mix(in srgb, #eef2f5 82%, transparent);
+  }
+  .aax-back:hover { color: var(--color-accent, #38f8ec); }
+  .aax-hero-top {
+    position: absolute;
+    top: 3.2rem;
+    left: 1.4rem;
+    right: 1.4rem;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
   }
-  .aa-logo {
-    height: 2.4rem;
-    width: auto;
-    opacity: 0.95;
-  }
-  .aa-slate {
-    letter-spacing: 0.26em;
-    color: color-mix(in srgb, #d9f2ec 75%, transparent);
+  .aax-logo { height: 2.2rem; width: auto; }
+  .aax-slate {
+    letter-spacing: 0.24em;
+    color: color-mix(in srgb, #d9f2ec 82%, transparent);
     margin: 0;
   }
-  .aa-title {
+  .aax-hero-foot {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+    padding: 0 1.4rem 2.2rem;
+    max-width: 60rem;
+  }
+  .aax-title {
     font-family: var(--font-display);
     font-weight: 560;
     font-style: italic;
-    font-size: clamp(2rem, 4.2vw, 3.4rem);
-    line-height: 1.12;
-    color: #f2f4f8;
+    font-size: clamp(2.1rem, 5vw, 3.9rem);
+    line-height: 1.08;
+    color: #f5f7fa;
+    text-wrap: balance;
+    text-shadow: 0 2px 26px rgba(5, 8, 14, 0.55);
   }
-  .aa-para {
-    font-family: var(--font-sans);
-    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
-    line-height: 1.65;
-    color: color-mix(in srgb, #eef2f5 86%, transparent);
-    max-width: 46rem;
+  .aax-hero-ctas { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+  .aax-hero-stamp {
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, #d9f2ec 66%, transparent);
   }
 
-  /* facts row — mono chips, hairline bordered, facts only */
-  .aa-facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  /* ── 2 · ribbon ────────────────────────────────────────────────────── */
+  .aax-ribbon {
+    display: block;
+    overflow: hidden;
+    border-block: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 30%, transparent);
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 7%, #0c1018);
+    padding: 0.65rem 0;
   }
-  .aa-chip {
+  .aax-ribbon-track { display: flex; width: max-content; animation: aax-ribbon 36s linear infinite; }
+  .aax-ribbon-run { display: inline-flex; white-space: nowrap; }
+  .aax-ribbon-line {
     font-family: var(--font-mono);
-    font-size: 0.64rem;
-    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-accent, #38f8ec) 88%, #ffffff);
+    padding-inline: 1.2rem;
+  }
+  .aax-ribbon-arrow { color: var(--color-accent, #38f8ec); }
+  .aax-ribbon:hover .aax-ribbon-track, .aax-ribbon:focus-visible .aax-ribbon-track { animation-play-state: paused; }
+  .aax-ribbon:hover .aax-ribbon-line { color: var(--color-accent, #38f8ec); }
+  @keyframes aax-ribbon { to { transform: translateX(-50%); } }
+
+  /* ── 3 · fresh strip ───────────────────────────────────────────────── */
+  .aax-band-head {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 3.4rem 1.4rem 1.2rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .aax-strip {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 0.2rem 1.4rem 1.6rem;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-accent, #38f8ec) 45%, transparent) transparent;
+  }
+  .aax-cell {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .aax-cell picture, .aax-cell img { display: block; height: 19rem; width: auto; }
+  .aax-cell-slate {
+    position: absolute;
+    left: 0.6rem;
+    bottom: 0.6rem;
+    margin: 0;
+    padding: 0.3rem 0.55rem;
+    background: rgba(8, 11, 18, 0.72);
+    border-radius: 2px;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, #eef2f5 88%, transparent);
+  }
+  .aax-cell--cta {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 0.9rem;
+    min-width: 19rem;
+    padding: 1.6rem;
+    background:
+      radial-gradient(120% 130% at 15% 0%, color-mix(in srgb, var(--color-accent-deep, #1e8f8a) 26%, transparent) 0%, transparent 60%),
+      #0c1018;
+    border: 1px solid color-mix(in srgb, var(--color-accent, #38f8ec) 35%, transparent);
+  }
+  .aax-cell-cta-kicker { letter-spacing: 0.2em; color: color-mix(in srgb, #d9f2ec 70%, transparent); }
+  .aax-cell-cta-line {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    color: #f2f4f8;
+    max-width: 16ch;
+    text-wrap: balance;
+  }
+  .aax-cell--cta:hover .aax-cell-cta-btn, .aax-cell--cta:focus-visible .aax-cell-cta-btn {
+    background: color-mix(in srgb, var(--color-accent, #38f8ec) 24%, #0c1018);
+    box-shadow: 0 6px 32px -8px color-mix(in srgb, var(--color-accent, #38f8ec) 60%, transparent);
+  }
+  .aax-cell--cta:hover .arrow { transform: translate(3px, -3px); }
+
+  /* ── 4 · story ─────────────────────────────────────────────────────── */
+  .aax-story {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 3rem 1.4rem 2.4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 2.4rem;
+    align-items: start;
+  }
+  .aax-story-text { display: grid; gap: 1.1rem; }
+  .aax-para {
+    font-family: var(--font-sans);
+    font-size: clamp(1.02rem, 1.3vw, 1.16rem);
+    line-height: 1.68;
+    color: color-mix(in srgb, #eef2f5 86%, transparent);
+    max-width: 62ch;
+  }
+  .aax-facts { display: flex; flex-wrap: wrap; gap: 0.6rem; list-style: none; margin: 0.4rem 0 0; padding: 0; }
+  .aax-chip {
+    letter-spacing: 0.16em;
     color: color-mix(in srgb, #d9f2ec 78%, transparent);
     border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
     border-radius: 2px;
     padding: 0.4rem 0.7rem;
   }
-
-  /* photo collage — CSS columns masonry, native aspects, licensed watermarks
-     are the story. Fast: lazy + avif/webp responsive sources. */
-  .aa-collage-wrap {
-    margin: 0.6rem 0 0;
-  }
-  .aa-collage {
-    columns: 3;
-    column-gap: 0.7rem;
-  }
-  .aa-shot {
-    break-inside: avoid;
-    margin-bottom: 0.7rem;
-    border-radius: 6px;
+  .aax-story-figure {
+    position: relative;
+    border-radius: 4px;
     overflow: hidden;
     background: color-mix(in srgb, #ffffff 4%, transparent);
   }
-  .aa-shot img {
-    display: block;
-    width: 100%;
-    height: auto;
+  .aax-story-figure img { display: block; width: 100%; height: auto; }
+
+  /* ── 5 · the wall ──────────────────────────────────────────────────── */
+  .aax-wall-wrap { padding-bottom: 1rem; }
+  .aax-wall {
+    columns: 3;
+    column-gap: 0.8rem;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 0 1.4rem;
   }
-  .aa-collage-cap {
-    margin-top: 0.8rem;
+  .aax-tile {
+    display: block;
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
+    overflow: hidden;
+    background: color-mix(in srgb, #ffffff 4%, transparent);
+  }
+  .aax-tile img { display: block; width: 100%; height: auto; transition: transform 340ms var(--ease-swift); }
+  .aax-tile-veil {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: end;
+    gap: 0.35rem;
+    padding: 0.9rem;
+    background: linear-gradient(180deg, transparent 45%, rgba(8, 11, 18, 0.85) 100%);
+    opacity: 0;
+    transition: opacity 220ms var(--ease-swift);
+  }
+  .aax-tile-place { letter-spacing: 0.16em; color: color-mix(in srgb, #eef2f5 85%, transparent); }
+  .aax-tile-go {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent, #38f8ec);
+  }
+  .aax-tile:hover .aax-tile-veil, .aax-tile:focus-visible .aax-tile-veil { opacity: 1; }
+  .aax-tile:hover img { transform: scale(1.025); }
+  .aax-wall-cap {
+    max-width: 72rem;
+    margin: 0.6rem auto 0;
+    padding: 0 1.4rem;
     letter-spacing: 0.18em;
     color: color-mix(in srgb, #d9f2ec 60%, transparent);
   }
 
-  /* CTA row — shared button grammar: 1px border, Space Mono caps, generous
-     padding, arrow slides 6px on hover, accent hover, visible at rest, ≥44px. */
-  .aa-ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    border-top: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
-    padding-top: 1.4rem;
-    margin-top: 0.4rem;
+  /* ── 6 · close (graticule + shimmer, the funnel grammar) ───────────── */
+  .aax-close { padding: 3.2rem 1.4rem 4.2rem; }
+  .aax-close-panel {
+    position: relative;
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: clamp(1.8rem, 4vw, 3.2rem);
+    border-radius: 4px;
+    overflow: hidden;
+    background:
+      radial-gradient(125% 140% at 12% 0%, color-mix(in srgb, var(--color-accent-deep, #1e8f8a) 16%, transparent) 0%, transparent 55%),
+      linear-gradient(160deg, #131a28 0%, #0e1420 60%, #0b101b 100%);
+    border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
   }
-  .aa-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-height: 44px;
-    padding: 0.7rem 1.15rem;
-    border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
-    border-radius: 2px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, #eef2f5 88%, transparent);
-    transition:
-      border-color var(--dur-hover, 160ms) var(--ease-swift),
-      color var(--dur-hover, 160ms) var(--ease-swift),
-      box-shadow var(--dur-hover, 160ms) var(--ease-swift);
+  .aax-close-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(to right, color-mix(in srgb, #ffffff 6%, transparent) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent) 0 1px, transparent 1px 64px);
+    -webkit-mask-image: radial-gradient(125% 120% at 82% 18%, #000 0%, transparent 80%);
+    mask-image: radial-gradient(125% 120% at 82% 18%, #000 0%, transparent 80%);
+    opacity: 0.6;
   }
-  .aa-cta--primary {
-    border-color: var(--color-accent-deep, #1e8f8a);
+  .aax-close-shimmer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .aax-close-shimmer::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: 0;
+    width: 34%;
+    height: 200%;
+    background: linear-gradient(105deg, transparent, color-mix(in srgb, var(--color-accent, #38f8ec) 9%, transparent), transparent);
+    transform: translateX(-140%) rotate(8deg);
+    animation: aax-shimmer 9s ease-in-out infinite;
+  }
+  @keyframes aax-shimmer {
+    0%, 100% { transform: translateX(-140%) rotate(8deg); opacity: 0; }
+    14% { opacity: 1; }
+    52% { transform: translateX(420%) rotate(8deg); opacity: 0.55; }
+    60%, 99% { opacity: 0; }
+  }
+  .aax-close-inner { position: relative; display: grid; gap: 1rem; justify-items: start; }
+  .aax-close-logo { height: 1.9rem; opacity: 0.95; }
+  .aax-close-h {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
     color: #f2f4f8;
   }
-  .aa-cta .arrow {
-    display: inline-block;
-    transition: transform var(--dur-hover, 160ms) var(--ease-swift);
-  }
-  .aa-cta:hover,
-  .aa-cta:focus-visible {
-    border-color: var(--color-accent, #38f8ec);
-    color: var(--color-accent, #38f8ec);
-    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-accent, #38f8ec) 55%, transparent);
-  }
-  .aa-cta:hover .arrow,
-  .aa-cta:focus-visible .arrow {
-    transform: translateX(6px);
-  }
+  .aax-close-body { color: color-mix(in srgb, #eef2f5 82%, transparent); max-width: 52ch; }
+  .aax-close-cta { margin-top: 0.3rem; }
+  .aax-close-links { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-top: 0.8rem; }
 
+  /* ── responsive ────────────────────────────────────────────────────── */
   @media (max-width: 1024px) {
-    .aa-collage { columns: 2; }
+    .aax-wall { columns: 2; }
+  }
+  @media (max-width: 900px) {
+    .aax-story { grid-template-columns: minmax(0, 1fr); }
+    .aax-story-figure { max-width: 26rem; }
   }
   @media (max-width: 640px) {
-    .aa-collage { columns: 1; }
-    .aa-cta { flex: 1 1 100%; justify-content: space-between; }
+    .aax-hero { min-height: 78svh; }
+    .aax-hero-top { top: 3rem; }
+    .aax-cell picture, .aax-cell img { height: 15rem; }
+    .aax-wall { columns: 1; }
+    .aax-hero-ctas .aax-btn { flex: 1 1 100%; justify-content: space-between; }
+    /* touch has no hover — keep the wall's destination legible at rest */
+    .aax-tile-veil { opacity: 1; background: linear-gradient(180deg, transparent 62%, rgba(8, 11, 18, 0.82) 100%); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .aa-cta .arrow { transition: none; }
+    .aax-ribbon-track { animation: none; }
+    .aax-close-shimmer::before { animation: none; opacity: 0; }
+    .aax-btn .arrow, .aax-tile img { transition: none; }
   }
 </style>
 
