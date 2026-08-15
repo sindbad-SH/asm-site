@@ -17,6 +17,8 @@ concurrency:
 jobs:
   audit-and-build:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_TARGET: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,12 +34,12 @@ jobs:
 
       # CUTOVER (2026-08-15, operator-directed): production target — base "/"
       # and site https://adventurestorytellingmedia.com (astro.config.mjs).
-      # The custom domain rides on this repo's Pages settings; the old live
-      # repo (adventure-storytelling-media) released it the same day.
+      # DEPLOY_TARGET is set at the JOB level (below the runs-on line), not
+      # here: the LHCI step reads the same switch to stage and audit at the
+      # right base, and a step-scoped env left it auditing staging URLs
+      # against a production build (run 31899963472).
       - name: Build
         run: npm run build
-        env:
-          DEPLOY_TARGET: production
 
       # Honesty Ledger gates — BUILD-PLAN.md §8. A build that fails either
       # audit must never deploy.
