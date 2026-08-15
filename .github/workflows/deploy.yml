@@ -30,8 +30,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # CUTOVER (2026-08-15, operator-directed): production target — base "/"
+      # and site https://adventurestorytellingmedia.com (astro.config.mjs).
+      # The custom domain rides on this repo's Pages settings; the old live
+      # repo (adventure-storytelling-media) released it the same day.
       - name: Build
         run: npm run build
+        env:
+          DEPLOY_TARGET: production
 
       # Honesty Ledger gates — BUILD-PLAN.md §8. A build that fails either
       # audit must never deploy.
