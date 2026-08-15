@@ -160,6 +160,25 @@
     letter-spacing: 0.22em;
     color: var(--color-ink-muted);
   }
+  /* MOBILE TYPE FLOOR (2026-08-15, operator: "the text looks very tiny" on
+     phones). The hud grammar is deliberately small on desktop, where a label
+     sits beside large elements; on a 375px screen 0.7rem lands at 11px and
+     dozens of these labels ARE the reading surface (slates, folios, chips,
+     footer buyers, signposts). One floor here lifts the whole population;
+     the tighter tracking keeps long labels from wrapping at the larger size. */
+  @media (max-width: 640px) {
+    .hud-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+    }
+    /* same floor family (2026-08-15 mobile pass): the button voice was
+       phone-illegible at its desktop size. (.terr-country-label's floor lives
+       UNLAYERED at the end of this file — its base rule is unlayered, and
+       unlayered beats @layer regardless of order.) */
+    .btn {
+      font-size: 0.85rem;
+    }
+  }
 
   /* Nav labels (P-brand) — the header nav voiced to echo the logo wordmark: the
      engraved display serif (Fraunces), wide uppercase caps, letterspaced. This
@@ -1836,17 +1855,19 @@
     .cluster-stage {
       min-height: 0;
       display: block;
-      padding: 3rem 1.25rem;
+      /* 3rem all around read as dead space between chapters on a phone
+         (2026-08-15 mobile pass) — the stacked floats carry the rhythm. */
+      padding: 1.75rem 1.25rem;
     }
     .float {
       position: relative;
       width: 100% !important;
       inset: auto !important;
-      margin: 0 0 1rem;
+      margin: 0 0 0.8rem;
     }
     .cluster-content {
       background: none;
-      padding: 1rem 0 2rem;
+      padding: 0.75rem 0 1.25rem;
     }
   }
 
@@ -3313,5 +3334,14 @@ html.js .portal-forced .portal-scrim {
   }
   .terr--live .terr-cluster:not(.is-open) .terr-locations {
     display: none;
+  }
+}
+
+/* 2026-08-15 mobile pass — terr map label floor. UNLAYERED on purpose: the
+   .terr-country-label base rule above is unlayered, and a floor inside
+   @layer components can never beat it. */
+@media (max-width: 640px) {
+  .terr-country-label {
+    font-size: 0.72rem;
   }
 }

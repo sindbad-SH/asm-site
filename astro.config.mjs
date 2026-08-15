@@ -37,6 +37,11 @@ export default defineConfig({
   // eventual production cutover (base "/" -> no double slash).
   redirects: {
     "/work/seriesfest": `${base === "/" ? "" : base}/venture/seriesfest`,
+    // LANDING SWAP (2026-08-15, operator-directed): the world flight moved
+    // from /world to the site root, and the old homepage now lives at /home.
+    // This keeps every shared /world link (socials, docs, session notes)
+    // landing on the flight. Same literal-path convention as above.
+    "/world": base === "/" ? "/" : `${base}/`,
   },
   build: {
     // Inline all CSS into each page: removes the render-blocking stylesheet

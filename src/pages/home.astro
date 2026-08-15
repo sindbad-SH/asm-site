@@ -1,0 +1,172 @@
+---
+import Base from "../layouts/Base.astro";
+import LegendMark from "../components/LegendMark.astro";
+import Testimonial from "../components/Testimonial.astro";
+import PortalHero from "../components/PortalHero.astro";
+import Tableaux from "../components/Tableaux.astro";
+import TrailJourney from "../components/TrailJourney.astro";
+import { COPY, PAGES, PRIMARY_CTA, SAGA_STAGES, SITE } from "../consts";
+
+const p = PAGES.home;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// P14a — the hero lockup now leads with the COMPANY (operator direction
+// 2026-07-08). The giant condensed-caps line is SITE.name verbatim (the caps are
+// presentational, applied by text-transform in CSS — the string is unchanged).
+// The italic turn is the promise: the remainder of the LOCKED hero headline
+// after its "The StorySmith." lead sentence.
+//
+// OPERATOR-DIRECTED (2026-07-08): hero leads with the company; The StorySmith
+// stays in About/copy — dropping the lead sentence here is presentational per
+// his call, flag for read-approval.
+const heroLead = SITE.name; // "Adventure Storytelling Media" → CSS uppercases it
+const splitAt = COPY.hero.headline.indexOf(". ");
+const heroTurn = splitAt === -1 ? COPY.hero.headline : COPY.hero.headline.slice(splitAt + 2);
+---
+
+<Base title={p.meta.title} description={p.meta.description}>
+  <!-- Ambient "you-are-here" survey trail (§3.3) — fixed behind content,
+       threads the three pillar sections. Desktop-only, degrades to static. -->
+  <TrailJourney />
+
+  <!-- H1 — the Portal Hero (§9.2): the mark as a window, A→B→A. Content
+       paints first (LCP) over the void; the dissolve-through plays behind it
+       and reverses on scroll-out as the handoff into the tableaux. -->
+  <PortalHero>
+    <p class="hud-label" data-portal-arrive style="--arrive-delay:0ms">{COPY.hero.kicker}</p>
+    <h1 class="portal-headline" data-portal-arrive style="--arrive-delay:90ms">
+      <span class="portal-headline-lead">{heroLead}</span>
+      {heroTurn && <span class="portal-headline-turn">{heroTurn}</span>}
+    </h1>
+    <!-- AUDIT-FIX (2026-08-02): buyerLine promoted out of .hud-label (was
+         0.7rem/uppercase/0.22em-tracked — effectively invisible, the one
+         line that actually answers "what is this") into the same readable
+         body scale as the subline below it, and moved ahead of it so the
+         plain factual answer is the second thing a visitor reads after the
+         H1, before the more poetic subline (COPY.hero.buyerLine, ⚠ flagged
+         in consts). -->
+    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:180ms">{COPY.hero.buyerLine}</p>
+    <p class="mx-auto max-w-2xl text-lg text-ink" data-portal-arrive style="--arrive-delay:230ms">{COPY.hero.subline}</p>
+    <!-- P29 — the hero CTA is PRIMARY_CTA (label + href travel together; the
+         signpost paths below were reordered money-first and no longer lead
+         with the forge). -->
+    <a href={`${base}${PRIMARY_CTA.href}`} class="btn" data-portal-arrive style="--arrive-delay:270ms">
+      {PRIMARY_CTA.label}
+    </a>
+  </PortalHero>
+
+  <!-- H2 — signpost band (R3.6c): each path gets a Space Mono index, a hairline
+       separator, and a hover state where the arrow drifts 6px + the label goes
+       accent. Reveal with 70ms stagger. No imagery — stays quieter than the
+       portal above it. -->
+  <nav aria-label="Explore by intent" class="border-t border-hairline p-8">
+    <ul class="signpost mx-auto max-w-3xl">
+      {
+        COPY.paths.map((path, i) => (
+          <li data-reveal data-reveal-stagger="70">
+            <a href={`${base}${path.href}`} class="signpost-link">
+              <span class="signpost-no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <span class="signpost-label">{path.label}</span>
+              <span class="signpost-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- H3 — three-pillar scroll tableaux engine (§2b) -->
+  <Tableaux />
+
+  <!-- H4 — proof band. Heading/intro/testimonial arrive via P3 (§1.1); the
+       legend items get a subtle 40ms-stagger arrival (DIRECTION §2.1 H4) — no
+       draw-on SVG theatrics. -->
+  <section class="mx-auto max-w-3xl space-y-6 border-t border-hairline p-8">
+    <h2 class="text-2xl font-bold" data-reveal>{p.proof.heading}</h2>
+    <p data-reveal>{p.proof.intro}</p>
+    <!-- Testimonial blockquote gains a contour rule that draws in on reveal
+         (R3.6c H4). AUDIT-FIX (2026-08-03): showProof was left at its
+         default (true), so the testimonial printed its own embedded
+         PitchBoulder citation ("The primary proof anchor.") immediately
+         above the tiered list below, whose own first row is also
+         "pitchboulder" — the same citation appeared twice back-to-back.
+         venture.astro's own E3 already documents and avoids this exact
+         collision (showProof={false} "to avoid a back-to-back duplicate");
+         home just hadn't applied it. -->
+    <div class="proof-quote" data-reveal>
+      <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
+    </div>
+    <!-- Legend rows: 40ms stagger (kept) + each symbol fires ONE survey-ping as
+         its row reveals — the honesty device pings onto the map (R3.6c H4). -->
+    <ul class="space-y-3">
+      {
+        p.proof.tiered.map((relationshipId) => (
+          <li class="proof-row" data-reveal data-reveal-stagger="40">
+            <LegendMark proof={{ relationshipId }} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- H5 — Forge the Saga teaser (R3.6c): a horizontal temper-line rule (accent
+       gradient — NOT orange; accent discipline holds on home) scales in on
+       reveal, with the 5 stage names beneath it staggering in. Makes the teaser
+       feel like an instrument, not a paragraph. -->
+  <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8" data-lane="home-forge">
+    <h2 class="text-2xl font-bold" data-reveal>{p.forgeTeaser.heading}</h2>
+    <p data-reveal>{p.forgeTeaser.body}</p>
+    <div class="forge-teaser-line" data-reveal>
+      <span class="temper-rule" aria-hidden="true"></span>
+      <ol class="temper-stages">
+        {
+          SAGA_STAGES.map((stage, i) => (
+            <li class="temper-stage" style={`--stage-delay:${i * 60}ms`}>{stage.name}</li>
+          ))
+        }
+      </ol>
+    </div>
+    <p class="italic opacity-80" data-reveal>{p.forgeTeaser.anchor}</p>
+    <a href={`${base}${p.forgeTeaser.cta.href}`} class="btn">
+      {p.forgeTeaser.cta.label}
+    </a>
+  </section>
+
+  <!-- H6 — About teaser (R3.6c): a 2-col layout (≥768px) with a small floating
+       portrait card beside the text (drift amp 0.7 — the 12th and last drifting
+       element on the page, exactly at the wire-up cap). Whole figure links to
+       /about. Stacks on mobile. -->
+  <section class="about-teaser mx-auto max-w-3xl border-t border-hairline p-8">
+    <div class="about-teaser-text space-y-4">
+      <p data-reveal>{p.aboutTeaser.body}</p>
+      <p class="italic opacity-80" data-reveal>{p.aboutTeaser.anchor}</p>
+      <a href={`${base}${p.aboutTeaser.link.href}`} class="link">{p.aboutTeaser.link.label} <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+    <a href={`${base}${p.aboutTeaser.link.href}`} class="about-teaser-figure" aria-label={p.aboutTeaser.link.label} data-reveal>
+      <figure class="map-inset about-portrait-float" data-drift data-drift-amp="0.7">
+        <picture>
+          <source type="image/avif" srcset={`${base}/media/about/portrait.avif`} />
+          <img
+            src={`${base}/media/about/portrait.webp`}
+            alt="Sindbad Horizon, founder of Adventure Storytelling Media"
+            width="200"
+            height="250"
+            loading="lazy"
+            decoding="async"
+            style="aspect-ratio:4/5;object-fit:cover;display:block;width:100%"
+          />
+        </picture>
+      </figure>
+    </a>
+  </section>
+
+  <!-- H7 — contact CTA band (R3.6c): the CTA gets a survey-ping pulse ring every
+       6s (one ping, then rest). Nothing else — the close stays calm. -->
+  <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
+    <h2 class="text-2xl font-bold" data-reveal>{p.contactBand.headline}</h2>
+    <p data-reveal>{p.contactBand.body}</p>
+    <a href={`${base}${p.contactBand.cta.href}`} class="btn cta-pulse">
+      {p.contactBand.cta.label}
+    </a>
+  </section>
+</Base>

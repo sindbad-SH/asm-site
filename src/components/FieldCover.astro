@@ -481,4 +481,30 @@ const sizes =
         linear-gradient(to top, rgba(10, 13, 18, 0.94) 0%, rgba(10, 13, 18, 0.88) 26%, transparent 64%);
     }
   }
+
+  /* ── PHONE TYPE FLOORS (2026-08-15 mobile pass) ─────────────────────────
+     The cqi ladders above scale the cover's micro-type down with the frame,
+     which is right on a desktop grid and wrong on a phone, where the frame IS
+     the screen: the mast credit landed at 7px, the foot slate at 8px, the AA
+     line at 6-7px. These floors sit LAST so they beat their earlier same-
+     specificity declarations; the AA line stays small but readable — hiding
+     it is barred by the partner-logo rule, so legibility is the honest fix. */
+  @media (max-width: 640px) {
+    .fcover-mast-credit {
+      font-size: 0.62rem;
+    }
+    .fcover-slate {
+      font-size: 0.72rem;
+    }
+    .fcover-cue {
+      font-size: 0.6rem;
+    }
+    .fcover-aa-line {
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+    }
+    .fcover-deck {
+      font-size: 0.95rem;
+    }
+  }
 </style>

@@ -427,8 +427,8 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                   {d.media && (
                     <span class="dispatch-thumb">
                       <picture>
-                        <source type="image/avif" srcset={d.media.avif} sizes="56px" />
-                        <source type="image/webp" srcset={d.media.webp} sizes="56px" />
+                        <source type="image/avif" srcset={d.media.avif} sizes="(max-width: 640px) 84px, 56px" />
+                        <source type="image/webp" srcset={d.media.webp} sizes="(max-width: 640px) 84px, 56px" />
                         <img src={d.media.src} alt="" loading="lazy" decoding="async" />
                       </picture>
                     </span>
@@ -1495,6 +1495,31 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   @media (max-width: 640px) {
     .field-teaser-strip {
       grid-template-columns: 1fr;
+    }
+    /* 2026-08-15 mobile pass (operator: photos + text tiny on phones).
+       The field board's 2-col flow put every frame at ~143px — single column
+       lets each photograph actually read; the slate rides the hud floor. */
+    .fb-grid {
+      grid-template-columns: 1fr;
+    }
+    .fb-slate {
+      font-size: 0.68rem;
+    }
+    .dispatch-thumb {
+      width: 5.25rem;
+      height: 5.25rem;
+    }
+    /* cover chrome on the two story covers + postcard CTAs — same floor family */
+    .fest-cover-issue,
+    .vybe-cover-years {
+      font-size: 0.66rem;
+    }
+    .fest-cover-enter,
+    .vybe-cover-enter {
+      font-size: 0.7rem;
+    }
+    .postcard-cta {
+      font-size: 0.74rem;
     }
   }
   .field-teaser-frame {

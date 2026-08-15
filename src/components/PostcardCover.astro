@@ -149,6 +149,17 @@ const sizes = compact ? "(min-width: 900px) 22vw, 45vw" : "(min-width: 900px) 62
     font-size: 0.5rem;
     letter-spacing: 0.08em;
   }
+  /* 2026-08-15 mobile pass — on a phone the compact tile is nearly full-width,
+     so its micro-type has room to be legible (kicker/date/loc were 8-9px). */
+  @media (max-width: 640px) {
+    .pc-cover--compact .pc-cover-kicker,
+    .pc-cover--compact .pc-cover-date {
+      font-size: 0.68rem;
+    }
+    .pc-cover--compact .pc-cover-loc {
+      font-size: 0.66rem;
+    }
+  }
 
   /* ── full (detail-page hero) sizing ── */
   .pc-cover--full {

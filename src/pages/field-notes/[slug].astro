@@ -1064,6 +1064,15 @@ const meta = {
       justify-items: start;
       margin-left: 0;
     }
+    /* 2026-08-15 mobile pass — supporting photographs take the full column on
+       a phone (was min(21rem, 82%) ≈ 283px), and the licensed chip under each
+       rides up to a readable size (was ~10px). */
+    .spotlight-float {
+      width: 100%;
+    }
+    .spotlight-float-chip {
+      font-size: 0.7rem;
+    }
   }
 </style>
 

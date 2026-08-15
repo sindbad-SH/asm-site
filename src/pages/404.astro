@@ -16,7 +16,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // other whole story column. Now built from NAV (the same single source the
 // header uses), so a 404 always offers a way back into both columns and can
 // never go stale again; "Home" is prepended since NAV itself doesn't include it.
-const links = [{ label: "Home", href: "/" }, ...NAV] as const;
+const links = [{ label: "Home", href: "/home" }, ...NAV] as const;
 ---
 
 <Base title="404 — off the map">
