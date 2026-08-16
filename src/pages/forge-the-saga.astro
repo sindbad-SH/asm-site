@@ -55,28 +55,6 @@ const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 // SAGA_STAGES (single source, unchanged); the `body` copy is new, written
 // for this page — no prices, no per-stage "bestFor" sales framing.
 const stages = SAGA_STAGES.map((stage, i) => ({ ...stage, body: p.method.stages[i].body }));
-
-// ENRICHMENT (2026-08-15, operator: "the forge the saga page feels kind of
-// sparse"). Each stage carries a photograph from the archive as TEXTURE — the
-// caption states only place/event, never a claim that the photo documents this
-// stage for a client. Sources are exports the operator already approved: the
-// clean field-note heroes (covers/) and the home-tableaux bakes. Existence-
-// gated so a missing file drops the image, never 404s.
-import { existsSync } from "node:fs";
-import { join } from "node:path";
-const PUB = join(process.cwd(), "public");
-function stageArt(rel: string, caption: string, alt: string) {
-  return existsSync(join(PUB, rel.replace(/^\//, "").split("/").join("/")))
-    ? { src: `${base}${rel}`, caption, alt }
-    : undefined;
-}
-const STAGE_ART = [
-  stageArt("/media/adventure/covers/twin-lakes-01-800.webp", "Twin Lakes, Colorado", "Aerial view of Twin Lakes, Colorado — turquoise channel between sandbars"),
-  stageArt("/media/adventure/covers/lac-de-tseuzier-02-800.webp", "Lac de Tseuzier, Valais", "Aerial view of Lac de Tseuzier in its cirque, the Valais Alps behind"),
-  stageArt("/media/home/industry/cluster/ridge.webp", "SeriesFest Pitch-A-Thon Roadshow, Denver", "A panel filmed inside a Denver bookstore, shelves and warm light around the stage"),
-  stageArt("/media/home/market/cluster/peak.webp", "PitchBoulder, Boulder", "A packed PitchBoulder room, founders watching a presentation"),
-  stageArt("/media/adventure/covers/clear-creek-02-800.webp", "Clear Creek Reservoir, Colorado", "The drawn-down basin of Clear Creek Reservoir, channels crossing the exposed bed"),
-];
 const total = stages.length;
 
 // Each card's temper color — the same hot-working-end → set-aqua-end thermal
@@ -129,21 +107,13 @@ const temper = (i: number) =>
             {
               stages.map((stage, i) => (
                 <li class="fg-svc" style={`--heat:${temper(i)}`}>
-                  <article class="fg-card fg-card--media" data-reveal data-reveal-stagger="80">
-                    {STAGE_ART[i] && (
-                      <figure class="fg-card-art">
-                        <img src={STAGE_ART[i].src} alt={STAGE_ART[i].alt} loading="lazy" decoding="async" />
-                        <figcaption class="hud-label fg-card-art-cap">{STAGE_ART[i].caption}</figcaption>
-                      </figure>
-                    )}
-                    <div class="fg-card-body">
-                      <header class="fg-card-head">
-                        <h3 class="fg-name">{stage.name}</h3>
-                        <p class="fg-stage-sub">{stage.sub}</p>
-                      </header>
-                      <p class="fg-blurb">{stage.body}</p>
-                      <p class="fg-ledger">Produces: {stage.deliverable}</p>
-                    </div>
+                  <article class="fg-card" data-reveal data-reveal-stagger="80">
+                    <header class="fg-card-head">
+                      <h3 class="fg-name">{stage.name}</h3>
+                      <p class="fg-stage-sub">{stage.sub}</p>
+                    </header>
+                    <p class="fg-blurb">{stage.body}</p>
+                    <p class="fg-ledger">Produces: {stage.deliverable}</p>
                   </article>
                 </li>
               ))
@@ -490,54 +460,6 @@ const temper = (i: number) =>
     align-content: start;
     /* each card sits in its own heat: a faint inset edge in station color */
     box-shadow: inset 3px 0 0 var(--heat);
-  }
-
-  /* ENRICHMENT (2026-08-15) — the stage photograph rides beside the text on
-     wide screens and above it on phones. The caption is place-only texture in
-     the hud voice; the image corners follow the card radius. */
-  .fg-card--media {
-    padding: 0;
-    overflow: hidden;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 0;
-  }
-  .fg-card-art {
-    position: relative;
-    margin: 0;
-    min-height: 100%;
-  }
-  .fg-card-art img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    inset: 0;
-  }
-  .fg-card-art-cap {
-    position: absolute;
-    left: 0.7rem;
-    bottom: 0.6rem;
-    margin: 0;
-    padding: 0.25rem 0.5rem;
-    border-radius: 2px;
-    background: rgba(8, 11, 18, 0.72);
-    letter-spacing: 0.14em;
-  }
-  .fg-card-body {
-    display: grid;
-    gap: 0.85rem;
-    align-content: start;
-    padding: 1.5rem 1.5rem 1.4rem;
-  }
-  @media (max-width: 720px) {
-    .fg-card--media {
-      grid-template-columns: 1fr;
-    }
-    .fg-card-art {
-      min-height: 0;
-      aspect-ratio: 5 / 3;
-    }
   }
   .fg-card-head {
     display: grid;
