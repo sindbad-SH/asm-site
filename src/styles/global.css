@@ -103,6 +103,16 @@
 
 @layer base {
   html {
+    /* FLUID ROOT (2026-08-16). Until now `html` declared no font-size, so the
+       root stayed at the browser's 16px at EVERY width — body copy computed to
+       exactly 16px on a 390px phone and on a 1440px monitor alike. That is why
+       the earlier pass (which only raised micro-label floors) changed nothing
+       the operator could feel, and why desktop never moved at all.
+       390→17.0px · 768→17.7px · 1440→19.0px · 2560+→20px (capped).
+       Tailwind v4 sizes/spacing/max-widths are rem-based, so this one
+       declaration also makes ~40 fixed-rem page rules fluid and widens the
+       rem-based containers that were leaving half of a wide screen empty. */
+    font-size: clamp(17px, 16.26px + 0.19vw, 20px);
     background-color: var(--color-base);
     color: var(--color-ink);
     font-family: var(--font-sans);
@@ -153,30 +163,23 @@
 
 @layer components {
   /* Surveyor's-instrument voice: eyebrows, kickers, coordinates, indices. */
+  /* TYPE FLOOR (2026-08-15, corrected 2026-08-16). The floor is UNSCOPED now.
+     Scoping it to `max-width: 640px` produced the opposite of the intent: the
+     hud voice rendered 12.0px on a phone and 11.2px on a 1440px monitor —
+     literally smaller on the bigger screen. Dozens of these labels ARE the
+     reading surface (slates, folios, chips, footer buyers, signposts), so the
+     floor holds everywhere and only the tracking tightens on a phone, where
+     long labels would otherwise wrap. */
   .hud-label {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     color: var(--color-ink-muted);
   }
-  /* MOBILE TYPE FLOOR (2026-08-15, operator: "the text looks very tiny" on
-     phones). The hud grammar is deliberately small on desktop, where a label
-     sits beside large elements; on a 375px screen 0.7rem lands at 11px and
-     dozens of these labels ARE the reading surface (slates, folios, chips,
-     footer buyers, signposts). One floor here lifts the whole population;
-     the tighter tracking keeps long labels from wrapping at the larger size. */
   @media (max-width: 640px) {
     .hud-label {
-      font-size: 0.75rem;
       letter-spacing: 0.16em;
-    }
-    /* same floor family (2026-08-15 mobile pass): the button voice was
-       phone-illegible at its desktop size. (.terr-country-label's floor lives
-       UNLAYERED at the end of this file — its base rule is unlayered, and
-       unlayered beats @layer regardless of order.) */
-    .btn {
-      font-size: 0.85rem;
     }
   }
 
@@ -216,7 +219,9 @@
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
     padding: 0.55rem 1.3rem;
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    /* 0.85rem, unscoped (2026-08-16): the button voice carried a phone-only
+       floor that left it smaller on desktop than on a phone. */
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     /* the sheen lives in the background layer, parked off-screen at rest */
@@ -1758,15 +1763,31 @@
     position: relative;
     overflow: clip;
   }
+  /* 2026-08-16 SCALE PASS — the stage was pinned at 128vh while its floats
+     were capped ~420px, so each chapter rendered 1440x1152 with photographs
+     covering only 23-32% of it: 68-77% empty ground, the "dead space between
+     the photos". The height now comes from the content. */
+  /* 2026-08-16 — the stage is a MOSAIC GRID, not an absolute scatter.
+     The scatter was the root of both complaints: photographs had to stay small
+     enough to miss a centred copy column, and the leftovers were padded out
+     with a 128vh box, so every chapter read as small pictures marooned in
+     empty ground (photos covered 23-32% of each 1440x1152 stage). Sizing them
+     properly made them collide with the copy instead — proof the composition,
+     not the sizes, was wrong. A 12-column grid gives the photographs real
+     scale AND a clear lane for the text, with no wasted height. The drift
+     parallax still applies (it is a transform, unaffected by grid placement). */
   .cluster-stage {
     position: relative;
-    min-height: 128vh;
+    min-height: auto;
     display: grid;
-    place-items: center;
-    padding: 6rem 1.5rem;
+    grid-template-columns: repeat(12, 1fr);
+    gap: clamp(0.5rem, 1vw, 1rem);
+    align-items: center;
+    justify-items: stretch;
+    padding: clamp(2.5rem, 4vw, 4.5rem) clamp(1rem, 3vw, 2.5rem);
   }
   .float {
-    position: absolute;
+    position: relative;
     margin: 0;
     border-radius: 0.5rem;
     overflow: clip;
@@ -1793,40 +1814,54 @@
      Matterhorn summit, the PitchBoulder logo, the AFM frame's edges. The literal
      ratio stays as the fallback if --ar can't be read. The width clamps are the
      size cap (DIRECTION), so a portrait card can't grow comically tall/wide. */
+  /* Slot geometry — grid cells, deliberately uneven so the wall still reads as
+     a composition rather than a contact sheet. Each frame keeps its own true
+     aspect (--ar, read from the pixels at build) so nothing is cropped; the
+     row heights follow. Row 1 = the two wide establishing frames, row 2 = the
+     copy with a portrait frame either side, row 3 = the remaining frame. */
   .float--valley {
-    width: clamp(220px, 30vw, 420px);
+    grid-column: 1 / 6;
+    grid-row: 1;
     aspect-ratio: var(--ar, 3/2);
-    top: 6%;
-    left: 3%;
   }
   .float--loop {
-    width: clamp(240px, 32vw, 460px);
+    grid-column: 6 / 13;
+    grid-row: 1;
     aspect-ratio: var(--ar, 3/2);
-    top: 10%;
-    right: 2%;
   }
   .float--peak {
-    width: clamp(150px, 19vw, 290px);
+    grid-column: 1 / 4;
+    grid-row: 2;
     aspect-ratio: var(--ar, 4/5);
-    bottom: 6%;
-    left: 8%;
   }
   .float--ridge {
-    width: clamp(150px, 19vw, 300px);
+    grid-column: 10 / 13;
+    grid-row: 2;
     aspect-ratio: var(--ar, 4/5);
-    bottom: 4%;
-    right: 9%;
   }
+  /* the fifth frame only exists on chapters that also carry the video loop;
+     it rides row 1 as the third establishing frame rather than opening a
+     third row, which would add a screen of height for one picture. When it is
+     present row 1 splits three ways — declared on the STAGE so all three
+     frames move together (a sibling :has moved only the loop and left it
+     overlapping the valley by a column). */
   .float--lake {
-    width: clamp(170px, 21vw, 320px);
+    grid-column: 9 / 13;
+    grid-row: 1;
     aspect-ratio: var(--ar, 3/2);
-    top: 46%;
-    right: 20%;
-    z-index: 1;
+  }
+  .cluster-stage:has(.float--lake) .float--valley {
+    grid-column: 1 / 5;
+  }
+  .cluster-stage:has(.float--lake) .float--loop {
+    grid-column: 5 / 9;
   }
   .cluster-content {
     position: relative;
     z-index: 3;
+    grid-column: 4 / 10;
+    grid-row: 2;
+    justify-self: center;
     max-width: 34rem;
     padding: 2rem;
     text-align: center;
@@ -1834,12 +1869,16 @@
     gap: 1.05rem;
     justify-items: center;
     /* small local legibility backdrop — a soft vignette behind the copy only,
-       not a full-frame scrim over the photos (R5: keep the imagery bright). */
+       not a full-frame scrim over the photos (R5: keep the imagery bright).
+       2026-08-16: the ellipse was measurably washing the left edge of the
+       floats it overlapped (a 43x276px grey band on the SeriesFest frame, and
+       words rendering ON the Tseuzier photo). Tightened to the text box and
+       given a mix-blend so it darkens the ground without greying a photo. */
     background: radial-gradient(
-      ellipse 82% 74% at 50% 50%,
-      color-mix(in srgb, var(--color-base) 82%, transparent) 0%,
-      color-mix(in srgb, var(--color-base) 62%, transparent) 55%,
-      transparent 100%
+      ellipse 64% 58% at 50% 50%,
+      color-mix(in srgb, var(--color-base) 88%, transparent) 0%,
+      color-mix(in srgb, var(--color-base) 70%, transparent) 62%,
+      transparent 92%
     );
   }
   .cluster-headline {
@@ -1852,22 +1891,51 @@
   /* Mobile: stack the shots into a simple flowing column (no absolute scatter,
      no parallax); copy sits above. Keeps it bright + readable without pin jank. */
   @media (max-width: 640px) {
+    /* 2026-08-16 SCALE PASS — the phone layout used to flatten every float
+       into a plain single-column stack at native aspect, so one portrait frame
+       alone ran 350x622 and /home reached 9,999px (11 screens). Now: the LEAD
+       frame goes full-bleed (edge to edge, no 20px gutter — a photography
+       publication should not give up 10% of a phone screen), and the rest pair
+       2-up. Same photographs, far less scrolling, more picture on screen. */
     .cluster-stage {
       min-height: 0;
       display: block;
-      /* 3rem all around read as dead space between chapters on a phone
-         (2026-08-15 mobile pass) — the stacked floats carry the rhythm. */
-      padding: 1.75rem 1.25rem;
+      columns: 2;
+      column-gap: 8px;
+      padding: 1.5rem 0 1.75rem;
     }
+    /* the copy is not a column item — it spans, below the pictures */
+    .cluster-content {
+      column-span: all;
+    }
+    /* The grid columns from the desktop mosaic are cleared, and the frames
+       below the lead pack into two masonry COLUMNS. Floats were tried first
+       and left ragged holes wherever a short frame sat beside a tall one;
+       column packing has no such gap and — unlike a fixed-ratio 2-up grid —
+       needs no crop, so the no-crop rule holds on a phone too. */
     .float {
       position: relative;
-      width: 100% !important;
       inset: auto !important;
-      margin: 0 0 0.8rem;
+      width: auto !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+      break-inside: avoid;
+      margin: 0 0 8px;
+    }
+    .cluster-floats-mobile {
+      columns: 2;
+      column-gap: 8px;
+    }
+    /* the lead frame — full-bleed, ahead of the columns */
+    .float--valley {
+      width: 100% !important;
+      margin: 0 0 8px;
+      border-radius: 0;
+      column-span: all;
     }
     .cluster-content {
       background: none;
-      padding: 0.75rem 0 1.25rem;
+      padding: 1rem 1.25rem 1.25rem;
     }
   }
 
@@ -2225,7 +2293,10 @@
     justify-self: center;
   }
   .about-portrait-float {
-    width: clamp(140px, 22vw, 200px);
+    /* 2026-08-16 — was clamp(140px, 22vw, 200px): the only photograph in the
+       whole lower half of /home rendered 187px (13% of a 1440 screen), the
+       smallest content image on the page. */
+    width: clamp(190px, 26vw, 400px);
     will-change: transform;
   }
 
