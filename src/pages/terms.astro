@@ -8,6 +8,8 @@
  */
 import Base from "../layouts/Base.astro";
 import { SITE } from "../consts";
+import { emailParts } from "../lib/email";
+const mail = emailParts(SITE.email);
 ---
 
 <Base
@@ -80,7 +82,7 @@ import { SITE } from "../consts";
     </div>
 
     <p class="text-sm text-ink-muted">
-      Questions? <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+      Questions? <a href={`mailto:${SITE.email}`} class="link">{mail.local}<wbr />{mail.domainName}<wbr />{mail.tld}</a>
     </p>
     <p class="text-sm text-ink-muted">Last updated July 28, 2026.</p>
   </section>

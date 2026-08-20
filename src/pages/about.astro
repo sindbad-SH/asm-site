@@ -38,6 +38,8 @@
 import Base from "../layouts/Base.astro";
 import LegendMark from "../components/LegendMark.astro";
 import { PAGES, SITE } from "../consts";
+import { emailParts } from "../lib/email";
+const founderMail = emailParts(SITE.founderEmail);
 
 const p = PAGES.about;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -91,7 +93,11 @@ const closeGhost = ["B", "O", "U", "L", "D", "E", "R"];
           <p class="ab-opener" data-reveal>{p.opener}</p>
         </div>
         <div class="ab-col ab-col--reach" data-reveal>
-          <a class="ab-mail" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          {/* 2026-08-20 (operator-directed): the founder's DIRECT address — the
+              one place on the site it appears; every other surface uses the
+              general SITE.email (contact@). Split with <wbr /> so the phone
+              wrap breaks at the "@", never mid-word (see lib/email.ts). */}
+          <a class="ab-mail" href={`mailto:${SITE.founderEmail}`}>{founderMail.local}<wbr />{founderMail.domainName}<wbr />{founderMail.tld}</a>
           <p class="hud-label ab-social-kicker">FIND ME IN THE FIELD</p>
           <p class="ab-social-note">The business lives here. I live on these:</p>
           {/* 2026-08-04 — operator-directed: socials render as icon buttons */}

@@ -19,6 +19,8 @@
  */
 import Base from "../layouts/Base.astro";
 import { SITE } from "../consts";
+import { emailParts } from "../lib/email";
+const mail = emailParts(SITE.email);
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -74,7 +76,7 @@ const LOGO = `${base}/media/adventure/aa-logo.png`;
           <a href={`${base}/contact`} class="btn-quiet lic-quiet-cta">
             <span>Contact →</span>
           </a>
-          <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+          <a href={`mailto:${SITE.email}`} class="link">{mail.local}<wbr />{mail.domainName}<wbr />{mail.tld}</a>
         </div>
       </section>
 

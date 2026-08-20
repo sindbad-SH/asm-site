@@ -43,8 +43,14 @@ export const SITE = {
   person: "Sindbad Horizon",
   persona: "The StorySmith",
   location: "Boulder, Colorado",
-  // Matches the address on file; per BUILD-PLAN §5A S9 confirm once with Sindbad.
-  email: "sindbad@adventurestorytellingmedia.com",
+  // 2026-08-20 (operator-directed): the general site contact is contact@ — it
+  // lands in the same inbox as sindbad@ but filters and formats better. The
+  // founder's direct address renders ONLY beside his portrait on /about (see
+  // `founderEmail`); everywhere else maps this field.
+  email: "contact@adventurestorytellingmedia.com",
+  // The direct-line-to-the-founder differentiator. NEVER render this anywhere
+  // except the /about portrait block — scarcity is the point.
+  founderEmail: "sindbad@adventurestorytellingmedia.com",
   formEndpoint: "[confirm]", // RESERVED — awaiting operator fact (AS-2). Free-tier form
                              // endpoint; account creation needs his email verification (a
                              // ~2-minute operator task). Form stays inert by design until then.

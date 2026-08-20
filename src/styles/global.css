@@ -111,8 +111,11 @@
        390→17.0px · 768→17.7px · 1440→19.0px · 2560+→20px (capped).
        Tailwind v4 sizes/spacing/max-widths are rem-based, so this one
        declaration also makes ~40 fixed-rem page rules fluid and widens the
-       rem-based containers that were leaving half of a wide screen empty. */
-    font-size: clamp(17px, 16.26px + 0.19vw, 20px);
+       rem-based containers that were leaving half of a wide screen empty.
+       +10% (2026-08-20, operator: still reading small on his phone) — the
+       whole curve scaled by 1.1: 390→18.7px · 768→19.5px · 1440→20.9px ·
+       2560+→22px (capped). */
+    font-size: clamp(18.7px, 17.89px + 0.21vw, 22px);
     background-color: var(--color-base);
     color: var(--color-ink);
     font-family: var(--font-sans);
@@ -310,6 +313,14 @@
   .link:focus-visible {
     color: var(--color-accent);
   }
+  /* 2026-08-20 — a full email address is one unbreakable ~38-char string; at
+     the +10% root it overran a 390px phone on /privacy, /terms and (via grid
+     min-content sizing) forced /licensing's whole column wide. `anywhere`
+     (unlike break-word) also shrinks the string's min-content, so it fixes
+     both the inline and the grid case. Sitewide by intent. */
+  a[href^="mailto:"] {
+    overflow-wrap: anywhere;
+  }
   .link .arrow {
     display: inline-block;
     transition: transform var(--dur-hover) var(--ease-swift);
@@ -472,11 +483,14 @@
   }
 
   /* ── Fullscreen menu (mobile nav) — v1 KEEP concept, tokens only ── */
+  /* 2026-08-20 (operator: "you really got to target to click on it") — the
+     burger grows from a 2.25rem box / 20px icon to a ~56px tap target with a
+     26px icon; bar offsets scale with it (same slight asymmetry as before). */
   .menu-toggle {
     display: grid;
     place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 3rem;
+    height: 3rem;
     color: var(--color-ink);
   }
   .menu-toggle .bar,
@@ -484,18 +498,18 @@
   .menu-toggle .bar::after {
     content: "";
     display: block;
-    width: 20px;
-    height: 1.5px;
+    width: 26px;
+    height: 2px;
     background: currentColor;
     transition:
       transform var(--dur-hover) var(--ease-swift),
       opacity var(--dur-hover) var(--ease-swift);
   }
   .menu-toggle .bar::before {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
   }
   .menu-toggle .bar::after {
-    transform: translateY(4.5px);
+    transform: translateY(6px);
   }
   .menu-toggle[aria-expanded="true"] .bar {
     background: transparent;
@@ -511,6 +525,11 @@
     position: fixed;
     inset: 0;
     z-index: 70;
+    /* 2026-08-20 — the +10% root consumed the menu's landscape headroom
+       (375px-tall phones clipped the first item and the email row with body
+       scroll locked). Paired with the nav's min-h-full, the sheet scrolls
+       instead of clipping. */
+    overflow-y: auto;
     background: color-mix(in srgb, var(--color-base) 97%, transparent);
     backdrop-filter: blur(10px);
     opacity: 0;

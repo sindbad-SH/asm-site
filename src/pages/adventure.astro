@@ -931,6 +931,11 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     margin: 0.5rem 0 0;
     padding: 0;
     display: grid;
+    /* 2026-08-20 — the implicit auto track sized itself to the rows'
+       min-content (~331px) and ignored the title's min-width: 0 below, so on
+       phones the whole list overhung its column no matter what the row did.
+       minmax(0, 1fr) lets the track shrink to the list's real content box. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .dispatch-row {
     border-top: 1px solid var(--color-hairline);
@@ -979,6 +984,13 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
   .dispatch-title {
     flex: 1 1 auto;
     font-size: 1.02rem;
+    /* 2026-08-20 — without this the title's min-content (longest word) is a
+       floor, and at the +10% root the row pushed the date chip past a 390px
+       viewport; let the title be the flexible part and wrap instead.
+       break-word is the escape hatch for a word longer than the shrunk box —
+       without it the ink painted straight across the date chip. */
+    min-width: 0;
+    overflow-wrap: break-word;
   }
   .dispatch-date {
     flex: none;
@@ -1505,9 +1517,20 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
     .fb-slate {
       font-size: 0.68rem;
     }
+    /* 2026-08-20 — keep the 2026-08-15 pass's VISUAL thumb size at the +10%
+       root (5.25rem × 17px ≈ 4.75rem × 18.7px) and slim the row's fixed
+       costs (gap, date tracking) so the title keeps a readable column on a
+       390px phone instead of wrapping every other word. */
     .dispatch-thumb {
-      width: 5.25rem;
-      height: 5.25rem;
+      width: 4.75rem;
+      height: 4.75rem;
+    }
+    .dispatch-link {
+      gap: 0.6rem;
+    }
+    .dispatch-date {
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
     }
     /* cover chrome on the two story covers + postcard CTAs — same floor family */
     .fest-cover-issue,

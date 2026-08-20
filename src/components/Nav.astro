@@ -293,11 +293,13 @@ const path = (Astro.url.pathname.slice(base.length).replace(/\/$/, "")) || "/";
       font-size: 0.6rem;
     }
   }
-  /* below the inline-nav breakpoint the bar is lockup + burger only — give the
-     lockup a touch more room while keeping the bar slim on a phone. */
+  /* below the inline-nav breakpoint the bar is lockup + burger only. 2026-08-20
+     (operator: the phone bar was "still quite small" / hard to target) — the
+     lockup now runs LARGER than the desktop base here, since it shares the row
+     with nothing but the enlarged burger. */
   @media (max-width: 640px) {
     .lockup-img {
-      height: 38px;
+      height: 46px;
     }
   }
   @media (min-width: 1280px) {

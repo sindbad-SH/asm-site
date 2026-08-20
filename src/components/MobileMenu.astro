@@ -12,12 +12,22 @@
  * visitor always has a working nav, just not the fullscreen presentation.
  */
 import { NAV, PRIMARY_CTA, SITE } from "../consts";
+import { emailParts } from "../lib/email";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const mail = emailParts(SITE.email);
 ---
 
 <div id="fs-menu" class="fs-menu" role="dialog" aria-modal="true" aria-label="Menu">
-  <nav class="flex h-full flex-col justify-center gap-2 px-8" aria-label="Primary (mobile)">
+  <!-- 2026-08-20 — the header's burger sits UNDER this z-70 sheet, so once the
+       menu opened, touch users had no visible/tappable way to close it (worse
+       when the page was scrolled: the static header is off-screen entirely).
+       The overlay now owns its close control, pinned where the burger lives. -->
+  <button type="button" class="fs-close" data-menu-close aria-label="Close menu"></button>
+  <!-- min-h-full (not h-full) + the menu's overflow-y: auto in global.css:
+       when the +10% type outgrows a short landscape phone, the column grows
+       past the viewport and scrolls instead of clipping both ends. -->
+  <nav class="flex min-h-full flex-col justify-center gap-2 px-8 py-10" aria-label="Primary (mobile)">
     {
       NAV.map((item, i) => (
         <a
@@ -40,7 +50,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       {PRIMARY_CTA.label}
     </a>
     <p class="fs-menu-item hud-label mt-8" style={`--stagger-delay: ${(NAV.length + 1) * 55}ms`}>
-      <a href={`mailto:${SITE.email}`} class="link email-link">{SITE.email}</a>
+      <a href={`mailto:${SITE.email}`} class="link email-link">{mail.local}<wbr />{mail.domainName}<wbr />{mail.tld}</a>
     </p>
   </nav>
 </div>
@@ -53,6 +63,44 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
      the transform on the address only; the row keeps its hud-label rhythm. */
   .email-link {
     text-transform: none;
+    /* 2026-08-20 — at the +10% root bump the address (one unbreakable string
+       in the row's tracked mono) ran off the right edge of a 390px phone.
+       Ease the hud tracking on the address and let it wrap mid-string rather
+       than clip. */
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+  }
+  /* 2026-08-20 — the overlay's own close control (see the markup comment).
+     Same grammar as the burger: a 3rem target, 26×2px bars, here crossed at
+     rest. Pinned to the burger's corner so the X appears where the finger
+     already is. */
+  .fs-close {
+    /* fixed, not absolute: the sheet scrolls (overflow-y: auto) and an
+       absolute child would ride away with the content; the sheet is inset: 0
+       so viewport coordinates ARE sheet coordinates. */
+    position: fixed;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-ink);
+  }
+  .fs-close::before,
+  .fs-close::after {
+    content: "";
+    grid-area: 1 / 1;
+    width: 26px;
+    height: 2px;
+    background: currentColor;
+  }
+  .fs-close::before {
+    transform: rotate(45deg);
+  }
+  .fs-close::after {
+    transform: rotate(-45deg);
   }
 </style>
 
@@ -73,6 +121,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   }
 
   toggle.addEventListener("click", () => setOpen(!open));
+  menu.querySelector("[data-menu-close]")?.addEventListener("click", () => setOpen(false));
   menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setOpen(false)));
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && open) setOpen(false);
