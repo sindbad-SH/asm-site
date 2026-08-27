@@ -277,76 +277,47 @@ export const COPY = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// SAGA_STAGES — ported from v1, voice converted to first-person solo.
-// Real productized IP; prices display per OD-4 (exact "from $X").
-// P30 REPRICE (2026-07-20, market-researched): stage floors raised to the
-// upper band for a boutique specialist who does BOTH research and production.
-// Benchmarks: custom market-research projects run $25k–$65k agency-side and
-// ~$8k–$12k small-scope (Farnsworth Group / IntoTheMinds / Drive Research
-// 2025-26); strategy consulting $150–$500/hr (consultfees.com). Only stage 01
-// renders directly (the /entertainment research floor); 02–05 feed the
-// package sums below.
+// SAGA_STAGES — the five-stage editorial method (Scouting → Mapping →
+// Forging → Testing → Assessing). REPOSITION (2026-08-27): the sales fields
+// (`price`, `deliverable`, `process`, `bestFor`) are DELETED so the rate
+// card cannot come back — what remains is the method's names, rendered on
+// /forge-the-saga (name + sub) and the home teaser (name only).
 // ---------------------------------------------------------------------------
 
 export type SagaStage = {
   no: string;
   name: string;
   sub: string;
-  deliverable: string;
-  process: string;
-  bestFor: string;
 };
 
 export const SAGA_STAGES: readonly SagaStage[] = [
   {
     no: "01",
     name: "Story Scouting",
-    sub: "Market & Audience Research",
-    deliverable: "Field Notes Brief",
-
-    process:
-      "Raw market intelligence. We uncover who your audience actually is, the exact language they use, and what your competitors are missing.",
-    bestFor: "You have a product but don't yet know who your real buyer is or how to talk to them.",
+    // REPOSITION (2026-08-27): subs rewritten from the consulting-deck
+    // service names ("Market & Audience Research" … "ROI Reporting") to the
+    // same five beats in editorial voice. ⚠ read-approval, all five.
+    sub: "Finding out who it's for",
   },
   {
     no: "02",
     name: "Story Mapping",
-    sub: "Messaging Strategy & Positioning",
-    deliverable: "Core Narrative Blueprint",
-
-    process:
-      "We shape raw intelligence into narrative strategy — who the audience is, what arc moves them, and what that looks like as tangible content.",
-    bestFor: "You have research but need it shaped into a clear, actionable strategic direction.",
+    sub: "Shaping the arc",
   },
   {
     no: "03",
     name: "Story Forging",
-    sub: "Asset Creation & Production",
-    deliverable: "Test-Ready Creative Assets",
-
-    process:
-      "The strategy becomes reality. We build high-quality video or copy assets designed specifically for market validation.",
-    bestFor: "You have a solid strategy and need the actual creative assets built and ready for feedback.",
+    sub: "The shoot and the cut",
   },
   {
     no: "04",
     name: "Story Testing",
-    sub: "A/B Testing & Analytics",
-    deliverable: "Live Market Data",
-
-    process:
-      "Your assets meet a real audience. We use curated human panels, AI audience simulations, or both to gather targeted data.",
-    bestFor: "You want data-backed proof it works before committing budget to distribution or ad spend.",
+    sub: "A small audience first",
   },
   {
     no: "05",
     name: "Story Assessing",
-    sub: "Iterative Refinement & ROI Reporting",
-    deliverable: "Action & Refinement Playbook",
-
-    process:
-      "We decode the data — what held attention, where people dropped off, what it means, and the exact steps to take next.",
-    bestFor: "You have campaign data but need an expert to decode it and point the way forward.",
+    sub: "Reading what happened",
   },
 ] as const;
 
@@ -1234,13 +1205,15 @@ export const PAGES = {
     },
     // F5 — proof: the method actually produces delivered work.
     proof: {
-      heading: "Proof",
+      // REPOSITION (2026-08-27): "Proof" read as evidence-for-a-purchase;
+      // the section is the method applied to a real story. ⚠ read-approval.
+      heading: "The method, applied",
       anchor: { relationshipId: "pitchboulder" } as ProofLine,
       testimonialId: "pitchboulder",
       // Delivered-work cards — services actually delivered for real people,
       // each labeled at exact status (WORK[].engagement, [confirm] until set).
       deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
-      note: "No second testimonial at launch. Everything shown is work actually delivered, labeled paid or unpaid as it truly was.",
+      note: "Everything shown here is work that actually happened, described as it actually was.",
     },
     // F6 — close. No CTA button, no trustline — one quiet line to the founder.
     close: {
@@ -1249,10 +1222,9 @@ export const PAGES = {
       // clients" hire-us line is RETIRED — the close now points at the
       // person, not an offer. ⚠ read-approval.
       body: "Every story published here is researched, shot, and cut by the founder, Sindbad Horizon — the method is how he keeps himself honest.",
-      links: [
-        { label: "About the founder", href: "/about" },
-        { label: "Get in touch", href: "/contact" },
-      ] as readonly Cta[],
+      // REPOSITION (2026-08-27): no CTA pair on the method page — one quiet
+      // link to the person; the door lives on /contact alone.
+      links: [{ label: "About the founder", href: "/about" }] as readonly Cta[],
     },
     // F7 — "Where the stories go" (PUB-E, 2026-07-27, Directive PUB-E): a
     // quiet channel directory at the bottom of the method page — where the
@@ -1270,8 +1242,11 @@ export const PAGES = {
     directory: {
       heading: "Where the stories go",
       body: "The publication lives in a few places besides this page — new dispatches, the licensed aerial archive, and a quieter sense of how the whole operation runs.",
+      // REPOSITION (2026-08-27): Substack is LIVE (SITE.socials.substack,
+      // launched 2026-08-02) — the newsletter entry now points straight at
+      // it instead of the on-site stub anchor.
       channels: [
-        { label: "Newsletter", href: "/contact#follow" },
+        { label: "The newsletter, on Substack", href: SITE.socials.substack },
         { label: "YouTube", href: SITE.socials.youtube },
         { label: "Instagram", href: SITE.socials.instagram },
         { label: "The licensed aerial archive", href: "/licensing" },
@@ -1279,20 +1254,12 @@ export const PAGES = {
     },
   },
 
-  // ---- ADVENTURE (§1.3) — P29: now ALSO the adventure-production SALES page
-  // (largely drone filming): samples + its own day-rate pricing + booking.
-  // 2026-08-03 design audit — that framing is STALE: the later Round 5/PUB-A
-  // notes below (search "A1b") removed the hire/day-rate/booking block from
-  // this page's actual body — it's a story index now, with one soft "Book a
-  // call" line at the close. `meta.description` still promised "day rates,
-  // samples, and direct booking" as if that were the page's main content;
-  // rewritten to match what the page actually shows (territory, field notes,
-  // festival/Vybe stories, postcards, the Amazing Aerial licensing note).
-  // ⚠ OPERATOR READ-APPROVAL REQUIRED — meta, hero.eyebrow, hire block, and
-  // the production handoff are NEW copy (staging-only until read).
+  // ---- ADVENTURE (§1.3) — a story index (PUB-A). REPOSITION (2026-08-27):
+  // the meta title dropped its "Drone & Aerial Production" service category —
+  // the last services phrase in any SERP surface. ⚠ read-approval, title.
   adventure: {
     meta: {
-      title: "Adventure Stories — Drone & Aerial Production | Boulder, Colorado",
+      title: "Adventure Stories — Drone & Expedition Coverage | Adventure Storytelling Media",
       description:
         "Expedition and adventure coverage — photo and film — from the Alps, Colorado's Front Range, and wherever the story leads. Field notes, postcards, and aerial work licensed through Amazing Aerial Agency.",
     },
@@ -1658,11 +1625,14 @@ export const PAGES = {
     caseStudies: {
       pitchboulder: {
         meta: {
-          title: "PitchBoulder — coverage, recaps & a commercial",
+          // REPOSITION (2026-08-27): title/description/hook rewritten from
+          // vendor framing ("the work we do for…") to the story of the room
+          // itself. ⚠ read-approval, all three.
+          title: "PitchBoulder — the Wednesday room in Boulder",
           description:
-            "How we run PitchBoulder's event coverage and recaps, and produced their commercial.",
+            "PitchBoulder is a weekly founder pitch event in Boulder, Colorado. One season of Wednesdays, the founders who took the front of the room, and the film that came out of it.",
         },
-        hook: "The work we do for PitchBoulder, start to finish.",
+        hook: "A season of Wednesdays in one Boulder room.",
         context: {
           heading: "Who they are",
           // ROUND 5 (TIMELESS pass): "nearly three years, across dozens of

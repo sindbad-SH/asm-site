@@ -806,11 +806,6 @@
     margin-top: 0.2rem;
     color: var(--color-ink);
   }
-  [data-lane="forge"] .temper-price {
-    font-family: var(--font-mono);
-    color: var(--color-peak);
-  }
-
   /* ── AA funnel card logo + Ledger phrasing (R3.2b) ── */
   .aa-funnel-logo {
     height: 44px;

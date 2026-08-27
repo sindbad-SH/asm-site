@@ -14,9 +14,8 @@
  * operator-directed): the last "available to clients" line in the close is
  * retired too — the close now points at the person, not an offer.
  *
- * SAGA_STAGES stays the single source of each stage's name/sub/deliverable;
- * its `process`/`bestFor` fields are sales language written for other
- * contexts and are deliberately NOT reused here. The `price` field and the
+ * SAGA_STAGES stays the single source of each stage's name/sub. Its former
+ * sales fields (`price`, `deliverable`, `process`, `bestFor`) and the
  * FORGE_SERVICES / FORGE_PACKAGES / FORGE_CONSULT_RATE menu were deleted
  * from consts.ts in the 2026-08-27 reposition (nothing rendered them).
  *
@@ -49,9 +48,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // path onto internal ones.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
-// The five stages, editorial framing: names/subs/deliverables come from
-// SAGA_STAGES (single source, unchanged); the `body` copy is new, written
-// for this page — no prices, no per-stage "bestFor" sales framing.
+// The five stages, editorial framing: names/subs come from SAGA_STAGES
+// (single source); the `body` copy is written for this page.
 const stages = SAGA_STAGES.map((stage, i) => ({ ...stage, body: p.method.stages[i].body }));
 const total = stages.length;
 
@@ -111,7 +109,6 @@ const temper = (i: number) =>
                       <p class="fg-stage-sub">{stage.sub}</p>
                     </header>
                     <p class="fg-blurb">{stage.body}</p>
-                    <p class="fg-ledger">Produces: {stage.deliverable}</p>
                   </article>
                 </li>
               ))
@@ -128,7 +125,7 @@ const temper = (i: number) =>
         <LegendMark proof={p.proof.anchor} />
         <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
         <a href={`${base}/work/pitchboulder`} class="fg-pill--quiet">
-          See the work <span aria-hidden="true">→</span>
+          Read the story <span aria-hidden="true">→</span>
         </a>
       </div>
       <p class="fg-note" data-reveal>{p.proof.note}</p>
@@ -482,15 +479,6 @@ const temper = (i: number) =>
     line-height: 1.55;
     color: color-mix(in srgb, #f0ece6 85%, transparent);
   }
-  .fg-ledger {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-    color: color-mix(in srgb, #f0ece6 55%, transparent);
-    padding-top: 0.2rem;
-    border-top: 1px solid var(--fg-hair);
-  }
-
   /* ── T4 proof ── */
   .fg-proof {
     padding: 3rem clamp(1.5rem, 6vw, 4rem) 4.5rem;

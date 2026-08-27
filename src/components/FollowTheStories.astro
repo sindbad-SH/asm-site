@@ -1,34 +1,19 @@
 ---
 /**
- * FollowTheStories.astro — PUB-C (2026-07-27), the publication's email-capture
- * block. Mounted sitewide in Footer.astro (compact variant) so every page
- * carries a way to follow along, ahead of the quieter "Book a call" CTA.
+ * FollowTheStories.astro — PUB-C (2026-07-27), the publication's follow
+ * block, mounted sitewide in Footer.astro (compact variant).
  *
- * ⚠ PROVIDER TODO — the newsletter provider is UNDECIDED (operator's call).
- * Built provider-agnostic on purpose. When the operator picks one, change
- * ONLY these two lines:
- *
- *   1. NEWSLETTER_PROVIDER → "buttondown" | "mailchimp"
- *   2. NEWSLETTER_ACTION   → the real form-submit URL:
- *        - Buttondown: https://buttondown.email/api/emails/embed-subscribe/<username>
- *          (name the email field "email" — already matches below)
- *        - Mailchimp:  the <form action="..."> URL from Audience → Signup
- *          forms → Embedded form (also swap the input's `name` to Mailchimp's
- *          expected field, typically "EMAIL", if you go this route)
- *
- * DISABLED-STATE CONTRACT: until NEWSLETTER_PROVIDER is set, this form stays
- * INERT — no `action`, submit disabled, button reads "Coming soon" instead of
- * "Subscribe". Same honesty pattern as /contact's SITE.formEndpoint gate
- * (never render a fake "thanks for subscribing" success state ahead of a
- * real, live endpoint — a visitor who submits into a void and sees a success
- * message anyway is a worse experience than an honest "not live yet").
+ * REPOSITION (2026-08-27): WIRED LIVE. The provider question the old header
+ * left open was settled by the operator's lane memo (2026-08-05): the
+ * newsletter IS adventurestorytellingmedia.substack.com, live since
+ * 2026-08-02 — so the "Coming soon" dead form is gone. The form now submits
+ * for real: a GET to the publication's /subscribe page with the typed
+ * address prefilled. The honesty contract carries forward — no fake success
+ * state; Substack renders its own confirmation on its own page.
  */
-type Provider = "buttondown" | "mailchimp" | null;
+import { SITE } from "../consts";
 
-const NEWSLETTER_PROVIDER: Provider = null; // ← 1. set to "buttondown" | "mailchimp"
-const NEWSLETTER_ACTION: string | undefined = undefined; // ← 2. set to the real submit URL
-
-const ready = NEWSLETTER_PROVIDER !== null && !!NEWSLETTER_ACTION;
+const SUBSTACK_SUBSCRIBE = `${SITE.socials.substack}/subscribe`;
 
 interface Props {
   compact?: boolean;
@@ -42,30 +27,12 @@ const fieldId = `fts-email${compact ? "-compact" : ""}`;
   {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new promise copy (staging-only until read). */}
   <p class="fts-promise">One dispatch when there's a real story to tell — no noise, unsubscribe anytime.</p>
 
-  <form
-    class="fts-form"
-    method="post"
-    action={ready ? NEWSLETTER_ACTION : undefined}
-    data-fts-ready={ready ? "true" : "false"}
-  >
+  <form class="fts-form" method="get" action={SUBSTACK_SUBSCRIBE} target="_blank" rel="noopener">
     <label for={fieldId} class="sr-only">Email</label>
     <input id={fieldId} name="email" type="email" required placeholder="you@email.com" class="fts-input" />
-    <button type="submit" disabled={!ready} class="btn fts-submit">
-      {ready ? "Subscribe" : "Coming soon"}
-    </button>
+    <button type="submit" class="btn fts-submit">Subscribe</button>
   </form>
-  <!--
-    Disabled state (visible note): while NEWSLETTER_PROVIDER is null, the
-    button above is disabled and reads "Coming soon" (global .btn:disabled —
-    dims + pointer-events:none). This line makes the same honesty explicit in
-    prose so it never reads as a broken form. Once a provider is wired, this
-    paragraph should be removed along with the `!ready` guard around it.
-  -->
-  {
-    !ready && (
-      <p class="fts-note">Not live yet — check back soon, or follow along on socials in the meantime.</p>
-    )
-  }
+  <p class="fts-note">Delivered by Substack — the subscribe page opens with your address filled in.</p>
 </div>
 
 <style>

@@ -37,6 +37,12 @@ export default defineConfig({
   // eventual production cutover (base "/" -> no double slash).
   redirects: {
     "/work/seriesfest": `${base === "/" ? "" : base}/venture/seriesfest`,
+    // REPOSITION (2026-08-27) — /entertainment retired as a PAGE FILE and
+    // moved here: the page-file redirect stub was being emitted into the
+    // sitemap (a live pointer to the retired three-lane identity); config
+    // redirects are excluded from the sitemap. Same literal-path convention
+    // as the entries around it.
+    "/entertainment": `${base === "/" ? "" : base}/venture`,
     // LANDING SWAP (2026-08-15, operator-directed): the world flight moved
     // from /world to the site root, and the old homepage now lives at /home.
     // This keeps every shared /world link (socials, docs, session notes)
