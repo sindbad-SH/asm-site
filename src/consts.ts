@@ -54,7 +54,8 @@ export const SITE = {
   formEndpoint: "[confirm]", // RESERVED — awaiting operator fact (AS-2). Free-tier form
                              // endpoint; account creation needs his email verification (a
                              // ~2-minute operator task). Form stays inert by design until then.
-  bookACall: "https://calendly.com/sindbad-adventurestorytellingmedia/new-meeting", // his binding pricing sheet + live site source
+  // REPOSITION (2026-08-27, operator-directed): `bookACall` (the Calendly
+  // link) is REMOVED — the publication has no scheduling surface anywhere.
   socials: {
     youtube: "https://www.youtube.com/@AdventureStorytellingMedia", // verified channel
     instagram: "https://www.instagram.com/adventurestorytellingmedia/", // verified live 2026-07-30 (bio + site link set)
@@ -79,23 +80,17 @@ export const SITE = {
    */
   analytics: "",
   /**
-   * P30 (round 2, 2026-07-20) — sitewide trust/logistics signals, surfaced
-   * near CTAs and in the footer. COPY RULES (operator-directed):
-   *  • `drone` — "FAA Part 107" is operator-CONFIRMED (2026-07-20) and is the
-   *    stated credential. NEVER claim "insured" anywhere on the site:
-   *    insurance is project-dependent and often the client's responsibility —
-   *    no false assurance, ever.
-   *  • `travel` — international framing stays POSITIVE and capable: shoots
-   *    welcome, operations accommodated to local aviation rules. Never imply
-   *    he can't fly internationally; never claim US flight authority abroad.
-   *  • `response` is a service promise he has to actually keep — one word from
-   *    him confirms or adjusts it.
+   * REPOSITION (2026-08-27, operator-directed): ASM is a publication, not a
+   * vendor — this block now carries FACTS about how the work is made, never
+   * service promises. REMOVED: `response` ("Replies within one business
+   * day") and `travel` ("International shoots welcome…") — both were offers.
+   * COPY RULE kept from P30: "FAA Part 107" is operator-CONFIRMED
+   * (2026-07-20) and is the stated credential. NEVER claim "insured"
+   * anywhere on the site — no false assurance, ever.
    */
   trust: {
     drone: "FAA Part 107 licensed drone operations (US)",
-    response: "Replies within one business day",
     base: "Boulder, Colorado (UTC-6)",
-    travel: "International shoots welcome — operations accommodated to local aviation rules",
   },
 } as const;
 
@@ -135,7 +130,9 @@ export const PRIMARY_CTA = { label: "Follow the Stories", href: "/contact#follow
 
 // ---------------------------------------------------------------------------
 // PILLARS — one storyteller, three terrains. Equal grammatical weight in copy
-// (the wild / the market / the industry); consulting alone owns the sales CTA.
+// (the wild / the market / the industry). REPOSITION (2026-08-27): the sales
+// handoff strings are gone — no lane hands to a sales pillar any more; ids
+// stay UNCHANGED (internal keys the media layer depends on, see below).
 // ---------------------------------------------------------------------------
 
 export type PillarId = "adventure" | "consulting" | "entertainment";
@@ -146,8 +143,6 @@ export type Pillar = {
   terrain: string; // the fixed triad — hold parallel everywhere
   role: "primary" | "credibility";
   href: string;
-  /** Soft handoff line closing the lane — every lane hands to consulting. */
-  handoff: string;
 };
 
 export const PILLARS: readonly Pillar[] = [
@@ -157,7 +152,6 @@ export const PILLARS: readonly Pillar[] = [
     terrain: "the wild",
     role: "credibility",
     href: "/adventure",
-    handoff: "This is the caliber of story we forge for founders.",
   },
   {
     id: "consulting",
@@ -165,7 +159,6 @@ export const PILLARS: readonly Pillar[] = [
     terrain: "the market",
     role: "primary",
     href: "/forge-the-saga",
-    handoff: "", // the primary lane IS the destination
   },
   {
     id: "entertainment",
@@ -179,8 +172,6 @@ export const PILLARS: readonly Pillar[] = [
     // is read by PAGES.entertainment.handoff below) — renaming either would
     // either 404 real production art or require touching unowned pages.
     href: "/venture",
-    handoff:
-      "The rooms this work keeps a pulse on are the same rooms your story eventually has to survive.",
   },
 ] as const;
 
@@ -302,7 +293,6 @@ export type SagaStage = {
   name: string;
   sub: string;
   deliverable: string;
-  price: string;
   process: string;
   bestFor: string;
 };
@@ -313,7 +303,6 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Scouting",
     sub: "Market & Audience Research",
     deliverable: "Field Notes Brief",
-    price: "from $4,000", // boutique research sprint — small-scope custom research benchmarks ~$8k–$12k; this is a deliberate specialist floor, not an agency study
 
     process:
       "Raw market intelligence. We uncover who your audience actually is, the exact language they use, and what your competitors are missing.",
@@ -324,7 +313,6 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Mapping",
     sub: "Messaging Strategy & Positioning",
     deliverable: "Core Narrative Blueprint",
-    price: "from $3,500", // messaging/positioning strategy — indep. strategy consultants $150–$275+/hr; ~2 wk engagement floor
 
     process:
       "We shape raw intelligence into narrative strategy — who the audience is, what arc moves them, and what that looks like as tangible content.",
@@ -335,7 +323,6 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Forging",
     sub: "Asset Creation & Production",
     deliverable: "Test-Ready Creative Assets",
-    price: "from $6,000", // production floor — boutique brand-video band $5k–$15k (Vidico/Firework 2025-26)
 
     process:
       "The strategy becomes reality. We build high-quality video or copy assets designed specifically for market validation.",
@@ -346,7 +333,6 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Testing",
     sub: "A/B Testing & Analytics",
     deliverable: "Live Market Data",
-    price: "from $2,500 + audience", // testing/analytics sprint — priced under IDI-round benchmarks ($5k–$15k per 10–15 interviews)
 
     process:
       "Your assets meet a real audience. We use curated human panels, AI audience simulations, or both to gather targeted data.",
@@ -357,7 +343,6 @@ export const SAGA_STAGES: readonly SagaStage[] = [
     name: "Story Assessing",
     sub: "Iterative Refinement & ROI Reporting",
     deliverable: "Action & Refinement Playbook",
-    price: "from $2,000", // analysis + playbook — ~a consulting week at the researched $200–$500/hr band's floor
 
     process:
       "We decode the data — what held attention, where people dropped off, what it means, and the exact steps to take next.",
@@ -366,151 +351,12 @@ export const SAGA_STAGES: readonly SagaStage[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// FORGE_SERVICES — P12.x REPACKAGE (operator-directed). The forge page stopped
-// selling a numbered "secret sauce" process and now sells the SERVICES you can
-// hire a StorySmith for, in two classes:
-//   • engagement  — long-span / retainer, "if you want me in it with you"
-//   • deliverable — "one specific thing I do all the time", priced at a floor
-//
-// Prices are RESEARCHED 2025-26 US + international-remote market floors,
-// REPRICED P30 (2026-07-20) to the HIGHER end of each verified band —
-// positioning: boutique specialist who does BOTH production and market
-// research, priced for internet-found clients (he can always discount in
-// person), never competing with $50/hr volume operators. Per-service market
-// ranges are cited inline. Shown as "Starts at $X" / "$X / mo".
-//
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — every name/price/blurb below is NEW copy.
-//
-// The flagship (`flagship: true`) carries the DEMOTED five-stage method as a
-// names-only strip; SAGA_STAGES stays the source of those names (home H5 also
-// maps them) and its per-stage prices are no longer rendered anywhere.
+// FORGE_SERVICES / FORGE_PACKAGES / FORGE_CONSULT_RATE — REMOVED (2026-08-27,
+// operator-directed publication reposition). The priced service menu is gone
+// for good: ASM publishes; it does not sell services. Nothing rendered these
+// (the last consumers left with PUB-B) — the full menu survives in git
+// history at tag `pre-publication-reposition-2026-08-27` if ever needed.
 // ---------------------------------------------------------------------------
-
-export type ForgeService = {
-  no: string;
-  klass: "engagement" | "deliverable";
-  name: string;
-  price: string;
-  blurb: string;
-  flagship?: boolean;
-  /** VERBATIM Ledger phrasing, when a service touches a real relationship. */
-  note?: string;
-};
-
-export const FORGE_SERVICES: readonly ForgeService[] = [
-  {
-    no: "01",
-    klass: "engagement",
-    name: "Forge the Saga",
-    price: "Starts at $15,000", // P30 — research+strategy+production+testing in one arc; custom research alone runs $25k–$65k agency-side
-    flagship: true,
-    blurb:
-      "Our deepest engagement — the one the whole studio is named for. We take a founder's story from raw market intelligence to a tested Core Narrative Blueprint your team can actually run: the full arc, start to finish. It moves through five stages, and once the spine is set it can carry on as a retainer if there's a reason to keep steering.",
-  },
-  {
-    no: "02",
-    klass: "engagement",
-    name: "The Standing Forge",
-    price: "$5,000 / mo", // P30 — fractional creative-direction retainers verify at $5k–$15k/mo (GTM 8020 2025-26); this is that band's floor
-    blurb:
-      "For companies that need the forge kept lit. A standing monthly engagement for the story work that never really finishes — ongoing video and photo, the next campaign, the content that keeps a brand's voice steady while it grows. One retainer, a predictable rhythm, no re-quoting every shoot.",
-  },
-  {
-    no: "03",
-    klass: "deliverable",
-    name: "The Story Intensive",
-    price: "Starts at $3,500", // P30 — ~1.5 consulting days at the researched $200–$500/hr fractional-creative band
-    blurb:
-      "The fastest way to work with us. A focused session on one thing — your positioning, your pitch, the story your launch has to carry. You bring the problem; we bring the questions, and you leave with sharp, usable language and a direction you can act on. The front door to everything else here.",
-  },
-  {
-    no: "04",
-    klass: "deliverable",
-    name: "The Brand-Story Film",
-    price: "Starts at $8,500", // P30 — boutique brand-story films verify at $5k–$15k (Vidico/Firework/Storyteller 2025-26); upper-middle of the band
-    blurb:
-      "A two-to-four-minute film that tells your story the way it deserves to be told — scripted, shot, and cut by one person who's thought hard about what it needs to say. Founder stories, product films, the piece that anchors your homepage. Pro gear, a real point of view, no committee.",
-  },
-  {
-    no: "05",
-    klass: "deliverable",
-    name: "Event & Conference Coverage",
-    price: "Starts at $3,500", // P30 — solo full-day event/conference coverage verifies at $1.5k–$4k, conferences $3k–$7k (D-MAK/Bonomotion 2025-26); high end of the solo band
-    blurb:
-      "We cover your event — photo and film — and hand back more than a folder of files. Conferences, pitch nights, summits, workshops: the recap that makes people wish they'd been there, plus clean speaker and session clips you can use the same week. One operator, on foot all day, reading the room.",
-  },
-  {
-    no: "06",
-    klass: "deliverable",
-    name: "Aerial Cinematography",
-    price: "Starts at $2,500 / day", // P30 — established commercial drone-op day rates verify at $1.5k–$4k (UAV Coach/Dronesgator 2025-26); upper-middle for cinema work with own gear
-    blurb:
-      "FAA Part 107 licensed drone work (US) for people who care how it reads from the air. Cinematic aerials for films, brands, and the places that are hardest to reach — the same eye we bring to the ground, lifted a few hundred feet. International shoots welcome — operations accommodated to local aviation rules.",
-    note: "Aerial work licensed through Amazing Aerial Agency",
-  },
-] as const;
-
-// ---------------------------------------------------------------------------
-// FORGE_PACKAGES — P29 money-now restructure (operator-directed, 2026-07-20).
-// Forge the Saga is now the CONSULTING page: the odd case who does BOTH
-// production and market research, for buyers who want everything. These three
-// packages are MOCK SCOPES cut from the existing five-stage method
-// (SAGA_STAGES stays the single source of the stage names). Pure-production
-// deliverables moved to their lanes: /adventure (aerial day rate) and
-// /entertainment (coverage + brand films) each price their own buyer.
-//
-// P30 REPRICE (2026-07-20, market-researched): the first two package floors
-// are the SUM of the per-stage floors each bundles (themselves repriced above
-// against 2025-26 benchmarks). The Full Saga is a bundle floor deliberately
-// UNDER the ~$18k stage-sum — and still a fraction of the $25k–$65k that a
-// custom research project alone runs agency-side. All render with honest
-// "from $X — scoped per project" framing.
-// ⚠ OPERATOR READ-APPROVAL REQUIRED — names/blurbs/bestFor are new copy.
-// ---------------------------------------------------------------------------
-
-export type ForgePackage = {
-  name: string;
-  /** Indexes into SAGA_STAGES — the stages this package bundles. */
-  stageIdx: readonly number[];
-  price: string;
-  blurb: string;
-  bestFor: string;
-  flagship?: boolean;
-};
-
-/** P30 — starting consultant rate: fractional creative-director / strategy
- *  consulting verifies at $200–$500/hr (GTM 8020, consultfees.com, 2025-26);
- *  $250 sits mid-band for the rare research+production combo. Always rendered
- *  with "scoped per project" framing, never as a fixed quote. */
-export const FORGE_CONSULT_RATE = "from $250 / hr";
-
-export const FORGE_PACKAGES: readonly ForgePackage[] = [
-  {
-    name: "The Scouting Report",
-    stageIdx: [0, 1],
-    price: "from $7,500", // P30 — sum of stage 01+02 floors; research+strategy engagements verify at ~$8k–$12k small-scope, $25k+ agency-side
-    blurb:
-      "The research half on its own: who your audience actually is, the exact language they use, and a Core Narrative Blueprint your team can run without us.",
-    bestFor: "You want the market research and the strategy — you have your own production.",
-  },
-  {
-    name: "Forge & Test",
-    stageIdx: [2, 3],
-    price: "from $8,500", // P30 — sum of stage 03+04 floors; boutique brand-video band $5k–$15k plus a testing round priced under IDI benchmarks
-    blurb:
-      "The production half with proof attached: we build the assets, then put them in front of a real audience before you spend to distribute them.",
-    bestFor: "Your strategy is set — you need the assets built and validated.",
-  },
-  {
-    name: "The Full Saga",
-    stageIdx: [0, 1, 2, 3, 4],
-    price: "from $15,000", // P30 — bundle floor under the ~$18k stage-sum; custom research alone runs $25k–$65k agency-side (Farnsworth/Drive Research 2025-26)
-    flagship: true,
-    blurb:
-      "Everything, one consultant: raw market intelligence to a tested, ready-to-run story. We carry the whole arc — the research, the production, and the read on what the data says to do next.",
-    bestFor: "You want the whole thing handled by one person, start to finish.",
-  },
-] as const;
 
 // ---------------------------------------------------------------------------
 // HONESTY LEGEND + RELATIONSHIPS — the map-legend device (BUILD-PLAN §3.4).
@@ -1305,16 +1151,12 @@ export const PAGES = {
       link: { label: "How it all fits", href: "/about" },
     },
     // H7 — contact CTA band.
-    // COHESION PASS (2026-08-13): the close was a consulting-qualification
-    // pitch ("Tell us what you're building… we'll tell you how"). It is now
-    // the home page's ONE quiet hire-us pointer — the operator's framing,
-    // near-verbatim: "we mostly do this to go capture all these stories, but
-    // if you have a story you want to hire us to capture — adventure or
-    // venture — here's what we do: mainly the drone work and the market
-    // research." ⚠ read-approval, body+cta label.
+    // REPOSITION (2026-08-27, operator-directed): the "want captured" hire-us
+    // pointer is RETIRED — the band now invites story tips, the publication's
+    // own ask. ⚠ read-approval, body.
     contactBand: {
       headline: COPY.anchors.noPressure, // "No pitch, no pressure."
-      body: "Mostly, we make these stories for their own sake. If you have one you want captured — an adventure or a venture — get in touch. The specialties: drone work and market research.",
+      body: "We make these stories for their own sake. If you know an adventure or a venture worth telling, we want to hear about it.",
       cta: { label: "Get in touch", href: "/contact" },
     },
   },
@@ -1337,7 +1179,7 @@ export const PAGES = {
     meta: {
       title: "The Method — How Stories Get Made | Adventure Storytelling Media",
       description:
-        "Five stages, research first: how every Adventure Storytelling Media story gets scouted, mapped, forged, tested, and assessed — the same method available to clients through the founder.",
+        "Five stages, research first: how every Adventure Storytelling Media story gets scouted, mapped, forged, tested, and assessed.",
     },
     // F1 — hero. No rate, no booking CTA.
     hero: {
@@ -1402,10 +1244,11 @@ export const PAGES = {
     },
     // F6 — close. No CTA button, no trustline — one quiet line to the founder.
     close: {
-      headline: "The same method, off the page.",
-      // COHESION PASS (2026-08-13): third hire-us surface, aligned to the
-      // same two specialties as contact + about. ⚠ read-approval.
-      body: "This same method is available to clients — mainly the drone work and the market research — through the founder, Sindbad Horizon.",
+      headline: "One person, the whole method.",
+      // REPOSITION (2026-08-27, operator-directed): the "available to
+      // clients" hire-us line is RETIRED — the close now points at the
+      // person, not an offer. ⚠ read-approval.
+      body: "Every story published here is researched, shot, and cut by the founder, Sindbad Horizon — the method is how he keeps himself honest.",
       links: [
         { label: "About the founder", href: "/about" },
         { label: "Get in touch", href: "/contact" },
@@ -1694,14 +1537,12 @@ export const PAGES = {
         href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
       },
     },
-    // COHESION PASS (2026-08-13): "Need this eye on your production?" talked
-    // AT a buyer — the reframe keeps the same door open in the publication's
-    // voice, and the CTA routes through /contact (the site's one deliberate
-    // hire-us surface) instead of a second direct booking link.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — new closing line (staging-only).
+    // REPOSITION (2026-08-27, operator-directed): "if you have one you want
+    // captured" was a commission offer — the close now invites story TIPS,
+    // the publication's own ask. ⚠ read-approval.
     handoff: {
-      body: "We mostly shoot these stories for their own sake. If you have one you want captured, tell us where and when.",
-      cta: { label: "Get in touch", href: "/contact" },
+      body: "We shoot these stories for their own sake. If you know one worth telling, tell us where to look.",
+      cta: { label: "Send a story tip", href: "/contact" },
     },
   },
 
@@ -1787,12 +1628,12 @@ export const PAGES = {
         { proof: { relationshipId: "workshop-coverage" } as ProofLine },
       ] as readonly { proof: ProofLine; testimonialId?: string }[],
     },
-    // E5 — soft handoff. PUB-A (2026-07-27): the close no longer sells a
-    // booking CTA (no services pillar) — it invites the reader to follow the
-    // publication, the same action as the header/hero CTA (PRIMARY_CTA).
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — revised cta (staging-only).
+    // E5 — soft handoff. PUB-A (2026-07-27): the close invites the reader to
+    // follow the publication (PRIMARY_CTA). REPOSITION (2026-08-27): the line
+    // no longer addresses "your story" at a buyer — it closes on the beat the
+    // publication keeps. ⚠ read-approval.
     handoff: {
-      body: PILLARS.find((p) => p.id === "entertainment")!.handoff,
+      body: "These are the rooms this publication keeps a pulse on — the stories keep coming.",
       cta: PRIMARY_CTA,
     },
   },
@@ -1944,12 +1785,12 @@ export const PAGES = {
     // THE QUIET SERVICES LINE — the only place services exist on the whole
     // site (ACTION-PLAN.md addendum). No prices, no packages, no service list.
     services: {
-      heading: "Working together",
-      // COHESION PASS (2026-08-13): aligned to the contact page's hire-us
-      // framing, first person for About's voice — the same two specialties,
-      // the same order, so the three quiet surfaces read as one.
-      // ⚠ read-approval.
-      body: "Mostly I do this to go capture the stories. But if you have one you want captured — an adventure or a venture — that's work I take on. The specialties are the drone work and the market research. Enquiries go through the contact page.",
+      heading: "The publication",
+      // REPOSITION (2026-08-27, operator-directed): the hire-us paragraph is
+      // RETIRED — this is now the church-and-state line: the publication
+      // publishes on its own terms and coverage is never for sale. First
+      // person for About's voice. ⚠ read-approval.
+      body: "Adventure Storytelling Media is how I tell these stories on my own terms — nobody assigns them, and the coverage is never for sale. If you know an adventure or a venture worth telling, I want to hear about it.",
       link: { label: "Get in touch", href: "/contact" },
     },
   },
@@ -1965,12 +1806,13 @@ export const PAGES = {
     meta: {
       title: "Contact — Adventure Storytelling Media",
       description:
-        "Story tips, licensing enquiries, or work with the founder directly — one email, one line to book a call.",
+        "Story tips, licensing enquiries, and letters to the publication — one email, real replies.",
     },
     headline: "Have an adventure or venture worth telling?",
-    // COHESION PASS (2026-08-13): "brand and positioning work" was a third
-    // name for the offer; aligned to the two specialties. ⚠ read-approval.
-    body: "Reach out for story tips, licensing enquiries, or to talk with the founder about capturing a story of your own. One inbox, real replies.",
+    // REPOSITION (2026-08-27, operator-directed): the "capturing a story of
+    // your own" hire-us clause is retired — the page invites stories, not
+    // engagements. ⚠ read-approval.
+    body: "Reach out with a story worth telling, a licensing enquiry, or a note for the founder. One inbox, real replies.",
     categories: [
       {
         label: "Story tips",
@@ -1981,20 +1823,18 @@ export const PAGES = {
         body: "Interested in licensing footage or photography from the archive? Say what you need.",
       },
       {
-        // COHESION PASS (2026-08-13): THE designated quiet hire-us surface.
-        // Operator, near-verbatim: "we mostly do this to go capture all these
-        // stories, but if you have a story that you want to hire us to
-        // capture — adventure or venture — here's what we do: mainly the
-        // drone work and the market research." ⚠ read-approval.
-        label: "Work with the founder",
-        body: "Mostly we do this to go capture the stories ourselves. But if you have one you want captured — an adventure or a venture — that's work we take on. The specialties: the drone work and the market research.",
+        // REPOSITION (2026-08-27, operator-directed): the "Work with the
+        // founder" hire-us category is RETIRED — the publication does not
+        // advertise services. This catch-all keeps the door ajar without
+        // offering anything: a serious enquiry can still arrive, but it has
+        // to ask. ⚠ read-approval.
+        label: "Everything else",
+        body: "Questions about the publication, the archive, or anything that doesn't fit a box. Write — the founder reads it.",
       },
     ] as readonly { label: string; body: string }[],
     email: SITE.email,
-    // The booking link, demoted to a small line beside the email — no longer
-    // the page's primary action.
-    bookNote: "Prefer to talk it through first?",
-    bookLabel: "Book a call",
+    // REPOSITION (2026-08-27): the booking line is gone — no scheduling
+    // surface anywhere on the site.
     // The follow/newsletter stub — PUB-C mounts the capture UI here.
     followHeading: "Follow the stories",
     // Form endpoint, book-a-call, and socials resolve from SITE ([confirm]).

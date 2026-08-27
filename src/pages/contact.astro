@@ -10,18 +10,19 @@
  * action. The inert lead form (gated on SITE.formEndpoint, which has never
  * resolved — see the RESERVED comment on SITE.formEndpoint in consts.ts) is
  * RETIRED: it never worked, and a publication contact page doesn't need one.
- * In its place: three honest reasons to write in (story tips, licensing,
- * work with the founder), ONE real email as the primary action, and the
- * booking link demoted to a small line beside it — still there for people
- * already in a conversation, no longer the headline CTA.
+ * In its place: three honest reasons to write in, ONE real email as the
+ * primary action. REPOSITION (2026-08-27, operator-directed): the "work with
+ * the founder" category and the booking link are GONE — the publication
+ * advertises no services and has no scheduling surface. The third category
+ * is a catch-all that keeps the door ajar without offering anything.
  *
  * NEW: a #follow section stub at the bottom (heading only) — PUB-C mounts
  * the newsletter capture UI there; this page only reserves the anchor +
  * heading so that build doesn't block on it.
  *
  * UNCHANGED CONTRACTS: the location decode eyebrow, the contour-line draw,
- * and SITE.trust logistics beside the booking line are all kept. All copy
- * verbatim from consts (⚠ operator read-approval, logged in COPY-DECK-B.md).
+ * and the SITE.trust facts beside the email are all kept. All copy verbatim
+ * from consts (⚠ operator read-approval, logged in COPY-DECK-B.md).
  */
 import Base from "../layouts/Base.astro";
 import { PAGES, SITE } from "../consts";
@@ -66,20 +67,12 @@ const p = PAGES.contact;
         <div class="ct-action" data-reveal>
           <a href={`mailto:${p.email}`} class="ct-pill ct-pill--mail">{p.email}</a>
           <ul class="ct-trust">
-            <!-- COHESION PASS (2026-08-13): SITE.trust.drone ("FAA Part 107
-                 licensed drone operations") was approved copy the page never
-                 rendered — the one line that quietly states the adventure
-                 specialty right where a hire-us enquiry lands. -->
+            <!-- REPOSITION (2026-08-27): facts only — the two service-promise
+                 lines are gone with their SITE.trust fields; the credential
+                 and the home base stay as facts about how the work is made. -->
             <li>{SITE.trust.drone}</li>
-            <li>{SITE.trust.response}</li>
             <li>{SITE.trust.base}</li>
-            <li>{SITE.trust.travel}</li>
           </ul>
-          <!-- the booking link, demoted to a small line beside the email —
-               no longer the page's primary action (PUB-B). -->
-          <p class="ct-book-note">
-            {p.bookNote} <a href={SITE.bookACall} class="link" rel="noopener">{p.bookLabel}</a>
-          </p>
         </div>
       </div>
     </section>
@@ -224,12 +217,6 @@ const p = PAGES.contact;
     text-transform: uppercase;
     color: color-mix(in srgb, #eef4f7 60%, transparent);
   }
-  .ct-book-note {
-    margin-top: 0.6rem;
-    font-size: 0.86rem;
-    color: color-mix(in srgb, #eef4f7 68%, transparent);
-  }
-
   /* ── follow the stories — quiet stub, PUB-C mounts the real UI ── */
   .ct-follow {
     padding: 3.5rem clamp(1.5rem, 6vw, 6rem);

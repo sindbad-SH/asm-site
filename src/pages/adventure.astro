@@ -36,7 +36,7 @@ import { join } from "node:path";
 
 const p = PAGES.adventure;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-// P29 — CTA hrefs may be external (Calendly direct); only prefix internal routes.
+// CTA hrefs may be external; only prefix internal routes.
 const href = (h: string) => (h.startsWith("http") ? h : `${base}${h}`);
 
 // Slug → gallery media map (moved up from the field-teaser section below,
@@ -405,12 +405,9 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       <GlobeHero />
     </section>
 
-    <!-- PUB-A (2026-07-27) — A1b "Hire the operator" (day rate, compliance
-         line, direct booking CTA) REMOVED: this is now a story index, not a
-         services pillar (no service offerings on this site, per
-         ACTION-PLAN.md). Replaced with THE DISPATCH STREAM — every published
+    <!-- A1b — THE DISPATCH STREAM (PUB-A, 2026-07-27): every published
          Field Notes entry, newest first, so the index itself is a feed of
-         real stories rather than a rate card.
+         real stories. (Prior section history lives in git.)
          ⚠ OPERATOR READ-APPROVAL REQUIRED — kicker/heading/body are new
          copy (staging-only until read; see COPY-DECK-A.md). -->
     {
@@ -903,9 +900,9 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
       )
     }
 
-    <!-- A5 — P29: the close is this lane's OWN buyer action (production →
-         Calendly direct), not a consulting handoff. The field-notes wayfinder
-         moved to /adventure/field with the gallery (Round 5). -->
+    <!-- A5 — REPOSITION (2026-08-27): the close invites story tips — the
+         publication's own ask. The field-notes wayfinder moved to
+         /adventure/field with the gallery (Round 5). -->
     <section class="mx-auto max-w-3xl space-y-4 border-t border-hairline p-8 text-center">
       <p class="text-lg italic text-ink">{p.handoff.body}</p>
       <a href={href(p.handoff.cta.href)} class="btn" rel="noopener">{p.handoff.cta.label}</a>

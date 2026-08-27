@@ -36,10 +36,12 @@ const canonical = new URL(`${base}${pagePath}`, Astro.site).href;
 // Staging (github.io) must never compete with the live domain in search.
 const isStaging = (Astro.site?.href ?? "").includes("github.io");
 
-// JSON-LD (BUILD-ORDERS Task 9) — a solo StorySmith. Values come ONLY from the
-// SITE consts (no composed facts). Person + ProfessionalService (provider is the
-// Person — a solo practice, NOT an Organization-with-employees). Socials wire in
-// as `sameAs` only for the entries that actually exist on SITE.socials.
+// JSON-LD (BUILD-ORDERS Task 9; REPOSITION 2026-08-27, operator-directed) —
+// a PUBLICATION, not a vendor: Person + WebSite (publisher = the Person). The
+// former ProfessionalService node was a machine-readable services-for-hire
+// claim to search engines and AI assistants and is deliberately GONE. Values
+// come ONLY from the SITE consts (no composed facts). Socials wire in as
+// `sameAs` only for the entries that actually exist on SITE.socials.
 const siteBase = new URL(base || "/", Astro.site).href.replace(/\/$/, "");
 const sameAs = Object.values(SITE.socials);
 const jsonLd = {
@@ -50,19 +52,17 @@ const jsonLd = {
       "@id": `${siteBase}/#person`,
       name: SITE.person,
       alternateName: SITE.persona,
-      // The Person IS the founder, so this entity carries his direct address;
-      // the ProfessionalService below carries the general contact@ (2026-08-20).
+      // The Person IS the founder, so this entity carries his direct address
+      // (2026-08-20); the general contact@ lives in visible page copy only.
       email: `mailto:${SITE.founderEmail}`,
       url: `${siteBase}/`,
       ...(sameAs.length ? { sameAs } : {}),
     },
     {
-      "@type": "ProfessionalService",
-      "@id": `${siteBase}/#service`,
+      "@type": "WebSite",
+      "@id": `${siteBase}/#site`,
       name: SITE.name,
-      provider: { "@id": `${siteBase}/#person` },
-      areaServed: SITE.location,
-      email: `mailto:${SITE.email}`,
+      publisher: { "@id": `${siteBase}/#person` },
       url: `${siteBase}/`,
     },
   ],
@@ -98,8 +98,9 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={abs("/media/og.jpg")} />
 
-    <!-- JSON-LD: solo StorySmith (Person + ProfessionalService). Values only
-         from SITE consts — no composed facts (BUILD-ORDERS Task 9). -->
+    <!-- JSON-LD: the publication (Person + WebSite — no services entity).
+         Values only from SITE consts — no composed facts (BUILD-ORDERS
+         Task 9; REPOSITION 2026-08-27). -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
     <script is:inline>
