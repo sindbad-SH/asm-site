@@ -25,6 +25,7 @@
  * from consts (⚠ operator read-approval, logged in COPY-DECK-B.md).
  */
 import Base from "../layouts/Base.astro";
+import FollowTheStories from "../components/FollowTheStories.astro";
 import { PAGES, SITE } from "../consts";
 
 const p = PAGES.contact;
@@ -80,7 +81,10 @@ const p = PAGES.contact;
     <!-- ── follow the stories — stub only; PUB-C mounts newsletter capture ── -->
     <section id="follow" class="ct-follow">
       <h2 class="ct-follow-heading">{p.followHeading}</h2>
-      <!-- PUB-C mounts newsletter capture here -->
+      {/* REPOSITION (2026-08-27): the sitewide PRIMARY_CTA anchors here — it
+          used to land on this bare heading. The capture block is live
+          (Substack-wired) and finally mounts at its own anchor. */}
+      <FollowTheStories />
     </section>
   </main>
 </Base>

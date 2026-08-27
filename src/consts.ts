@@ -141,7 +141,6 @@ export type Pillar = {
   id: PillarId;
   name: string;
   terrain: string; // the fixed triad — hold parallel everywhere
-  role: "primary" | "credibility";
   href: string;
 };
 
@@ -150,21 +149,18 @@ export const PILLARS: readonly Pillar[] = [
     id: "adventure",
     name: "Adventure",
     terrain: "the wild",
-    role: "credibility",
     href: "/adventure",
   },
   {
     id: "consulting",
     name: "Forge the Saga",
     terrain: "the market",
-    role: "primary",
     href: "/forge-the-saga",
   },
   {
     id: "entertainment",
     name: "Venture",
     terrain: "the industry",
-    role: "credibility",
     // PUB-A (2026-07-27) — repointed to /venture (retired /entertainment).
     // `id`/`terrain` intentionally UNCHANGED: both are internal keys the media
     // layer system depends on (Tableaux.astro derives public/media/home/<slug>
@@ -232,8 +228,12 @@ export const COPY = {
     // never sold. This line is the one plain decode of the whole site and
     // previously named only the adventure specialty. ⚠ OPERATOR READ-APPROVAL
     // REQUIRED — revised sentence (staging-only until read).
-    buyerLine:
-      "Drone and expedition photography, founder stories and market research — Boulder, Colorado, working worldwide",
+    // REPOSITION (2026-08-27): renamed buyerLine -> decodeLine ("buyer" was
+    // the doctrine that kept regrowing offers) and the availability clause
+    // ("working worldwide") is cut — the disciplines are the signal, the
+    // availability was the ad. ⚠ read-approval.
+    decodeLine:
+      "Drone and expedition photography, founder stories and market research — Boulder, Colorado",
     globeCaption: "Where the stories are told", // LOCKED — see GLOBE below
   },
   anchors: {
@@ -1040,7 +1040,7 @@ export const PAGES = {
     meta: {
       title: `${SITE.name} — Adventure & Venture Stories from the Field`,
       description:
-        "Adventure Storytelling Media publishes two kinds of hard-won stories from Boulder, Colorado — Adventure Stories from the field, Venture Stories from the market. One storyteller, research to final cut, working worldwide.",
+        "Adventure Storytelling Media publishes two kinds of hard-won stories from Boulder, Colorado — Adventure Stories from the field, Venture Stories from the market. One storyteller, research to final cut.",
     },
     // H3 — three-pillar scroll tableaux, equal grammatical weight.
     tableaux: [
@@ -1137,15 +1137,10 @@ export const PAGES = {
   // ---- FORGE THE SAGA (§1.2) — PUB-B (2026-07-27): rebuilt as THE METHOD
   // PAGE per ACTION-PLAN.md's publication restructure. This page no longer
   // sells anything — no prices, no packages, no booking CTA. It presents the
-  // five stages (SAGA_STAGES stays the single source of stage name/sub/
-  // deliverable — its `price`/`process`/`bestFor` fields are sales language
-  // for OTHER pages that still price them and are deliberately NOT reused
-  // here) as ASM's editorial method: how a story gets made before it's
-  // published, and why research comes first. Ends with one quiet line
-  // pointing to the founder (about/contact) — the only trace of "hire me" on
-  // this page. FORGE_SERVICES / FORGE_PACKAGES / FORGE_CONSULT_RATE are left
-  // untouched in consts (adventure.astro + entertainment.astro still price
-  // off FORGE_SERVICES) but are no longer imported or rendered here.
+  // five stages (SAGA_STAGES, names only since the 2026-08-27 reposition —
+  // the sales fields and the FORGE_* menu are deleted) as ASM's editorial
+  // method: how a story gets made before it's published, and why research
+  // comes first. Ends on the person, not an offer.
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — every string below is new copy
   // (staging-only until read). Logged in COPY-DECK-B.md.
   forge: {
@@ -1653,11 +1648,17 @@ export const PAGES = {
         work: {
           heading: "In the room",
           proof: { relationshipId: "pitchboulder" } as ProofLine,
-          body: "Event coverage and recaps on an ongoing basis, plus a commercial produced end to end.",
+          // REPOSITION (2026-08-27): body rewritten from deliverable-list
+          // grammar to what is actually seen; facts unchanged, and the
+          // LegendMark proof line above still carries the verbatim status
+          // claim. ⚠ read-approval.
+          body: "Most Wednesdays the camera is in the back of the room — the coverage and recaps come from there, and so does the film below, cut from those same sessions.",
         },
         outcome: {
           heading: "Where it landed",
-          body: "The commercial now runs as PitchBoulder's primary website asset — commissioned directly by Peter, produced end to end. The event coverage and recaps continue week to week.",
+          // ⚠ read-approval — "commissioned directly by Peter" stays: a
+          // stated past fact is the quiet door, not an offer.
+          body: "The film now fronts PitchBoulder's own website — commissioned directly by Peter — and the Wednesday room keeps meeting.",
         },
         testimonialId: "pitchboulder",
         cta: { label: "How the stories get made", href: "/forge-the-saga" },
@@ -1691,7 +1692,8 @@ export const PAGES = {
         },
         outcome: {
           heading: "The film",
-          body: "Jack got a finished cinematic film of his car — the machine's story and character on screen, delivered. It's below; watch it.",
+          // ⚠ read-approval — "delivered" vendor framing dropped, film kept.
+          body: "The machine's story and character, on screen. It's below; watch it.",
         },
         // P29 — Jack Bell testimonial ACTIVATED (operator direction, 2026-07-20).
         testimonialId: "pebble-beach-owner",
@@ -1760,7 +1762,7 @@ export const PAGES = {
     ] as readonly ProofLine[],
     // THE QUIET SERVICES LINE — the only place services exist on the whole
     // site (ACTION-PLAN.md addendum). No prices, no packages, no service list.
-    services: {
+    colophon: {
       heading: "The publication",
       // REPOSITION (2026-08-27, operator-directed): the hire-us paragraph is
       // RETIRED — this is now the church-and-state line: the publication

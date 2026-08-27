@@ -343,9 +343,8 @@ const GROUNDS = {
       <p class="im-turn im-intro-sub" data-reveal>{p.hero.subline}</p>
     </section>
 
-    <!-- PUB-A (2026-07-27) — E1b "Hire this lane" (services + floors, a
-         booking CTA) REMOVED here: this page is now a story index, not a
-         services pillar. See the file-header comment. -->
+    {/* PUB-A (2026-07-27) — the E1b sales block was removed here: this page
+        is a story index. History in the file-header comment. */}
 
     <!-- ═══ S3 · THE WORK CHAPTERS — numbered, grounded, collaged ═══
          Round 3 — the MEME chapter moved to /work (Industry Stories); the two
@@ -798,8 +797,8 @@ const GROUNDS = {
       )
     }
 
-    <!-- ═══ S5 · HANDOFF — PUB-A: closes on the publication's own action
-         (follow), not a consulting booking. ═══ -->
+    {/* ═══ S5 · HANDOFF — PUB-A: closes on the publication's own action
+        (follow). ═══ */}
     <section class="im-sec im-handoff" data-im-section data-ground={GROUNDS.handoff} style={`--sec-ground:${GROUNDS.handoff}`}>
       <p class="im-turn im-handoff-line" data-reveal>{p.handoff.body}</p>
       <a href={href(p.handoff.cta.href)} class="btn" data-reveal rel="noopener">{p.handoff.cta.label}</a>

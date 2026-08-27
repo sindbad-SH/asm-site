@@ -34,3 +34,9 @@ _wf-hero-out/
 # local file Windows-locked by the dev server — delete after a restart.
 public/media/home/industry/cluster/valley.webp
 .lighthouserc.effective.json
+_docs-archive/
+.impeccable/
+_claude-design-bundle/
+_design-lab/
+_design-ports/
+dist-designlab/
