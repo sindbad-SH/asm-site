@@ -51,9 +51,9 @@ export const SITE = {
   // The direct-line-to-the-founder differentiator. NEVER render this anywhere
   // except the /about portrait block — scarcity is the point.
   founderEmail: "sindbad@adventurestorytellingmedia.com",
-  formEndpoint: "[confirm]", // RESERVED — awaiting operator fact (AS-2). Free-tier form
-                             // endpoint; account creation needs his email verification (a
-                             // ~2-minute operator task). Form stays inert by design until then.
+  // REPOSITION (2026-08-27): `formEndpoint` REMOVED — it gated a lead form
+  // that was retired with PUB-B and never resolved past "[confirm]". A
+  // publication contact page does not need one.
   // REPOSITION (2026-08-27, operator-directed): `bookACall` (the Calendly
   // link) is REMOVED — the publication has no scheduling surface anywhere.
   socials: {
@@ -544,7 +544,15 @@ export type WorkItem = {
    *  may only ever be stated in its verbatim phrasing). */
   forOrg?: string;
   what?: string;
-  engagement?: "paid engagement" | "unpaid coverage" | "personal / editorial" | "made on a handshake" | "[confirm]";
+  // REPOSITION (2026-08-27, operator-directed): the `engagement` field —
+  // "paid engagement" / "unpaid coverage" / "made on a handshake" — is
+  // REMOVED. Commercial terms are not published. His words: whether a piece
+  // was paid or unpaid "is largely [ir]relevant and not something that needs
+  // to be publicly advertised — if I'm directly asked that question I'll
+  // answer it." The attribution line is now "For [org] · [what]": the work
+  // and who it was with, full stop. The relationship TIER (LEGEND /
+  // permittedPhrasing) is a different mechanism and STAYS — it prevents
+  // overclaiming a role, which is a legal posture, not a terms disclosure.
   relationshipId?: string;
   href?: string;
   /** When true, the tile prints RELATIONSHIP_BY_ID[relationshipId].permittedPhrasing
@@ -583,10 +591,6 @@ export const WORK: readonly WorkItem[] = [
     pillar: "entertainment",
     forOrg: "Jack Bell", // published with attribution on his live site — flag at staging review (COPY.md §4)
     what: "attended with a car owner to cover a restored Shelby",
-    // RESERVED — awaiting operator fact (COPY.md §4). Paid vs unpaid is not
-    // stated anywhere in his published copy; one word from him at staging review
-    // resolves it. This stays "[confirm]" — one of the two production blockers.
-    engagement: "[confirm]",
     relationshipId: "pebble-beach",
     href: "/work/shelby-pebble-beach",
   },
@@ -596,10 +600,6 @@ export const WORK: readonly WorkItem[] = [
     pillar: "entertainment",
     forOrg: "PitchBoulder",
     what: "event coverage & recaps, and produced their commercial",
-    // Sourced (COPY.md §3), not guessed: Rothschild's published quote says
-    // "I hired Sindbad Horizon"; the published case copy says "directly
-    // commissioned by founder Peter Rothschild."
-    engagement: "paid engagement",
     relationshipId: "pitchboulder",
     href: "/work/pitchboulder",
   },
@@ -607,16 +607,13 @@ export const WORK: readonly WorkItem[] = [
   // "Knights of Mayhem is an adventure story, not a venture — I just was at a
   // cool place and covered a story." So the only two VENTURE tiles are the
   // Shelby/Pebble Beach story and PitchBoulder (both above); everything else on
-  // the wall files under adventure. Engagement wording ("made on a handshake")
-  // is the operator's own phrase — states the deal's shape without claiming or
-  // denying payment. Title/what still in the read-approval queue.
+  // the wall files under adventure. Title/what still in the read-approval queue.
   {
     slug: "knights-of-mayhem",
     title: "Knights of Mayhem — full-contact jousting at the Colorado Medieval Festival",
     pillar: "adventure",
     forOrg: "Knights of Mayhem",
     what: "covered the jousting troupe and cut their showcase piece",
-    engagement: "made on a handshake",
   },
   // P-work (2026-07-12) — AA FLAGSHIP. The watermarked AA+ASM adventure stills
   // that used to fill the wall were REMOVED at the operator's direction ("all
@@ -1078,13 +1075,13 @@ export const PAGES = {
       },
     ] as readonly TableauChapter[],
     // H4 — proof band. P29 INVERSION (operator-directed): lead with the
-    // strongest delivered work, not the caveats. The honesty DISCIPLINE is
-    // unchanged (every line still renders its verbatim permittedPhrasing);
-    // only the self-narrating tier framing is gone and the order now runs
-    // paid/delivered first. ⚠ OPERATOR READ-APPROVAL REQUIRED — new heading +
-    // intro copy (staging-only until read).
+    // strongest delivered work, not the caveats; every line still renders its
+    // verbatim permittedPhrasing. REPOSITION (2026-08-27): the heading led
+    // with "Paid" — commercial terms are not published any more, so it now
+    // names what the band actually shows: the work and who it was with.
+    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading + intro (staging-only).
     proof: {
-      heading: "Paid, delivered, ongoing.",
+      heading: "The work, and who it was with.",
       // REPOSITION (2026-08-27): "Real work for real clients" was
       // client-portfolio framing; the honesty half stays. ⚠ read-approval.
       intro:

@@ -674,7 +674,7 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
          piece, re-laned from /work and broadened into one cohesive festival
          story block — feature video + joust & ground-combat drone frames.
          The attribution line composes from the WORK record (the wall's own
-         "For [org] · [what] — [engagement]" grammar); the aerial-licensing
+         "For [org] · [what]" grammar); the aerial-licensing
          credibility marker renders via LegendMark (the _AA source folders
          carry these festival frames — the relationship's verbatim phrasing is
          the only way it may be stated). -->
@@ -751,7 +751,6 @@ const teaserReel = existsSync(join(teaserReelDir, "loop.mp4"))
                 <div class="fest-attrib space-y-1" data-reveal>
                   <p class="fest-line">
                     For {knights.forOrg} · {knights.what}
-                    {knights.engagement && knights.engagement !== "[confirm]" ? ` — ${knights.engagement}` : ""}
                   </p>
                   <LegendMark proof={{ relationshipId: "amazing-aerial" }} class="fest-aa" />
                 </div>
