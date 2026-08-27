@@ -178,7 +178,6 @@
  * consts.ts — unlike the festival/steelDust copy blocks).
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -691,7 +690,6 @@ const clip = existsSync(join(clipDir, "vybe-fest.mp4"))
       <!-- sign-off -->
       <footer class="vy-col pt-10 pb-8">
         <div class="vy-footer" data-reveal>
-          <LegendMark proof={{ relationshipId: "vybe" }} showName={false} />
           <a href={`${base}/work/vybe`} class="link">The short version, on /work →</a>
         </div>
       </footer>

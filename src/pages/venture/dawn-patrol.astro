@@ -34,23 +34,21 @@
  * video-first, field log + honesty footnote, the bleed, all captions, the
  * zero-repeats rule — is untouched.
  *
- * HONESTY: the only relationship claim renders via <LegendMark> from
- * RELATIONSHIPS["pebble-beach"].permittedPhrasing (verbatim). The sign-off
+ * HONESTY (REPOSITION 2026-08-27): no relationship plate renders here any
+ * more — less-is-more; the prose carries the story. The sign-off
  * attribution composes from the WORK record, gating `engagement` exactly like
  * steel-and-dust does (never resolves the "[confirm]" by omission-as-silence).
  * Clock times attribute to the shoot's per-car log via fieldLog.timeNote,
  * never stated as bare EXIF-sourced fact.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
-import { PAGES, WORK } from "../../consts";
+import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const dp = PAGES.ventureStories.dawnPatrol;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const shelby = WORK.find((w) => w.slug === "shelby-pebble-beach");
 
 // Baked media (make-dawn-patrol.mjs) — existence-gated per file, same
 // contract as every other baked set on the site.
@@ -141,7 +139,6 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
         <p class="hud-label" data-reveal>{dp.slate}</p>
         <p class="hud-label dp-accent" data-reveal>{dp.byline}</p>
         <div class="dp-proof" data-reveal>
-          <LegendMark proof={{ relationshipId: "pebble-beach" }} />
         </div>
         <p class="dp-lede" data-reveal>{dp.lede}</p>
       </header>
@@ -421,11 +418,6 @@ const loopSrc = existsSync(join(videoDir, "dawn-patrol.mp4")) ? `${base}/media/v
 
       <!-- sign-off -->
       <footer class="dp-col pt-6 pb-8">
-        {shelby && (
-          <p class="dp-attrib">
-            For {shelby.forOrg} · {shelby.what}
-          </p>
-        )}
         <nav class="dp-links">
           <a href={`${base}${dp.links.shelbyCase.href}`} class="link">{dp.links.shelbyCase.label} <span class="arrow" aria-hidden="true">→</span></a>
           <a href={`${base}${dp.links.back.href}`} class="link"><span class="arrow" aria-hidden="true">←</span> {dp.links.back.label}</a>

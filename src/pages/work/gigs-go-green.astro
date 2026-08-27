@@ -8,9 +8,9 @@
  * CTAs, ← back to /work.
  *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every heading / caption / paragraph / CTA
- * label below is NEW copy, staging-only until read. The ONLY relationship
- * statement is the LOCKED permittedPhrasing, rendered verbatim via <LegendMark>
- * ("gigs-go-green" → "production work for Gigs Go Green"). Prose states plainly
+ * label below is NEW copy, staging-only until read. REPOSITION (2026-08-27):
+ * the relationship plate no longer renders — less-is-more; any relationship
+ * statement must still copy consts' permittedPhrasing verbatim. Prose states plainly
  * what the two projects were — competition / pitch films — in the past tense,
  * with NO claim about either venture today and NO payment talk (per operator
  * direction the one-liner was softened off "two paid production engagements").
@@ -20,7 +20,6 @@
  * beat (vault → the "WeOwnCash" logo over a skyline), never the stock B-roll.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -97,7 +96,6 @@ const CTAS = [
       </p>
       <h1 class="case-title" data-reveal>{ARTICLE.title}</h1>
       <div class="case-proof" data-reveal>
-        <LegendMark proof={{ relationshipId: "gigs-go-green" }} showName={false} />
       </div>
 
       {

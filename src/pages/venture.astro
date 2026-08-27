@@ -39,7 +39,6 @@
  * plain stacked media. The morph/assembly/parallax are enhancement-only.
  */
 import Base from "../layouts/Base.astro";
-import LegendMark from "../components/LegendMark.astro";
 import Testimonial from "../components/Testimonial.astro";
 import YouTubeEmbed from "../components/YouTubeEmbed.astro";
 import { PAGES, WORK, WORK_ARCHIVE, RELATIONSHIP_BY_ID, VENTURE_STORY_RAIL } from "../consts";
@@ -422,16 +421,14 @@ const GROUNDS = {
             <span class="im-line"><span class="im-turn">A restored</span> SHELBY</span>
             <span class="im-line im-line--push"><span class="im-turn">at</span> PEBBLE BEACH</span>
           </h2>
-          {pebbleRoom && <p class="im-turn im-tag" data-reveal>{pebbleRoom.proof.context}</p>}
         </div>
         <div class="im-chapter-meta" data-reveal>
-          {pebbleRoom && <LegendMark proof={pebbleRoom.proof} />}
           {/* P29 — the Jack Bell testimonial, ACTIVATED per operator (consts
               TESTIMONIALS[1]): the owner's own words beside the owner's story. */}
           {
             pebbleRoom?.testimonialId && (
               <div class="im-quote">
-                <Testimonial testimonialId={pebbleRoom.testimonialId} showProof={false} />
+                <Testimonial testimonialId={pebbleRoom.testimonialId} />
               </div>
             )
           }
@@ -528,12 +525,10 @@ const GROUNDS = {
             <span class="im-line">PITCH</span>
             <span class="im-line im-line--push">BOULDER</span>
           </h2>
-          <p class="im-turn im-tag" data-reveal>{p.pitchboulder.proof.context}</p>
         </div>
         <div class="im-chapter-meta" data-reveal>
-          <LegendMark proof={p.pitchboulder.proof} />
           <div class="im-quote">
-            <Testimonial testimonialId={p.pitchboulder.testimonialId} showProof={false} />
+            <Testimonial testimonialId={p.pitchboulder.testimonialId} />
           </div>
           {/* Round 3 — the commercial ITSELF, in the PitchBoulder slot
               (operator: integrate the video component here). Same click-to-
@@ -639,7 +634,6 @@ const GROUNDS = {
         </div>
 
         <div class="im-chapter-meta im-chapter-meta--meme" data-reveal>
-          <LegendMark proof={memeData.proof} />
           {
             memePrograms.length > 0 && (
               <div class="im-meme-programs">
@@ -736,21 +730,6 @@ const GROUNDS = {
         </ul>
       </div>
 
-      <!-- the honesty proofs that lived in the rooms list. Every remaining
-           room is handled elsewhere on this page today, so the list renders
-           only if a future room joins. Verbatim permittedPhrasing via
-           LegendMark. -->
-      {
-        otherRooms.length > 0 && (
-          <ul class="im-rail-proofs" aria-label="How close each relationship is">
-            {otherRooms.map((room) => (
-              <li data-reveal data-reveal-stagger="70">
-                <LegendMark proof={room.proof} />
-              </li>
-            ))}
-          </ul>
-        )
-      }
     </section>
 
     <!-- ═══ S4b · FROM THE ARCHIVE — moved here from /work (Round 3): the

@@ -7,9 +7,10 @@
  * media band (a muted web-loop clip + stills), prominent CTAs, ← back to /work.
  *
  * ⚠ OPERATOR READ-APPROVAL REQUIRED — every heading / caption / paragraph / CTA
- * label below is NEW copy, staging-only until read. The ONLY relationship
- * statement is the LOCKED permittedPhrasing, rendered verbatim via <LegendMark>
- * ("vybe" → "event coverage for Vybe"). The prose describes Vybe factually — a
+ * label below is NEW copy, staging-only until read. REPOSITION (2026-08-27):
+ * the relationship plate no longer renders — less-is-more; any relationship
+ * statement must still copy consts' permittedPhrasing verbatim. The prose
+ * describes Vybe factually — a
  * Denver arts / music / dance collective ("Vibrate Your Best Energy", verified
  * from the brand's own public channels) — and states plainly that I covered a
  * few of their events. NO affiliation and NO client relationship is claimed for
@@ -20,7 +21,6 @@
  * Lights frames (stage + live painting).
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -83,8 +83,8 @@ const CTAS = [
 ---
 
 <Base
-  title="Vybe — event coverage"
-  description="Event coverage for Vybe, a Denver arts and music collective — a 2023 outdoor festival from the air and the 2024 Boogie Lights show, in frames and a short clip."
+  title="Vybe — two nights in Denver"
+  description="Vybe, a Denver arts and music collective — a 2023 outdoor festival from the air and the 2024 Boogie Lights show, in frames and a short clip."
 >
   <main class="case">
     <article class="case-inner">
@@ -95,7 +95,6 @@ const CTAS = [
       </p>
       <h1 class="case-title" data-reveal>{ARTICLE.title}</h1>
       <div class="case-proof" data-reveal>
-        <LegendMark proof={{ relationshipId: "vybe" }} showName={false} />
       </div>
 
       {

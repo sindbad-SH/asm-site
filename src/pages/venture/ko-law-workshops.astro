@@ -31,7 +31,6 @@
  * (no identifiable faces) facing the KO-branded "Startup Workshop" screen.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -209,7 +208,7 @@ const IAN_CHAPTER = {
 
 <Base
   title="KO Law startup workshops — a venture story"
-  description="Light, honest coverage of KO Law's startup workshop series — on video and in photographs, from the boardroom to the stage."
+  description="KO Law's startup workshop series — on video and in photographs, from the boardroom to the stage."
 >
   <main class="ko-story">
     <article class="ko-inner">
@@ -220,7 +219,6 @@ const IAN_CHAPTER = {
       </p>
       <h1 class="ko-title" data-reveal>{ARTICLE.title}</h1>
       <div class="ko-proof" data-reveal>
-        <LegendMark proof={ko.proof} />
       </div>
 
       {

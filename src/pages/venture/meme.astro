@@ -29,7 +29,6 @@
  * (that is Amber MacPherson — see the honesty note in consts.ts).
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -582,7 +581,6 @@ const ARTICLE = {
       </p>
       <h1 class="meme-title" data-reveal>{ARTICLE.title}</h1>
       <div class="meme-proof" data-reveal>
-        <LegendMark proof={meme.proof} />
       </div>
 
       {

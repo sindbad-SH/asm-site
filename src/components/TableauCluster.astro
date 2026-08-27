@@ -183,7 +183,7 @@ const tintDeg = [0, 14, -18][index] ?? 0;
       <h2 class="cluster-headline tableau-headline" data-tableau-headline>{chapter.headline}</h2>
       <div class="tableau-reveal">
         <p class="mx-auto max-w-md text-lg text-ink">{chapter.body}</p>
-        <LegendMark proof={chapter.proof} class="justify-center" />
+        {chapter.proof && <LegendMark proof={chapter.proof} class="justify-center" />}
         <a href={`${base}${chapter.link.href}`} class="btn tableau-cta">
           <span>{chapter.link.label}</span>
           <span class="arrow" aria-hidden="true">→</span>

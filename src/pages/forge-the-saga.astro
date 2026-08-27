@@ -37,8 +37,6 @@
  * hero canvas + the S draw are enhancement-only.
  */
 import Base from "../layouts/Base.astro";
-import LegendMark from "../components/LegendMark.astro";
-import Testimonial from "../components/Testimonial.astro";
 import { PAGES, SAGA_STAGES } from "../consts";
 
 const p = PAGES.forge;
@@ -118,17 +116,16 @@ const temper = (i: number) =>
       </div>
     </section>
 
-    <!-- ═══ T4 · PROOF — one ember-glass artifact ═══ -->
+    {/* ═══ T4 · the method, applied — one line and the story itself
+        (REPOSITION 2026-08-27: plate + embedded testimonial retired). ═══ */}
     <section class="fg-sec fg-proof">
       <h2 class="fg-h2 fg-h2--serif" data-reveal>{p.proof.heading}</h2>
       <div class="fg-proof-card" data-reveal>
-        <LegendMark proof={p.proof.anchor} />
-        <Testimonial testimonialId={p.proof.testimonialId} showProof={false} />
+        <p class="fg-blurb">{p.proof.body}</p>
         <a href={`${base}/work/pitchboulder`} class="fg-pill--quiet">
           Read the story <span aria-hidden="true">→</span>
         </a>
       </div>
-      <p class="fg-note" data-reveal>{p.proof.note}</p>
     </section>
 
     {/* ═══ T5 · THE SAGA — the cooled line becomes the mark; a quiet

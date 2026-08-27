@@ -70,7 +70,6 @@
  * them, and no relationship beyond attendance is claimed.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -172,7 +171,7 @@ const CAPTIONS = {
 const meta = {
   title: "American Film Market 2025 — a venture story",
   description:
-    "American Film Market 2025 in Los Angeles, California — a week of AFM Sessions panels on finance, AI, gaming and independent film, the Pitch Conference, and the market floor itself, from a week of relationship-building attendance.",
+    "American Film Market 2025 in Los Angeles, California — a week of AFM Sessions panels on finance, AI, gaming and independent film, the Pitch Conference, and the market floor itself.",
 };
 ---
 
@@ -190,7 +189,6 @@ const meta = {
 
       {afmRoom && (
         <div class="vs-proof" data-reveal>
-          <LegendMark proof={afmRoom.proof} />
         </div>
       )}
     </section>

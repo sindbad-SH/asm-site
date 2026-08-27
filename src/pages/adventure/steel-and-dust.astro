@@ -31,14 +31,13 @@
  * operator reads it).
  */
 import Base from "../../layouts/Base.astro";
-import { PAGES, WORK } from "../../consts";
+import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const sd = PAGES.adventure.steelDust;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const knights = WORK.find((w) => w.slug === "knights-of-mayhem");
 
 // Baked festival media (make-festival-photos.mjs + make-steel-dust.mjs) —
 // existence-gated per file like every other baked set.
@@ -351,11 +350,6 @@ const loopSrc = existsSync(join(loopDir, "loop.mp4"))
            licensing band (operator rule 2026-07-22: logo + link wherever this
            coverage's licensing is referenced). -->
       <footer class="sd-col pt-8 pb-8">
-        {knights && (
-          <p class="sd-attrib">
-            For {knights.forOrg} · {knights.what}
-          </p>
-        )}
         <div class="sd-editorial panel" data-reveal>
           <img
             src={`${base}/media/adventure/aa-logo.png`}

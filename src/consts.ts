@@ -331,6 +331,24 @@ export const SAGA_STAGES: readonly SagaStage[] = [
 
 // ---------------------------------------------------------------------------
 // HONESTY LEGEND + RELATIONSHIPS — the map-legend device (BUILD-PLAN §3.4).
+//
+// REPOSITION (2026-08-27, operator-directed) — LESS IS MORE: the stories are
+// about their subjects, not about ASM, so the site no longer narrates why it
+// was in the room or what its role was. His ruling, near-verbatim: "me
+// defining what my relationship of being there is should be very minimal if
+// addressed at all… even defining why I was there is largely irrelevant."
+// CONSEQUENCES:
+//  • LegendMark plates are PRUNED site-wide to ONE standing affiliation —
+//    amazing-aerial ("Aerial work licensed through Amazing Aerial Agency"),
+//    which must stay adjacent to any AA logo use (nominative-use rule below).
+//  • A personal relationship WITH THE SUBJECT is disclosed as ONE plain
+//    sentence inside the story's own prose, only where it could color the
+//    reading — the MEME board seat in the MEME article, the Vybe friendship,
+//    arriving with the Shelby's owner. No taxonomy, no plates, no legend.
+//  • This table REMAINS THE LAW: any future statement about a relationship
+//    still must copy a permittedPhrasing verbatim (silence is always
+//    allowed; composing is not), and the tiers still gate the PARTNER-LOGO
+//    RULE. The table stopped being chrome; it did not stop being binding.
 // Every relationship renders through <LegendMark> with its tier symbol.
 // permittedPhrasing is VERBATIM from the Honesty Ledger — copy, never compose.
 // ---------------------------------------------------------------------------
@@ -997,7 +1015,7 @@ export type TableauChapter = {
   terrain: string;
   headline: string;
   body: string;
-  proof: ProofLine;
+  proof?: ProofLine;
   link: Cta;
 };
 
@@ -1011,7 +1029,7 @@ export type CaseStudyData = {
   hook: string;
   context: CaseStudySection;
   ask: CaseStudySection;
-  work: CaseStudySection & { proof: ProofLine };
+  work: CaseStudySection;
   outcome: CaseStudySection;
   /** Optional — omitted when a case's testimonial is RESERVED (e.g. Shelby /
    *  Jack Bell, COPY.md §2.2). CaseStudy.astro guards its render. */
@@ -1057,7 +1075,6 @@ export const PAGES = {
         terrain: "The market",
         headline: COPY.anchors.belief, // "Every venture runs on a story."
         body: "Venture stories start with the market research — who the audience really is, what they already believe, what everyone else missed — before anything is filmed.",
-        proof: { relationshipId: "pitchboulder" },
         link: { label: "How the stories get made", href: "/forge-the-saga" },
       },
       {
@@ -1067,39 +1084,19 @@ export const PAGES = {
         // "Venture Stories"). ⚠ read-approval, headline+link.
         terrain: "The industry",
         headline: "We keep a pulse on the rooms the industry moves in.",
-        body: "We stay close to how the industry moves — the board work, the coverage, the festivals and markets — and we are honest about exactly how close each relationship is.",
-        proof: { relationshipId: "meme" },
+        // REPOSITION (2026-08-27): "…and we are honest about exactly how
+        // close each relationship is" was the closeness taxonomy narrating
+        // itself on the homepage — cut with the taxonomy. ⚠ read-approval.
+        body: "We stay close to how the industry moves — the board work, the coverage, the festivals and markets.",
         // PUB-A (2026-07-27) — Industry Stories is retired; MEME + festival/
         // market coverage now live on /venture (the venture-stories index).
         link: { label: "Read the venture stories", href: "/venture" },
       },
     ] as readonly TableauChapter[],
-    // H4 — proof band. P29 INVERSION (operator-directed): lead with the
-    // strongest delivered work, not the caveats; every line still renders its
-    // verbatim permittedPhrasing. REPOSITION (2026-08-27): the heading led
-    // with "Paid" — commercial terms are not published any more, so it now
-    // names what the band actually shows: the work and who it was with.
-    // ⚠ OPERATOR READ-APPROVAL REQUIRED — heading + intro (staging-only).
-    proof: {
-      heading: "The work, and who it was with.",
-      // REPOSITION (2026-08-27): "Real work for real clients" was
-      // client-portfolio framing; the honesty half stays. ⚠ read-approval.
-      intro:
-        "Every relationship on this site is stated at exactly what it is, in its own words. No logo wall, no borrowed credit.",
-      anchor: { relationshipId: "pitchboulder" } as ProofLine,
-      testimonialId: "pitchboulder",
-      // P29 order = delivered/paying work first, rooms last (was tier-formal
-      // first, which led with a nonprofit role and closed on caveats).
-      tiered: [
-        "pitchboulder",
-        "amazing-aerial",
-        "workshop-coverage",
-        "meme",
-        "pebble-beach",
-        "seriesfest",
-        "afm",
-      ] as readonly string[],
-    },
+    // H4 — REMOVED (REPOSITION 2026-08-27, less-is-more): the proof band was
+    // a homepage section whose whole job was listing ASM's relationships —
+    // the self-definition his ruling retires. The Rothschild quote lives on
+    // at its real home, /work/pitchboulder.
     // H5 — Forge the Saga teaser. Stage names come from SAGA_STAGES.
     // COHESION PASS (2026-08-13): the body framed the method as a client
     // service ("a founder's story") while the method page frames it as the
@@ -1197,17 +1194,12 @@ export const PAGES = {
       heading: "Before your story meets investors, it meets the panel.",
       body: "Echo Panel is an AI investor-pitch pretest tool built in-house — your pitch gets stress-tested before it costs you a real meeting.",
     },
-    // F5 — proof: the method actually produces delivered work.
+    // F5 — the method, applied. REPOSITION (2026-08-27, less-is-more): the
+    // relationship plate + embedded testimonial are gone — one line and a
+    // link to the story, which speaks for itself. ⚠ read-approval, body.
     proof: {
-      // REPOSITION (2026-08-27): "Proof" read as evidence-for-a-purchase;
-      // the section is the method applied to a real story. ⚠ read-approval.
       heading: "The method, applied",
-      anchor: { relationshipId: "pitchboulder" } as ProofLine,
-      testimonialId: "pitchboulder",
-      // Delivered-work cards — services actually delivered for real people,
-      // each labeled at exact status (WORK[].engagement, [confirm] until set).
-      deliveredWorkSlugs: ["pitchboulder"] as readonly string[],
-      note: "Everything shown here is work that actually happened, described as it actually was.",
+      body: "The clearest example is the PitchBoulder story — a season of Wednesdays covered from the back of the room, and the film that came out of it.",
     },
     // F6 — close. No CTA button, no trustline — one quiet line to the founder.
     close: {
@@ -1644,11 +1636,8 @@ export const PAGES = {
         },
         work: {
           heading: "In the room",
-          proof: { relationshipId: "pitchboulder" } as ProofLine,
           // REPOSITION (2026-08-27): body rewritten from deliverable-list
-          // grammar to what is actually seen; facts unchanged, and the
-          // LegendMark proof line above still carries the verbatim status
-          // claim. ⚠ read-approval.
+          // grammar to what is actually seen; facts unchanged. ⚠ read-approval.
           body: "Most Wednesdays the camera is in the back of the room — the coverage and recaps come from there, and so does the film below, cut from those same sessions.",
         },
         outcome: {
@@ -1684,7 +1673,6 @@ export const PAGES = {
         },
         work: {
           heading: "On the lawn",
-          proof: { relationshipId: "pebble-beach" } as ProofLine,
           body: "We shot the Cobra on the lawn, then shaped the footage into a narrative built on emotion and craftsmanship — what the car means, not just what it is.",
         },
         outcome: {
@@ -1743,20 +1731,13 @@ export const PAGES = {
         body: "I go behind the scenes with the people building the thing — founders, teams, the unglamorous middle of starting something. Not arrival. The work of getting there.",
       },
     ] as readonly { heading: string; body: string }[],
-    // The honesty framing, now introducing real proof points instead of
-    // standing alone as an abstract statement.
-    legendLine: "None of it is borrowed. Every relationship below is real, stated at exactly what it is:",
-    // Real, site-verified proof points only — rendered via <LegendMark> so
-    // each prints its RELATIONSHIP_BY_ID verbatim permittedPhrasing. MEME
-    // renders here as a credential line, not a story.
-    proof: [
-      { relationshipId: "amazing-aerial" },
-      { relationshipId: "pitchboulder" },
-      { relationshipId: "seriesfest" },
-      { relationshipId: "afm" },
-      { relationshipId: "pebble-beach" },
-      { relationshipId: "meme" },
-    ] as readonly ProofLine[],
+    // REPOSITION (2026-08-27, less-is-more): the six-line relationship
+    // ledger is retired — the stories are about their subjects, and in-story
+    // prose now carries any subject-relationship disclosure. What remains is
+    // the ONE standing affiliation, in its verbatim phrasing.
+    // ⚠ read-approval, legendLine.
+    legendLine: "One standing affiliation:",
+    proof: [{ relationshipId: "amazing-aerial" }] as readonly ProofLine[],
     // THE QUIET SERVICES LINE — the only place services exist on the whole
     // site (ACTION-PLAN.md addendum). No prices, no packages, no service list.
     colophon: {

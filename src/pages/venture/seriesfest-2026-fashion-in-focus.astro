@@ -20,7 +20,6 @@
  * asserts what's legible in frame" discipline as every other rebuilt page.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -71,7 +70,7 @@ const CAPTIONS = {
 const meta = {
   title: "SeriesFest 2026 · Fashion in Focus — a venture story",
   description:
-    "SeriesFest 2026 Fashion in Focus in Denver, Colorado — a runway, a masterclass with costume designer Molly Rogers, and a salon's 20th anniversary, from a weekend of relationship-building attendance.",
+    "SeriesFest 2026 Fashion in Focus in Denver, Colorado — a runway, a masterclass with costume designer Molly Rogers, and a salon's 20th anniversary.",
 };
 ---
 
@@ -89,7 +88,6 @@ const meta = {
 
       {seriesRoom && (
         <div class="vs-proof" data-reveal>
-          <LegendMark proof={seriesRoom.proof} />
         </div>
       )}
     </section>

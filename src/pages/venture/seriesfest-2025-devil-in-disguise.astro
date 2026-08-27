@@ -41,7 +41,6 @@
  * appear on the screen in frame.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -107,7 +106,6 @@ const meta = {
 
       {seriesRoom && (
         <div class="vs-proof" data-reveal>
-          <LegendMark proof={seriesRoom.proof} />
         </div>
       )}
     </section>

@@ -48,7 +48,6 @@
  * near-duplicates of a kept frame. Left on disk, simply not referenced.
  */
 import Base from "../../layouts/Base.astro";
-import LegendMark from "../../components/LegendMark.astro";
 import { PAGES } from "../../consts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -134,7 +133,7 @@ const CAPTIONS = {
 const meta = {
   title: "SeriesFest 2025 — a venture story",
   description:
-    "SeriesFest Season 11 in Denver, Colorado, April 30 – May 4, 2025 — official-selection screenings, the Pitch-A-Thon, panels from Carnival Films to the showrunners room, the Soirée and the Awards Ceremony, from a week of relationship-building attendance.",
+    "SeriesFest Season 11 in Denver, Colorado, April 30 – May 4, 2025 — official-selection screenings, the Pitch-A-Thon, panels from Carnival Films to the showrunners room, the Soirée and the Awards Ceremony.",
 };
 ---
 
@@ -152,7 +151,6 @@ const meta = {
 
       {seriesRoom && (
         <div class="vs-proof" data-reveal>
-          <LegendMark proof={seriesRoom.proof} />
         </div>
       )}
     </section>

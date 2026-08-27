@@ -3,19 +3,17 @@
  * Renders a testimonial quote + attribution. Both fields are `[confirm]`
  * until Sindbad supplies the exact wording AND written permission
  * (BUILD-PLAN.md §5A S4/S5) — never invent a quote or a name. The
- * relationship's status still only comes from <LegendMark>, never from here.
+ * REPOSITION (2026-08-27, less-is-more): the embedded LegendMark status
+ * line is gone — a testimonial is the subject's own words, and the site no
+ * longer narrates its relationships around them.
  */
 import { TESTIMONIAL_BY_ID } from "../consts";
-import LegendMark from "./LegendMark.astro";
 
 interface Props {
   testimonialId: string;
-  /** Set false when the caller already renders a LegendMark for this same
-      relationship nearby — avoids printing the proof line twice. */
-  showProof?: boolean;
   class?: string;
 }
-const { testimonialId, showProof = true, class: klass = "" } = Astro.props;
+const { testimonialId, class: klass = "" } = Astro.props;
 const testimonial = TESTIMONIAL_BY_ID[testimonialId];
 
 if (!testimonial) {
@@ -26,7 +24,4 @@ if (!testimonial) {
 <figure class={`space-y-2 ${klass}`}>
   <blockquote class="italic">&ldquo;{testimonial.quote}&rdquo;</blockquote>
   <figcaption class="text-sm opacity-80">— {testimonial.attribution}</figcaption>
-  {showProof && (
-    <LegendMark proof={{ relationshipId: testimonial.relationshipId, context: testimonial.context }} />
-  )}
 </figure>
