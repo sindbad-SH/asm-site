@@ -1085,8 +1085,10 @@ export const PAGES = {
     // intro copy (staging-only until read).
     proof: {
       heading: "Paid, delivered, ongoing.",
+      // REPOSITION (2026-08-27): "Real work for real clients" was
+      // client-portfolio framing; the honesty half stays. ⚠ read-approval.
       intro:
-        "Real work for real clients — and every relationship on this site stated at exactly what it is, in its own words. No logo wall, no borrowed credit.",
+        "Every relationship on this site is stated at exactly what it is, in its own words. No logo wall, no borrowed credit.",
       anchor: { relationshipId: "pitchboulder" } as ProofLine,
       testimonialId: "pitchboulder",
       // P29 order = delivered/paying work first, rooms last (was tier-formal
@@ -1222,9 +1224,10 @@ export const PAGES = {
       // clients" hire-us line is RETIRED — the close now points at the
       // person, not an offer. ⚠ read-approval.
       body: "Every story published here is researched, shot, and cut by the founder, Sindbad Horizon — the method is how he keeps himself honest.",
-      // REPOSITION (2026-08-27): no CTA pair on the method page — one quiet
-      // link to the person; the door lives on /contact alone.
-      links: [{ label: "About the founder", href: "/about" }] as readonly Cta[],
+      links: [
+        { label: "About the founder", href: "/about" },
+        { label: "Get in touch", href: "/contact" },
+      ] as readonly Cta[],
     },
     // F7 — "Where the stories go" (PUB-E, 2026-07-27, Directive PUB-E): a
     // quiet channel directory at the bottom of the method page — where the
@@ -1259,7 +1262,7 @@ export const PAGES = {
   // the last services phrase in any SERP surface. ⚠ read-approval, title.
   adventure: {
     meta: {
-      title: "Adventure Stories — Drone & Expedition Coverage | Adventure Storytelling Media",
+      title: "Adventure Stories — Drone & Aerial Photography | Adventure Storytelling Media",
       description:
         "Expedition and adventure coverage — photo and film — from the Alps, Colorado's Front Range, and wherever the story leads. Field notes, postcards, and aerial work licensed through Amazing Aerial Agency.",
     },
@@ -1640,19 +1643,20 @@ export const PAGES = {
           // standing fact doesn't. ⚠ OPERATOR READ-APPROVAL — revised sentence.
           body: "PitchBoulder is a weekly founder pitch event in Boulder, Colorado — founders on stage, investors and operators in the room, and the sharpest questions in town. Peter Rothschild founded it. Adventure Storytelling Media is in that room week after week, watching the gap between what a founder says and what the room actually hears.",
         },
+        // REPOSITION (2026-08-27): the engagement-phase chapter headings
+        // ("The ask" / "The work" / "The outcome") are renamed to the story's
+        // own chapters — bodies unchanged. ⚠ read-approval, headings only.
         ask: {
-          heading: "The ask",
-          // ROUND 5 (TIMELESS pass): "three years of" dropped — the ask reads
-          // as the standing fact it is. ⚠ OPERATOR READ-APPROVAL — revised.
+          heading: "Why the film exists",
           body: "When PitchBoulder built their website, they needed one video that could stand for the room's weekly founder energy — something an investor or a founder could watch and instantly understand what the room feels like.",
         },
         work: {
-          heading: "The work",
+          heading: "In the room",
           proof: { relationshipId: "pitchboulder" } as ProofLine,
           body: "Event coverage and recaps on an ongoing basis, plus a commercial produced end to end.",
         },
         outcome: {
-          heading: "The outcome",
+          heading: "Where it landed",
           body: "The commercial now runs as PitchBoulder's primary website asset — commissioned directly by Peter, produced end to end. The event coverage and recaps continue week to week.",
         },
         testimonialId: "pitchboulder",
@@ -1674,17 +1678,19 @@ export const PAGES = {
           heading: "The car",
           body: "A one-of-a-kind restored 1967 Shelby Cobra 427 S/C, bound for the Concours d'Elegance at Pebble Beach — the most prestigious lawn in the automotive world. Its owner, Jack Bell, had spent years bringing the machine back.",
         },
+        // REPOSITION (2026-08-27): chapter headings renamed to the story's
+        // own — bodies unchanged. ⚠ read-approval, headings only.
         ask: {
-          heading: "The ask",
+          heading: "What Jack wanted",
           body: "Jack didn't want documentation. He wanted the car's legacy and craftsmanship to come through on screen — the story of the machine, not a walkaround.",
         },
         work: {
-          heading: "The work",
+          heading: "On the lawn",
           proof: { relationshipId: "pebble-beach" } as ProofLine,
           body: "We shot the Cobra on the lawn, then shaped the footage into a narrative built on emotion and craftsmanship — what the car means, not just what it is.",
         },
         outcome: {
-          heading: "The outcome",
+          heading: "The film",
           body: "Jack got a finished cinematic film of his car — the machine's story and character on screen, delivered. It's below; watch it.",
         },
         // P29 — Jack Bell testimonial ACTIVATED (operator direction, 2026-07-20).

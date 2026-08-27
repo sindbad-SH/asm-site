@@ -96,11 +96,15 @@ const {
 // The "Words" chapter only exists when the case supplies a testimonialId — a
 // RESERVED testimonial (Shelby / Jack Bell, COPY.md §2.2) omits it, so the rail
 // must not carry a dead jump-link to a section that isn't rendered.
+// REPOSITION (2026-08-27): the fixed engagement-phase labels (Context / The
+// Ask / The Work / Outcome) are gone — the rail reads each story's own
+// chapter headings, so the walkthrough is the subject's story, not a
+// statement of work. Section ids (and the scroll-spy) are unchanged.
 const rail = [
-  { id: "context", label: "Context" },
-  { id: "ask", label: "The Ask" },
-  { id: "work", label: "The Work" },
-  { id: "outcome", label: "Outcome" },
+  { id: "context", label: study.context.heading },
+  { id: "ask", label: study.ask.heading },
+  { id: "work", label: study.work.heading },
+  { id: "outcome", label: study.outcome.heading },
   ...(study.testimonialId ? [{ id: "words", label: "Words" }] : []),
 ];
 
@@ -328,7 +332,9 @@ const isPending = (body: string) => body.trim() === "[confirm]";
   <!-- Single CTA -->
   <section class="case-chapter">
     <div class="case-chapter__inner space-y-4 text-center">
-      <a href={`${base}${study.cta.href}`} class="btn case-cta">
+      {/* REPOSITION (2026-08-27): the glowing terminal .btn was the vendor
+          tell — demoted to the site's quiet link grammar, same destination. */}
+      <a href={`${base}${study.cta.href}`} class="link case-cta">
         <span>{study.cta.label}</span>
         <span class="arrow" aria-hidden="true">→</span>
       </a>
@@ -337,15 +343,14 @@ const isPending = (body: string) => body.trim() === "[confirm]";
 </article>
 
 <style>
-  /* Case CTA — the shared prominent-button grammar on the global .btn base: keeps
-     the border / mono caps / accent hover / glow, adds the 6px arrow slide and a
-     guaranteed ≥44px tap target, consistent with the work-wall + tableaux CTAs. */
+  /* Case CTA — quiet link grammar (REPOSITION 2026-08-27): keeps the arrow
+     slide and the ≥44px tap target, drops the prominent-button treatment. */
   .case-cta {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     min-height: 44px;
-    padding: 0.7rem 1.3rem;
+    padding: 0.7rem 0;
   }
   .case-cta .arrow {
     display: inline-block;
