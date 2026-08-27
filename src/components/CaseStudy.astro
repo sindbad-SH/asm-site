@@ -146,10 +146,10 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     </ol>
   </nav>
 
-  <!-- 01 · Context -->
+  {/* 01 */}
   <section id="context" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">01 · Context</p>
+      <p class="hud-label">01</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.context.heading}</h2>
       {
         isPending(study.context.body) ? (
@@ -180,10 +180,10 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     </div>
   </section>
 
-  <!-- 02 · The Ask -->
+  {/* 02 */}
   <section id="ask" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">02 · The Ask</p>
+      <p class="hud-label">02</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.ask.heading}</h2>
       {
         isPending(study.ask.body) ? (
@@ -203,10 +203,10 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     </div>
   </section>
 
-  <!-- 03 · The Work — the rich chapter: BTS scrub + commercial + proof -->
+  {/* 03 — the rich chapter: BTS scrub + film + proof */}
   <section id="work" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-6">
-      <p class="hud-label">03 · The Work</p>
+      <p class="hud-label">03</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.work.heading}</h2>
       <p class="text-lg text-ink" data-reveal>{study.work.body}</p>
       <LegendMark proof={study.work.proof} />
@@ -298,10 +298,10 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     }
   </section>
 
-  <!-- 04 · Outcome — honest, never an invented metric -->
+  {/* 04 — honest, never an invented metric */}
   <section id="outcome" class="case-chapter" data-chapter>
     <div class="case-chapter__inner space-y-4">
-      <p class="hud-label">04 · Outcome</p>
+      <p class="hud-label">04</p>
       <h2 class="text-2xl font-bold" data-reveal>{study.outcome.heading}</h2>
       {
         isPending(study.outcome.body) ? (
@@ -322,7 +322,7 @@ const isPending = (body: string) => body.trim() === "[confirm]";
     study.testimonialId && (
       <section id="words" class="case-chapter" data-chapter>
         <div class="case-chapter__inner">
-          <p class="hud-label mb-4">05 · Words</p>
+          <p class="hud-label mb-4">05</p>
           <Testimonial testimonialId={study.testimonialId} class="panel p-6" />
         </div>
       </section>
