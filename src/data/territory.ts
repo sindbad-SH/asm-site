@@ -52,7 +52,8 @@ export interface TerritoryLocation {
   /**
    * Round 5 (2026-07-21) — what kind of work seats this dot:
    *   "aerial"   (default) — the AA archive; its chip links to the licensing
-   *              portfolio ("License this work →").
+   *              portfolio ("See the collection →" — collection-level; the
+   *              link is the whole portfolio, never a per-location promise).
    *   "coverage" — event/story coverage shot at this place; its chip links to
    *              the story that proves it (href/linkLabel below).
    */

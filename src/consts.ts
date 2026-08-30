@@ -1461,7 +1461,7 @@ export const PAGES = {
       editorial: {
         note: "This coverage lives in the Adventure Storytelling Media portfolio on Amazing Aerial Agency, where the work is available to license.",
         cta: {
-          label: "See more of this work at Amazing Aerial",
+          label: "See the collection at Amazing Aerial",
           href: AA_PORTFOLIO,
         },
       },
