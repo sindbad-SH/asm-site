@@ -18,7 +18,7 @@
  * operator-authorized).
  */
 import Base from "../layouts/Base.astro";
-import { SITE } from "../consts";
+import { SITE, AA_PORTFOLIO } from "../consts";
 import { emailParts } from "../lib/email";
 const mail = emailParts(SITE.email);
 import { existsSync } from "node:fs";
@@ -29,7 +29,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // The general Amazing Aerial collection page — his portfolio, not a filtered
 // search or a per-photo deep link. Directive-locked; do not swap for the
 // per-search encoded URL used elsewhere on the site.
-const AA_COLLECTION = "https://www.amazingaerial.com/controller/portfolio/shorizon";
+// FUNNEL (2026-08-27): was the /controller/portfolio/ path; unified onto the
+// canonical contributor-search URL used site-wide (consts AA_PORTFOLIO), the
+// one the operator himself browses.
+const AA_COLLECTION = AA_PORTFOLIO;
 
 const logoAbs = join(process.cwd(), "public", "media", "adventure", "aa-logo.png");
 const hasLogo = existsSync(logoAbs);
@@ -58,6 +61,13 @@ const LOGO = `${base}/media/adventure/aa-logo.png`;
         Most of the aerial work on this site — the field notes, the territory map, the postcards —
         comes from that same archive. If a frame here caught your eye, there's a good chance the
         collection holds it, and more from the same flight.
+      </p>
+      {/* ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy. The counts are FACTS
+          verified against the live portfolio on 2026-08-27 (1,114 photographs
+          + 246 film clips). Refresh when they drift materially. */}
+      <p class="lic-body" data-reveal>
+        The collection runs to more than 1,300 pieces today — upward of 1,100 photographs and
+        200 film clips, from the Front Range and the Colorado high country to the Alps.
       </p>
 
       <section class="lic-block" data-reveal>

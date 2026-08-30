@@ -11,6 +11,11 @@
  * renders. The phrasing text is UNCHANGED and still verbatim. Component API
  * is unchanged so no call site breaks. Never paraphrase this output; change
  * `context` in consts.ts if framing must vary.
+ *
+ * FUNNEL (2026-08-27): when the relationship carries an `href` (today only
+ * Amazing Aerial), the VERBATIM phrasing renders as a link to it. The words
+ * are untouched — only their wrapper changes — so the honesty contract holds
+ * while the licensing route becomes reachable from every page that shows it.
  */
 import { LEGEND, RELATIONSHIP_BY_ID, type ProofLine } from "../consts";
 
@@ -38,6 +43,30 @@ const nameShown = showName && !relationship.permittedPhrasing.startsWith(relatio
     {proof.context && <span class="phrasing">{proof.context} </span>}
     {nameShown && <span class="name">{relationship.name}</span>}
     {nameShown && <span class="phrasing"> · </span>}
-    <span class="phrasing">{relationship.permittedPhrasing}</span>
+    {
+      relationship.href ? (
+        <a class="phrasing legend-link" href={relationship.href} rel="noopener" target="_blank">
+          {relationship.permittedPhrasing}
+        </a>
+      ) : (
+        <span class="phrasing">{relationship.permittedPhrasing}</span>
+      )
+    }
   </span>
 </p>
+
+<style>
+  /* the licensing route reads as a quiet link, never a button */
+  .legend-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: 0.2em;
+    transition: color var(--dur-hover, 160ms) var(--ease-swift, ease);
+  }
+  .legend-link:hover,
+  .legend-link:focus-visible {
+    color: var(--color-accent, #38f8ec);
+    text-decoration-color: currentColor;
+  }
+</style>

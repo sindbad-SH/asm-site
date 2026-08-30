@@ -368,7 +368,18 @@ export type Relationship = {
   tier: RelationshipTier;
   /** VERBATIM from the Honesty Ledger. The only way this relationship may be described. */
   permittedPhrasing: string;
+  /** Optional outbound link rendered on the phrasing by <LegendMark>. */
+  href?: string;
 };
+
+/**
+ * The operator's Amazing Aerial contributor portfolio — his listing, not the
+ * AA homepage, and never a per-photo deep link. Verified 2026-08-27: 1,360
+ * live pieces (1,114 photographs + 246 film clips). Single source for every
+ * AA link on the site.
+ */
+export const AA_PORTFOLIO =
+  "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D";
 
 // PARTNER-LOGO RULE (R3.2, operator-directed):
 //  • Amazing Aerial — REAL logo allowed on: gallery watermarks, the AA funnel card/button,
@@ -402,6 +413,12 @@ export const RELATIONSHIPS: readonly Relationship[] = [
     name: "Amazing Aerial Agency",
     tier: "official",
     permittedPhrasing: "Aerial work licensed through Amazing Aerial Agency",
+    // FUNNEL (2026-08-27, operator-directed): the ONE affiliation the site
+    // states is also the ONE place its work can be licensed — so the phrase
+    // now carries the portfolio link wherever LegendMark renders it (~20
+    // pages incl. every field note). General collection link only, never a
+    // per-photo deep link (cta-policy-drone-portfolio).
+    href: AA_PORTFOLIO,
   },
   /** PRIMARY proof anchor (research-brief §0). Testimonial #1 lives here. */
   {
@@ -1445,7 +1462,7 @@ export const PAGES = {
         note: "This coverage lives in the Adventure Storytelling Media portfolio on Amazing Aerial Agency, where the work is available to license.",
         cta: {
           label: "See more of this work at Amazing Aerial",
-          href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
+          href: AA_PORTFOLIO,
         },
       },
     },
@@ -1485,10 +1502,14 @@ export const PAGES = {
       // previews" became factually false once the field-note heroes went
       // unmarked (covers/, 2026-08-13) — the sentence now claims nothing
       // about which frames carry marks. ⚠ read-approval.
-      body: "The aerial work is represented by Amazing Aerial Agency — the full, licensable collection lives on the Amazing Aerial portfolio.",
+      // FUNNEL (2026-08-27): the collection's real size is a verifiable fact
+      // and the strongest thing this block can say. Counted from the live
+      // portfolio 2026-08-27 (1,114 photographs + 246 clips = 1,360).
+      // ⚠ read-approval. Refresh the number when it drifts materially.
+      body: "The aerial work is represented by Amazing Aerial Agency — more than 1,300 photographs and film clips, licensable through the Amazing Aerial portfolio.",
       cta: {
         label: "See the full collection at Amazing Aerial",
-        href: "https://www.amazingaerial.com/search/en/1/0x7B22736561726368626172223A22222C226F726465726D6F6465223A2232222C226F726465726279223A2231222C226D6F6D616E65742D69645F75736572223A22323838227D",
+        href: AA_PORTFOLIO,
       },
     },
     // REPOSITION (2026-08-27, operator-directed): "if you have one you want
