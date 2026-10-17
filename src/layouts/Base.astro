@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import MobileMenu from "../components/MobileMenu.astro";
 import PageVeil from "../components/PageVeil.astro";
 import { SITE } from "../consts";
+import { ogSources, pageKey, breadcrumbTrail, shortTitle } from "../lib/seo";
 // Hashed URLs for the two paint-critical font files (display + body), so we
 // can preload them — text is the LCP on most pages, and early font arrival
 // also shrinks the swap-shift window (§4 CLS).
@@ -14,13 +15,18 @@ import dmSansWoff2 from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-n
 interface Props {
   title: string;
   description?: string;
+  /** keep this page out of search indexes (e.g. the 404) */
+  noindex?: boolean;
+  /** place name for story pages — becomes the Article's contentLocation */
+  location?: string;
 }
 
 // PUB-D (2026-07-27) — default description no longer uses "The StorySmith" as
 // a name/title byline (retired site-wide per the consistency sweep; only
 // used as JSON-LD alternateName below now). Currently the fallback for pages
 // that pass no description prop (e.g. 404.astro).
-const { title, description = "Adventure Storytelling Media — Adventure & Venture Stories from Boulder, Colorado." } = Astro.props;
+const DEFAULT_DESCRIPTION = "Adventure Storytelling Media — Adventure & Venture Stories from Boulder, Colorado.";
+const { title, description = DEFAULT_DESCRIPTION, noindex = false, location } = Astro.props;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // Absolute URLs for social scrapers (they don't resolve relative paths).
@@ -35,6 +41,15 @@ const pagePath = Astro.url.pathname.startsWith(base)
 const canonical = new URL(`${base}${pagePath}`, Astro.site).href;
 // Staging (github.io) must never compete with the live domain in search.
 const isStaging = (Astro.site?.href ?? "").includes("github.io");
+
+// SEO PASS (2026-10-17) — story pages share their OWN lead photo (a 1200×630
+// JPEG baked by src/pages/og/[...slug].jpg.ts, alt reused verbatim) and are
+// typed as articles; everything else keeps the brand endcard. See src/lib/seo.ts.
+const og = (await ogSources())[pageKey(pagePath)];
+const ogImage = og ? abs(`/og/${pageKey(pagePath)}.jpg`) : abs("/media/og.jpg");
+const ogImageAlt = og?.alt ?? `The ${SITE.name} mountain-S mark over snowy peaks and an aurora night sky`;
+const isArticle = !!og;
+const trail = breadcrumbTrail(pagePath, title);
 
 // JSON-LD (BUILD-ORDERS Task 9; REPOSITION 2026-08-27, operator-directed) —
 // a PUBLICATION, not a vendor: Person + Organization (the publisher, carrying
@@ -60,9 +75,14 @@ const jsonLd = {
       url: `${siteBase}/`,
     },
     {
-      "@type": "Organization",
+      // SEO PASS (2026-10-17): NewsMediaOrganization is schema.org's
+      // Organization subtype for publishers — the publication framing above,
+      // in the vocabulary search engines read. Same properties as before, plus
+      // the site-wide default meta description (existing copy).
+      "@type": "NewsMediaOrganization",
       "@id": `${siteBase}/#publisher`,
       name: SITE.name,
+      description: DEFAULT_DESCRIPTION,
       url: `${siteBase}/`,
       email: `mailto:${SITE.email}`,
       logo: `${siteBase}/logo-mark.png`,
@@ -75,7 +95,42 @@ const jsonLd = {
       name: SITE.name,
       publisher: { "@id": `${siteBase}/#publisher` },
       url: `${siteBase}/`,
+      inLanguage: "en",
     },
+    // SEO PASS (2026-10-17) — story pages: an Article built only from what
+    // the page already says (its title, description, lead photo, place).
+    // No dates: the site records when stories HAPPENED, not when they were
+    // published, and datePublished must not guess.
+    ...(isArticle
+      ? [
+          {
+            "@type": "Article",
+            "@id": `${canonical}#article`,
+            headline: shortTitle(title),
+            description,
+            image: { "@type": "ImageObject", url: ogImage, width: 1200, height: 630, caption: ogImageAlt },
+            author: { "@id": `${siteBase}/#person` },
+            publisher: { "@id": `${siteBase}/#publisher` },
+            isPartOf: { "@id": `${siteBase}/#site` },
+            mainEntityOfPage: canonical,
+            inLanguage: "en",
+            ...(location ? { contentLocation: { "@type": "Place", name: location } } : {}),
+          },
+        ]
+      : []),
+    ...(trail
+      ? [
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: trail.map((t, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: t.name,
+              item: new URL(`${base}${t.path === "/" ? "/" : `${t.path}/`}`, Astro.site).href,
+            })),
+          },
+        ]
+      : []),
   ],
 };
 ---
@@ -93,23 +148,28 @@ const jsonLd = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {isStaging && <meta name="robots" content="noindex" />}
+    {(isStaging || noindex) && <meta name="robots" content="noindex" />}
 
-    <!-- Open Graph / Twitter (og.jpg = the brand endcard: mark over the sting scene) -->
-    <meta property="og:type" content="website" />
+    <!-- Open Graph / Twitter (og.jpg = the brand endcard: mark over the sting
+         scene; story pages use their own lead photo — src/lib/seo.ts) -->
+    <meta property="og:type" content={isArticle ? "article" : "website"} />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={abs("/media/og.jpg")} />
+    <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={abs("/media/og.jpg")} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
-    <!-- JSON-LD: the publication (Person + WebSite — no services entity).
+    <!-- JSON-LD: the publication (Person + publisher + WebSite — no services
+         entity), plus Article + BreadcrumbList on story pages.
          Values only from SITE consts — no composed facts (BUILD-ORDERS
          Task 9; REPOSITION 2026-08-27). -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

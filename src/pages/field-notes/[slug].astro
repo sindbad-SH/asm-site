@@ -199,17 +199,28 @@ const floatSizes = "(min-width: 880px) 17rem, (min-width: 560px) 42vw, 80vw";
 // LOCKED — reused verbatim from consts/this template; NOT new copy.
 const AA_LICENSED_LINE = "Licensed through Amazing Aerial Agency";
 
+// SEO PASS (2026-10-17) — the place line drops location segments the title
+// already names ("Bellagio, Lake Como" + "Bellagio, Lake Como, Italy" read
+// "Bellagio, Lake Como, Bellagio, Lake Como, Italy"), and the note's own deck
+// follows it, so the snippet says what the story is about. Still composed
+// only from the note's own frontmatter — no new copy.
+const place = [
+  note.data.title,
+  ...(note.data.location ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part && !note.data.title.includes(part)),
+].join(", ");
+
 const meta = {
   title: `${note.data.title} — Field Notes`,
   // ⚠ OPERATOR READ-APPROVAL REQUIRED — new copy (meta description template,
   // staging-only until read). Composed only from the note's own place data.
-  description: note.data.location
-    ? `Field note — ${note.data.title}, ${note.data.location}.`
-    : `Field note — ${note.data.title}.`,
+  description: note.data.deck ? `Field note — ${place}. ${note.data.deck}` : `Field note — ${place}.`,
 };
 ---
 
-<Base title={meta.title} description={meta.description}>
+<Base title={meta.title} description={meta.description} location={note.data.location}>
   <div data-lane="adventure">
     <article class="spotlight">
       <p class="spotlight-back" data-reveal>

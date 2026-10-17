@@ -58,7 +58,17 @@ export default defineConfig({
   // Sitemap inherits `site` + `base` above, so staging builds emit staging
   // URLs and the cutover build emits production URLs — the correct behavior,
   // not hacked (BUILD-ORDERS Task 9).
-  integrations: [sitemap(), honestyAudit()],
+  //
+  // SEO PASS (2026-10-17): the Makeshift Film Group page is held from publish
+  // (see its file — a production build emits only a redirect to /venture), so
+  // its URL is filtered out of the sitemap rather than advertised as a page.
+  // Same PUBLISH_MFG interlock: publishing the page restores the entry.
+  integrations: [
+    sitemap({
+      filter: (page) => process.env.PUBLISH_MFG === "true" || !page.includes("/venture/makeshift-film-group"),
+    }),
+    honestyAudit(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
