@@ -19,7 +19,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const links = [{ label: "Home", href: "/home" }, ...NAV] as const;
 ---
 
-<Base title="404 — off the map">
+<Base title="404 — off the map" noindex>
   <section class="mx-auto max-w-2xl space-y-6 p-8 text-center">
     <h1 class="text-3xl font-bold sm:text-5xl">This trail doesn't exist.</h1>
     <p class="text-lg text-ink">

@@ -30,6 +30,7 @@
  * staging-only until the operator reads and approves it.
  */
 import "../styles/global.css";
+import { SITE } from "../consts";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const asset = (p: string) => `${base}${p}`;
@@ -43,16 +44,22 @@ const siteBase = canonical.replace(/\/$/, "");
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "Person", "@id": `${siteBase}/#person`, name: "Sindbad Horizon", url: `${siteBase}/` },
+    // SEO PASS (2026-10-17): the same three nodes Base.astro ships on every
+    // other page (minus the contact email, which this page never carried), so
+    // the front door no longer describes the publisher with fewer facts (no
+    // sameAs) than the pages behind it. Values from SITE only.
+    { "@type": "Person", "@id": `${siteBase}/#person`, name: SITE.person, alternateName: SITE.persona, url: `${siteBase}/` },
     {
-      "@type": "Organization",
+      "@type": "NewsMediaOrganization",
       "@id": `${siteBase}/#publisher`,
-      name: "Adventure Storytelling Media",
+      name: SITE.name,
+      description: "Adventure Storytelling Media — Adventure & Venture Stories from Boulder, Colorado.",
       url: `${siteBase}/`,
       logo: `${siteBase}/logo-mark.png`,
       founder: { "@id": `${siteBase}/#person` },
+      sameAs: Object.values(SITE.socials),
     },
-    { "@type": "WebSite", "@id": `${siteBase}/#site`, name: "Adventure Storytelling Media", publisher: { "@id": `${siteBase}/#publisher` }, url: `${siteBase}/` },
+    { "@type": "WebSite", "@id": `${siteBase}/#site`, name: SITE.name, publisher: { "@id": `${siteBase}/#publisher` }, url: `${siteBase}/`, inLanguage: "en" },
   ],
 };
 ---
@@ -73,7 +80,14 @@ const jsonLd = {
     <meta property="og:description" content="A publication of adventure stories and venture stories, out of Boulder, Colorado." />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The Adventure Storytelling Media mountain-S mark over snowy peaks and an aurora night sky" />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Adventure Storytelling Media — fly through the world" />
+    <meta name="twitter:description" content="A publication of adventure stories and venture stories, out of Boulder, Colorado." />
+    <meta name="twitter:image" content={ogImage} />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
     <!-- LANDING (2026-08-15, operator-directed): the world flight IS the
          front door now — indexable. Deep-link visitors are unaffected; the
@@ -258,6 +272,9 @@ const jsonLd = {
         · lockup <img> alt: "Adventure Storytelling Media"
       Server-rendered on purpose so the whole block survives with JS disabled.
     -->
+    <!-- SEO PASS (2026-10-17): the page had no <h1> in its HTML (scene titles
+         are injected by the engine as h2s). Visually hidden — no layout change. -->
+    <h1 class="sr-only">Adventure Storytelling Media</h1>
     <div class="sw-brandblock">
       <a class="sw-brand-lockup" href={`${base}/home`} aria-label="Adventure Storytelling Media — home">
         <picture>
